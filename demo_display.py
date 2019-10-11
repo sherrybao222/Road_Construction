@@ -21,6 +21,7 @@ screen.fill(WHITE)
 
 click = [(0, 0)]
 distance_his = [0]
+# distance matrix double check
 
 
 class City:
