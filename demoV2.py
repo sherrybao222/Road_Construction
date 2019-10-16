@@ -22,6 +22,8 @@ road_size = 3
 
 screen.fill(WHITE)
 
+# 后来我发现collision和click其实是一个东西，所以这个draft里面我就直接用collision
+# 来检测是不是有点在城市上面，而不是随便乱点的
 collision = []
 click = [(0, 0)]
 distance_his = [0]
@@ -35,7 +37,7 @@ class City:
         self.radius = 50
         self.xy = self.x, self.y
 
-
+# 这个地方我用了distance matrix，但是不知道该怎么有效的在里面找数值
 class Map:
     def __init__(self):
         self.city_start = City()
@@ -63,7 +65,8 @@ class Collision:
                 return Map().all_city_xy.index(city)
                 # x1, y1
 
-
+# 这个部分就要求在distance matrix里面找数值，并用到updating budget 和budget check 里面
+# budget check这个我觉得有点难，因为电脑要算出来你是不是game over 了
 class Budget:
     def __init__(self):
         self.total = 700  # can change this total budget
