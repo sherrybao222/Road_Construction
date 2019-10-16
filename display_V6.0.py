@@ -27,7 +27,7 @@ screen.fill(WHITE)
 click = [(0, 0)]
 distance_his = [0]
 
-
+# -------------------------------------------------------------------------
 # A list of Class objects: City, Map, Budget, DrawBoard
 
 # Generate individual city coordinates and size 
@@ -39,6 +39,8 @@ class City:
         self.radius = 50
         self.xy = self.x, self.y
 
+
+# -------------------------------------------------------------------------
 # Generate the map as a collection of random cities 
 class Map:
     def __init__(self):
@@ -54,6 +56,8 @@ class Map:
         # pos_a = click[-2]  # from the click list [-2]
         # pos_b = click[-1]  # the most recent click/the mouse location
 
+
+# -------------------------------------------------------------------------
 # anything relavant to budget, total and history of past budget 
 class Budget:
     def __init__(self):
@@ -91,6 +95,8 @@ class Budget:
         click.pop(-1)
         pg.draw.line(screen, WHITE, click[-2], click[-1], 3)
 
+
+# -------------------------------------------------------------------------
 # 这一部分贼乱，我可能不是特别懂class和object的关系，所以我想重新写一个直接用class的版本
 # 那个版本和distance matrix都在同一个草稿里，但是还没写完，也不知道写对没有
 # those should be good order, otherwise will generate twice and don't know which to use
@@ -100,6 +106,9 @@ budget = Budget()
 click.append(city_start.xy)
 # a lot of places use this temporary list for update, but it's different from saving
 
+
+
+# -------------------------------------------------------------------------
 # 这个主要存所以的input，包括mouse location，时间之类的
 class Data:
     def __init__(self):
@@ -125,6 +134,8 @@ class Data:
 
 data1 = Data()
 
+
+# -------------------------------------------------------------------------
 # 这个是主要的前端设计，包括各种visualization 和功能
 class Draw:
 
@@ -228,6 +239,7 @@ class Draw:
         pg.display.flip()
 
 
+# -------------------------------------------------------------------------
 # class objects
 draw_map = Draw()
 mouse = pg.mouse.get_pos()
@@ -236,6 +248,9 @@ mouse = pg.mouse.get_pos()
 # 主要分成mousemotion = 用户探索
 # 和mousebuttondown = 用户决策 两部分
 
+
+
+# -------------------------------------------------------------------------
 # loop for displaying until quit
 while not done:
     for event in pg.event.get():
@@ -261,6 +276,8 @@ while not done:
                 Draw.refresh()
 
 
+
+# -------------------------------------------------------------------------
 print("-----------------MAP INFORMATION --------------")
 print("Starting City: " + str(city_start.xy))
 print("city locations: " + str(map_1.all_city_xy))
