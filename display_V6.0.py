@@ -2,6 +2,13 @@ import pygame as pg
 import random
 import math
 
+#   大问题
+# 结构我觉得有点乱，不是特别简明。而且我想用distance matrix赶紧会更方便，但是不确定该怎么写
+# budget，city range，和screen的设定很微妙，因为会有情况看不到完整的budget
+# data saving/data structure 我也不是很懂，目前我只会把所有东西都堆在一起
+# budget line 永远向右指那个我不知道是bug还是怎么回事
+
+#   setting up window, basic features 
 pg.init()
 pg.font.init()
 # conditions
@@ -16,12 +23,14 @@ GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 screen.fill(WHITE)
 
-# current memory for running the game, not saving
+# current memory for running the game, not saving (updating on current location)
 click = [(0, 0)]
 distance_his = [0]
+
+
 # A list of Class objects: City, Map, Budget, DrawBoard
 
-
+# Generate individual city coordinates and size 
 class City:
 
     def __init__(self):
@@ -30,31 +39,37 @@ class City:
         self.radius = 50
         self.xy = self.x, self.y
 
-
+# Generate the map as a collection of random cities 
 class Map:
     def __init__(self):
         self.cities = [City() for i in range(10)]
         self.all_city_xy = [city.xy for city in self.cities]
         self.dis_history = [0]
 
+# this is calculating distance between any two cities
+# 我觉得这个很笨，所以之前想用distance matrix重新编，但是还没有完成
     @staticmethod
     def distance(pos_a, pos_b):
         return round((math.sqrt((pos_a[0] - pos_b[0]) ** 2 + (pos_a[1] - pos_b[1]) ** 2)), 2)
         # pos_a = click[-2]  # from the click list [-2]
         # pos_b = click[-1]  # the most recent click/the mouse location
 
-
+# anything relavant to budget, total and history of past budget 
 class Budget:
     def __init__(self):
         self.total = 700  # can change this total budget
         self.bud_history = [self.total]
 
+# calculate current budget using the distance between selected cities 
     @staticmethod
     def budget_update(remain, used):
         return round((remain - used), 2)
         # remain = bud_history [-1]
         # used = ask Map.dis_history[-1] for most recent budget used
 
+# 这个主要是解决budget rotation的问题。因为pygame划线需要两点一线，但那个终点是跟着鼠标移动的
+# 所以这个像reverse engineering，反向求出终点然后画budget line
+# 最后给出来的是budget line 的end point
     @staticmethod   # given loc_a & distance for loc_b to draw line
     def budget_pos(city_x, city_y, d):  # d = budget remain bud_his[-1], xy = current city loc city[-1][0], [-1][1]
         cx, cy = pg.mouse.get_pos()[0] - click[-1][0], pg.mouse.get_pos()[1] - click[-1][1]
@@ -66,6 +81,8 @@ class Budget:
         # print("-------------------------------")
         return int(city_x + d * math.cos(radians)), int(city_y + d * math.sin(radians))
 
+# 这个相当于undo之后把之前的budget还给你，顺便那之前的选择给消除了
+# 消除的是顶上那两个memory list，所以过程和data是存在另一个地方的
     @staticmethod
     def budget_undo():
         undo = round(distance_his[-1] + budget.bud_history[-1], 2)
@@ -74,7 +91,8 @@ class Budget:
         click.pop(-1)
         pg.draw.line(screen, WHITE, click[-2], click[-1], 3)
 
-
+# 这一部分贼乱，我可能不是特别懂class和object的关系，所以我想重新写一个直接用class的版本
+# 那个版本和distance matrix都在同一个草稿里，但是还没写完，也不知道写对没有
 # those should be good order, otherwise will generate twice and don't know which to use
 city_start = City()
 map_1 = Map()
@@ -82,7 +100,7 @@ budget = Budget()
 click.append(city_start.xy)
 # a lot of places use this temporary list for update, but it's different from saving
 
-
+# 这个主要存所以的input，包括mouse location，时间之类的
 class Data:
     def __init__(self):
         self.click_his = [(0, 0)]
@@ -96,6 +114,7 @@ class Data:
         tick_second = round((pg.time.get_ticks()/1000), 2)
         data1.click_time.append(tick_second)
 
+# 这个是整体刷新，就是当被试点了city之后，所有相关的distance/budget的后台数据
     @staticmethod
     def game_update():  # update with input for new draw information
         click.append(pg.mouse.get_pos())
@@ -106,8 +125,11 @@ class Data:
 
 data1 = Data()
 
-
+# 这个是主要的前端设计，包括各种visualization 和功能
 class Draw:
+
+    # 这个主要检测用户有没有点在我们给的城市上面
+    # 鼠标和城市都像是两个圆，如果有重合那就选对了
     @staticmethod
     def collision(mouse_loc):
         for city in map_1.all_city_xy:
@@ -117,6 +139,7 @@ class Draw:
             if distance <= 14:  # radius for each city circle and mouse circle is 7
                 return x1, y1
 
+    # 一旦鼠标接近城市，这个就会自动连线，并覆盖等量的budget line
     @staticmethod
     def auto_snap(mouse_loc):
         budget_allow = budget.bud_history[-1] >= Map.distance(click[-1], pg.mouse.get_pos())
@@ -128,6 +151,8 @@ class Draw:
                 # print("bud_his: " + str(budget.bud_history[-1]), "dis: " + str(Map.distance(click[-1], pg.mouse.get_pos())))
                 # print("Allow?: " + str(budget.bud_history[-1] > Map.distance(click[-1], pg.mouse.get_pos())))
 
+    # 这个主要确定budget line上面的那个滑点停在最终点
+    # 而不是跟着鼠标乱跑
     @staticmethod
     def mouse_limit(mouse_loc):
         mouse_dis = Map.distance(click[-1], mouse_loc)
@@ -136,6 +161,7 @@ class Draw:
         else:
             pg.draw.circle(screen, GREEN, Budget.budget_pos(click[-1][0], click[-1][1], budget.bud_history[-1]), 5)
 
+    # 这个是road construction，连续画线，从一个list里面顺着连那种
     @staticmethod
     def road_visual():
         pg.draw.lines(screen, BLACK, False, click, 1)
@@ -143,17 +169,20 @@ class Draw:
         # to hide the first line draw from origin
         pg.draw.circle(screen, RED, city_start.xy, 10)
 
+    # undo box的visualization
     @staticmethod
     def road_undo():
         Draw.text_write("Undo", 50, BLACK, 900, 600)
         pg.draw.rect(screen, GREEN, (900, 600, 100, 50), 3)
         # those variable should be set at the top, so it's obvious
 
+    # reset box的visualization
     @staticmethod
     def road_reset():
         Draw.text_write("Reset", 50, BLACK, 900, 550)
         pg.draw.rect(screen, GREEN, (900, 550, 100, 50), 3)
 
+    # 写字的general function
     @staticmethod
     def text_write(text, size, color, x, y):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
@@ -162,6 +191,8 @@ class Draw:
         text_rectangle.center = x, y
         screen.blit(text_surface, text_rectangle.center)
 
+    # 主要的draw initiation，把所有部分都拼凑到一起
+    # 这一片的规划也有点乱
     def __init__(self):
         self.undo_box = pg.draw.rect(screen, GREEN, (900, 600, 100, 50), 3)
         self.rest_box = pg.draw.rect(screen, GREEN, (900, 550, 100, 50), 3)
@@ -182,6 +213,8 @@ class Draw:
         screen.fill(WHITE)
         clock.tick(FPS)
 
+    # 这个就是reset之后，把那个memory list刷新重启
+    # 同时在data 里面标注0来表示用户重启
     @staticmethod
     def refresh():  # append put anchor to indicate new start
         click.clear()
@@ -198,6 +231,10 @@ class Draw:
 # class objects
 draw_map = Draw()
 mouse = pg.mouse.get_pos()
+
+# 这个就是game loop，各种condition
+# 主要分成mousemotion = 用户探索
+# 和mousebuttondown = 用户决策 两部分
 
 # loop for displaying until quit
 while not done:
