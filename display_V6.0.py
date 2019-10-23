@@ -11,6 +11,11 @@ import math
 #   setting up window, basic features 
 pg.init()
 pg.font.init()
+# fix pygame not responding problem
+#while True:  # the while loop that will keep your display up and running!
+#    for event in pg.event.get():  # the for event loop, keeping track of events,
+#        if event.type == pg.QUIT:  # and in this case, it will be keeping track of pygame.QUIT, which is the X or the top right
+#             pg.quit()  # stops pygame
 # conditions
 done = False
 # display setup
