@@ -2,36 +2,6 @@ import pygame as pg
 import random
 import math
 
-#   大问题
-# 结构我觉得有点乱，不是特别简明。而且我想用distance matrix赶紧会更方便，但是不确定该怎么写
-# budget，city range，和screen的设定很微妙，因为会有情况看不到完整的budget
-# data saving/data structure 我也不是很懂，目前我只会把所有东西都堆在一起
-# budget line 永远向右指那个我不知道是bug还是怎么回事
-
-#   setting up window, basic features 
-pg.init()
-pg.font.init()
-# fix pygame not responding problem
-#while True:  # the while loop that will keep your display up and running!
-#    for event in pg.event.get():  # the for event loop, keeping track of events,
-#        if event.type == pg.QUIT:  # and in this case, it will be keeping track of pygame.QUIT, which is the X or the top right
-#             pg.quit()  # stops pygame
-# conditions
-done = False
-# display setup
-screen = pg.display.set_mode((1000, 650))   # display surface
-clock = pg.time.Clock()
-FPS = 30  # tracking time check how to use
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLACK = (0, 0, 0)
-screen.fill(WHITE)
-
-# current memory for running the game, not saving (updating on current location)
-click = [(0, 0)]
-distance_his = [0]
-
 # -------------------------------------------------------------------------
 # A list of Class objects: City, Map, Budget, DrawBoard
 
@@ -100,19 +70,6 @@ class Budget:
         click.pop(-1)
         pg.draw.line(screen, WHITE, click[-2], click[-1], 3)
 
-
-# -------------------------------------------------------------------------
-# 这一部分贼乱，我可能不是特别懂class和object的关系，所以我想重新写一个直接用class的版本
-# 那个版本和distance matrix都在同一个草稿里，但是还没写完，也不知道写对没有
-# those should be good order, otherwise will generate twice and don't know which to use
-city_start = City()
-map_1 = Map()
-budget = Budget()
-click.append(city_start.xy)
-# a lot of places use this temporary list for update, but it's different from saving
-
-
-
 # -------------------------------------------------------------------------
 # 这个主要存所以的input，包括mouse location，时间之类的
 class Data:
@@ -135,9 +92,6 @@ class Data:
         distance_his.append(Map.distance(click[-2], click[-1]))
         map_1.dis_history.append(Map.distance(click[-2], click[-1]))
         budget.bud_history.append(Budget.budget_update(budget.bud_history[-1], map_1.dis_history[-1]))
-
-
-data1 = Data()
 
 
 # -------------------------------------------------------------------------
@@ -243,6 +197,42 @@ class Draw:
         draw_map.__init__()
         pg.display.flip()
 
+#------------------------------------------------------------------------------
+#   大问题
+# 结构我觉得有点乱，不是特别简明。而且我想用distance matrix赶紧会更方便，但是不确定该怎么写
+# budget，city range，和screen的设定很微妙，因为会有情况看不到完整的budget
+# data saving/data structure 我也不是很懂，目前我只会把所有东西都堆在一起
+# budget line 永远向右指那个我不知道是bug还是怎么回事
+
+#   setting up window, basic features 
+pg.init()
+pg.font.init()
+
+# conditions
+done = False
+# display setup
+screen = pg.display.set_mode((1000, 650))   # display surface
+clock = pg.time.Clock()
+FPS = 30  # tracking time check how to use
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLACK = (0, 0, 0)
+screen.fill(WHITE)
+
+# current memory for running the game, not saving (updating on current location)
+click = [(0, 0)]
+distance_his = [0]
+
+# -------------------------------------------------------------------------
+# 这一部分贼乱，我可能不是特别懂class和object的关系，所以我想重新写一个直接用class的版本
+# 那个版本和distance matrix都在同一个草稿里，但是还没写完，也不知道写对没有
+# those should be good order, otherwise will generate twice and don't know which to use
+city_start = City()
+map_1 = Map()
+budget = Budget()
+click.append(city_start.xy)
+# a lot of places use this temporary list for update, but it's different from saving
 
 # -------------------------------------------------------------------------
 # class objects
@@ -253,7 +243,7 @@ mouse = pg.mouse.get_pos()
 # 主要分成mousemotion = 用户探索
 # 和mousebuttondown = 用户决策 两部分
 
-
+data1 = Data()
 
 # -------------------------------------------------------------------------
 # loop for displaying until quit
