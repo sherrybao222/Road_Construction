@@ -5,47 +5,42 @@ import math
 # -------------------------------------------------------------------------
 # A list of Class objects: City, Map, Budget, DrawBoard
 
-# Generate individual city coordinates and size 
+# Generate individual city coordinates and size
 class City:
-
-    def __init__(self):
-        self.N = 10 #total city number
+    def __init__(self): # 注意多了一个argument，代入city
+        self.N = 11 #total city number
+        self.radius = 7
         self.x = random.sample(range(51, 649), self.N)  # set up in a way so don't overlap with budget information
         self.y = random.sample(range(51, 649), self.N)
-        self.city = [(self.x[i], self.y[i]) for i in range(0, len(self.x))]
-        # 这个directory 名字改了，后面的都要找这个city
-
-
-# -------------------------------------------------------------------------
-# Generate the map as a collection of random cities 
-class Map:
-    def __init__(self):
-        self.cities = [City() for i in range(10)]
-        self.all_city_xy = [city.xy for city in self.cities]
-        self.dis_history = [0]
-
-# this is calculating distance between any two cities
-# 我觉得这个很笨，所以之前想用distance matrix重新编，但是还没有完成
-    @staticmethod
-    def distance(pos_a, pos_b):
-        return round((math.sqrt((pos_a[0] - pos_b[0]) ** 2 + (pos_a[1] - pos_b[1]) ** 2)), 2)
-        # pos_a = click[-2]  # from the click list [-2]
-        # pos_b = click[-1]  # the most recent click/the mouse location
-
+        self.map = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]
+        # 这个directory 名字改了，后面的都要找这个map
+      	self.city_start = self.map[0] # the starting city from the list
+        self.distance = sp.spatial.distance_matrix(self.map, self.map, p=2, threshold=10000)
 
 # -------------------------------------------------------------------------
-# anything relavant to budget, total and history of past budget 
+# anything relevant to budget, total and history of past budget
 class Budget:
     def __init__(self):
         self.total = 700  # can change this total budget
-        self.bud_history = [self.total]
 
-# calculate current budget using the distance between selected cities 
+    # 这个主要检测用户有没有点在我们给的城市上面
+    @staticmethod  # >A< input changed, need mouse and current map type, return the selected city
+    def collision(mouse_loc, city):
+        for i in range(1, city.N):
+            x2, y2 = mouse_loc  # pg.mouse.get_pos()
+            distance = math.hypot(city.x[i] - x2, city.y[i] - y2)
+            if distance <= city.radius:
+                return i, city.map[i]
+
+
+# calculate current budget using the distance between selected cities
     @staticmethod
-    def budget_update(remain, used):
-        return round((remain - used), 2)
-        # remain = bud_history [-1]
-        # used = ask Map.dis_history[-1] for most recent budget used
+    def budget_update(data):
+        budget = data.budget_his[-1]  # the latest remain budget from data saving
+        city_b = data.choice[-1][0]  # find the index from the choice lists
+        city_a = data.choice[-2][0]
+        distance = city.distance[city_a, city_b]  # using index to find distance from matrix
+        return round((budget - distance), 2)
 
 # 这个主要是解决budget rotation的问题。因为pygame划线需要两点一线，但那个终点是跟着鼠标移动的
 # 所以这个像reverse engineering，反向求出终点然后画budget line
@@ -75,16 +70,19 @@ class Budget:
 # 这个主要存所以的input，包括mouse location，时间之类的
 class Data:
     def __init__(self):
+        self.choice = [0]
         self.click_his = [(0, 0)]
-        self.click_time = []    # record the click time since game started
-        self.movement = []      # get.rel
+        self.click_time = []  # record the click time since game started
+        self.movement = []  # get.rel
+        self.budget_his = []
 
-    @staticmethod   # find a way to code to adding to new instance
-    def saving():
-        data1.click_his.append(pg.mouse.get_pos())
-        data1.movement.append(pg.mouse.get_rel())
-        tick_second = round((pg.time.get_ticks()/1000), 2)
-        data1.click_time.append(tick_second)
+    @staticmethod  # find a way to code to adding to new instance, check arguement
+    def saving(trial, budget):
+        trial.choice.append(budget.collision(mouse_loc, city))
+        trial.click_his.append(pg.mouse.get_pos())
+        trial.movement.append(pg.mouse.get_rel())
+        tick_second = round((pg.time.get_ticks() / 1000), 2)
+        trial.click_time.append(tick_second)
 
 # 这个是整体刷新，就是当被试点了city之后，所有相关的distance/budget的后台数据
     @staticmethod
@@ -98,17 +96,6 @@ class Data:
 # -------------------------------------------------------------------------
 # 这个是主要的前端设计，包括各种visualization 和功能
 class Draw:
-
-    # 这个主要检测用户有没有点在我们给的城市上面
-    # 鼠标和城市都像是两个圆，如果有重合那就选对了
-    @staticmethod
-    def collision(mouse_loc):
-        for city in map_1.all_city_xy:
-            x1, y1 = city[0], city[1]
-            x2, y2 = mouse_loc  # pg.mouse.get_pos()
-            distance = math.hypot(x1 - x2, y1 - y2)
-            if distance <= 14:  # radius for each city circle and mouse circle is 7
-                return x1, y1
 
     # 一旦鼠标接近城市，这个就会自动连线，并覆盖等量的budget line
     @staticmethod
