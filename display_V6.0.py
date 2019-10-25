@@ -1,41 +1,39 @@
 import pygame as pg
 import random
 import math
-
+import scipy as sp
 # -------------------------------------------------------------------------
 # A list of Class objects: City, Map, Budget, DrawBoard
 
 # Generate individual city coordinates and size
-class City:
-    def __init__(self): # 注意多了一个argument，代入city
-        self.N = 11 #total city number
-        self.radius = 7
-        self.x = random.sample(range(51, 649), self.N)  # set up in a way so don't overlap with budget information
+class Map:
+    def __init__(self): 
+        self.N = 11 # total city number
+        self.radius = 7 # radius of city
+        self.total = 700 # total budget
+        
+        self.x = random.sample(range(51, 649), self.N)  
         self.y = random.sample(range(51, 649), self.N)
         self.map = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]
-        # 这个directory 名字改了，后面的都要找这个map
-      	self.city_start = self.map[0] # the starting city from the list
+   
+        self.city_start = self.map[0] # the starting city from the list
         self.distance = sp.spatial.distance_matrix(self.map, self.map, p=2, threshold=10000)
+
 
 # -------------------------------------------------------------------------
 # anything relevant to budget, total and history of past budget
-class Budget:
-    def __init__(self):
-        self.total = 700  # can change this total budget
-
-    # 这个主要检测用户有没有点在我们给的城市上面
+class Update:
     @staticmethod  # >A< input changed, need mouse and current map type, return the selected city
-    def collision(mouse_loc, city):
+    def __init__(self, mouse_loc, city):
         for i in range(1, city.N):
             x2, y2 = mouse_loc  # pg.mouse.get_pos()
             distance = math.hypot(city.x[i] - x2, city.y[i] - y2)
             if distance <= city.radius:
                 return i, city.map[i]
 
-
 # calculate current budget using the distance between selected cities
     @staticmethod
-    def budget_update(data):
+    def budget_update(data,city):
         budget = data.budget_his[-1]  # the latest remain budget from data saving
         city_b = data.choice[-1][0]  # find the index from the choice lists
         city_a = data.choice[-2][0]
