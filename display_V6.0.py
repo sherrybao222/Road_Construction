@@ -9,10 +9,11 @@ import math
 class City:
 
     def __init__(self):
-        self.x = random.randint(51, 649)  # set up in a way so don't overlap with budget information
-        self.y = random.randint(51, 649)
-        self.radius = 50
-        self.xy = self.x, self.y
+        self.N = 10 #total city number
+        self.x = random.sample(range(51, 649), self.N)  # set up in a way so don't overlap with budget information
+        self.y = random.sample(range(51, 649), self.N)
+        self.city = [(self.x[i], self.y[i]) for i in range(0, len(self.x))]
+        # 这个directory 名字改了，后面的都要找这个city
 
 
 # -------------------------------------------------------------------------
