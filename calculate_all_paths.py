@@ -5,7 +5,7 @@ import numpy as np
 import math
 from itertools import permutations 
 import operator 
-
+import matplotlib.pyplot as plt
 
 
 # generate random dot
@@ -38,10 +38,11 @@ for path in paths_list:
 
 dict_path = dict(zip(paths_list, dist)) 
 sorted_path = sorted(dict_path.items(), key=operator.itemgetter(1))
-
+optimal_index_wozero = sorted_path[0][0]
+optimal_index = (0,) + optimal_index_wozero
 # greedy
 dist_greedy = 0
-index_greedy = np.zeros(N)
+index_greedy = np.zeros(N,dtype = int)
 i = 0
 matrix_copy = matrix.copy()
 while i <= N-2:
@@ -53,4 +54,20 @@ while i <= N-2:
     matrix_copy[int(index_greedy[i]),:] = 0
     i = i + 1
     index_greedy[i] = index_np[0]
-    
+
+# draw optimal path
+# draw greedy path
+plt.plot(operator.itemgetter(*optimal_index)(x), 
+         operator.itemgetter(*optimal_index)(y), 'ro-')
+for i,txt in enumerate(optimal_index):
+    plt.text(x[txt],y[txt],i, fontsize=11)
+plt.plot(x[0],y[0],'go')
+plt.show()   
+
+# draw greedy path
+plt.plot(operator.itemgetter(*index_greedy)(x), 
+         operator.itemgetter(*index_greedy)(y), 'bo-')
+for i,txt in enumerate(index_greedy):
+    plt.text(x[txt],y[txt],i, fontsize=11)
+plt.plot(x[0],y[0],'go')
+plt.show()   
