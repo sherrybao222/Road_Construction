@@ -3,9 +3,6 @@ import random
 import math
 import scipy as sp
 # -------------------------------------------------------------------------
-# A list of Class objects: City, Map, Budget, DrawBoard
-
-# Generate individual city coordinates and size
 class Map:
     def __init__(self): 
         self.N = 11 # total city number
@@ -14,22 +11,24 @@ class Map:
         
         self.x = random.sample(range(51, 649), self.N)  
         self.y = random.sample(range(51, 649), self.N)
-        self.map = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]
+        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]
    
         self.city_start = self.map[0] # the starting city from the list
         self.distance = sp.spatial.distance_matrix(self.map, self.map, p=2, threshold=10000)
 
 
 # -------------------------------------------------------------------------
-# anything relevant to budget, total and history of past budget
+
 class Update:
-    @staticmethod  # >A< input changed, need mouse and current map type, return the selected city
-    def __init__(self, mouse_loc, city):
-        for i in range(1, city.N):
-            x2, y2 = mouse_loc  # pg.mouse.get_pos()
-            distance = math.hypot(city.x[i] - x2, city.y[i] - y2)
-            if distance <= city.radius:
-                return i, city.map[i]
+    @staticmethod  
+    def  __init__(self, mouse_loc, mmap):
+        for i in range(1, mmap.N): # do not evaluate the starting point
+            x2, y2 = mouse_loc  
+            distance = math.hypot(mmap.x[i] - x2, mmap.y[i] - y2)
+            if distance <= mmap.radius:
+                self.index = i
+                self.city = mmap.xy[i]
+            
 
 # calculate current budget using the distance between selected cities
     @staticmethod
