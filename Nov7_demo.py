@@ -107,6 +107,7 @@ data1 = Data()
 
 
 class Draw:
+    # need to code so you can't double click a city
     @staticmethod
     def collision(mouse_loc):
         for city in map_1.all_city_xy:
@@ -137,7 +138,7 @@ class Draw:
 
     @staticmethod
     def road_visual():
-        pg.draw.lines(screen, BLACK, False, click, 1)
+        pg.draw.lines(screen, BLACK, False, click, 3)
         pg.draw.line(screen, WHITE, click[0], city_start.xy, 3)
         # to hide the first line draw from origin
         pg.draw.circle(screen, RED, city_start.xy, 10)
@@ -146,8 +147,10 @@ class Draw:
     def instruction():
         Draw.text_write("Press Z to UNDO", 50, BLACK, 100, 200)
         pg.draw.rect(screen, WHITE, (100, 200, 1000, 50), 1)
-        Draw.text_write("Press Return to SUBMIT", 50, BLACK, 100, 400)
-        pg.draw.rect(screen, WHITE, (100, 400, 1000, 50), 1)
+        Draw.text_write("Press Return to SUBMIT", 50, BLACK, 100, 300)
+        pg.draw.rect(screen, WHITE, (100, 300, 1000, 50), 1)
+        # Draw.text_write("Press Space to the next trial", 50, BLACK, 100, 400)
+        # pg.draw.rect(screen, WHITE, (100, 400, 1000, 50), 1)
         # Draw.text_write("Undo", 50, BLACK, 900, 600)
         # pg.draw.rect(screen, GREEN, (900, 600, 100, 50), 3)
         # those variable should be set at the top, so it's obvious
@@ -159,6 +162,12 @@ class Draw:
         text_rectangle = text_surface.get_rect()
         text_rectangle.center = x, y
         screen.blit(text_surface, text_rectangle.center)
+
+    @staticmethod
+    def game_end():
+        pg.draw.rect(screen, BLACK, (600, 600, 600, 200), 0)
+        Draw.text_write('Your score is ' + str(len(click) - 2), 60, WHITE, 650, 650)
+        pg.display.flip()
 
     def __init__(self):
         self.road_visual()
@@ -177,17 +186,17 @@ class Draw:
         screen.fill(WHITE)
         clock.tick(FPS)
 
-    # @staticmethod
-    # def refresh():  # append put anchor to indicate new start
-    #     click.clear()
-    #     click.append((0, 0))
-    #     click.append(city_start.xy)
-    #     pg.mouse.set_pos(city_start.xy)
-    #     budget.bud_history.append(budget.total)
-    #     data1.movement.append((0, 0))
-    #     data1.click_time.append(0)
-    #     draw_map.__init__()
-    #     pg.display.flip()
+    @staticmethod
+    def refresh():  # append put anchor to indicate new start
+        click.clear()
+        click.append((0, 0))
+        click.append(city_start.xy)
+        pg.mouse.set_pos(city_start.xy)
+        budget.bud_history.append(budget.total)
+        data1.movement.append((0, 0))
+        data1.click_time.append(0)
+        draw_map.__init__()
+        pg.display.flip()
 
 
 # class objects
@@ -216,6 +225,11 @@ while not done:
             if pg.key.get_pressed() and event.key == pg.K_z:
                 budget.budget_undo()
                 draw_map.__init__()
+            if event.key == pg.K_RETURN:
+                draw_map.game_end()
+                pg.time.wait(600)
+            # if event.key == pg.K_SPACE:
+            #     draw_map.refresh()
             if event.key == pg.K_ESCAPE:
                 done = True   # very important, otherwise stuck
                 pg.display.quit()
