@@ -1,200 +1,150 @@
 import pygame as pg
 import random
 import math
-import scipy as sp
+import scipy.spatial
+from anytree import Node
+
 # -------------------------------------------------------------------------
 class Map:
     def __init__(self): 
         self.N = 11 # total city number
         self.radius = 7 # radius of city
+        self.budget_remain = 700
         self.total = 700 # total budget
         
         self.x = random.sample(range(51, 649), self.N)  
         self.y = random.sample(range(51, 649), self.N)
         self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]
    
-        self.city_start = self.map[0] # the starting city from the list
-        self.distance = sp.spatial.distance_matrix(self.map, self.map, p=2, threshold=10000)
+        self.city_start = self.xy[0] # the starting city from the list
+        self.distance = scipy.spatial.distance_matrix(self.xy, self.xy, p=2, threshold=10000)
+ 
+    
+    
+        self.choice = Node(0, budget = self.total) # start point
+        self.click = []
+        self.click_time = []    
+        #self.movement = []  
+        self.budget_his = [self.total]
+        self.choice_his = [0]
+        self.choice_loc = [self.city_start]
+        self.n_city = 0
+        self.check = 0
+    
+    def make_choice(self, mouse):
+        for i in range(1, self.N): # do not evaluate the starting point
+            x2, y2 = mouse  
+            self.mouse_distance = math.hypot(self.x[i] - x2, self.y[i] - y2)
+            if (self.mouse_distance <= self.radius) and (i not in self.choice_his):
+                self.index = i
+                self.city = self.xy[i]
+                self.check = 1
+        
 
+    def budget_update(self):
+        dist =  self.distance[self.index][self.choice_his[-1]] # the latest remain budget from data saving
+        self.budget_remain = self.budget_remain - dist
+       
+        # using index to find distance from matrix
+            
+   
+    def data(self, mouse):
+        tick_second = round((pg.time.get_ticks()/1000), 2)
+        self.click_time.append(tick_second)
+        self.click.append(mouse)
+        #mmap.movement.append(pg.mouse.get_rel()) 
+        self.budget_his.append(self.budget_remain)
+        self.choice_his.append(self.index)
+        self.choice_loc.append(self.city)
+        new = Node(self.index, parent = self.choice, budget = self.budget_remain, time = tick_second)
+        
+        self.n_city = self.n_city + 1
+        self.choice = new
+        
+        self.check = 0 
+        del self.index, self.city
+        
+    def check_end(self):
+        distance_copy = self.distance[self.choice_his[-1]]
+        distance_copy[self.choice_his[-1]] = 100000
+        if all(i > self.budget_his[-1] and i != 0 for i in distance_copy):
+            return False
+        else:
+            return True
+        
+    def undo(self):
+        new = self.choice.parent
+        self.choice = new
+        budget = self.budget_his[-2]
+        self.budget_his.append(budget)
+        choice = self.choice_his[-2]
+        self.choice_his.append(choice)
+        
 
 # -------------------------------------------------------------------------
+class Draw:
+    
+    def __init__(self, mmap, mouse):
+        self.cities(mmap)
+        #Draw.undo_box()
+        if len(mmap.choice_his) >= 2:
+            self.road(mmap)
+        self.text_write(str(mmap.n_city), 100, BLACK, 900, 100) 
+        
+        
+        
+    def road(self,mmap):
+        pg.draw.lines(screen, BLACK, False, mmap.choice_loc, 1)
 
-class Update:
-    @staticmethod  
-    def  __init__(self, mouse_loc, mmap):
-        for i in range(1, mmap.N): # do not evaluate the starting point
-            x2, y2 = mouse_loc  
-            distance = math.hypot(mmap.x[i] - x2, mmap.y[i] - y2)
-            if distance <= mmap.radius:
-                self.index = i
-                self.city = mmap.xy[i]
-            
-
-# calculate current budget using the distance between selected cities
-    @staticmethod
-    def budget_update(data,city):
-        budget = data.budget_his[-1]  # the latest remain budget from data saving
-        city_b = data.choice[-1][0]  # find the index from the choice lists
-        city_a = data.choice[-2][0]
-        distance = city.distance[city_a, city_b]  # using index to find distance from matrix
-        return round((budget - distance), 2)
-
-# 这个主要是解决budget rotation的问题。因为pygame划线需要两点一线，但那个终点是跟着鼠标移动的
-# 所以这个像reverse engineering，反向求出终点然后画budget line
-# 最后给出来的是budget line 的end point
-    @staticmethod   # given loc_a & distance for loc_b to draw line
-    def budget_pos(city_x, city_y, d):  # d = budget remain bud_his[-1], xy = current city loc city[-1][0], [-1][1]
-        cx, cy = pg.mouse.get_pos()[0] - click[-1][0], pg.mouse.get_pos()[1] - click[-1][1]
+    
+    def cities(self, mmap):
+        
+        for city in mmap.xy[1:]:
+            self.city = pg.draw.circle(screen, BLACK, city, 7)
+           
+        self.start = pg.draw.circle(screen, RED, mmap.city_start, 7)
+        
+        
+    # given loc_a & distance for loc_b to draw line
+    def budget(self, mmap, mouse):  # d = budget remain bud_his[-1], xy = current city loc city[-1][0], [-1][1]
+        cx, cy = mouse[0] - mmap.x[mmap.choice_his[-1]], mouse[1] - mmap.y[mmap.choice_his[-1]]
         # current mouse position
         radians = math.atan2(cy, cx)
         # give budget line follow mouse in the correct direction
-        budget_pos = int(city_x + d * math.cos(radians)), int(city_y + d * math.sin(radians))
-        # print("budget_dis: " + str(Map.distance(click[-1], budget_pos)), "budget: " + str(budget.bud_history[-1]))
-        # print("-------------------------------")
-        return int(city_x + d * math.cos(radians)), int(city_y + d * math.sin(radians))
+        budget_pos = (int(mmap.x[mmap.choice_his[-1]] + mmap.budget_his[-1] * math.cos(radians)), 
+                      int(mmap.y[mmap.choice_his[-1]] + mmap.budget_his[-1] * math.sin(radians)))
 
-# 这个相当于undo之后把之前的budget还给你，顺便那之前的选择给消除了
-# 消除的是顶上那两个memory list，所以过程和data是存在另一个地方的
-    @staticmethod
-    def budget_undo():
-        undo = round(distance_his[-1] + budget.bud_history[-1], 2)
-        budget.bud_history.append(undo)
-        distance_his.pop(-1)
-        click.pop(-1)
-        pg.draw.line(screen, WHITE, click[-2], click[-1], 3)
-
-# -------------------------------------------------------------------------
-# 这个主要存所以的input，包括mouse location，时间之类的
-class Data:
-    def __init__(self):
-        self.choice = [0]
-        self.click_his = [(0, 0)]
-        self.click_time = []  # record the click time since game started
-        self.movement = []  # get.rel
-        self.budget_his = []
-
-    @staticmethod  # find a way to code to adding to new instance, check arguement
-    def saving(trial, budget):
-        trial.choice.append(budget.collision(mouse_loc, city))
-        trial.click_his.append(pg.mouse.get_pos())
-        trial.movement.append(pg.mouse.get_rel())
-        tick_second = round((pg.time.get_ticks() / 1000), 2)
-        trial.click_time.append(tick_second)
-
-# 这个是整体刷新，就是当被试点了city之后，所有相关的distance/budget的后台数据
-    @staticmethod
-    def game_update():  # update with input for new draw information
-        click.append(pg.mouse.get_pos())
-        distance_his.append(Map.distance(click[-2], click[-1]))
-        map_1.dis_history.append(Map.distance(click[-2], click[-1]))
-        budget.bud_history.append(Budget.budget_update(budget.bud_history[-1], map_1.dis_history[-1]))
-
-
-# -------------------------------------------------------------------------
-# 这个是主要的前端设计，包括各种visualization 和功能
-class Draw:
-
-    # 一旦鼠标接近城市，这个就会自动连线，并覆盖等量的budget line
-    @staticmethod
-    def auto_snap(mouse_loc):
-        budget_allow = budget.bud_history[-1] >= Map.distance(click[-1], pg.mouse.get_pos())
-        if budget_allow:
-            if Draw.collision(pg.mouse.get_pos()):
-                # this is a bug, somehow need to change Budget_allow calculation
-                pg.draw.line(screen, BLACK, click[-1], mouse_loc, 3)
-                # print("||||||||||||||||||||||||||||||||||||||||")
-                # print("bud_his: " + str(budget.bud_history[-1]), "dis: " + str(Map.distance(click[-1], pg.mouse.get_pos())))
-                # print("Allow?: " + str(budget.bud_history[-1] > Map.distance(click[-1], pg.mouse.get_pos())))
-
-    # 这个主要确定budget line上面的那个滑点停在最终点
-    # 而不是跟着鼠标乱跑
-    @staticmethod
-    def mouse_limit(mouse_loc):
-        mouse_dis = Map.distance(click[-1], mouse_loc)
-        if mouse_dis < budget.bud_history[-1]:
-            pg.draw.circle(screen, GREEN, pg.mouse.get_pos(), 5)
-        else:
-            pg.draw.circle(screen, GREEN, Budget.budget_pos(click[-1][0], click[-1][1], budget.bud_history[-1]), 5)
-
-    # 这个是road construction，连续画线，从一个list里面顺着连那种
-    @staticmethod
-    def road_visual():
-        pg.draw.lines(screen, BLACK, False, click, 1)
-        pg.draw.line(screen, WHITE, click[0], city_start.xy, 3)
-        # to hide the first line draw from origin
-        pg.draw.circle(screen, RED, city_start.xy, 10)
-
-    # undo box的visualization
-    @staticmethod
-    def road_undo():
-        Draw.text_write("Undo", 50, BLACK, 900, 600)
-        pg.draw.rect(screen, GREEN, (900, 600, 100, 50), 3)
+        self.budget_line = pg.draw.line(screen, GREEN, mmap.xy[mmap.choice_his[-1]], budget_pos, 3)
+    
+      
+    def auto_snap(self, mmap):
+        pg.draw.line(screen, BLACK, mmap.xy[mmap.choice_his[-2]], 
+                     mmap.xy[mmap.choice_his[-1]], 3)
+  
+    #@staticmethod
+    #def undo_box():
+    #   Draw.text_write(self, "Undo", 50, BLACK, 900, 600)
+    #    pg.draw.rect(screen, GREEN, (900, 600, 100, 50), 3)
         # those variable should be set at the top, so it's obvious
 
-    # reset box的visualization
-    @staticmethod
-    def road_reset():
-        Draw.text_write("Reset", 50, BLACK, 900, 550)
-        pg.draw.rect(screen, GREEN, (900, 550, 100, 50), 3)
-
-    # 写字的general function
-    @staticmethod
-    def text_write(text, size, color, x, y):  # function that can display any text
+   
+    def text_write(self, text, size, color, x, y):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
         text_surface = font_object.render(text, True, color)
         text_rectangle = text_surface.get_rect()
         text_rectangle.center = x, y
         screen.blit(text_surface, text_rectangle.center)
 
-    # 主要的draw initiation，把所有部分都拼凑到一起
-    # 这一片的规划也有点乱
-    def __init__(self):
-        self.undo_box = pg.draw.rect(screen, GREEN, (900, 600, 100, 50), 3)
-        self.rest_box = pg.draw.rect(screen, GREEN, (900, 550, 100, 50), 3)
-        Draw.road_visual()
-        Draw.mouse_limit(pg.mouse.get_pos())
-        Draw.road_undo()
-        Draw.road_reset()
-        city_visit = len(click) - 2
-        # find a better structure to place this background information
-        Draw.text_write(str(city_visit), 100, BLACK, 900, 100)
-        for cities in map_1.all_city_xy:
-            self.city_rect = (pg.draw.circle(screen, BLACK, cities, 7))
-        pg.draw.line(screen, GREEN, click[-1], Budget.budget_pos(click[-1][0], click[-1][1], budget.bud_history[-1]), 3)
-        if budget.bud_history[-1] > Map.distance(click[-1], pg.mouse.get_pos()):
-            Draw.auto_snap(pg.mouse.get_pos())
-            # this is still a bug
-        pg.display.flip()
-        screen.fill(WHITE)
-        clock.tick(FPS)
-
-    # 这个就是reset之后，把那个memory list刷新重启
-    # 同时在data 里面标注0来表示用户重启
-    @staticmethod
-    def refresh():  # append put anchor to indicate new start
-        click.clear()
-        click.append((0, 0))
-        click.append(city_start.xy)
-        pg.mouse.set_pos(city_start.xy)
-        budget.bud_history.append(budget.total)
-        data1.movement.append((0, 0))
-        data1.click_time.append(0)
-        draw_map.__init__()
-        pg.display.flip()
 
 #------------------------------------------------------------------------------
-#   大问题
-# 结构我觉得有点乱，不是特别简明。而且我想用distance matrix赶紧会更方便，但是不确定该怎么写
-# budget，city range，和screen的设定很微妙，因为会有情况看不到完整的budget
-# data saving/data structure 我也不是很懂，目前我只会把所有东西都堆在一起
-# budget line 永远向右指那个我不知道是bug还是怎么回事
-
-#   setting up window, basic features 
+trial = Map()
+# setting up window, basic features 
 pg.init()
 pg.font.init()
 
 # conditions
 done = False
+
 # display setup
 screen = pg.display.set_mode((1000, 650))   # display surface
 clock = pg.time.Clock()
@@ -204,31 +154,11 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 screen.fill(WHITE)
-
-# current memory for running the game, not saving (updating on current location)
-click = [(0, 0)]
-distance_his = [0]
-
+clock.tick(FPS)
 # -------------------------------------------------------------------------
-# 这一部分贼乱，我可能不是特别懂class和object的关系，所以我想重新写一个直接用class的版本
-# 那个版本和distance matrix都在同一个草稿里，但是还没写完，也不知道写对没有
-# those should be good order, otherwise will generate twice and don't know which to use
-city_start = City()
-map_1 = Map()
-budget = Budget()
-click.append(city_start.xy)
-# a lot of places use this temporary list for update, but it's different from saving
 
-# -------------------------------------------------------------------------
-# class objects
-draw_map = Draw()
-mouse = pg.mouse.get_pos()
-
-# 这个就是game loop，各种condition
-# 主要分成mousemotion = 用户探索
-# 和mousebuttondown = 用户决策 两部分
-
-data1 = Data()
+mouse_loc = trial.city_start
+draw_map = Draw(trial,mouse_loc)
 
 # -------------------------------------------------------------------------
 # loop for displaying until quit
@@ -236,36 +166,34 @@ while not done:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             done = True
-        elif event.type == pg.MOUSEMOTION:
-            draw_map.__init__()
-        elif event.type == pg.MOUSEBUTTONDOWN:
-            if draw_map.collision(pg.mouse.get_pos()) and event.button == 1:
-                if budget.bud_history[-1] >= Map.distance(click[-2], click[-1]):
-                    data1.game_update()
-                    data1.saving()
-                    draw_map.__init__()
-                else:
-                    # budget.bud_history[-1] <= Map.distance(click[-1], pg.mouse.get_pos()):
-                    draw_map.refresh()
-            if pg.Rect.collidepoint(draw_map.undo_box, pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]) and event.button == 1:
-                budget.budget_undo()
-                # click.pop(-1)
-                # # budget.bud_history.append(budget.bud_history[-2]) # bug to give back used budget
-                # pg.draw.line(screen, WHITE, click[-2], click[-1], 3)
-            if pg.Rect.collidepoint(draw_map.rest_box, pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]) and event.button == 1:
-                Draw.refresh()
-
+            
+        if event.type == pg.MOUSEMOTION:
+            draw_map.budget(trial,pg.mouse.get_pos())
+            
+        if event.type == pg.MOUSEBUTTONDOWN:
+            mouse_loc = pg.mouse.get_pos()
+            draw_map.budget(trial,mouse_loc)
+            if trial.check_end():
+                trial.make_choice(mouse_loc)
+                if trial.check == 1:
+                    trial.budget_update()
+                    trial.data(mouse_loc)
+                    draw_map.auto_snap(trial)
+            if not(trial.check_end()):
+                print("The End")
+            #if pg.Rect.collidepoint(draw_map.undo_box, pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]) and event.button == 1:
+            #    budget.budget_undo()
+        if event.type == pg.MOUSEBUTTONUP:
+            draw_map.budget(trial,pg.mouse.get_pos())
+            
+        pg.display.flip()  
+        screen.fill(WHITE)
+        draw_map = Draw(trial,pg.mouse.get_pos())
 
 
 # -------------------------------------------------------------------------
 print("-----------------MAP INFORMATION --------------")
-print("Starting City: " + str(city_start.xy))
-print("city locations: " + str(map_1.all_city_xy))
-print("---------------- INPUT DATA ----------------")
-print("click history Data: " + str(data1.click_his))
-print("click memory: " + str(click))
-print("distance history Data: " + str(map_1.dis_history))
-print("distance memory: " + str(distance_his))
-print("budget history: " + str(budget.bud_history))
+print("Starting City: " + str(trial.city_start))
+print("city locations: " + str(trial.xy))
 print("---------------- Break ----------------")
 pg.quit()
