@@ -8,7 +8,7 @@ import math
 # Generate individual city coordinates and size
 class City:
     def __init__(self): # 注意多了一个argument，代入city
-        self.N = 11 #total city number
+        self.N = 11 #total city number with starting location
         self.radius = 7
         self.x = random.sample(range(51, 649), self.N)  # set up in a way so don't overlap with budget information
         self.y = random.sample(range(51, 649), self.N)
@@ -35,11 +35,13 @@ class Budget:
 
 # calculate current budget using the distance between selected cities
     @staticmethod
-    def budget_update(data):
+    def budget_update(data, city):
         budget = data.budget_his[-1]  # the latest remain budget from data saving
-        city_b = data.choice[-1][0]  # find the index from the choice lists
+        city_b = data.choice[-1][0]  # find the paired city from user choice lists
         city_a = data.choice[-2][0]
-        distance = city.distance[city_a, city_b]  # using index to find distance from matrix
+        i = city.map.index(city_b) # convert to index of those city for this map
+        j = city.map.index(city_a)
+        distance = city.distance[i, j]  # using index to find distance from matrix
         return round((budget - distance), 2)
 
 # 这个主要是解决budget rotation的问题。因为pygame划线需要两点一线，但那个终点是跟着鼠标移动的
