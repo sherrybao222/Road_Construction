@@ -48,15 +48,18 @@ class Budget:
 # 所以这个像reverse engineering，反向求出终点然后画budget line
 # 最后给出来的是budget line 的end point
     @staticmethod   # given loc_a & distance for loc_b to draw line
-    def budget_pos(city_x, city_y, d):  # d = budget remain bud_his[-1], xy = current city loc city[-1][0], [-1][1]
-        cx, cy = pg.mouse.get_pos()[0] - click[-1][0], pg.mouse.get_pos()[1] - click[-1][1]
-        # current mouse position
-        radians = math.atan2(cy, cx)
-        # give budget line follow mouse in the correct direction
+    def budget_pos(data):
+        city_x = data.choice[-1][0]
+        city_y = data.choice[-1][1]     # xy = current city location xy
+        cx, cy = pg.mouse.get_pos()[0] - city_x, pg.mouse.get_pos()[1] - city_y
+            # cx, cy = pg.mouse.get_pos()[0] - click[-1][0], pg.mouse.get_pos()[1] - click[-1][1]
+        radians = math.atan2(cy, cx)    #budget direction given mouse position
+        d = data.budget_his[-1]     # d = budget remain
         budget_pos = int(city_x + d * math.cos(radians)), int(city_y + d * math.sin(radians))
-        # print("budget_dis: " + str(Map.distance(click[-1], budget_pos)), "budget: " + str(budget.bud_history[-1]))
-        # print("-------------------------------")
-        return int(city_x + d * math.cos(radians)), int(city_y + d * math.sin(radians))
+            # the end point of budget line given budget left & mouse position
+            # print("budget_dis: " + str(Map.distance(click[-1], budget_pos)), "budget: " + str(budget.bud_history[-1]))
+            # print("-------------------------------")
+        return budget_pos
 
 # 这个相当于undo之后把之前的budget还给你，顺便那之前的选择给消除了
 # 消除的是顶上那两个memory list，所以过程和data是存在另一个地方的
