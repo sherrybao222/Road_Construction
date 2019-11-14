@@ -44,13 +44,13 @@ class Map:
         dist =  self.distance[self.index][self.choice_his[-1]] # get distance from current choice to previous choice
         self.budget_remain = self.budget_remain - dist # budget update
        
-    def data(self, mouse):
+    def data(self, mouse): # not sure I understand this part
         tick_second = round((pg.time.get_ticks()/1000), 2)
         self.click_time.append(tick_second)
         self.click.append(mouse)
         #mmap.movement.append(pg.mouse.get_rel()) 
         self.budget_his.append(self.budget_remain)
-        self.choice_his.append(self.index)
+        self.choice_his.append(self.index)  #which index is this referring to? 
         self.choice_loc.append(self.city)
         new = Node(self.index, parent = self.choice, budget = self.budget_remain, time = tick_second)
         
@@ -139,7 +139,7 @@ screen.fill(WHITE)
 clock.tick(FPS)
 # -------------------------------------------------------------------------
 trial = Map()
-draw_map = Draw(trial)
+draw_map = Draw(trial)  #this is important, but I dont't understand this syntax 
 # -------------------------------------------------------------------------
 # loop for displaying until quit
 while not done:
