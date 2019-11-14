@@ -27,7 +27,7 @@ class Map:
         self.click_time = [] # mouse click time 
         self.budget_his = [self.total] # budget history
         self.choice_his = [0] # choice history
-        self.choice_loc = [self.city_start] # choice location history
+        self.choice_loc = [self.city_start, self.city_start] # choice location history
         self.n_city = 0 # number of cities connected
         self.check = 0 # indicator showing if people made a valid choice
     
@@ -41,7 +41,7 @@ class Map:
                 self.check = 1 # indicator showing people made a valid choice
         
     def budget_update(self):
-        dist =  self.distance[self.index][self.choice_his[-1]] # get distance from current choice to previous choice
+        dist = self.distance[self.index][self.choice_his[-1]] # get distance from current choice to previous choice
         self.budget_remain = self.budget_remain - dist # budget update
        
     def data(self, mouse): 
@@ -68,12 +68,17 @@ class Map:
             return False # end
         
     def undo(self): # undo function, haven't tested
-        new = self.choice.parent
-        self.choice = new
-        budget = self.budget_his[-2]
-        self.budget_his.append(budget)
-        choice = self.choice_his[-2]
-        self.choice_his.append(choice)
+        distance = self.distance[self.index][self.choice_loc[-1]]
+        budget_return = self.budget_his[-1] + distance
+        self.budget_his.append(budget_return)
+        self.choice_loc.pop(-1)
+        # new = self.choice.parent
+        # self.choice = new
+        # budget = self.budget_his[-2]
+        # self.budget_his.append(budget)
+        # choice = self.choice_his[-2]
+        # self.choice_his.append(choice)
+
         
 # visualize the game
 # -------------------------------------------------------------------------
@@ -99,7 +104,6 @@ class Draw:
         radians = math.atan2(cy, cx)
         budget_pos = (int(mmap.choice_loc[-1][0] + mmap.budget_his[-1] * math.cos(radians)), 
                       int(mmap.choice_loc[-1][1] + mmap.budget_his[-1] * math.sin(radians)))
-
         self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_loc[-1], budget_pos, 3)
         
     def auto_snap(self, mmap):
@@ -153,11 +157,17 @@ while not done:
                     trial.budget_update()
                     trial.data(mouse_loc)
                     draw_map.auto_snap(trial)
+            #         auto snap bug
             else: # end
                 print("The End") # need other end function
             
         if event.type == pg.MOUSEBUTTONUP: 
             draw_map.budget(trial,pg.mouse.get_pos())
+
+        if event.type == pg.KEYDOWN:
+            if pg.key.get_pressed() and event.key == pg.K_z:
+                trial.undo()
+                # draw_map.budget(trial, mouse_loc)
             
         pg.display.flip()  
         screen.fill(WHITE)
@@ -168,5 +178,6 @@ while not done:
 print("-----------------MAP INFORMATION --------------")
 print("Starting City: " + str(trial.city_start))
 print("city locations: " + str(trial.xy))
+print("budget history" + str(trial.budget_his))
 print("---------------- Break ----------------")
 pg.quit()
