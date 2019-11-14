@@ -106,7 +106,7 @@ class Draw:
     def auto_snap(self, mmap):
         pg.draw.line(screen, BLACK, mmap.choice_loc[-2], mmap.choice_loc[-1], 3)
   
-    #def undo_box():
+    #def undo_box(): we actually don't need this now 
     #   Draw.text_write(self, "Undo", 50, BLACK, 900, 600)
     #    pg.draw.rect(screen, GREEN, (900, 600, 100, 50), 3)
         # those variable should be set at the top, so it's obvious
@@ -163,7 +163,7 @@ while not done:
                 print("The End") # need other end function
             #if pg.Rect.collidepoint(draw_map.undo_box, pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]) and event.button == 1:
             #    budget.budget_undo()
-        if event.type == pg.MOUSEBUTTONUP:
+        if event.type == pg.MOUSEBUTTONUP: #whats is this condition about? 
             draw_map.budget(trial,pg.mouse.get_pos())
             
         pg.display.flip()  
