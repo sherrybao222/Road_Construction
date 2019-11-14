@@ -5,6 +5,7 @@ import numpy as np
 import operator 
 import matplotlib.pyplot as plt
 
+
 class Map:
     def __init__(self): 
         # map parameters
@@ -103,6 +104,7 @@ plt.plot(mmap.x[0],mmap.y[0],'cv')
 
 plt.axis('off')
 
-plt.show()   
+plt.show()
+print(diff)
 
 
