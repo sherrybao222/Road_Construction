@@ -30,7 +30,7 @@ for i in name:
         matrix[int(i)][int(j)] = math.sqrt((dict_city[i][0] - dict_city[j][0])**2 + \
                                  (dict_city[i][1] - dict_city[j][1])**2)
 
-# calculate all path lengths
+# calculate all path lengths with budget
 for i in reversed(range(1,N)):
     pool = combinations(range(1,N), i)
     paths = [list(permutations(x)) for x in pool]
@@ -59,11 +59,11 @@ optimal_index = (0,) + optimal_index_wozero
 
 # greedy with budget
 dist_greedy = 0
-index_greedy = np.zeros(N,dtype = int)
+greedy_index = [0]
 i = 0
 matrix_copy = matrix.copy()
 while i <= N-2:
-    dist_list = matrix_copy[int(index_greedy[i])]
+    dist_list = matrix_copy[greedy_index[i]]
     dist = np.amin(dist_list[dist_list != 0])
     
     if (dist_greedy + dist > budget):
@@ -72,40 +72,40 @@ while i <= N-2:
     else:
         dist_greedy = dist_greedy + dist
         index_np = np.where(dist_list == dist)
-        matrix_copy[:,int(index_greedy[i])] = 0
-        matrix_copy[int(index_greedy[i]),:] = 0
+        matrix_copy[:,greedy_index[i]] = 0
+        matrix_copy[greedy_index[i],:] = 0
         i = i + 1
-        index_greedy[i] = index_np[0]
+        greedy_index = np.append(greedy_index,index_np[0])
     
 diff =  abs(n_optimal - n_greedy)
 
 # greedy all cities
-dist_greedy = 0
-index_greedy = np.zeros(N,dtype = int)
-i = 0
-matrix_copy = matrix.copy()
-while i <= N-2:
-    dist_list = matrix_copy[int(index_greedy[i])]
-    dist = np.amin(dist_list[dist_list != 0])
-    dist_greedy = dist_greedy + dist
-    index_np = np.where(dist_list == dist)
-    matrix_copy[:,int(index_greedy[i])] = 0
-    matrix_copy[int(index_greedy[i]),:] = 0
-    i = i + 1
-    index_greedy[i] = index_np[0]
+#dist_greedy = 0
+#index_greedy = np.zeros(N,dtype = int)
+#i = 0
+#matrix_copy = matrix.copy()
+#while i <= N-2:
+#    dist_list = matrix_copy[int(index_greedy[i])]
+#    dist = np.amin(dist_list[dist_list != 0])
+#    dist_greedy = dist_greedy + dist
+#    index_np = np.where(dist_list == dist)
+#    matrix_copy[:,int(index_greedy[i])] = 0
+#    matrix_copy[int(index_greedy[i]),:] = 0
+#    i = i + 1
+#    index_greedy[i] = index_np[0]
 
 # draw optimal path
 plt.plot(operator.itemgetter(*optimal_index)(x), 
          operator.itemgetter(*optimal_index)(y), 'ro-')
 for i,txt in enumerate(optimal_index):
     plt.text(x[txt],y[txt],i, fontsize=11)
-plt.plot(x[0],y[0],'go')
+plt.plot(x,y,'go')
 plt.show()   
 
 # draw greedy path
-plt.plot(operator.itemgetter(*index_greedy)(x), 
-         operator.itemgetter(*index_greedy)(y), 'bo-')
-for i,txt in enumerate(index_greedy):
+plt.plot(operator.itemgetter(*greedy_index)(x), 
+         operator.itemgetter(*greedy_index)(y), 'bo-')
+for i,txt in enumerate(greedy_index):
     plt.text(x[txt],y[txt],i, fontsize=11)
-plt.plot(x[0],y[0],'go')
+plt.plot(x,y,'go')
 plt.show()   
