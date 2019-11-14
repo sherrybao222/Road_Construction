@@ -21,18 +21,21 @@ class Map:
         self.city_start = self.xy[0] # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000) # city distance matrix
         
-        # undo dynamic
-        self.undo_dyn = [self.city_start]
+        # choice dynamic
+        self.choice_dyn = [0]
+        self.choice_locdyn = [self.city_start]
         self.budget_dyn = [self.total]
-        self.index_dyn = [0]
 
-        # people's decisions
+        # choice history
         self.choice = Node(0, budget = self.total) # start choice in tree
-        self.click = [] # mouse click location
-        self.click_time = [] # mouse click time 
-        self.budget_his = [self.total] # budget history
         self.choice_his = [0] # choice history, index
         self.choice_loc = [self.city_start] # choice location history
+        
+        self.click = [] # mouse click location
+        self.click_time = [] # mouse click time 
+        
+        self.budget_his = [self.total] # budget history
+
         self.n_city = 0 # number of cities connected
         self.check = 0 # indicator showing if people made a valid choice
     
@@ -40,14 +43,14 @@ class Map:
         for i in range(1, self.N): # do not evaluate the starting point
             x2, y2 = mouse # mouse location
             self.mouse_distance = math.hypot(self.x[i] - x2, self.y[i] - y2)
-            if (self.mouse_distance <= self.radius) and (i not in self.undo_dyn): # cannot choose what has been chosen
+            if (self.mouse_distance <= self.radius) and (i not in self.choice_dyn): # cannot choose what has been chosen
                 self.index = i # index of chosen city
                 self.city = self.xy[i] # location of chosen city
                 self.check = 1 # indicator showing people made a valid choice
         
     def budget_update(self):
-        dist = self.distance[self.index][self.choice_his[-1]] # get distance from current choice to previous choice
-        self.budget_remain = self.budget_remain - dist # budget update
+        dist = self.distance[self.index][self.choice_dyn[-1]] # get distance from current choice to previous choice
+        self.budget_remain = self.budget_dyn[-1] - dist # budget update
        
     def data(self, mouse): 
         tick_second = round((pg.time.get_ticks()/1000), 2)
@@ -56,9 +59,11 @@ class Map:
        
         self.budget_his.append(self.budget_remain)
         self.budget_dyn.append(self.budget_remain)
+        
         self.choice_his.append(self.index)
-        self.choice_loc.append(self.city)
-        self.undo_dyn.append(self.city)
+        self.choice_dyn.append(self.index)
+        self.choice_loc.append(self.city)  
+        self.choice_locdyn.append(self.city) 
         new = Node(self.index, parent = self.choice, budget = self.budget_remain, time = tick_second)
         
         self.n_city = self.n_city + 1
@@ -75,37 +80,31 @@ class Map:
             return False # end
         
     def undo(self):
+        # dynamic change
+        self.choice_dyn.pop(-1)
+        self.choice_locdyn.pop(-1)
+        self.budget_dyn.pop(-1)
+        self.n_city = self.n_city - 1
+        # save history
+        self.budget_his.append(self.budget_dyn[-1])
+        self.choice_his.append(self.choice_dyn[-1])
+        self.choice_loc.append(self.choice_locdyn[-1])
+        
         new = self.choice.parent
         self.choice = new
-        budget = self.budget_his[-2]
-        self.budget_his.append(budget)
-        choice = self.choice_his[-2]
-        self.choice_his.append(choice)
-        # budget dynamic, bug, calculation is wrong
-        i = self.choice_his[-2]
-        j = self.choice_his[-1]
-        dis = self.distance[i][j]
-        budget_undo = self.budget_dyn[-1] + dis
-        self.budget_dyn.append(budget_undo)
-        # undo dynamic
-        self.undo_dyn.pop(-1)
-
-
-
-
-
+       
 
 # visualize the game
 # -------------------------------------------------------------------------
 class Draw: 
     def __init__(self, mmap):
         self.cities(mmap) # draw city dots
-        if len(mmap.undo_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
+        if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road(mmap)
         self.text_write(str(mmap.n_city), 100, BLACK, 900, 100) # show number of connected cities
          
     def road(self,mmap): # if people have made choice, need to redraw the chosen path every time
-        pg.draw.lines(screen, BLACK, False, mmap.undo_dyn, 3)
+        pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 3)
 
     def cities(self,mmap): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
@@ -114,15 +113,15 @@ class Draw:
         
     def budget(self, mmap, mouse):  
         # current mouse position
-        cx, cy = mouse[0] - mmap.undo_dyn[-1][0], mouse[1] - mmap.undo_dyn[-1][1]
+        cx, cy = mouse[0] - mmap.choice_locdyn[-1][0], mouse[1] - mmap.choice_locdyn[-1][1]
         # give budget line follow mouse in the correct direction
         radians = math.atan2(cy, cx)
-        budget_pos = (int(mmap.undo_dyn[-1][0] + mmap.budget_dyn[-1] * math.cos(radians)),
-                      int(mmap.undo_dyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians)))
-        self.budget_line = pg.draw.line(screen, GREEN, mmap.undo_dyn[-1], budget_pos, 3)
+        budget_pos = (int(mmap.choice_locdyn[-1][0] + mmap.budget_dyn[-1] * math.cos(radians)),
+                      int(mmap.choice_locdyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians)))
+        self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 3)
         
     def auto_snap(self, mmap):
-        pg.draw.line(screen, BLACK, mmap.undo_dyn[-2], mmap.undo_dyn[-1], 3)
+        pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
 
     def text_write(self, text, size, color, x, y):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
@@ -178,17 +177,18 @@ while not done:
             
         if event.type == pg.MOUSEBUTTONUP:
             draw_map.budget(trial,pg.mouse.get_pos())
-            if event.type == pg.KEYUP:
-                draw_map.road(trial)
+            
 
         if event.type == pg.KEYDOWN:
             if pg.key.get_pressed() and event.key == pg.K_z:
                 trial.undo()
-                # draw_map.budget(trial,pg.mouse.get_pos())
-                # draw_map.road_undo(trial)
-
-                # draw_map.budget(trial, mouse_loc)
-            
+                print("budget undo" + str(trial.budget_dyn))
+      
+        if event.type == pg.KEYUP:
+            draw_map.budget(trial,pg.mouse.get_pos())
+            if len(trial.choice_dyn) >= 2: 
+                draw_map.road(trial)
+                
         pg.display.flip()  
         screen.fill(WHITE)
         draw_map = Draw(trial)
@@ -198,6 +198,5 @@ while not done:
 print("-----------------MAP INFORMATION --------------")
 print("Starting City: " + str(trial.city_start))
 print("city locations: " + str(trial.xy))
-print("budget undo" + str(trial.budget_dyn))
 print("---------------- Break ----------------")
 pg.quit()
