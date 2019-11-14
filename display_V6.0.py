@@ -44,7 +44,7 @@ class Map:
         dist =  self.distance[self.index][self.choice_his[-1]] # get distance from current choice to previous choice
         self.budget_remain = self.budget_remain - dist # budget update
        
-    def data(self, mouse): # not sure I understand this part
+    def data(self, mouse): 
         tick_second = round((pg.time.get_ticks()/1000), 2)
         self.click_time.append(tick_second)
         self.click.append(mouse)
@@ -83,7 +83,6 @@ class Draw:
         if len(mmap.choice_his) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road(mmap)
         self.text_write(str(mmap.n_city), 100, BLACK, 900, 100) # show number of connected cities
-        #self.undo_box()
          
     def road(self,mmap): # if people have made choice, need to redraw the chosen path every time
         pg.draw.lines(screen, BLACK, False, mmap.choice_loc, 3)
@@ -105,11 +104,6 @@ class Draw:
         
     def auto_snap(self, mmap):
         pg.draw.line(screen, BLACK, mmap.choice_loc[-2], mmap.choice_loc[-1], 3)
-  
-    #def undo_box(): we actually don't need this now 
-    #   Draw.text_write(self, "Undo", 50, BLACK, 900, 600)
-    #    pg.draw.rect(screen, GREEN, (900, 600, 100, 50), 3)
-        # those variable should be set at the top, so it's obvious
 
     def text_write(self, text, size, color, x, y):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
@@ -139,7 +133,7 @@ screen.fill(WHITE)
 clock.tick(FPS)
 # -------------------------------------------------------------------------
 trial = Map()
-draw_map = Draw(trial)  #this is important, but I dont't understand this syntax 
+draw_map = Draw(trial) 
 # -------------------------------------------------------------------------
 # loop for displaying until quit
 while not done:
@@ -161,9 +155,8 @@ while not done:
                     draw_map.auto_snap(trial)
             else: # end
                 print("The End") # need other end function
-            #if pg.Rect.collidepoint(draw_map.undo_box, pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]) and event.button == 1:
-            #    budget.budget_undo()
-        if event.type == pg.MOUSEBUTTONUP: #whats is this condition about? 
+            
+        if event.type == pg.MOUSEBUTTONUP: 
             draw_map.budget(trial,pg.mouse.get_pos())
             
         pg.display.flip()  
