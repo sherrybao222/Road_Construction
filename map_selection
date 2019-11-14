@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 class Map:
     def __init__(self): 
         # map parameters
-        self.N = 9 # total city number, including start
-        self.total = 600 # total budget
+        self.N = 11 # total city number, including start
+        self.total = 700 # total budget
         
         self.x = random.sample(range(51, 649), self.N) # x axis of all cities
         self.y = random.sample(range(51, 649), self.N) # y axis of all cities
