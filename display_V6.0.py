@@ -48,7 +48,7 @@ class Map:
         tick_second = round((pg.time.get_ticks()/1000), 2)
         self.click_time.append(tick_second)
         self.click.append(mouse)
-        #mmap.movement.append(pg.mouse.get_rel()) 
+       
         self.budget_his.append(self.budget_remain)
         self.choice_his.append(self.index)  #which index is this referring to? 
         self.choice_loc.append(self.city)
