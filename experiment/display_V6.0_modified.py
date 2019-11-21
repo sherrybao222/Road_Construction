@@ -1,4 +1,5 @@
 import pygame as pg
+import pygame_textinput
 import random
 import math
 from scipy.spatial import distance_matrix
@@ -27,7 +28,7 @@ class Map:
         self.choice_dyn = [0]
         self.choice_locdyn = [self.city_start]
         self.budget_dyn = [self.total]
-        # self.number_dyn = pg.event.unicode
+        self.number_dyn = pygame_textinput.TextInput()
 
         # choice history
         self.choice = Node(0, budget = self.total)  # start choice in tree
@@ -193,7 +194,13 @@ while not done:
             done = True
 
         if condition == 1:
+            events = pg.event.get()
             draw_map.instruction_ne(trial)
+            trial.number_dyn.update(events)
+            # Blit its surface onto the screen
+            screen.blit(trial.number_dyn.get_surface(), (10, 10))
+            pg.display.update()
+            clock.tick(30)
             if event.type == pg.KEYDOWN:
                 number = event.unicode
                 draw_map.text_write(number, 100, BLACK, 700, 200)
