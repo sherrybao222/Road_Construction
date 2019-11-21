@@ -107,7 +107,7 @@ class Draw:
         self.cities(mmap) # draw city dots
         if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road(mmap)
-        self.text_write("Score: " + str(mmap.n_city), 100, BLACK, 1000, 200) # show number of connected cities
+        self.text_write("Score: " + str(mmap.n_city), 100, BLACK, 1600, 200) # show number of connected cities
          
     def road(self,mmap): # if people have made choice, need to redraw the chosen path every time
         pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 3)
@@ -150,7 +150,7 @@ class Draw:
 
     def game_end(self, mmap): # I don't understand the self argument here
         pg.draw.rect(screen, BLACK, (600, 600, 600, 200), 0)
-        Draw.text_write(self, 'Your score is ' + str(mmap.n_city), 60, WHITE, 650, 650)
+        Draw.text_write(self, 'Your score is ' + str(mmap.n_city), 60, WHITE, 600, 650)
         pg.display.update()
 
     # def text_input(self):
@@ -194,18 +194,18 @@ while not done:
         if event.type == pg.QUIT:
             done = True
 
-        while condition == 1:
+        if condition == 1:
             draw_map.instruction_ne(trial)
             if event.type == pg.KEYDOWN:
                 number = event.unicode
-                draw_map.text_write(number, 50, BLACK, 500, 500)
+                draw_map.text_write(number, 100, BLACK, 700, 200)
                 trial.number_est.append(number)
                 pg.display.flip()
                 # screen.fill(WHITE)
                 print(trial.number_est)
-        while condition == 2:
+        if condition == 2:
             draw_map.instruction_rc(trial)
-        while condition == 3:
+        if condition == 3:
             draw_map.instruction_undo(trial)
             if event.type == pg.KEYDOWN:
                 if pg.key.get_pressed() and event.key == pg.K_z:
