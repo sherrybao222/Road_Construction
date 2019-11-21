@@ -27,11 +27,13 @@ class Map:
         self.choice_dyn = [0]
         self.choice_locdyn = [self.city_start]
         self.budget_dyn = [self.total]
+        # self.number_dyn = pg.event.unicode
 
         # choice history
         self.choice = Node(0, budget = self.total)  # start choice in tree
         self.choice_his = [0]   # choice history, index
         self.choice_loc = [self.city_start] # choice location history
+        self.number_est = []
         
         self.click = [] # mouse click location
         self.click_time = [] # mouse click time 
@@ -58,6 +60,8 @@ class Map:
         tick_second = round((pg.time.get_ticks()/1000), 2)
         self.click_time.append(tick_second)
         self.click.append(mouse)
+
+        # self.number_est.append(self.number_dyn)
        
         self.budget_his.append(self.budget_remain)
         self.budget_dyn.append(self.budget_remain)
@@ -128,6 +132,7 @@ class Draw:
     def instruction_ne(self, mmap): # number estimation
         Draw.text_write(self, "How many cities can you connect?", 50, BLACK, 100, 200)
         pg.draw.rect(screen, WHITE, (100, 200, 1000, 50), 1)
+        # Draw.text_write(trial.number_dyn, 50, BLACK, 500, 500)
         Draw.text_write(self, "Press Return to SUBMIT", 50, BLACK, 100, 300)
         pg.draw.rect(screen, WHITE, (100, 300, 1000, 50), 1)
 
@@ -148,10 +153,9 @@ class Draw:
         Draw.text_write(self, 'Your score is ' + str(mmap.n_city), 60, WHITE, 650, 650)
         pg.display.update()
 
-    def text_input(self):
-        input_rec = pg.Rect(100, 200, 1000, 50)
-        pg.key.set_text_input_rect(input_rec)
-        pg.key.start_text_input()
+    # def text_input(self):
+    #     input_rec = pg.Rect(1200, 200, 1000, 50)
+
 
     def text_write(self, text, size, color, x, y):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
@@ -190,12 +194,18 @@ while not done:
         if event.type == pg.QUIT:
             done = True
 
-        if condition == 1:
+        while condition == 1:
             draw_map.instruction_ne(trial)
-            draw_map.text_input()
-        if condition == 2:
+            if event.type == pg.KEYDOWN:
+                number = event.unicode
+                draw_map.text_write(number, 50, BLACK, 500, 500)
+                trial.number_est.append(number)
+                pg.display.flip()
+                # screen.fill(WHITE)
+                print(trial.number_est)
+        while condition == 2:
             draw_map.instruction_rc(trial)
-        if condition == 3:
+        while condition == 3:
             draw_map.instruction_undo(trial)
             if event.type == pg.KEYDOWN:
                 if pg.key.get_pressed() and event.key == pg.K_z:
