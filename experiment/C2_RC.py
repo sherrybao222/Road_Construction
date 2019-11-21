@@ -48,7 +48,7 @@ class Map:
         
     def budget_update(self):
         dist = self.distance[self.index][self.choice_his[-1]] # get distance from current choice to previous choice
-        self.budget_remain = self.budget_dyn[-1] - dist # budget update
+        self.budget_remain = self.budget_his[-1] - dist # budget update
        
     def data(self, mouse): 
         tick_second = round((pg.time.get_ticks()/1000), 2)
@@ -58,11 +58,11 @@ class Map:
         # self.number_est.append(self.number_dyn)
        
         self.budget_his.append(self.budget_remain)
-        self.budget_dyn.append(self.budget_remain)
+        # self.budget_dyn.append(self.budget_remain)
         
         self.choice_his.append(self.index)
         self.choice_loc.append(self.city)  
-        self.choice_locdyn.append(self.city) 
+        # self.choice_locdyn.append(self.city)
         new = Node(self.index, parent = self.choice, budget = self.budget_remain, time = tick_second)
         
         self.n_city = self.n_city + 1
@@ -73,7 +73,7 @@ class Map:
         
     def check_end(self): # check if trial end
         distance_copy = self.distance[self.choice_his[-1]] # copy distance list for current city
-        if any(i < self.budget_dyn[-1] and i != 0 for i in distance_copy):
+        if any(i < self.budget_his[-1] and i != 0 for i in distance_copy):
             return True # not end
         else:
             return False # end
@@ -98,12 +98,12 @@ class Map:
 class Draw: 
     def __init__(self, mmap):
         self.cities(mmap) # draw city dots
-        if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
+        if len(mmap.choice_his) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road(mmap)
         self.text_write("Score: " + str(mmap.n_city), 100, BLACK, 1600, 200) # show number of connected cities
          
     def road(self,mmap): # if people have made choice, need to redraw the chosen path every time
-        pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 3)
+        pg.draw.lines(screen, BLACK, False, mmap.choice_loc, 3)
 
     def cities(self,mmap): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
@@ -112,15 +112,15 @@ class Draw:
         
     def budget(self, mmap, mouse):  
         # current mouse position
-        cx, cy = mouse[0] - mmap.choice_locdyn[-1][0], mouse[1] - mmap.choice_locdyn[-1][1]
+        cx, cy = mouse[0] - mmap.choice_loc[-1][0], mouse[1] - mmap.choice_loc[-1][1]
         # give budget line follow mouse in the correct direction
         radians = math.atan2(cy, cx)
-        budget_pos = (int(mmap.choice_locdyn[-1][0] + mmap.budget_dyn[-1] * math.cos(radians)),
-                      int(mmap.choice_locdyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians)))
-        self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 3)
+        budget_pos = (int(mmap.choice_loc[-1][0] + mmap.budget_his[-1] * math.cos(radians)),
+                      int(mmap.choice_loc[-1][1] + mmap.budget_his[-1] * math.sin(radians)))
+        self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_loc[-1], budget_pos, 3)
 
-    def auto_snap(self, mmap):
-        pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
+    def auto_snap(self, mmap): # bug
+        pg.draw.line(screen, BLACK, mmap.choice_loc[-2], mmap.choice_loc[-1], 3)
 
     def instruction_undo(self, mmap): # how does this related to individual map condition
         self.text_write("Press Return to SUBMIT", 50, BLACK, 100, 300)
@@ -194,11 +194,11 @@ while not done:
                 pg.event.set_blocked(pg.MOUSEMOTION)
                 done = True
 
-        if event.type == pg.KEYUP:
-            if event.key == pg.K_z:
-                draw_map.budget(trial,pg.mouse.get_pos())
-                if len(trial.choice_dyn) >= 2:
-                    draw_map.road(trial)
+        # if event.type == pg.KEYUP:
+        #     if event.key == pg.K_z:
+        #         draw_map.budget(trial,pg.mouse.get_pos())
+        #         if len(trial.choice_dyn) >= 2:
+        #             draw_map.road(trial)
 
         draw_map.budget(trial, pg.mouse.get_pos())
         draw_map.instruction_undo(trial)
