@@ -3,7 +3,7 @@ import random
 import math
 from scipy.spatial import distance_matrix
 from anytree import Node
-import numpy as np
+#import numpy as np
 
 # generate map and its corresponding parameters about people's choice
 # -------------------------------------------------------------------------
