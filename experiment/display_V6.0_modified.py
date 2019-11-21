@@ -16,7 +16,7 @@ class Map:
         self.budget_remain = 700 # remaining budget
         
         mean = [350, 350]
-        cov = [[50000, 0], [0, 50000]]  # diagonal covariance
+        cov = [[20000, 0], [0, 20000]]  # diagonal covariance
         
         self.xy = np.random.multivariate_normal(mean, cov, self.N)
         self.xy = self.xy.astype(int)
