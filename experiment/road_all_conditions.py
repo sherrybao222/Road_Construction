@@ -1,9 +1,16 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Nov 21 14:48:32 2019
+
+@author: sherrybao
+"""
 import pygame as pg
+import pygame_textinput
 import random
 import math
 from scipy.spatial import distance_matrix
 from anytree import Node
-#import numpy as np
 
 # generate map and its corresponding parameters about people's choice
 # -------------------------------------------------------------------------
@@ -28,11 +35,13 @@ class Map:
         self.choice_dyn = [0]
         self.choice_locdyn = [self.city_start]
         self.budget_dyn = [self.total]
+        self.number_dyn = pygame_textinput.TextInput()
 
         # choice history
         self.choice = Node(0, budget = self.total)  # start choice in tree
         self.choice_his = [0]   # choice history, index
         self.choice_loc = [self.city_start] # choice location history
+        self.number_est = []
         
         self.click = [] # mouse click location
         self.click_time = [] # mouse click time 
@@ -128,17 +137,31 @@ class Draw:
     def auto_snap(self, mmap):
         pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
 
-    def instruction_undo(self, mmap): # how does this related to individual map condition
-        self.text_write("Press Z to UNDO", 50, GREEN, 100, 200)
+    def instruction_ne(self, mmap): # number estimation
+        Draw.text_write(self, "How many cities can you connect?", 50, BLACK, 100, 200)
         pg.draw.rect(screen, WHITE, (100, 200, 1000, 50), 1)
-        self.text_write("Press Return to SUBMIT", 50, BLACK, 100, 300)
+        # Draw.text_write(trial.number_dyn, 50, BLACK, 500, 500)
+        Draw.text_write(self, "Press Return to SUBMIT", 50, BLACK, 100, 300)
+        pg.draw.rect(screen, WHITE, (100, 300, 1000, 50), 1)
+
+    def instruction_submit(self, mmap):
+        Draw.text_write(self, "Press Return to SUBMIT", 50, BLACK, 100, 300)
+        pg.draw.rect(screen, WHITE, (100, 300, 1000, 50), 1)
+
+    def instruction_undo(self, mmap): # how does this related to individual map condition
+        Draw.text_write(self, "Press Z to UNDO", 50, BLACK, 100, 200)
+        pg.draw.rect(screen, WHITE, (100, 200, 1000, 50), 1)
+        Draw.text_write(self, "Press Return to SUBMIT", 50, BLACK, 100, 300)
         pg.draw.rect(screen, WHITE, (100, 300, 1000, 50), 1)
 
     def game_end(self, mmap): # I don't understand the self argument here
-        screen.fill(WHITE)
-        pg.draw.rect(screen, BLACK, (600, 600, 1000, 500), 0)
-        Draw.text_write(self, 'Your score is ' + str(mmap.n_city), 60, WHITE, 900, 700)
-        pg.display.flip()
+        pg.draw.rect(screen, BLACK, (600, 600, 600, 200), 0)
+        Draw.text_write(self, 'Your score is ' + str(mmap.n_city), 60, WHITE, 600, 650)
+        pg.display.update()
+
+    # def text_input(self):
+    #     input_rec = pg.Rect(1200, 200, 1000, 50)
+
 
     def text_write(self, text, size, color, x, y):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
@@ -169,12 +192,40 @@ clock.tick(FPS)
 # -------------------------------------------------------------------------
 trial = Map()
 draw_map = Draw(trial)
+condition = 1   # undo condition
 # -------------------------------------------------------------------------
 # loop for displaying until quit
 while not done:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             done = True
+
+        if condition == 1:
+            events = pg.event.get()
+            draw_map.instruction_ne(trial)
+            trial.number_dyn.update(events)
+            # Blit its surface onto the screen
+            screen.blit(trial.number_dyn.get_surface(), (10, 10))
+            pg.display.update()
+            clock.tick(30)
+            if event.type == pg.KEYDOWN:
+                number = event.unicode
+                draw_map.text_write(number, 100, BLACK, 700, 200)
+                trial.number_est.append(number)
+                pg.display.flip()
+                # screen.fill(WHITE)
+                print(trial.number_est)
+        if condition == 2:
+            draw_map.instruction_rc(trial)
+        if condition == 3:
+            draw_map.instruction_undo(trial)
+            if event.type == pg.KEYDOWN:
+                if pg.key.get_pressed() and event.key == pg.K_z:
+                    trial.undo()
+                    print("budget undo" + str(trial.budget_dyn))
+
+        if event.type == pg.MOUSEMOTION:
+            draw_map.budget(trial,pg.mouse.get_pos())
             
         if event.type == pg.MOUSEBUTTONDOWN:
             mouse_loc = pg.mouse.get_pos()
@@ -185,6 +236,7 @@ while not done:
                     trial.budget_update()
                     trial.data(mouse_loc)
                     draw_map.auto_snap(trial)
+            #         auto snap bug
             else: # end
                 print("The End") # need other end function
             
@@ -192,34 +244,33 @@ while not done:
             draw_map.budget(trial,pg.mouse.get_pos())
 
         if event.type == pg.KEYDOWN:
-            if pg.key.get_pressed() and event.key == pg.K_z:
-                trial.undo()
-                print("budget undo" + str(trial.budget_dyn))
             if event.key == pg.K_ESCAPE:
                 done = True   # very important, otherwise stuck in full screen
                 pg.display.quit()
             if event.key == pg.K_RETURN:
                 pg.event.set_blocked(pg.MOUSEMOTION)
-                done = True
+                draw_map.game_end(trial) # don't know how to make this stay
+                # pg.time.wait(3000)
+                # done = True
+                pg.display.quit()
+
+        # if event.type == pg.TEXTINPUT:
+        #     draw_map.text_write(self, 'Your score is ' + str(mmap.n_city), 60, WHITE, 650, 650)
 
         if event.type == pg.KEYUP:
             if event.key == pg.K_z:
                 draw_map.budget(trial,pg.mouse.get_pos())
                 if len(trial.choice_dyn) >= 2:
                     draw_map.road(trial)
+            # if event.key == pg.K_RETURN:
+            #     draw_map.game_end(trial)
+            #     # pg.time.wait(5000)
+            #     # done = True
+            #     pg.display.quit()
 
-        draw_map.budget(trial, pg.mouse.get_pos())
-        draw_map.instruction_undo(trial)
         pg.display.flip()  
         screen.fill(WHITE)
         draw_map = Draw(trial)
-
-while done:
-    for event in pg.event.get():
-        draw_map.game_end(trial)
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
-                pg.display.quit()
 
 
 # -------------------------------------------------------------------------
@@ -228,3 +279,5 @@ print("Starting City: " + str(trial.city_start))
 print("city locations: " + str(trial.xy))
 print("---------------- Break ----------------")
 pg.quit()
+
+
