@@ -25,7 +25,7 @@ class gaussian_map:
         self.total = 100 # total budget
         
         mean = [0, 0]
-        cov = [[333, 0], [0, 333]]  # diagonal covariance
+        cov = [[33333, 0], [0, 33333]]  # diagonal covariance
         
         self.xy = np.random.multivariate_normal(mean, cov, self.N)
         self.x, self.y = self.xy.T #transpose

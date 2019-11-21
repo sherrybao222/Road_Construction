@@ -3,6 +3,7 @@ import random
 import math
 from scipy.spatial import distance_matrix
 from anytree import Node
+import numpy as np
 
 # generate map and its corresponding parameters about people's choice
 # -------------------------------------------------------------------------
@@ -14,9 +15,16 @@ class Map:
         self.total = 700 # total budget
         self.budget_remain = 700 # remaining budget
         
-        self.x = random.sample(range(51, 649), self.N) # x axis of all cities
-        self.y = random.sample(range(51, 649), self.N) # y axis of all cities
-        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))] # combine x and y
+        mean = [350, 350]
+        cov = [[50000, 0], [0, 50000]]  # diagonal covariance
+        
+        self.xy = np.random.multivariate_normal(mean, cov, self.N)
+        self.xy = self.xy.astype(int)
+        self.x, self.y = self.xy.T #transpose
+        
+        #self.x = random.sample(range(51, 649), self.N) # x axis of all cities
+        #self.y = random.sample(range(51, 649), self.N) # y axis of all cities
+        #self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))] # combine x and y
    
         self.city_start = self.xy[0] # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000) # city distance matrix
