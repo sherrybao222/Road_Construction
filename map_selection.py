@@ -7,10 +7,12 @@ import matplotlib.pyplot as plt
 
 
 class Map:
+
+class uniform_map:
     def __init__(self): 
         # map parameters
-        self.N = 9 # total city number, including start
-        self.total = 600 # total budget
+        self.N = 11 # total city number, including start
+        self.total = 700 # total budget
         
         self.x = random.sample(range(51, 649), self.N) # x axis of all cities
         self.y = random.sample(range(51, 649), self.N) # y axis of all cities
@@ -18,6 +20,22 @@ class Map:
    
         self.city_start = self.xy[0] # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000) # city distance matrix
+#------------------------------------------------------------------------------
+class gaussian_map:
+    def __init__(self):
+        # map parameters
+        self.N = 11 # total city number, including start
+        self.total = 100 # total budget
+        
+        mean = [0, 0]
+        cov = [[33333, 0], [0, 33333]]  # diagonal covariance
+        
+        self.xy = np.random.multivariate_normal(mean, cov, self.N)
+        self.x, self.y = self.xy.T #transpose
+   
+        self.city_start = self.xy[0] # start city
+        self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000) # city distance matrix
+
 #------------------------------------------------------------------------------
 def remove_nest(l,output): 
     for i in l: 
@@ -74,7 +92,6 @@ def greedy(mmap):
         dist = np.amin(dist_list[dist_list != 0])
     
         if (dist_greedy + dist > mmap.total):
-            n_greedy = i
             break
         else:
             dist_greedy = dist_greedy + dist
@@ -82,11 +99,13 @@ def greedy(mmap):
             matrix_copy[:,greedy_index[i]] = 0
             matrix_copy[greedy_index[i],:] = 0
             i = i + 1
-            greedy_index = np.append(greedy_index,index_np[0])
+            n_greedy = i
+            greedy_index = np.append(greedy_index,index_np[0])     
+            
     return n_greedy, greedy_index
 
 #------------------------------------------------------------------------------
-mmap = Map()
+mmap = gaussian_map()
 dist, paths_list, n_optimal = calculate_all(mmap)   
 optimal_index = optimal(dist, paths_list) 
 n_greedy, greedy_index = greedy(mmap)
