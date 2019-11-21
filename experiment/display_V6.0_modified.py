@@ -3,7 +3,6 @@ import random
 import math
 from scipy.spatial import distance_matrix
 from anytree import Node
-#import numpy as np
 
 # generate map and its corresponding parameters about people's choice
 # -------------------------------------------------------------------------
@@ -137,9 +136,7 @@ class Draw:
         Draw.text_write(self, "Press Return to SUBMIT", 50, BLACK, 100, 300)
         pg.draw.rect(screen, WHITE, (100, 300, 1000, 50), 1)
 
-    def instruction_rc(self, mmap):
-        # Draw.text_write(self, "Press Z to UNDO", 50, BLACK, 100, 200)
-        # pg.draw.rect(screen, WHITE, (100, 200, 1000, 50), 1)
+    def instruction_submit(self, mmap):
         Draw.text_write(self, "Press Return to SUBMIT", 50, BLACK, 100, 300)
         pg.draw.rect(screen, WHITE, (100, 300, 1000, 50), 1)
 
