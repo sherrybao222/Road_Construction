@@ -103,6 +103,7 @@ class Map:
 # -------------------------------------------------------------------------
 class Draw: 
     def __init__(self, mmap):
+        self.instruction_undo()
         self.cities(mmap) # draw city dots
         if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road(mmap)
@@ -128,17 +129,15 @@ class Draw:
     def auto_snap(self, mmap):
         pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
 
-    def instruction_undo(self, mmap): # how does this related to individual map condition
+    def instruction_undo(self): # how does this related to individual map condition
         self.text_write("Press Z to UNDO", 50, GREEN, 100, 200)
         pg.draw.rect(screen, WHITE, (100, 200, 1000, 50), 1)
         self.text_write("Press Return to SUBMIT", 50, BLACK, 100, 300)
         pg.draw.rect(screen, WHITE, (100, 300, 1000, 50), 1)
 
     def game_end(self, mmap): # I don't understand the self argument here
-        screen.fill(WHITE)
         pg.draw.rect(screen, BLACK, (600, 600, 1000, 500), 0)
-        Draw.text_write(self, 'Your score is ' + str(mmap.n_city), 60, WHITE, 900, 700)
-        pg.display.flip()
+        self.text_write('Your score is ' + str(mmap.n_city), 60, WHITE, 900, 700)
 
     def text_write(self, text, size, color, x, y):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
@@ -209,14 +208,15 @@ while not done:
                     draw_map.road(trial)
 
         draw_map.budget(trial, pg.mouse.get_pos())
-        draw_map.instruction_undo(trial)
         pg.display.flip()  
         screen.fill(WHITE)
         draw_map = Draw(trial)
 
 while done:
     for event in pg.event.get():
+        screen.fill(WHITE)
         draw_map.game_end(trial)
+        pg.display.flip() 
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 pg.display.quit()
