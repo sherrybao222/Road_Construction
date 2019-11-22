@@ -187,14 +187,20 @@ while not done:
                 pg.display.quit()
             if event.key == pg.K_RETURN:
                 pg.event.set_blocked(pg.MOUSEMOTION)
-                draw_map.game_end(trial) 
-    
-                pg.display.quit()
+                done = True
 
         pg.display.flip()  
         screen.fill(WHITE)
         draw_map = Draw(trial)
 
+while done:
+    for event in pg.event.get():
+        screen.fill(WHITE)
+        draw_map.game_end(trial)
+        pg.display.flip() 
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_ESCAPE:
+                pg.display.quit()
 
 # -------------------------------------------------------------------------
 print("-----------------MAP INFORMATION --------------")

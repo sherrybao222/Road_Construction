@@ -175,6 +175,9 @@ while not done:
         if event.type == pg.QUIT:
             done = True
             
+        if event.type == pg.MOUSEMOTION:
+            draw_map.budget(trial,pg.mouse.get_pos())
+            
         if event.type == pg.MOUSEBUTTONDOWN:
             mouse_loc = pg.mouse.get_pos()
             draw_map.budget(trial,mouse_loc)
@@ -184,8 +187,8 @@ while not done:
                     trial.budget_update()
                     trial.data(mouse_loc)
                     draw_map.auto_snap(trial)
-            else: # end
-                print("The End") # need other end function
+#            else: # end
+#                print("The End") # need other end function
             
         if event.type == pg.MOUSEBUTTONUP:
             draw_map.budget(trial,pg.mouse.get_pos())
@@ -207,7 +210,7 @@ while not done:
                 if len(trial.choice_dyn) >= 2:
                     draw_map.road(trial)
 
-        draw_map.budget(trial, pg.mouse.get_pos())
+       
         pg.display.flip()  
         screen.fill(WHITE)
         draw_map = Draw(trial)
