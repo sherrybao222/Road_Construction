@@ -3,6 +3,7 @@ import random
 import math
 from scipy.spatial import distance_matrix
 from anytree import Node
+import csv
 
 
 # import numpy as np
@@ -26,14 +27,25 @@ class Map:
         self.city_start = self.xy[0]  # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)
 
-subject_1 = Map()
-# print(subject_1.trial_t)
-# print('Filename:', sub1, file=f)
-
 trial = 10
 
-for i in range(trial):
-    with open('map_trial2.txt', "a") as f:
-        i = Map()
-        print(i.xy)
-        print('Trial', i.xy, file=f)
+with open('trial.csv', 'w', newline='') as trial_file:
+    trial_writer = csv.writer(trial_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    trial_writer.writerow(['trial_n']+['City_n'] + ['City_start'] + ['City_xy'] + ['Distance_m'] + ['Budget_t'] + ['Budget_r'])
+
+for trial in range(trial):
+    i = Map()
+    trial_index = trial.__index__()
+    with open('trial.csv', 'a', newline='') as trial_file:
+        trial_writer = csv.writer(trial_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        # trial_writer.writerow(['City_n'] + ['City_start'] + ['City_xy'] + ['Budget_t'] + ['Budget_r'])
+        trial_writer.writerow([trial_index, i.N, i.city_start, i.xy, i.distance, i.total, i.budget_remain])
+
+with open('trial.csv', newline='') as trial_file:
+    trial_reader = csv.reader(trial_file, delimiter=' ', quotechar='|')
+    for row in trial_reader:
+        print(''.join(row))
+
+
+
+

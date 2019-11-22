@@ -107,7 +107,7 @@ class Draw:
             self.road(mmap)
         self.text_write("Score: " + str(mmap.n_city), 100, BLACK, 1600, 200) # show number of connected cities
          
-    def road(self,mmap): # if people have made choice, need to redraw the chosen path every time
+    def road(self, mmap): # if people have made choice, need to redraw the chosen path every time
         pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 3)
 
     def cities(self,mmap): # draw city dots       
@@ -174,7 +174,7 @@ while not done:
             done = True
             
         if event.type == pg.MOUSEMOTION:
-            draw_map.budget(trial,pg.mouse.get_pos())
+            draw_map.budget(trial, pg.mouse.get_pos())
             
         if event.type == pg.MOUSEBUTTONDOWN:
             mouse_loc = pg.mouse.get_pos()
