@@ -7,8 +7,6 @@ from anytree import Node
 
 # generate map and its corresponding parameters about people's choice
 # -------------------------------------------------------------------------
-
-
 class Map:
     def __init__(self): 
         # map parameters
@@ -187,8 +185,8 @@ while not done:
                     trial.budget_update()
                     trial.data(mouse_loc)
                     draw_map.auto_snap(trial)
-#            else: # end
-#                print("The End") # need other end function
+            else: # end
+                print("The End") # need other end function
             
         if event.type == pg.MOUSEBUTTONUP:
             draw_map.budget(trial,pg.mouse.get_pos())

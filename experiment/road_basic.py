@@ -7,8 +7,6 @@ from anytree import Node
 
 # generate map and its corresponding parameters about people's choice
 # -------------------------------------------------------------------------
-
-
 class Map:
     def __init__(self): 
         # map parameters
@@ -125,7 +123,7 @@ class Draw:
         self.text_write('Your score is ' + str(mmap.n_city), 60, WHITE, 600, 650)
         pg.display.update()
 
-    def text_write(text, size, color, x, y):  # function that can display any text
+    def text_write(self, text, size, color, x, y):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
         text_surface = font_object.render(text, True, color)
         text_rectangle = text_surface.get_rect()
