@@ -1,19 +1,22 @@
 import pygame as pg
-import pygame_textinput
 import random
 import math
 from scipy.spatial import distance_matrix
-from anytree import Node
+
 
 # generate map and its corresponding parameters about people's choice
 # -------------------------------------------------------------------------
 class Map:
     def __init__(self): 
+        
+        self.uniform_map()
+        self.data_init()
+        
+    def uniform_map(self):
         # map parameters
         self.N = 11     # total city number, including start
         self.radius = 7     # radius of city
         self.total = 700    # total budget
-        self.budget_remain = 700    # remaining budget
         
         self.x = random.sample(range(500, 1400), self.N)    # x axis of all cities
         self.y = random.sample(range(500, 1400), self.N)    # y axis of all cities
@@ -22,20 +25,19 @@ class Map:
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
         
-        # choice dynamic
+    def data_init(self):
+        # choice dynamic for undo
         self.choice_dyn = [0]
         self.choice_locdyn = [self.city_start]
         self.budget_dyn = [self.total]
-        self.number_dyn = pygame_textinput.TextInput()
+        self.budget_remain = 700    # remaining budget
 
         # choice history
-        self.choice = Node(0, budget = self.total)  # start choice in tree
         self.choice_his = [0]   # choice history, index
         self.choice_loc = [self.city_start] # choice location history
-        self.number_est = []
         
-        self.click = [] # mouse click location
-        self.click_time = [] # mouse click time 
+        self.click = [0] # mouse click location
+        self.click_time = [0] # mouse click time 
         
         self.budget_his = [self.total] # budget history
 
@@ -69,13 +71,26 @@ class Map:
         self.choice_dyn.append(self.index)
         self.choice_loc.append(self.city)  
         self.choice_locdyn.append(self.city) 
-        new = Node(self.index, parent = self.choice, budget = self.budget_remain, time = tick_second)
         
         self.n_city = self.n_city + 1
-        self.choice = new
         
         self.check = 0 # clear choice parameters after saving them
         del self.index, self.city
+    
+    def static_data(self, mouse): 
+        tick_second = round((pg.time.get_ticks()/1000), 2)
+        self.click_time.append(tick_second)
+        self.click.append(mouse)
+
+        # self.number_est.append(self.number_dyn)
+       
+        self.budget_his.append(float('nan'))
+        self.budget_dyn.append(float('nan'))
+        
+        self.choice_his.append(float('nan'))
+        self.choice_dyn.append(float('nan'))
+        self.choice_loc.append(float('nan'))  
+        self.choice_locdyn.append(float('nan')) 
         
     def check_end(self): # check if trial end
         distance_copy = self.distance[self.choice_his[-1]] # copy distance list for current city
@@ -141,14 +156,14 @@ done = False
 
 # display setup
 screen = pg.display.set_mode((2000, 1500), flags=pg.FULLSCREEN)  # display surface
-clock = pg.time.Clock()
-FPS = 30  # tracking time check how to use
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 screen.fill(WHITE)
-clock.tick(FPS)
+#clock = pg.time.Clock()
+#FPS = 30  # tracking time check how to use
+#clock.tick(FPS)
 # -------------------------------------------------------------------------
 trial = Map()
 draw_map = Draw(trial)
@@ -162,6 +177,8 @@ while not done:
 
         if event.type == pg.MOUSEMOTION:
             draw_map.budget(trial,pg.mouse.get_pos())
+            trial.static_data(pg.mouse.get_pos())
+            
             
         if event.type == pg.MOUSEBUTTONDOWN:
             mouse_loc = pg.mouse.get_pos()
@@ -172,12 +189,14 @@ while not done:
                     trial.budget_update()
                     trial.data(mouse_loc)
                     draw_map.auto_snap(trial)
-            #         auto snap bug
+                else:
+                    trial.static_data(mouse_loc)
             else: # end
                 print("The End") # need other end function
             
         if event.type == pg.MOUSEBUTTONUP:
             draw_map.budget(trial,pg.mouse.get_pos())
+            trial.static_data(pg.mouse.get_pos())
 
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
