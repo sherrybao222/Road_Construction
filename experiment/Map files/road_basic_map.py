@@ -1,8 +1,9 @@
 import pygame as pg
+import pandas as pd
 import random
 import math
 from scipy.spatial import distance_matrix
-#import numpy as np
+
 
 # generate map and its corresponding parameters about people's choice
 # -------------------------------------------------------------------------
@@ -18,7 +19,7 @@ class Map:
         self.radius = 7     # radius of city
         self.total = 700    # total budget
         self.budget_remain = 700    # remaining budget
-        
+
         self.x = random.sample(range(500, 1400), self.N)    # x axis of all cities
         self.y = random.sample(range(500, 1400), self.N)    # y axis of all cities
         self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
@@ -28,7 +29,16 @@ class Map:
     
         self.n_city = 0 # number of cities connected
         self.check = 0 # indicator showing if people made a valid choice
-    
+        
+    # def map_load(self):
+    #     self.trial_num = 10
+    #     self.map_file = pd.read_csv("trial.csv") # access the 4th_col of city_xy from "trial.csv", usecols=[3])
+    #     for i in range(0, self.trial_num):
+    #         self.map_row = self.map_file.loc[self.trial_num]
+    #         self.map_col = self.map_row[['City_xy']]
+    #         # print(map_col)
+
+
     def make_choice(self, mouse):
         for i in range(1, self.N): # do not evaluate the starting point
             x2, y2 = mouse # mouse location
@@ -56,12 +66,11 @@ class Map:
         self.choice_loc = [self.city_start] # choice location history
         
         self.click = [0] # mouse click indicator
-        self.undo_press = [0] # undo indicator
         
         self.budget_his = [self.total] # budget history
-        
+    
     def data(self, mouse, time): 
-        # dynamic
+        # dynamic 
         self.choice_dyn.append(self.index)
         self.choice_locdyn.append(self.city) 
         self.budget_dyn.append(self.budget_remain)
@@ -74,7 +83,6 @@ class Map:
         self.choice_loc.append(self.city)
         
         self.click.append(1)
-        self.undo_press.append(0)
 
         self.budget_his.append(self.budget_remain)
    
@@ -94,43 +102,25 @@ class Map:
         self.budget_his.append(float('nan'))
         
         self.click.append(0)
-        self.undo_press.append(0)
         
     def check_end(self): # check if trial end
-        distance_copy = self.distance[self.choice_dyn[-1]]  # copy distance list for current city
+        distance_copy = self.distance[self.choice_dyn[-1]] # copy distance list for current city
         if any(i < self.budget_dyn[-1] and i != 0 for i in distance_copy):
             return True # not end
         else:
             return False # end
         
-    def undo(self, mouse, time):
-        # dynamic change
-        self.choice_dyn.pop(-1)
-        self.choice_locdyn.pop(-1)
-        self.budget_dyn.pop(-1)
-        self.n_city = self.n_city - 1
-        
-        # save history
-        self.time.append(time)
-        self.pos.append(mouse)
-        
-        self.budget_his.append(self.budget_dyn[-1])
-        self.choice_his.append(self.choice_dyn[-1])
-        self.choice_loc.append(self.choice_locdyn[-1])
-        
-        self.click.append(0)
-        self.undo_press.append(1)
 # visualize the game
 # -------------------------------------------------------------------------
 class Draw: 
     def __init__(self, mmap):
-        self.instruction_undo()
+        self.instruction_submit()
         self.cities(mmap) # draw city dots
         if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road(mmap)
         self.text_write("Score: " + str(mmap.n_city), 100, BLACK, 1600, 200) # show number of connected cities
          
-    def road(self, mmap): # if people have made choice, need to redraw the chosen path every time
+    def road(self,mmap): # if people have made choice, need to redraw the chosen path every time
         pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 5)
 
     def cities(self,mmap): # draw city dots       
@@ -150,9 +140,8 @@ class Draw:
     def auto_snap(self, mmap):
         pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
 
-    def instruction_undo(self): # how does this related to individual map condition
-        self.text_write("Press Z to UNDO", 60, BLACK, 100, 200)
-        self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 300)
+    def instruction_submit(self):
+        self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 200)
 
     def game_end(self, mmap): 
         #pg.draw.rect(screen, WHITE, (600, 600, 600, 200), 0)
@@ -174,6 +163,7 @@ pg.font.init()
 
 # conditions
 done = False
+next_trial = False
 
 # display setup
 screen = pg.display.set_mode((2000, 1500), flags=pg.FULLSCREEN)  # display surface
@@ -188,20 +178,21 @@ screen.fill(WHITE)
 # -------------------------------------------------------------------------
 trial = Map()
 draw_map = Draw(trial)
+
 # -------------------------------------------------------------------------
 # loop for displaying until quit
 while not done:
-    for event in pg.event.get():      
+    for event in pg.event.get():
         tick_second = round((pg.time.get_ticks()/1000), 2)
         mouse_loc = pg.mouse.get_pos()
         
         if event.type == pg.QUIT:
             done = True
-            
+
         elif event.type == pg.MOUSEMOTION:
             draw_map.budget(trial,mouse_loc)
             trial.static_data(mouse_loc,tick_second)
-            
+       
         elif event.type == pg.MOUSEBUTTONDOWN:
             draw_map.budget(trial,mouse_loc)
             if trial.check_end(): # not end
@@ -221,24 +212,15 @@ while not done:
             trial.static_data(mouse_loc,tick_second)
 
         elif event.type == pg.KEYDOWN:
-            if pg.key.get_pressed() and event.key == pg.K_z:
-                trial.undo(mouse_loc, tick_second)
-                print("budget undo" + str(trial.budget_dyn))
-                
             if event.key == pg.K_ESCAPE:
                 done = True   # very important, otherwise stuck in full screen
                 pg.display.quit()
             if event.key == pg.K_RETURN:
                 pg.event.set_blocked(pg.MOUSEMOTION)
                 done = True
+                # next_trial = True
+                # draw_map.budget(map10.map_col, mouse_loc)
 
-        elif event.type == pg.KEYUP:
-            if event.key == pg.K_z:
-                draw_map.budget(trial,mouse_loc)
-                if len(trial.choice_dyn) >= 2:
-                    draw_map.road(trial)
-
-       
         pg.display.flip()  
         screen.fill(WHITE)
         draw_map = Draw(trial)
@@ -251,6 +233,23 @@ while done:
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 pg.display.quit()
+
+# while next_trial:
+#     mouse_loc = pg.mouse.get_pos()
+#     # draw_map.budget(trial.map_col, mouse_loc)
+#     # done = False
+#     # next_trial = False
+#
+#     for event in pg.event.get():
+#         if event.type == pg.KEYDOWN:
+#             if event.key == pg.K_ESCAPE:
+#                 done = True  # very important, otherwise stuck in full screen
+#                 pg.display.quit()
+#             if event.key == pg.K_RETURN:
+#                 pg.event.set_blocked(pg.MOUSEMOTION)
+#                 done = True
+#                 next_trial = True
+
 
 
 # -------------------------------------------------------------------------
