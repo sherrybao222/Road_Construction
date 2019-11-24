@@ -43,7 +43,7 @@ class Map:
         self.budget_remain = self.budget_dyn[-1] - dist # budget update
        
     def data_init(self):
-        # dynamic for undo
+        # dynamic 
         self.choice_dyn = [0]
         self.choice_locdyn = [self.city_start]
         self.budget_dyn = [self.total]
@@ -60,7 +60,7 @@ class Map:
         self.budget_his = [self.total] # budget history
     
     def data(self, mouse, time): 
-        # dynamic for undo
+        # dynamic 
         self.choice_dyn.append(self.index)
         self.choice_locdyn.append(self.city) 
         self.budget_dyn.append(self.budget_remain)
@@ -132,7 +132,6 @@ class Draw:
 
     def instruction_submit(self):
         self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 200)
-        #pg.draw.rect(screen, WHITE, (100, 300, 1000, 50), 1)
 
     def game_end(self, mmap): 
         #pg.draw.rect(screen, WHITE, (600, 600, 600, 200), 0)
@@ -179,11 +178,11 @@ while not done:
         if event.type == pg.QUIT:
             done = True
 
-        if event.type == pg.MOUSEMOTION:
+        elif event.type == pg.MOUSEMOTION:
             draw_map.budget(trial,mouse_loc)
             trial.static_data(mouse_loc,tick_second)
        
-        if event.type == pg.MOUSEBUTTONDOWN:
+        elif event.type == pg.MOUSEBUTTONDOWN:
             draw_map.budget(trial,mouse_loc)
             if trial.check_end(): # not end
                 trial.make_choice(mouse_loc)
@@ -197,11 +196,11 @@ while not done:
             else: # end
                 print("The End") # need other end function
             
-        if event.type == pg.MOUSEBUTTONUP:
+        elif event.type == pg.MOUSEBUTTONUP:
             draw_map.budget(trial,mouse_loc)
             trial.static_data(mouse_loc,tick_second)
 
-        if event.type == pg.KEYDOWN:
+        elif event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 done = True   # very important, otherwise stuck in full screen
                 pg.display.quit()
