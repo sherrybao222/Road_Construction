@@ -19,25 +19,37 @@ class Map:
         self.radius = 7     # radius of city
         self.total = 700    # total budget
         self.budget_remain = 700    # remaining budget
+        self.trial_n = 0
 
-        self.x = random.sample(range(500, 1400), self.N)    # x axis of all cities
-        self.y = random.sample(range(500, 1400), self.N)    # y axis of all cities
-        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
+        # self.x = random.sample(range(500, 1400), self.N)    # x axis of all cities
+        # self.y = random.sample(range(500, 1400), self.N)    # y axis of all cities
+        map_file = pd.read_csv("trial.csv")
+        map_row = map_file.loc[self.trial_n]
+        print(map_row)
+        self.xy = map_row[['City_xy']].tolist()
+        # self.xy = self.map_col
+        # [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
    
-        self.city_start = self.xy[0]    # start city
-        self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
+        self.city_start = map_row['City_start']
+        print(self.city_start)
+        # self.xy[0]    # start city
+        self.distance = map_row[['Distance_m']]
+        # distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
     
         self.n_city = 0 # number of cities connected
         self.check = 0 # indicator showing if people made a valid choice
         
     # def map_load(self):
+    #     map_file = pd.read_csv("trial.csv")
+    #     map_row = map_file.loc[self.trial_n]
+    #     self.map_col = map_row[['City_xy']]
+
     #     self.trial_num = 10
     #     self.map_file = pd.read_csv("trial.csv") # access the 4th_col of city_xy from "trial.csv", usecols=[3])
     #     for i in range(0, self.trial_num):
     #         self.map_row = self.map_file.loc[self.trial_num]
     #         self.map_col = self.map_row[['City_xy']]
     #         # print(map_col)
-
 
     def make_choice(self, mouse):
         for i in range(1, self.N): # do not evaluate the starting point
@@ -108,6 +120,7 @@ class Map:
         if any(i < self.budget_dyn[-1] and i != 0 for i in distance_copy):
             return True # not end
         else:
+            self.trial_n += 1
             return False # end
         
 # visualize the game
