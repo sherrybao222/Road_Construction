@@ -25,7 +25,7 @@ class Map:
         self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]  # combine x and y
         # self.trial_t = [[self.xy] for i in range(0, self.trial)] # combine trials together
 
-        self.city_start = self.xy[0]  # start city
+        self.city_start = self.x[0], self.y[0]  # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)
 
 trial = 10

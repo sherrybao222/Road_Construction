@@ -30,7 +30,7 @@ class Map:
         # self.xy = self.map_col
         # [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
    
-        self.city_start = map_row['City_start']
+        self.city_start = map_row[['City_start']]
         print(self.city_start)
         # self.xy[0]    # start city
         self.distance = map_row[['Distance_m']]
