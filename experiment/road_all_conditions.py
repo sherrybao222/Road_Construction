@@ -276,7 +276,7 @@ while not done:
         user_input.update(events)
         screen.blit(user_input.get_surface(), (700, 500))
         clock.tick(30)
-        
+
 
         pg.display.update()
         screen.fill(WHITE)
