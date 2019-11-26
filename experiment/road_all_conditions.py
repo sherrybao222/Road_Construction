@@ -9,8 +9,10 @@ import pygame as pg
 import pygame_textinput
 import random
 import math
+import pygame_textinput
 from scipy.spatial import distance_matrix
 from anytree import Node
+
 
 # generate map and its corresponding parameters about people's choice
 # -------------------------------------------------------------------------
@@ -192,14 +194,18 @@ clock.tick(FPS)
 # -------------------------------------------------------------------------
 trial = Map()
 draw_map = Draw(trial)
-condition = 1   # undo condition
+user_input = pygame_textinput.TextInput()
+condition = 2   # undo condition
 # -------------------------------------------------------------------------
 # loop for displaying until quit
 while not done:
-    for event in pg.event.get():
+    events = pg.event.get()
+    for event in events:
         if event.type == pg.QUIT:
             done = True
 
+        # user_input.update(text)
+        # screen.blit(user_input.get_surface(), (700, 500))
         if condition == 1:
             events = pg.event.get()
             draw_map.instruction_ne(trial)
@@ -216,7 +222,7 @@ while not done:
                 # screen.fill(WHITE)
                 print(trial.number_est)
         if condition == 2:
-            draw_map.instruction_rc(trial)
+            draw_map.instruction_submit(trial)
         if condition == 3:
             draw_map.instruction_undo(trial)
             if event.type == pg.KEYDOWN:
@@ -267,8 +273,12 @@ while not done:
             #     # pg.time.wait(5000)
             #     # done = True
             #     pg.display.quit()
+        user_input.update(events)
+        screen.blit(user_input.get_surface(), (700, 500))
+        clock.tick(30)
+        
 
-        pg.display.flip()  
+        pg.display.update()
         screen.fill(WHITE)
         draw_map = Draw(trial)
 
