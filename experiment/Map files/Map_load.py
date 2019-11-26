@@ -10,5 +10,3 @@ for trial in range(0, trial):
         data_row = data.loc[trial]
         data_col = data_row[['City_xy']]
         print(data_col)
-
-

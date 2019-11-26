@@ -37,16 +37,19 @@ with open('trial.csv', 'w', newline='') as trial_file:
 for trial in range(trial):
     i = Map()
     trial_index = trial.__index__()
-    pickle.dump(i, open('save_trial.p', 'wb'))
-    # with open('trial.csv', 'a', newline='') as trial_file:
-    #     trial_writer = csv.writer(trial_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    #     # trial_writer.writerow(['City_n'] + ['City_start'] + ['City_xy'] + ['Budget_t'] + ['Budget_r'])
-    #     trial_writer.writerow([trial_index, i.N, i.city_start, i.xy, i.distance, i.total, i.budget_remain])
+    # pickle.dump(i, open('save_trial.p', 'wb'))
+    with open('trial.csv', 'a', newline='') as trial_file:
+        trial_writer = csv.writer(trial_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        # trial_writer.writerow(['trial']+['City_n'] + ['City_start'] + ['City_xy'] + ['Budget_t'] + ['Budget_r'])
+        trial_writer.writerow([trial_index, i.N, i.city_start, i.xy, i.distance, i.total, i.budget_remain])
 
-# with open('trial.csv', newline='') as trial_file:
-#     trial_reader = csv.reader(trial_file, delimiter=' ', quotechar='|')
-#     for row in trial_reader:
-#         print(''.join(row))
+# new_map = pickle.load(open('save_trial.p', 'rb'))
+# print(new_map)
+
+with open('trial.csv', newline='') as trial_file:
+    trial_reader = csv.reader(trial_file, delimiter=' ', quotechar='|')
+    for row in trial_reader:
+        print(''.join(row))
 
 
 
