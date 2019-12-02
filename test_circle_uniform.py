@@ -5,13 +5,14 @@ Created on Mon Nov 18 13:25:33 2019
 
 @author: sherrybao
 """
-
-mean = [0, 0]
-cov = [[10000, 0], [0, 10000]]  # diagonal covariance
-
 import matplotlib.pyplot as plt
 import numpy as np
-x,y = np.random.multivariate_normal(mean, cov, 10).T
+from math import pi
+N = 1000
+r = np.random.uniform(0,1, N) 
+phi = np.random.uniform(0,2*pi, N) 
+x = np.sqrt(r) * np.cos(phi) # np.sqrt(r)
+y = np.sqrt(r) * np.sin(phi)
 plt.plot(x, y, 'x')
 plt.axis('equal')
 plt.show()
