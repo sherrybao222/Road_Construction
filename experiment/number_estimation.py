@@ -3,6 +3,7 @@ import random
 import math
 import pygame_textinput
 from scipy.spatial import distance_matrix
+import numpy as np
 
 
 # generate map and its corresponding parameters about people's choice
@@ -28,22 +29,48 @@ class Map:
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
     
-        self.n_city = 0 # number of cities connected
-        self.check = 0 # indicator showing if people made a valid choice
+#        self.n_city = 0 # number of cities connected
+#        self.check = 0 # indicator showing if people made a valid choice
         
-    def make_choice(self, mouse):
-        for i in range(1, self.N): # do not evaluate the starting point
-            x2, y2 = mouse # mouse location
-            self.mouse_distance = math.hypot(self.x[i] - x2, self.y[i] - y2)
-            if (self.mouse_distance <= self.radius) and (i not in self.choice_dyn): # cannot choose what has been chosen
-                self.index = i # index of chosen city
-                self.city = self.xy[i] # location of chosen city
-                self.check = 1 # indicator showing people made a valid choice
+    def circle_map(self):
+        # map parameters
+        self.N = 11     # total city number, including start
+        self.radius = 10     # radius of city
+        self.total = 700    # total budget
+        self.budget_remain = 700    # remaining budget
+
+        self.R = 450*450 #circle radius' sqaure
+        self.r = np.random.uniform(0, self.R, self.N) 
+        self.phi = np.random.uniform(0,2 * math.pi, self.N) 
+        self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
+        self.x = self.x.astype(int)
+        self.y = np.sqrt(self.r) * np.sin(self.phi) + 950
+        self.y = self.y.astype(int)
+        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
         
-    def budget_update(self):
-        dist = self.distance[self.index][self.choice_dyn[-1]] # get distance from current choice to previous choice
-        self.budget_remain = self.budget_dyn[-1] - dist # budget update
-       
+        self.city_start = self.xy[0]    # start city
+        self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
+    
+#        self.n_city = 0 # number of cities connected
+#        self.check = 0 # indicator showing if people made a valid choice
+        
+# =============================================================================
+#     def make_choice(self, mouse):
+#         for i in range(1, self.N): # do not evaluate the starting point
+#             x2, y2 = mouse # mouse location
+#             self.mouse_distance = math.hypot(self.x[i] - x2, self.y[i] - y2)
+#             if (self.mouse_distance <= self.radius) and (i not in self.choice_dyn): # cannot choose what has been chosen
+#                 self.index = i # index of chosen city
+#                 self.city = self.xy[i] # location of chosen city
+#                 self.check = 1 # indicator showing people made a valid choice
+#         
+# =============================================================================
+# =============================================================================
+#     def budget_update(self):
+#         dist = self.distance[self.index][self.choice_dyn[-1]] # get distance from current choice to previous choice
+#         self.budget_remain = self.budget_dyn[-1] - dist # budget update
+#        
+# =============================================================================
     def data_init(self):
         # dynamic 
         self.choice_dyn = [0]
@@ -174,7 +201,7 @@ pg.font.init()
 done = False
 
 # display setup
-screen = pg.display.set_mode((2000, 1500), flags=pg.FULLSCREEN)  # display surface
+screen = pg.display.set_mode((2000, 1500))#, flags=pg.FULLSCREEN)  # display surface
 WHITE = (255, 255, 255)
 RED = (255, 102, 102)
 GREEN = (0, 204, 102)

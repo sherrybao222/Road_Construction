@@ -16,3 +16,6 @@ y = np.sqrt(r) * np.sin(phi)
 plt.plot(x, y, 'x')
 plt.axis('equal')
 plt.show()
+
+import scipy.io as sio
+sio.savemat('test.mat', {'city_x':x,'city_y':y})
