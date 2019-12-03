@@ -12,6 +12,7 @@ class Map:
     def __init__(self): 
         
         self.uniform_map()
+        self.num_input = pygame_textinput.TextInput()
         self.data_init()
         
     def uniform_map(self):
@@ -19,7 +20,6 @@ class Map:
         self.N = 11     # total city number, including start
         self.radius = 7     # radius of city
         self.total = 700    # total budget
-        self.budget_remain = 700    # remaining budget
         
         self.x = random.sample(range(500, 1400), self.N)    # x axis of all cities
         self.y = random.sample(range(500, 1400), self.N)    # y axis of all cities
@@ -28,16 +28,12 @@ class Map:
    
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
-    
-#        self.n_city = 0 # number of cities connected
-#        self.check = 0 # indicator showing if people made a valid choice
         
     def circle_map(self):
         # map parameters
         self.N = 11     # total city number, including start
         self.radius = 10     # radius of city
         self.total = 700    # total budget
-        self.budget_remain = 700    # remaining budget
 
         self.R = 450*450 #circle radius' sqaure
         self.r = np.random.uniform(0, self.R, self.N) 
@@ -51,103 +47,26 @@ class Map:
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
     
-#        self.n_city = 0 # number of cities connected
-#        self.check = 0 # indicator showing if people made a valid choice
-        
-# =============================================================================
-#     def make_choice(self, mouse):
-#         for i in range(1, self.N): # do not evaluate the starting point
-#             x2, y2 = mouse # mouse location
-#             self.mouse_distance = math.hypot(self.x[i] - x2, self.y[i] - y2)
-#             if (self.mouse_distance <= self.radius) and (i not in self.choice_dyn): # cannot choose what has been chosen
-#                 self.index = i # index of chosen city
-#                 self.city = self.xy[i] # location of chosen city
-#                 self.check = 1 # indicator showing people made a valid choice
-#         
-# =============================================================================
-# =============================================================================
-#     def budget_update(self):
-#         dist = self.distance[self.index][self.choice_dyn[-1]] # get distance from current choice to previous choice
-#         self.budget_remain = self.budget_dyn[-1] - dist # budget update
-#        
-# =============================================================================
     def data_init(self):
-        # dynamic 
-        self.choice_dyn = [0]
-        self.choice_locdyn = [self.city_start]
-        self.budget_dyn = [self.total]
-
         # history
-        self.time = [0] # mouse click time 
-        self.pos = [0]
+        self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
+        self.pos = [pg.mouse.get_pos()]
         
-        self.choice_his = [0]   # choice history, index
-        self.choice_loc = [self.city_start] # choice location history
-        
-        self.click = [0] # mouse click indicator
-        
-        self.budget_his = [self.total] # budget history
-
-        self.num_input = pygame_textinput.TextInput()
         self.num_est = [] # number estimation input
-    
-    def data(self, mouse, time): 
-        # dynamic 
-        self.choice_dyn.append(self.index)
-        self.choice_locdyn.append(self.city) 
-        self.budget_dyn.append(self.budget_remain)
-        
-        # history     
-        self.time.append(time)
-        self.pos.append(mouse)
-        
-        self.choice_his.append(self.index) 
-        self.choice_loc.append(self.city)
-        
-        self.click.append(1)
-
-        self.budget_his.append(self.budget_remain)
-
-        self.num_est.append(self.num_input.get_text()) # find a way to save this input data
-   
-        self.n_city = self.n_city + 1
-        
-        self.check = 0 # clear choice parameters after saving them
-        del self.index, self.city
     
     def static_data(self, mouse, time): 
         # history 
         self.time.append(time)
         self.pos.append(mouse)
         
-        self.choice_his.append(float('nan'))
-        self.choice_loc.append(float('nan'))  
-        
-        self.budget_his.append(float('nan'))
-        
-        self.click.append(0)
-        
-    def check_end(self): # check if trial end
-        distance_copy = self.distance[self.choice_dyn[-1]] # copy distance list for current city
-        if any(i < self.budget_dyn[-1] and i != 0 for i in distance_copy):
-            return True # not end
-        else:
-            return False # end
-        
 # visualize the game
 # -------------------------------------------------------------------------
 class Draw: 
     def __init__(self, mmap):
         self.num_est(mmap)
-        self.cities(mmap) # draw city dots
+        self.cities(mmap) 
         self.city_order(mmap)
-        if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
-            self.road(mmap)
-        # self.text_write("Score: " + str(mmap.n_city), 100, BLACK, 1600, 200) # show number of connected cities
-         
-    def road(self,mmap): # if people have made choice, need to redraw the chosen path every time
-        pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 5)
-
+        
     def cities(self,mmap): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
             self.city = pg.draw.circle(screen, BLACK, city, 10)     
@@ -155,29 +74,26 @@ class Draw:
 
     def city_order(self,mmap):
         for order in mmap.order[0:]: # order of connection
-            x = mmap.xy[order][0] - 30
+            x = mmap.xy[order][0] - 50
             y = mmap.xy[order][1]
             number = str(order)
             self.text_write(number, 50, BLACK, x, y)
         
     def budget(self, mmap, mouse):  
         # current mouse position
-        cx, cy = mouse[0] - mmap.choice_locdyn[-1][0], mouse[1] - mmap.choice_locdyn[-1][1]
+        cx, cy = mouse[0] - mmap.city_start[0], mouse[1] - mmap.city_start[1]
         # give budget line follow mouse in the correct direction
         radians = math.atan2(cy, cx)
-        budget_pos = (int(mmap.choice_locdyn[-1][0] + mmap.budget_dyn[-1] * math.cos(radians)),
-                      int(mmap.choice_locdyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians)))
-        self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 5)
-
-    def auto_snap(self, mmap):
-        pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
+        budget_pos = (int(mmap.city_start[0] + mmap.total * math.cos(radians)),
+                      int(mmap.city_start[1] + mmap.total * math.sin(radians)))
+        self.budget_line = pg.draw.line(screen, GREEN, mmap.city_start, budget_pos, 5)
 
     def instruction_submit(self):
         self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 200)
 
     def game_end(self, mmap): 
         #pg.draw.rect(screen, WHITE, (600, 600, 600, 200), 0)
-        self.text_write('Next Trial ', 100, BLACK, 700, 750)
+        self.text_write('Next Trial ', 100, BLACK, 800, 650)
         pg.display.update()
 
     def num_est(self, mmap):
@@ -201,20 +117,16 @@ pg.font.init()
 done = False
 
 # display setup
-screen = pg.display.set_mode((2000, 1500))#, flags=pg.FULLSCREEN)  # display surface
+screen = pg.display.set_mode((2000, 1500), flags=pg.FULLSCREEN)  # display surface
 WHITE = (255, 255, 255)
 RED = (255, 102, 102)
 GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)
 screen.fill(WHITE)
-#clock = pg.time.Clock()
-#FPS = 30  # tracking time check how to use
-#clock.tick(FPS)
+
 # -------------------------------------------------------------------------
 trial = Map()
 draw_map = Draw(trial)
-# user_input = pygame_textinput.TextInput()
-clock = pg.time.Clock()
 
 # -------------------------------------------------------------------------
 # loop for displaying until quit
@@ -223,17 +135,16 @@ while not done:
     for event in events:
         tick_second = round((pg.time.get_ticks()/1000), 2)
         mouse_loc = pg.mouse.get_pos()
-
-        # draw map and budget
         draw_map.budget(trial,mouse_loc)
-        trial.static_data(mouse_loc,tick_second)
+        
         pg.event.set_blocked(pg.MOUSEBUTTONDOWN)
         pg.event.set_blocked(pg.MOUSEBUTTONUP)
+        
+        trial.static_data(mouse_loc,tick_second)
 
         # allow text-input on the screen
         trial.num_input.update(events)
         screen.blit(trial.num_input.get_surface(), (600, 300))
-        clock.tick(tick_second)
 
         # save text-input
         text = trial.num_input.get_text()

@@ -216,6 +216,7 @@ while not done:
     for event in pg.event.get():      
         tick_second = round((pg.time.get_ticks()/1000), 2)
         mouse_loc = pg.mouse.get_pos()
+        draw_map.budget(trial, mouse_loc)
         
         if event.type == pg.QUIT:
             done = True
