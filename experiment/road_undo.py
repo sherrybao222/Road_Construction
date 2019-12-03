@@ -2,14 +2,14 @@ import pygame as pg
 import random
 import math
 from scipy.spatial import distance_matrix
-#import numpy as np
+import numpy as np
 
 # generate map and its corresponding parameters about people's choice
 # -------------------------------------------------------------------------
 class Map:
     def __init__(self): 
         
-        self.uniform_map()
+        self.circle_map()
         self.data_init()
         
     def uniform_map(self):
@@ -29,6 +29,28 @@ class Map:
         self.n_city = 0 # number of cities connected
         self.check = 0 # indicator showing if people made a valid choice
     
+    def circle_map(self):
+        # map parameters
+        self.N = 11     # total city number, including start
+        self.radius = 10     # radius of city
+        self.total = 700    # total budget
+        self.budget_remain = 700    # remaining budget
+
+        self.R = 450*450 #circle radius' sqaure
+        self.r = np.random.uniform(0, self.R, self.N) 
+        self.phi = np.random.uniform(0,2 * math.pi, self.N) 
+        self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
+        self.x = self.x.astype(int)
+        self.y = np.sqrt(self.r) * np.sin(self.phi) + 950
+        self.y = self.y.astype(int)
+        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
+        
+        self.city_start = self.xy[0]    # start city
+        self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
+    
+        self.n_city = 0 # number of cities connected
+        self.check = 0 # indicator showing if people made a valid choice
+        
     def make_choice(self, mouse):
         for i in range(1, self.N): # do not evaluate the starting point
             x2, y2 = mouse # mouse location
@@ -135,8 +157,8 @@ class Draw:
 
     def cities(self,mmap): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
-            self.city = pg.draw.circle(screen, BLACK, city, 10)     
-        self.start = pg.draw.circle(screen, RED, mmap.city_start, 10)
+            self.city = pg.draw.circle(screen, BLACK, city, mmap.radius)     
+        self.start = pg.draw.circle(screen, RED, mmap.city_start, mmap.radius)
         
     def budget(self, mmap, mouse):  
         # current mouse position
@@ -150,7 +172,7 @@ class Draw:
     def auto_snap(self, mmap):
         pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
 
-    def instruction_undo(self): # how does this related to individual map condition
+    def instruction_undo(self): 
         self.text_write("Press Z to UNDO", 60, BLACK, 100, 200)
         self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 300)
 
