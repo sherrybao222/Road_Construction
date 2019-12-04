@@ -80,32 +80,40 @@ while i <= N-2:
 diff =  abs(n_optimal - n_greedy)
 
 # greedy all cities
-#dist_greedy = 0
-#index_greedy = np.zeros(N,dtype = int)
-#i = 0
-#matrix_copy = matrix.copy()
-#while i <= N-2:
-#    dist_list = matrix_copy[int(index_greedy[i])]
-#    dist = np.amin(dist_list[dist_list != 0])
-#    dist_greedy = dist_greedy + dist
-#    index_np = np.where(dist_list == dist)
-#    matrix_copy[:,int(index_greedy[i])] = 0
-#    matrix_copy[int(index_greedy[i]),:] = 0
-#    i = i + 1
-#    index_greedy[i] = index_np[0]
+dist_greedy = 0
+index_greedy = np.zeros(N,dtype = int)
+i = 0
+matrix_copy = matrix.copy()
+while i <= N-2:
+    dist_list = matrix_copy[int(index_greedy[i])]
+    dist = np.amin(dist_list[dist_list != 0])
+    dist_greedy = dist_greedy + dist
+    index_np = np.where(dist_list == dist)
+    matrix_copy[:,int(index_greedy[i])] = 0
+    matrix_copy[int(index_greedy[i]),:] = 0
+    i = i + 1
+    index_greedy[i] = index_np[0]
 
 # draw optimal path
-plt.plot(operator.itemgetter(*optimal_index)(x), 
-         operator.itemgetter(*optimal_index)(y), 'ro-')
-for i,txt in enumerate(optimal_index):
-    plt.text(x[txt],y[txt],i, fontsize=11)
-plt.plot(x,y,'go')
-plt.show()   
+#plt.plot(operator.itemgetter(*optimal_index)(x), 
+#         operator.itemgetter(*optimal_index)(y), 'ro-')
+#for i,txt in enumerate(optimal_index):
+#    plt.text(x[txt],y[txt],i, fontsize=11)
+#plt.plot(x,y,'go')
+#plt.show()   
 
 # draw greedy path
-plt.plot(operator.itemgetter(*greedy_index)(x), 
-         operator.itemgetter(*greedy_index)(y), 'bo-')
-for i,txt in enumerate(greedy_index):
+#plt.plot(operator.itemgetter(*greedy_index)(x), 
+#         operator.itemgetter(*greedy_index)(y), 'bo-')
+#for i,txt in enumerate(greedy_index):
+#    plt.text(x[txt],y[txt],i, fontsize=11)
+#plt.plot(x,y,'go')
+#plt.show()   
+
+# draw greedy path
+plt.plot(operator.itemgetter(*index_greedy)(x), 
+         operator.itemgetter(*index_greedy)(y), 'bo-')
+for i,txt in enumerate(index_greedy):
     plt.text(x[txt],y[txt],i, fontsize=11)
 plt.plot(x,y,'go')
-plt.show()   
+plt.show()  

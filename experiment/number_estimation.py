@@ -4,14 +4,15 @@ import math
 import pygame_textinput
 from scipy.spatial import distance_matrix
 import numpy as np
+import scipy.io as sio
 
 
 # generate map and its corresponding parameters about people's choice
 # -------------------------------------------------------------------------
 class Map:
-    def __init__(self): 
+    def __init__(self, map_content): 
         
-        self.uniform_map()
+        self.load_map(map_content)
         self.num_input = pygame_textinput.TextInput()
         self.data_init()
         
@@ -24,7 +25,6 @@ class Map:
         self.x = random.sample(range(500, 1400), self.N)    # x axis of all cities
         self.y = random.sample(range(500, 1400), self.N)    # y axis of all cities
         self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
-        self.order = [4, 6, 2, 1, 5, 8, 3, 7, 9, 10]
    
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
@@ -47,6 +47,24 @@ class Map:
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
     
+    def load_map(self, map_content):
+        
+        self.loadmap = map_content['map_list'][0,0][0,0]
+        self.order = map_content['order_list'][0]
+
+        self.radius = 10     # radius of city
+        self.total = 700    # total budget
+        
+        self.R = self.loadmap.R
+        self.r = self.loadmap.r
+        self.phi = self.loadmap.phi
+        self.x = self.loadmap.x
+        self.y = self.loadmap.y
+        self.xy = self.loadmap.xy
+        
+        self.city_start = self.loadmap.city_start.tolist()[0]
+        self.distance = self.loadmap.distance
+            
     def data_init(self):
         # history
         self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
@@ -73,11 +91,12 @@ class Draw:
         self.start = pg.draw.circle(screen, RED, mmap.city_start, 10)
 
     def city_order(self,mmap):
-        for order in mmap.order[0:]: # order of connection
-            x = mmap.xy[order][0] - 50
-            y = mmap.xy[order][1]
-            number = str(order)
-            self.text_write(number, 50, BLACK, x, y)
+        i = 1
+        for order in mmap.order[1:]: # order of connection
+            x = mmap.x[0,order] - 50
+            y = mmap.y[0,order] 
+            self.text_write(str(i), 50, BLACK, x, y)
+            i = i + 1
         
     def budget(self, mmap, mouse):  
         # current mouse position
@@ -124,12 +143,16 @@ GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)
 screen.fill(WHITE)
 
+map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
+n_trial = 5
 # -------------------------------------------------------------------------
-trial = Map()
-draw_map = Draw(trial)
 
 # -------------------------------------------------------------------------
-# loop for displaying until quit
+#def pygame_trial(done, map_content):
+    
+trial = Map(map_content)
+draw_map = Draw(trial)
+
 while not done:
     events = pg.event.get()
     for event in events:

@@ -3,10 +3,9 @@ from scipy.spatial import distance_matrix
 from itertools import combinations, permutations
 import numpy as np
 import operator 
+import math
 import matplotlib.pyplot as plt
 
-
-class Map:
 
 class uniform_map:
     def __init__(self): 
@@ -37,6 +36,25 @@ class gaussian_map:
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000) # city distance matrix
 
 #------------------------------------------------------------------------------
+class circle_map:    
+    def __init__(self):
+        # map parameters
+        self.N = 11     # total city number, including start
+        self.total = 700    # total budget
+
+        self.R = 450*450 #circle radius' sqaure
+        self.r = np.random.uniform(0, self.R, self.N) 
+        self.phi = np.random.uniform(0,2 * math.pi, self.N) 
+        self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
+        self.x = self.x.astype(int)
+        self.y = np.sqrt(self.r) * np.sin(self.phi) + 950
+        self.y = self.y.astype(int)
+        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
+        
+        self.city_start = self.xy[0]    # start city
+        self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
+
+#--------------------------------------------------------------------------------------
 def remove_nest(l,output): 
     for i in l: 
         if type(i) == list: 
