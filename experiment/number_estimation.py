@@ -15,8 +15,9 @@ class Map:
         self.load_map(map_content)
         self.num_input = pygame_textinput.TextInput()
         self.data_init()
-# -----------------------------------------------------------------------------
-# different maps  
+        
+#   different maps
+# ----------------------------------------------------------------------------
     def uniform_map(self):
         # map parameters
         self.N = 11     # total city number, including start

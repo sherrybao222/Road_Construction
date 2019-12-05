@@ -13,8 +13,8 @@ class Map:
         self.load_map(map_content)
         self.data_init()
 
-# ----------------------------------------------------------------------------
 #   different maps
+# ----------------------------------------------------------------------------
     def uniform_map(self):
         # map parameters
         self.N = 11     # total city number, including start
@@ -195,7 +195,8 @@ class Draw:
         screen.blit(text_surface, text_rectangle.center)
 
 
-#------------------------------------------------------------------------------
+# main
+# =============================================================================
 # setting up window, basic features 
 pg.init()
 pg.font.init()
