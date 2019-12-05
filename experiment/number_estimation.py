@@ -10,9 +10,9 @@ import scipy.io as sio
 # generate map and its corresponding parameters about people's choice
 # =============================================================================
 class Map:
-    def __init__(self, map_content): 
+    def __init__(self, map_content, trl_id): 
         
-        self.load_map(map_content)
+        self.load_map(map_content, trl_id)
         self.num_input = pygame_textinput.TextInput()
         self.data_init()
         
@@ -49,10 +49,10 @@ class Map:
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
     
-    def load_map(self, map_content):
+    def load_map(self, map_content, trl_id):
         
-        self.loadmap = map_content['map_list'][0,0][0,0]
-        self.order = map_content['order_list'][0]
+        self.loadmap = map_content['map_list'][0,trl_id][0,0]
+        self.order = map_content['order_list'][trl_id]
 
         self.radius = 10     # radius of city
         self.total = 700    # total budget
@@ -139,8 +139,8 @@ pg.init()
 pg.font.init()
 
 # conditions
-done = False
-
+all_done = False
+trl_done = False
 # display setup
 screen = pg.display.set_mode((2000, 1500), flags=pg.FULLSCREEN)  # display surface
 WHITE = (255, 255, 255)
@@ -151,59 +151,70 @@ screen.fill(WHITE)
 
 # load maps
 map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
-n_trial = 5
-
+n_trial = 2
 # -------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------
-#def pygame_trial(done, map_content):
+def pygame_trial(all_done, trl_done, map_content, trl_id):
     
-trial = Map(map_content)
-draw_map = Draw(trial)
+    trial = Map(map_content, trl_id)
+    draw_map = Draw(trial)
+    
+    while not trl_done:
+        events = pg.event.get()
+        for event in events:
+            tick_second = round((pg.time.get_ticks()/1000), 2)
+            mouse_loc = pg.mouse.get_pos()
+            draw_map.budget(trial,mouse_loc)
+            
+            pg.event.set_blocked(pg.MOUSEBUTTONDOWN)
+            pg.event.set_blocked(pg.MOUSEBUTTONUP)
+            
+            trial.static_data(mouse_loc,tick_second)
+    
+            # allow text-input on the screen
+            trial.num_input.update(events)
+            screen.blit(trial.num_input.get_surface(), (600, 300))
+    
+            # save text-input
+            text = trial.num_input.get_text()
+            trial.num_est.append(text)
+    
+            if event.type == pg.QUIT:
+                all_done = True
+    
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    all_done = True   # very important, otherwise stuck in full screen
+                    pg.display.quit()
+                if event.key == pg.K_RETURN:
+                    trl_done = True
+                    pg.display.flip()
+                    screen.fill(WHITE)
+                    draw_map.game_end(trial)
+                     
+    
+            pg.display.flip()
+            screen.fill(WHITE)
+            draw_map = Draw(trial)
+            
+    return all_done,trial
+#    while trl_done:
+#        for event in pg.event.get():
+#
+#            if event.type == pg.KEYDOWN:
+#                if event.key == pg.K_ESCAPE:
+#                    pg.display.quit()
 
-while not done:
-    events = pg.event.get()
-    for event in events:
-        tick_second = round((pg.time.get_ticks()/1000), 2)
-        mouse_loc = pg.mouse.get_pos()
-        draw_map.budget(trial,mouse_loc)
-        
-        pg.event.set_blocked(pg.MOUSEBUTTONDOWN)
-        pg.event.set_blocked(pg.MOUSEBUTTONUP)
-        
-        trial.static_data(mouse_loc,tick_second)
 
-        # allow text-input on the screen
-        trial.num_input.update(events)
-        screen.blit(trial.num_input.get_surface(), (600, 300))
-
-        # save text-input
-        text = trial.num_input.get_text()
-        trial.num_est.append(text)
-
-        if event.type == pg.QUIT:
-            done = True
-
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
-                done = True   # very important, otherwise stuck in full screen
-                pg.display.quit()
-            if event.key == pg.K_RETURN:
-                done = True
-
-        pg.display.update()
-        screen.fill(WHITE)
-        draw_map = Draw(trial)
-
-while done:
-    for event in pg.event.get():
-        screen.fill(WHITE)
-        draw_map.game_end(trial)
-        pg.display.flip() 
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
-                pg.display.quit()
-
+for trl_id in range(0, n_trial):
+    while not all_done:
+        all_done,trial = pygame_trial(all_done, trl_done, map_content, trl_id)
+        trl_done = False
+        if trl_id == n_trial - 1:
+            all_done = True
+    while all_done:
+        pg.display.quit()
 # -------------------------------------------------------------------------
 print("-----------------MAP INFORMATION --------------")
 print("Starting City: " + str(trial.city_start))
