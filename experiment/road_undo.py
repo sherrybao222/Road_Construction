@@ -180,7 +180,9 @@ class Draw:
         #pg.draw.rect(screen, WHITE, (600, 600, 600, 200), 0)
         self.text_write('Your score is ' + str(mmap.n_city), 100, BLACK, 700, 750)
         pg.display.update()
-
+        
+# helper function
+# ----------------------------------------------------------------------------- 
     def text_write(self, text, size, color, x, y):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
         text_surface = font_object.render(text, True, color)

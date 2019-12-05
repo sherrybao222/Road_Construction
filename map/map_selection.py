@@ -5,8 +5,20 @@ import numpy as np
 import operator 
 import math
 import matplotlib.pyplot as plt
+import scipy.io as sio
 
-
+# helper functions
+# =============================================================================
+# remove list nesting
+def remove_nest(l,output): 
+    for i in l: 
+        if type(i) == list: 
+            remove_nest(i,output) 
+        else: 
+            output.append(i) 
+            
+# different maps
+# =============================================================================
 class uniform_map:
     def __init__(self): 
         # map parameters
@@ -39,7 +51,7 @@ class gaussian_map:
 class circle_map:    
     def __init__(self):
         # map parameters
-        self.N = 11     # total city number, including start
+        self.N = 7     # total city number, including start
         self.total = 700    # total budget
 
         self.R = 450*450 #circle radius' sqaure
@@ -54,17 +66,11 @@ class circle_map:
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
 
-#--------------------------------------------------------------------------------------
-def remove_nest(l,output): 
-    for i in l: 
-        if type(i) == list: 
-            remove_nest(i,output) 
-        else: 
-            output.append(i) 
-
-#------------------------------------------------------------------------------            
-# calculate all path lengths within budget
-def calculate_all(mmap):
+# different paths
+# =============================================================================         
+# optimal within budget
+def optimal(mmap):
+    # calculate all possible paths within budget
     for i in reversed(range(1,mmap.N)):
         pool = combinations(range(1,mmap.N), i)
         paths = [list(permutations(x)) for x in pool]
@@ -85,21 +91,16 @@ def calculate_all(mmap):
         if any(x<= mmap.total for x in dist):
             n_optimal = i
             break
-        
-    return dist, paths_list, n_optimal
-
-#------------------------------------------------------------------------------        
-# optimal path       
-def optimal(dist, paths_list):
+    
     dict_path = dict(zip(paths_list, dist)) 
     sorted_path = sorted(dict_path.items(), key=operator.itemgetter(1))
     optimal_index_wozero = sorted_path[0][0]
-    optimal_index = (0,) + optimal_index_wozero
+    optimal_index = (0,) + optimal_index_wozero   
     
-    return optimal_index
+    return n_optimal, optimal_index, sorted_path
 
 #------------------------------------------------------------------------------
-# greedy with budget
+# greedy within budget
 def greedy(mmap):
     dist_greedy = 0
     greedy_index = [0]
@@ -122,26 +123,53 @@ def greedy(mmap):
             
     return n_greedy, greedy_index
 
-#------------------------------------------------------------------------------
-mmap = gaussian_map()
-dist, paths_list, n_optimal = calculate_all(mmap)   
-optimal_index = optimal(dist, paths_list) 
-n_greedy, greedy_index = greedy(mmap)
+# main
+# =============================================================================   
+n_map = 2 # number of maps needed
+map_list = []
+path_list = []
+optimal_list = []
+greedy_list = []
+optimal_number = []
+greedy_number = []
 
-diff =  abs(n_optimal - n_greedy)
+
+while True:
+    mmap = circle_map()
+    n_optimal, optimal_index, sorted_path = optimal(mmap) 
+    n_greedy, greedy_index = greedy(mmap)
+    diff =  abs(n_optimal - n_greedy)
+    
+    if diff >= 1:
+        map_list.append(mmap)
+        path_list.append(sorted_path)
+        optimal_list.append(optimal_index)
+        greedy_list.append(greedy_index)
+        optimal_number.append(n_optimal)
+        greedy_number.append(n_greedy)
+        
+    if len(map_list) == 5:
+        break
+    
+   
+# saving
+sio.savemat('test_basic_undo.mat', {'map_list':map_list,'path_list':path_list,
+                                    'optimal_list':optimal_list,'greedy_list':greedy_list,
+                                    'optimal_number':optimal_number,'greedy_number':greedy_number})
 
 # draw 
-plt.plot(operator.itemgetter(*optimal_index)(mmap.x), 
-         operator.itemgetter(*optimal_index)(mmap.y), 'ro-')
-plt.plot(operator.itemgetter(*greedy_index)(mmap.x), 
-         operator.itemgetter(*greedy_index)(mmap.y), 'bo-')
-
-plt.plot(mmap.x[1:],mmap.y[1:],'go')
-plt.plot(mmap.x[0],mmap.y[0],'cv')
-
-plt.axis('off')
-
-plt.show()
-print(diff)
+#plt.plot(operator.itemgetter(*optimal_index)(mmap.x), 
+#         operator.itemgetter(*optimal_index)(mmap.y), 'ro-')
+#plt.plot(operator.itemgetter(*greedy_index)(mmap.x), 
+#         operator.itemgetter(*greedy_index)(mmap.y), 'bo-')
+#
+#plt.plot(mmap.x[1:],mmap.y[1:],'go')
+#plt.plot(mmap.x[0],mmap.y[0],'cv')
+#
+#plt.gca().set_aspect('equal', adjustable='box')
+#plt.axis('scaled')
+#
+#plt.show()
+#print(diff)
 
 

@@ -8,14 +8,15 @@ import scipy.io as sio
 
 
 # generate map and its corresponding parameters about people's choice
-# -------------------------------------------------------------------------
+# =============================================================================
 class Map:
     def __init__(self, map_content): 
         
         self.load_map(map_content)
         self.num_input = pygame_textinput.TextInput()
         self.data_init()
-        
+# -----------------------------------------------------------------------------
+# different maps  
     def uniform_map(self):
         # map parameters
         self.N = 11     # total city number, including start
@@ -63,8 +64,9 @@ class Map:
         self.xy = self.loadmap.xy
         
         self.city_start = self.loadmap.city_start.tolist()[0]
-        self.distance = self.loadmap.distance
-            
+        self.distance = self.loadmap.distance 
+        
+# -----------------------------------------------------------------------------       
     def data_init(self):
         # history
         self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
@@ -78,7 +80,7 @@ class Map:
         self.pos.append(mouse)
         
 # visualize the game
-# -------------------------------------------------------------------------
+# =============================================================================
 class Draw: 
     def __init__(self, mmap):
         self.num_est(mmap)
@@ -119,6 +121,8 @@ class Draw:
         self.text_write('How many cities can you connect? ', 60, BLACK, 100, 200)
         self.text_write("Type your answer here: ", 60, BLACK, 100, 300)
 
+# helper function
+# ----------------------------------------------------------------------------- 
     def text_write(self, text, size, color, x, y):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
         text_surface = font_object.render(text, True, color)
@@ -127,7 +131,8 @@ class Draw:
         screen.blit(text_surface, text_rectangle.center)
 
 
-#------------------------------------------------------------------------------
+# main
+# =============================================================================
 # setting up window, basic features 
 pg.init()
 pg.font.init()
@@ -143,8 +148,10 @@ GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)
 screen.fill(WHITE)
 
+# load maps
 map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
 n_trial = 5
+
 # -------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------

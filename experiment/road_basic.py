@@ -3,16 +3,18 @@ import random
 import math
 from scipy.spatial import distance_matrix
 import numpy as np
-
+import scipy.io as sio
 
 # generate map and its corresponding parameters about people's choice
-# -------------------------------------------------------------------------
+# ============================================================================
 class Map:
-    def __init__(self): 
+    def __init__(self, map_content): 
         
-        self.circle_map()
+        self.load_map(map_content)
         self.data_init()
-        
+
+# ----------------------------------------------------------------------------
+#   different maps
     def uniform_map(self):
         # map parameters
         self.N = 11     # total city number, including start
@@ -52,6 +54,28 @@ class Map:
         self.n_city = 0 # number of cities connected
         self.check = 0 # indicator showing if people made a valid choice
       
+    def load_map(self, map_content):
+        
+        self.loadmap = map_content['map_list'][0,0][0,0]
+
+        self.N = self.loadmap.N.tolist()[0][0]
+        self.radius = 10     # radius of city
+        self.total = self.loadmap.total   # total budget
+        self.budget_remain = 700    # remaining budget
+        
+        self.R = self.loadmap.R
+        self.r = self.loadmap.r
+        self.phi = self.loadmap.phi
+        self.x = self.loadmap.x.tolist()[0]
+        self.y = self.loadmap.y.tolist()[0]
+        self.xy = self.loadmap.xy.tolist()
+        
+        self.city_start = self.loadmap.city_start.tolist()[0]
+        self.distance = self.loadmap.distance.tolist()
+        
+        self.n_city = 0 # number of cities connected
+        self.check = 0 # indicator showing if people made a valid choice
+# -----------------------------------------------------------------------------        
     def make_choice(self, mouse):
         for i in range(1, self.N): # do not evaluate the starting point
             x2, y2 = mouse # mouse location
@@ -65,6 +89,13 @@ class Map:
         dist = self.distance[self.index][self.choice_dyn[-1]] # get distance from current choice to previous choice
         self.budget_remain = self.budget_dyn[-1] - dist # budget update
        
+    def check_end(self): # check if trial end
+        distance_copy = self.distance[self.choice_dyn[-1]] # copy distance list for current city
+        if any(i < self.budget_dyn[-1] and i != 0 for i in distance_copy):
+            return True # not end
+        else:
+            return False # end
+# -----------------------------------------------------------------------------           
     def data_init(self):
         # dynamic 
         self.choice_dyn = [0]
@@ -116,15 +147,8 @@ class Map:
         
         self.click.append(0)
         
-    def check_end(self): # check if trial end
-        distance_copy = self.distance[self.choice_dyn[-1]] # copy distance list for current city
-        if any(i < self.budget_dyn[-1] and i != 0 for i in distance_copy):
-            return True # not end
-        else:
-            return False # end
-        
 # visualize the game
-# -------------------------------------------------------------------------
+# ============================================================================
 class Draw: 
     def __init__(self, mmap):
         self.instruction_submit()
@@ -161,6 +185,8 @@ class Draw:
         self.text_write('Your score is ' + str(mmap.n_city), 100, BLACK, 700, 750)
         pg.display.update()
 
+# helper function
+# ----------------------------------------------------------------------------- 
     def text_write(self, text, size, color, x, y):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
         text_surface = font_object.render(text, True, color)
@@ -184,13 +210,14 @@ RED = (255, 102, 102)
 GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)
 screen.fill(WHITE)
-#clock = pg.time.Clock()
-#FPS = 30  # tracking time check how to use
-#clock.tick(FPS)
-# -------------------------------------------------------------------------
-trial = Map()
-draw_map = Draw(trial)
 
+# load maps
+map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
+n_trial = 5
+
+# -------------------------------------------------------------------------
+trial = Map(map_content)
+draw_map = Draw(trial)
 # -------------------------------------------------------------------------
 # loop for displaying until quit
 while not done:

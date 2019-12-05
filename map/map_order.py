@@ -5,6 +5,8 @@ import scipy.io as sio
 import operator 
 import matplotlib.pyplot as plt
 
+# maps
+# =============================================================================
 class circle_map:    
     def __init__(self):
         # map parameters
@@ -22,6 +24,8 @@ class circle_map:
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
 
+# paths
+# =============================================================================      
 # greedy all cities
 def greedy(mmap):
     dist_greedy = 0
@@ -40,6 +44,8 @@ def greedy(mmap):
     
     return index_greedy
 
+# main
+# =============================================================================  
 n_map = 2 # number of maps needed
 map_list = []
 order_list = []
@@ -51,12 +57,12 @@ for i in range(0,n_map):
     order_list.append(greedy_index)
     
     # draw
-    plt.plot(operator.itemgetter(*order_list[i])(mmap.x), 
-             operator.itemgetter(*order_list[i])(mmap.y), 'bo-')
-    for i,txt in enumerate(order_list[i]):
-        plt.text(mmap.x[txt],mmap.y[txt],i, fontsize=11)
-    plt.plot(mmap.x,mmap.y,'go')
-    plt.show() 
-    
+#    plt.plot(operator.itemgetter(*order_list[i])(mmap.x), 
+#             operator.itemgetter(*order_list[i])(mmap.y), 'bo-')
+#    for i,txt in enumerate(order_list[i]):
+#        plt.text(mmap.x[txt],mmap.y[txt],i, fontsize=11)
+#    plt.plot(mmap.x,mmap.y,'go')
+#    plt.show() 
+   
 # saving
 sio.savemat('test.mat', {'map_list':map_list,'order_list':order_list})
