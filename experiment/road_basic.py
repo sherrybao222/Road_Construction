@@ -11,7 +11,7 @@ class Map:
     def __init__(self, map_content, trl_id): 
         
         self.load_map(map_content, trl_id)
-        self.data_init()
+        self.data_init(trl_id)
 
 #   different maps
 # ----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ class Map:
         self.N = self.loadmap.N.tolist()[0][0]
         self.radius = 10     # radius of city
         self.total = self.loadmap.total   # total budget
-        self.budget_remain = 700    # remaining budget
+        self.budget_remain = self.loadmap.total.copy()   # remaining budget
         
         self.R = self.loadmap.R
         self.r = self.loadmap.r
@@ -96,9 +96,9 @@ class Map:
         else:
             return False # end
 # -----------------------------------------------------------------------------           
-    def data_init(self):
+    def data_init(self, trl_id):
         # dynamic 
-        self.choice_dyn = [0]
+        self.choice_dyn[trl_id] = [0]
         self.choice_locdyn = [self.city_start]
         self.budget_dyn = [self.total]
 
@@ -275,7 +275,7 @@ all_done = False
 trl_done = False
 
 # display setup
-screen = pg.display.set_mode((2000, 1500), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
+screen = pg.display.set_mode((2000, 1500), flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
 WHITE = (255, 255, 255)
 RED = (255, 102, 102)
 GREEN = (0, 204, 102)
