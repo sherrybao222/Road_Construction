@@ -8,9 +8,9 @@ import scipy.io as sio
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
 class Map:
-    def __init__(self, map_content): 
+    def __init__(self, map_content, trl_id): 
         
-        self.load_map(map_content)
+        self.load_map(map_content, trl_id)
         self.data_init()
 
 #   different maps
@@ -54,9 +54,9 @@ class Map:
         self.n_city = 0 # number of cities connected
         self.check = 0 # indicator showing if people made a valid choice
       
-    def load_map(self, map_content):
+    def load_map(self, map_content, trl_id):
         
-        self.loadmap = map_content['map_list'][0,0][0,0]
+        self.loadmap = map_content['map_list'][0,trl_id][0,0]
 
         self.N = self.loadmap.N.tolist()[0][0]
         self.radius = 10     # radius of city
@@ -183,7 +183,8 @@ class Draw:
     def game_end(self, mmap): 
         #pg.draw.rect(screen, WHITE, (600, 600, 600, 200), 0)
         self.text_write('Your score is ' + str(mmap.n_city), 100, BLACK, 700, 750)
-        pg.display.update()
+        self.text_write('Press Return to Next Trial ', 100, BLACK, 600, 850)
+#        pg.display.update()
 
 # helper function
 # ----------------------------------------------------------------------------- 
@@ -194,6 +195,74 @@ class Draw:
         text_rectangle.center = x, y
         screen.blit(text_surface, text_rectangle.center)
 
+# single trial
+# =============================================================================
+def pygame_trial(all_done, trl_done, map_content, trl_id):
+    
+    trial = Map(map_content, trl_id)
+    pg.display.flip()
+    screen.fill(WHITE)
+    draw_map = Draw(trial)
+    
+    while not trl_done:
+        for event in pg.event.get():
+            tick_second = round((pg.time.get_ticks()/1000), 2)
+            mouse_loc = pg.mouse.get_pos()
+            draw_map.budget(trial, mouse_loc)
+            
+            if event.type == pg.QUIT:
+                all_done = True
+    
+            elif event.type == pg.MOUSEMOTION:
+                draw_map.budget(trial,mouse_loc)
+                trial.static_data(mouse_loc,tick_second)
+           
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                draw_map.budget(trial,mouse_loc)
+                if trial.check_end(): # not end
+                    trial.make_choice(mouse_loc)
+                    if trial.check == 1: # made valid choice
+                        trial.budget_update()
+                        trial.data(mouse_loc, tick_second)
+                        draw_map.auto_snap(trial)
+                    else:
+                        trial.static_data(mouse_loc,tick_second)
+                        trial.click[-1] = 1
+                else: # end
+                    print("The End") # need other end function
+                
+            elif event.type == pg.MOUSEBUTTONUP:
+                draw_map.budget(trial,mouse_loc)
+                trial.static_data(mouse_loc,tick_second)
+    
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    all_done = True   # very important, otherwise stuck in full screen
+                    pg.display.quit()
+                if event.key == pg.K_RETURN:
+#                    pg.event.set_blocked(pg.MOUSEMOTION)
+                    trl_done = True
+    
+            pg.display.flip()  
+            screen.fill(WHITE)
+            draw_map = Draw(trial)
+            
+    
+    while trl_done:
+        for event in pg.event.get():
+            
+            screen.fill(WHITE)
+            draw_map.game_end(trial)
+            pg.display.flip() 
+            
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    trl_done = False 
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.display.quit()
+    
+    return all_done,trial,trl_done
 
 # main
 # =============================================================================
@@ -202,10 +271,11 @@ pg.init()
 pg.font.init()
 
 # conditions
-done = False
+all_done = False
+trl_done = False
 
 # display setup
-screen = pg.display.set_mode((2000, 1500), flags=pg.FULLSCREEN)  # display surface
+screen = pg.display.set_mode((2000, 1500), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
 WHITE = (255, 255, 255)
 RED = (255, 102, 102)
 GREEN = (0, 204, 102)
@@ -217,62 +287,12 @@ map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction
 n_trial = 5
 
 # -------------------------------------------------------------------------
-trial = Map(map_content)
-draw_map = Draw(trial)
-# -------------------------------------------------------------------------
-# loop for displaying until quit
-while not done:
-    for event in pg.event.get():
-        tick_second = round((pg.time.get_ticks()/1000), 2)
-        mouse_loc = pg.mouse.get_pos()
-        draw_map.budget(trial, mouse_loc)
-        
-        if event.type == pg.QUIT:
-            done = True
-
-        elif event.type == pg.MOUSEMOTION:
-            draw_map.budget(trial,mouse_loc)
-            trial.static_data(mouse_loc,tick_second)
-       
-        elif event.type == pg.MOUSEBUTTONDOWN:
-            draw_map.budget(trial,mouse_loc)
-            if trial.check_end(): # not end
-                trial.make_choice(mouse_loc)
-                if trial.check == 1: # made valid choice
-                    trial.budget_update()
-                    trial.data(mouse_loc, tick_second)
-                    draw_map.auto_snap(trial)
-                else:
-                    trial.static_data(mouse_loc,tick_second)
-                    trial.click[-1] = 1
-            else: # end
-                print("The End") # need other end function
-            
-        elif event.type == pg.MOUSEBUTTONUP:
-            draw_map.budget(trial,mouse_loc)
-            trial.static_data(mouse_loc,tick_second)
-
-        elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
-                done = True   # very important, otherwise stuck in full screen
-                pg.display.quit()
-            if event.key == pg.K_RETURN:
-                pg.event.set_blocked(pg.MOUSEMOTION)
-                done = True
-
-        pg.display.flip()  
-        screen.fill(WHITE)
-        draw_map = Draw(trial)
-        
-
-while done:
-    for event in pg.event.get():
-        screen.fill(WHITE)
-        draw_map.game_end(trial)
-        pg.display.flip() 
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
-                pg.display.quit()
+while not all_done:
+    for trl_id in range(0, n_trial):
+        all_done,trial,trl_done = pygame_trial(all_done, trl_done, map_content, trl_id)
+    all_done = True
+while all_done:
+    pg.display.quit()
 
 # -------------------------------------------------------------------------
 print("-----------------MAP INFORMATION --------------")

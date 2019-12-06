@@ -8,9 +8,9 @@ import scipy.io as sio
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
 class Map:
-    def __init__(self, map_content): 
+    def __init__(self, map_content, trl_id): 
         
-        self.load_map(map_content)
+        self.load_map(map_content, trl_id)
         self.data_init()
 
 #   different maps
@@ -54,9 +54,9 @@ class Map:
         self.n_city = 0 # number of cities connected
         self.check = 0 # indicator showing if people made a valid choice
     
-    def load_map(self, map_content):
+    def load_map(self, map_content, trl_id):
         
-        self.loadmap = map_content['map_list'][0,0][0,0]
+        self.loadmap = map_content['map_list'][0,trl_id][0,0]
 
         self.N = self.loadmap.N.tolist()[0][0]
         self.radius = 10     # radius of city
