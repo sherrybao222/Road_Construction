@@ -196,7 +196,7 @@ all_done = False
 trl_done = False
 
 # display setup
-screen = pg.display.set_mode((2000, 1500), flags= pg.FULLSCREEN )  #  pg.FULLSCREEN pg.RESIZABLE
+screen = pg.display.set_mode((2000, 1500), flags= pg.RESIZABLE )  #  pg.FULLSCREEN pg.RESIZABLE
 WHITE = (255, 255, 255)
 RED = (255, 102, 102)
 GREEN = (0, 204, 102)

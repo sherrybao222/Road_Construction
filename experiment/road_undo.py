@@ -92,6 +92,8 @@ class Map:
 
     def check_end(self): # check if trial end
         distance_copy = self.distance[self.choice_dyn[-1]]  # copy distance list for current city
+        for x in self.choice_dyn:
+            distance_copy[x] = 0
         if any(i < self.budget_dyn[-1] and i != 0 for i in distance_copy):
             return True # not end
         else:
