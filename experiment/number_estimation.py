@@ -117,6 +117,10 @@ class Draw:
 
     def game_end(self, mmap): 
         self.text_write('Press Return to Next Trial ', 100, BLACK, 600, 650)
+        
+    def all_end(self, mmap): 
+        self.text_write('All trials are finished.', 100, BLACK, 600, 650)
+        self.text_write('Press ESC to exit.', 100, BLACK, 600, 750)
 
 # helper function
 # ----------------------------------------------------------------------------- 
@@ -167,7 +171,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id):
             pg.display.flip()
             screen.fill(WHITE)
             draw_map = Draw(trial)
-    
+
     while trl_done:
         events = pg.event.get()
         for event in events:
@@ -182,8 +186,10 @@ def pygame_trial(all_done, trl_done, map_content, trl_id):
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     pg.display.quit()   
+                    
+ 
                  
-    return all_done,trial,trl_done
+    return all_done,trl_done,trial,draw_map
 
 # main
 # =============================================================================
@@ -196,7 +202,7 @@ all_done = False
 trl_done = False
 
 # display setup
-screen = pg.display.set_mode((2000, 1500), flags= pg.RESIZABLE )  #  pg.FULLSCREEN pg.RESIZABLE
+screen = pg.display.set_mode((2000, 1500), flags= pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
 WHITE = (255, 255, 255)
 RED = (255, 102, 102)
 GREEN = (0, 204, 102)
@@ -206,15 +212,19 @@ screen.fill(WHITE)
 # load maps
 map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
 n_trial = 2
+trials = []
 
+# running
 # -------------------------------------------------------------------------
 while not all_done:
     for trl_id in range(0, n_trial):
-        all_done,trial,trl_done = pygame_trial(all_done, trl_done, map_content, trl_id)
+        all_done,trl_done,trial,draw_map = pygame_trial(all_done, trl_done, map_content, trl_id)
+        del trial.num_input
+        trials.append(trial)
     all_done = True
-while all_done:
-    pg.display.quit()
-    
+
+# saving
+sio.savemat('test_saving.mat', {'trials':trials})    
 # -------------------------------------------------------------------------
 print("-----------------MAP INFORMATION --------------")
 print("Starting City: " + str(trial.city_start))
