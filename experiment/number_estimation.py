@@ -118,9 +118,6 @@ class Draw:
     def game_end(self, mmap): 
         self.text_write('Press Return to Next Trial ', 100, BLACK, 600, 650)
         
-    def all_end(self, mmap): 
-        self.text_write('All trials are finished.', 100, BLACK, 600, 650)
-        self.text_write('Press ESC to exit.', 100, BLACK, 600, 750)
 
 # helper function
 # ----------------------------------------------------------------------------- 
