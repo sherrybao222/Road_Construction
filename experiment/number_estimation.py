@@ -118,7 +118,6 @@ class Draw:
     def game_end(self, mmap): 
         self.text_write('Press Return to Next Trial ', 100, BLACK, 600, 650)
         
-
 # helper function
 # ----------------------------------------------------------------------------- 
     def text_write(self, text, size, color, x, y):  # function that can display any text
@@ -186,7 +185,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id):
                     
  
                  
-    return all_done,trl_done,trial,draw_map
+    return all_done,trl_done,trial
 
 # main
 # =============================================================================
@@ -215,8 +214,8 @@ trials = []
 # -------------------------------------------------------------------------
 while not all_done:
     for trl_id in range(0, n_trial):
-        all_done,trl_done,trial,draw_map = pygame_trial(all_done, trl_done, map_content, trl_id)
-        del trial.num_input
+        all_done,trl_done,trial = pygame_trial(all_done, trl_done, map_content, trl_id)
+        del trial.num_input # saving this variable will cause error
         trials.append(trial)
     all_done = True
 

@@ -287,14 +287,17 @@ screen.fill(WHITE)
 # load maps
 map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
 n_trial = 5
+trials = []
 
 # -------------------------------------------------------------------------
 while not all_done:
     for trl_id in range(0, n_trial):
         all_done,trial,trl_done = pygame_trial(all_done, trl_done, map_content, trl_id)
+        trials.append(trial)
     all_done = True
-while all_done:
-    pg.display.quit()
+
+# saving
+sio.savemat('test_saving_basic.mat', {'trials':trials})    
 
 # -------------------------------------------------------------------------
 print("-----------------MAP INFORMATION --------------")
