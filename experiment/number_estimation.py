@@ -131,8 +131,6 @@ class Draw:
 # =============================================================================
 def pygame_trial(all_done, trl_done, map_content, trl_id, screen):
     
-    WHITE = (255, 255, 255)
-    
     trial = Map(map_content, trl_id)
     pg.display.flip()
     screen.fill(WHITE)
@@ -145,8 +143,8 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen):
             mouse_loc = pg.mouse.get_pos()
             draw_map.budget(trial,mouse_loc,screen)
             
-            pg.event.set_blocked(pg.MOUSEBUTTONDOWN)
-            pg.event.set_blocked(pg.MOUSEBUTTONUP)
+#            pg.event.set_blocked(pg.MOUSEBUTTONDOWN)
+#            pg.event.set_blocked(pg.MOUSEBUTTONUP)
 
             # allow text-input on the screen
             trial.num_input.update(events)
