@@ -8,10 +8,10 @@ import scipy.io as sio
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
 class Map:
-    def __init__(self, map_content, trl_id): 
+    def __init__(self, map_content, trl_id, blk): 
         
         self.load_map(map_content, trl_id)
-        self.data_init()
+        self.data_init(blk)
 
 #   different maps
 # ----------------------------------------------------------------------------        
@@ -61,7 +61,7 @@ class Map:
         self.N = self.loadmap.N.tolist()[0][0]
         self.radius = 10     # radius of city
         self.total = self.loadmap.total   # total budget
-        self.budget_remain = 700    # remaining budget
+        self.budget_remain = self.loadmap.total.copy()    # remaining budget
         
         self.R = self.loadmap.R
         self.r = self.loadmap.r
@@ -98,32 +98,18 @@ class Map:
             return True # not end
         else:
             return False # end
-        
-    def undo(self, mouse, time):
-        # dynamic change
-        self.choice_dyn.pop(-1)
-        self.choice_locdyn.pop(-1)
-        self.budget_dyn.pop(-1)
-        self.n_city = self.n_city - 1
-        
-        # save history
-        self.time.append(time)
-        self.pos.append(mouse)
-        
-        self.budget_his.append(self.budget_dyn[-1])
-        self.choice_his.append(self.choice_dyn[-1])
-        self.choice_loc.append(self.choice_locdyn[-1])
-        
-        self.click.append(0)
-        self.undo_press.append(1)
-# -----------------------------------------------------------------------------          
-    def data_init(self):
+
+# -----------------------------------------------------------------------------            
+    def data_init(self,blk):
         # dynamic 
         self.choice_dyn = [0]
         self.choice_locdyn = [self.city_start]
         self.budget_dyn = [self.total]
 
         # history
+        self.blk = [blk]
+        self.cond = [3] # condition
+        
         self.time = [0] # mouse click time 
         self.pos = [0]
         
@@ -135,13 +121,16 @@ class Map:
         
         self.budget_his = [self.total] # budget history
         
-    def data(self, mouse, time): 
+    def data(self, mouse, time, blk): 
         # dynamic
         self.choice_dyn.append(self.index)
         self.choice_locdyn.append(self.city) 
         self.budget_dyn.append(self.budget_remain)
         
         # history     
+        self.blk.append(blk)
+        self.cond.append(3)
+        
         self.time.append(time)
         self.pos.append(mouse)
         
@@ -158,8 +147,11 @@ class Map:
         self.check = 0 # clear choice parameters after saving them
         del self.index, self.city
     
-    def static_data(self, mouse, time): 
+    def static_data(self, mouse, time, blk): 
         # history 
+        self.blk.append(blk)
+        self.cond.append(3)
+        
         self.time.append(time)
         self.pos.append(mouse)
         
@@ -170,26 +162,47 @@ class Map:
         
         self.click.append(0)
         self.undo_press.append(0)
+
+    def undo(self, mouse, time, blk):
+        # dynamic change
+        self.choice_dyn.pop(-1)
+        self.choice_locdyn.pop(-1)
+        self.budget_dyn.pop(-1)
+        self.n_city = self.n_city - 1
+        
+        # save history
+        self.blk.append(blk)
+        self.cond.append(3)
+        
+        self.time.append(time)
+        self.pos.append(mouse)
+        
+        self.budget_his.append(self.budget_dyn[-1])
+        self.choice_his.append(self.choice_dyn[-1])
+        self.choice_loc.append(self.choice_locdyn[-1])
+        
+        self.click.append(0)
+        self.undo_press.append(1)
         
 # visualize the game
 # ============================================================================
 class Draw: 
-    def __init__(self, mmap):
-        self.instruction_undo()
-        self.cities(mmap) # draw city dots
+    def __init__(self, mmap,screen):
+        self.instruction_undo(screen)
+        self.cities(mmap,screen) # draw city dots
         if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
-            self.road(mmap)
-        self.text_write("Score: " + str(mmap.n_city), 100, BLACK, 1600, 200) # show number of connected cities
+            self.road(mmap,screen)
+        self.text_write("Score: " + str(mmap.n_city), 100, BLACK, 1600, 200,screen) # show number of connected cities
          
-    def road(self, mmap): # if people have made choice, need to redraw the chosen path every time
+    def road(self, mmap,screen): # if people have made choice, need to redraw the chosen path every time
         pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 5)
 
-    def cities(self,mmap): # draw city dots       
+    def cities(self,mmap,screen): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
             self.city = pg.draw.circle(screen, BLACK, city, mmap.radius)     
         self.start = pg.draw.circle(screen, RED, mmap.city_start, mmap.radius)
         
-    def budget(self, mmap, mouse):  
+    def budget(self, mmap, mouse,screen):  
         # current mouse position
         cx, cy = mouse[0] - mmap.choice_locdyn[-1][0], mouse[1] - mmap.choice_locdyn[-1][1]
         # give budget line follow mouse in the correct direction
@@ -198,21 +211,21 @@ class Draw:
                       int(mmap.choice_locdyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians)))
         self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 5)
 
-    def auto_snap(self, mmap):
+    def auto_snap(self, mmap,screen):
         pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
 
-    def instruction_undo(self): 
-        self.text_write("Press Z to UNDO", 60, BLACK, 100, 200)
-        self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 300)
+    def instruction_undo(self,screen): 
+        self.text_write("Press Z to UNDO", 60, BLACK, 100, 200,screen)
+        self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 300,screen)
 
-    def game_end(self, mmap): 
+    def game_end(self, mmap,screen): 
         #pg.draw.rect(screen, WHITE, (600, 600, 600, 200), 0)
-        self.text_write('Your score is ' + str(mmap.n_city), 100, BLACK, 700, 750)
-        self.text_write('Press Return to Next Trial ', 100, BLACK, 600, 850)
+        self.text_write('Your score is ' + str(mmap.n_city), 100, BLACK, 700, 750,screen)
+        self.text_write('Press Return to Next Trial ', 100, BLACK, 600, 850,screen)
         
 # helper function
 # ----------------------------------------------------------------------------- 
-    def text_write(self, text, size, color, x, y):  # function that can display any text
+    def text_write(self, text, size, color, x, y,screen):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
         text_surface = font_object.render(text, True, color)
         text_rectangle = text_surface.get_rect()
@@ -221,43 +234,43 @@ class Draw:
 
 # single trial
 # =============================================================================
-def pygame_trial(all_done, trl_done, map_content, trl_id):
+def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
     
-    trial = Map(map_content, trl_id)
+    trial = Map(map_content, trl_id, blk)
     pg.display.flip()
     screen.fill(WHITE)
-    draw_map = Draw(trial)
+    draw_map = Draw(trial, screen)
 
     while not trl_done:
         for event in pg.event.get():      
             tick_second = round((pg.time.get_ticks()/1000), 2)
             mouse_loc = pg.mouse.get_pos()
-            draw_map.budget(trial, mouse_loc)
+            draw_map.budget(trial, mouse_loc, screen)
             
             if event.type == pg.QUIT:
                 all_done = True
                 
             elif event.type == pg.MOUSEMOTION:
-                draw_map.budget(trial,mouse_loc)
-                trial.static_data(mouse_loc,tick_second)
+                draw_map.budget(trial,mouse_loc, screen)
+                trial.static_data(mouse_loc,tick_second,blk)
                 
             elif event.type == pg.MOUSEBUTTONDOWN:
-                draw_map.budget(trial,mouse_loc)
+                draw_map.budget(trial,mouse_loc, screen)
                 if trial.check_end(): # not end
                     trial.make_choice(mouse_loc)
                     if trial.check == 1: # made valid choice
                         trial.budget_update()
-                        trial.data(mouse_loc, tick_second)
-                        draw_map.auto_snap(trial)
+                        trial.data(mouse_loc, tick_second,blk)
+                        draw_map.auto_snap(trial, screen)
                     else:
-                        trial.static_data(mouse_loc,tick_second)
+                        trial.static_data(mouse_loc,tick_second,blk)
                         trial.click[-1] = 1
                 else: # end
                     print("The End") # need other end function
                 
             elif event.type == pg.MOUSEBUTTONUP:
-                draw_map.budget(trial,mouse_loc)
-                trial.static_data(mouse_loc,tick_second)
+                draw_map.budget(trial,mouse_loc, screen)
+                trial.static_data(mouse_loc,tick_second,blk)
     
             elif event.type == pg.KEYDOWN:
                 if pg.key.get_pressed() and event.key == pg.K_z:
@@ -266,7 +279,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id):
                     
                 if event.key == pg.K_ESCAPE:
                     all_done = True   # very important, otherwise stuck in full screen
-                    pg.display.quit()
+                    pg.quit()
                 if event.key == pg.K_RETURN:
 #                    pg.event.set_blocked(pg.MOUSEMOTION)
                     trl_done = True
@@ -280,13 +293,13 @@ def pygame_trial(all_done, trl_done, map_content, trl_id):
            
             pg.display.flip()  
             screen.fill(WHITE)
-            draw_map = Draw(trial)
+            draw_map = Draw(trial, screen)
     
     while trl_done:
         for event in pg.event.get():
             
             screen.fill(WHITE)
-            draw_map.game_end(trial)
+            draw_map.game_end(trial, screen)
             pg.display.flip() 
             
             if event.type == pg.KEYDOWN:
@@ -294,48 +307,54 @@ def pygame_trial(all_done, trl_done, map_content, trl_id):
                     trl_done = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
-                    pg.display.quit()
+                    pg.quit()
 
     return all_done,trial,trl_done
 
-# main
-# =============================================================================
-# setting up window, basic features 
-if __name__ == "__main__":
-    pg.init()
-    pg.font.init()
-    
+def road_undo(screen,map_content,n_trials,blk):
     # conditions
     all_done = False
     trl_done = False
     
-    # display setup
-    screen = pg.display.set_mode((2000, 1500), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
-    WHITE = (255, 255, 255)
-    RED = (255, 102, 102)
-    GREEN = (0, 204, 102)
-    BLACK = (0, 0, 0)
-    screen.fill(WHITE)
-    
-    # load maps
-    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
-    n_trial = 5
     trials = []
     
     # -------------------------------------------------------------------------
     while not all_done:
-        for trl_id in range(0, n_trial):
-            all_done,trial,trl_done = pygame_trial(all_done, trl_done, map_content, trl_id)
+        for trl_id in range(0, n_trials):
+            all_done,trial,trl_done = pygame_trial(all_done, trl_done, 
+                                                   map_content, trl_id, screen,blk)
             trials.append(trial)
         all_done = True
     #while all_done:
     #    pg.display.quit()
         
     # saving
-    sio.savemat('test_saving_undo.mat', {'trials':trials})    
-    # -------------------------------------------------------------------------
-    print("-----------------MAP INFORMATION --------------")
-    print("Starting City: " + str(trial.city_start))
-    print("city locations: " + str(trial.xy))
-    print("---------------- Break ----------------")
+#    sio.savemat('test_saving_undo.mat', {'trials':trials})   
+    return trials
+
+# main
+# =============================================================================
+# setting up window, basic features 
+    
+WHITE = (255, 255, 255)
+RED = (255, 102, 102)
+GREEN = (0, 204, 102)
+BLACK = (0, 0, 0)    
+
+if __name__ == "__main__":
+    pg.init()
+    pg.font.init()
+    
+    # display setup
+    screen = pg.display.set_mode((2000, 1500), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
+
+    screen.fill(WHITE)
+    
+    # load maps
+    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
+    n_trials = 5
+    blk = 3 # set to some number
+    
+    trials = road_undo(screen,map_content,n_trials,blk)
+
     pg.quit()

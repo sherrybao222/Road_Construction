@@ -10,11 +10,11 @@ import scipy.io as sio
 # generate map and its corresponding parameters about people's choice
 # =============================================================================
 class Map:
-    def __init__(self, map_content, trl_id): 
+    def __init__(self, map_content, trl_id, blk): 
         
         self.load_map(map_content, trl_id)
         self.num_input = pygame_textinput.TextInput()
-        self.data_init()
+        self.data_init(blk)
         
 #   different maps
 # ----------------------------------------------------------------------------
@@ -68,18 +68,22 @@ class Map:
         self.distance = self.loadmap.distance 
         
 # -----------------------------------------------------------------------------       
-    def data_init(self):
+    def data_init(self, blk):
         # history
+        self.blk = [blk]
+        self.cond = [1] # condition
         self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
         self.pos = [pg.mouse.get_pos()]
         self.num_est = [] # number estimation input
     
-    def static_data(self, mouse, time, text): 
+    def data(self, mouse, time, text, blk): 
         # history 
+        self.blk.append(blk)
+        self.cond.append(1)
         self.time.append(time)
         self.pos.append(mouse)
         self.num_est.append(text)
-        
+                
 # visualize the game
 # =============================================================================
 class Draw: 
@@ -129,9 +133,9 @@ class Draw:
 
 # single trial
 # =============================================================================
-def pygame_trial(all_done, trl_done, map_content, trl_id, screen):
+def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
     
-    trial = Map(map_content, trl_id)
+    trial = Map(map_content, trl_id, blk)
     pg.display.flip()
     screen.fill(WHITE)
     draw_map = Draw(trial,screen)
@@ -149,11 +153,10 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen):
             # allow text-input on the screen
             trial.num_input.update(events)
             screen.blit(trial.num_input.get_surface(), (600, 300))
-    
-            # save text-input
+            # save estimation input
             text = trial.num_input.get_text()
-            trial.static_data(mouse_loc,tick_second,text)
-    
+            trial.data(mouse_loc,tick_second,text,blk)         
+            
             if event.type == pg.QUIT:
                 all_done = True
     
@@ -187,7 +190,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen):
                  
     return all_done,trl_done,trial
 
-def num_estimation(screen,map_content,n_trials):    
+def num_estimation(screen,map_content,n_trials,blk):    
     # conditions
     all_done = False
     trl_done = False
@@ -198,14 +201,14 @@ def num_estimation(screen,map_content,n_trials):
     # -------------------------------------------------------------------------
     while not all_done:
         for trl_id in range(0, n_trials):
-            all_done,trl_done,trial = pygame_trial(all_done, trl_done, map_content, trl_id, screen)
+            all_done,trl_done,trial = pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk)
             del trial.num_input # saving this variable will cause error
             trials.append(trial)
         all_done = True
-    
     # saving
-    sio.savemat('test_saving.mat', {'trials':trials})    
-    
+#    sio.savemat('test_saving.mat', {'trials':trials})    
+    return trials
+
 # main
 # =============================================================================
 # setting up window, basic features 
@@ -227,7 +230,8 @@ if __name__ == "__main__":
     # load maps
     map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
     n_trials = 2
+    blk = 1 # set some number
     
-    num_estimation(screen,map_content,n_trials)
+    trials = num_estimation(screen,map_content,n_trials,blk)
     
     pg.quit()

@@ -8,10 +8,10 @@ import scipy.io as sio
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
 class Map:
-    def __init__(self, map_content, trl_id): 
+    def __init__(self, map_content, trl_id, blk): 
         
         self.load_map(map_content, trl_id)
-        self.data_init()
+        self.data_init(blk)
         
 #   different maps
 # ----------------------------------------------------------------------------
@@ -75,6 +75,7 @@ class Map:
         
         self.n_city = 0 # number of cities connected
         self.check = 0 # indicator showing if people made a valid choice
+        
 # -----------------------------------------------------------------------------        
     def make_choice(self, mouse):
         for i in range(1, self.N): # do not evaluate the starting point
@@ -98,13 +99,16 @@ class Map:
         else:
             return False # end
 # -----------------------------------------------------------------------------           
-    def data_init(self):
+    def data_init(self,blk):
         # dynamic 
         self.choice_dyn = [0]
         self.choice_locdyn = [self.city_start]
         self.budget_dyn = [self.total]
 
         # history
+        self.blk = [blk]
+        self.cond = [2] # condition
+        
         self.time = [0] # mouse click time 
         self.pos = [0]
         
@@ -115,13 +119,16 @@ class Map:
         
         self.budget_his = [self.total] # budget history
     
-    def data(self, mouse, time): 
+    def data(self, mouse, time, blk): 
         # dynamic 
         self.choice_dyn.append(self.index)
         self.choice_locdyn.append(self.city) 
         self.budget_dyn.append(self.budget_remain)
         
-        # history     
+        # history    
+        self.blk.append(blk)
+        self.cond.append(2)
+        
         self.time.append(time)
         self.pos.append(mouse)
         
@@ -137,8 +144,11 @@ class Map:
         self.check = 0 # clear choice parameters after saving them
         del self.index, self.city
     
-    def static_data(self, mouse, time): 
+    def static_data(self, mouse, time, blk): 
         # history 
+        self.blk.append(blk)
+        self.cond.append(2)
+        
         self.time.append(time)
         self.pos.append(mouse)
         
@@ -197,9 +207,9 @@ class Draw:
 
 # single trial
 # =============================================================================
-def pygame_trial(all_done, trl_done, map_content, trl_id, screen):
+def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
     
-    trial = Map(map_content, trl_id)
+    trial = Map(map_content, trl_id, blk)
     pg.display.flip()
     screen.fill(WHITE)
     draw_map = Draw(trial,screen)
@@ -215,7 +225,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen):
     
             elif event.type == pg.MOUSEMOTION:
                 draw_map.budget(trial,mouse_loc,screen)
-                trial.static_data(mouse_loc,tick_second)
+                trial.static_data(mouse_loc,tick_second,blk)
            
             elif event.type == pg.MOUSEBUTTONDOWN:
                 draw_map.budget(trial,mouse_loc,screen)
@@ -223,22 +233,22 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen):
                     trial.make_choice(mouse_loc)
                     if trial.check == 1: # made valid choice
                         trial.budget_update()
-                        trial.data(mouse_loc, tick_second)
+                        trial.data(mouse_loc, tick_second,blk)
                         draw_map.auto_snap(trial,screen)
                     else:
-                        trial.static_data(mouse_loc,tick_second)
+                        trial.static_data(mouse_loc,tick_second,blk)
                         trial.click[-1] = 1
                 else: # end
                     print("The End") # need other end function
                 
             elif event.type == pg.MOUSEBUTTONUP:
                 draw_map.budget(trial,mouse_loc,screen)
-                trial.static_data(mouse_loc,tick_second)
+                trial.static_data(mouse_loc,tick_second,blk)
     
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     all_done = True   # very important, otherwise stuck in full screen
-                    pg.display.quit()
+                    pg.quit()
                 if event.key == pg.K_RETURN:
 #                    pg.event.set_blocked(pg.MOUSEMOTION)
                     trl_done = True
@@ -260,11 +270,11 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen):
                     trl_done = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
-                    pg.display.quit()
+                    pg.quit()
     
     return all_done,trial,trl_done
 
-def basic(screen,map_content,n_trials):
+def road_basic(screen,map_content,n_trials, blk):
      # conditions
     all_done = False
     trl_done = False
@@ -274,13 +284,14 @@ def basic(screen,map_content,n_trials):
     # -------------------------------------------------------------------------
     while not all_done:
         for trl_id in range(0, n_trials):
-            all_done,trial,trl_done = pygame_trial(all_done, trl_done, map_content, trl_id,screen)
+            all_done,trial,trl_done = pygame_trial(all_done, trl_done, 
+                                                   map_content, trl_id, screen, blk)
             trials.append(trial)
         all_done = True
-    
     # saving
-    sio.savemat('test_saving_basic.mat', {'trials':trials}) 
-    
+#    sio.savemat('test_saving_basic.mat', {'trials':trials}) 
+    return trials
+
 # main
 # =============================================================================
 # setting up window, basic features 
@@ -302,7 +313,8 @@ if __name__ == "__main__":
     # load maps
     map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
     n_trials = 5
+    blk = 2 # set some number
  
-    basic(screen,map_content,n_trials)
+    trials = road_basic(screen,map_content,n_trials,blk)
     
     pg.quit()
