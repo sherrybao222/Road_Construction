@@ -83,30 +83,30 @@ class Map:
 # visualize the game
 # =============================================================================
 class Draw: 
-    def __init__(self, mmap):
-        self.cities(mmap) 
-        self.city_order(mmap)
-        self.num_est(mmap)
+    def __init__(self, mmap,screen):
+        self.cities(mmap,screen) 
+        self.city_order(mmap,screen)
+        self.num_est(mmap,screen)
         
-    def cities(self,mmap): # draw city dots       
+    def cities(self,mmap,screen): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
             self.city = pg.draw.circle(screen, BLACK, city, 10)     
         self.start = pg.draw.circle(screen, RED, mmap.city_start, 10)
 
-    def city_order(self,mmap):
+    def city_order(self,mmap,screen):
         i = 1
         for order in mmap.order[1:]: # order of connection
             x = mmap.x[0,order] - 50
             y = mmap.y[0,order] 
-            self.text_write(str(i), 50, BLACK, x, y)
+            self.text_write(str(i), 50, BLACK, x, y,screen)
             i = i + 1
         
-    def num_est(self, mmap):
-        self.text_write('How many cities can you connect? ', 60, BLACK, 100, 200)
-        self.text_write("Type your answer here: ", 60, BLACK, 100, 300)
-        self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 400)
+    def num_est(self, mmap,screen):
+        self.text_write('How many cities can you connect? ', 60, BLACK, 100, 200,screen)
+        self.text_write("Type your answer here: ", 60, BLACK, 100, 300,screen)
+        self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 400,screen)
         
-    def budget(self, mmap, mouse):  
+    def budget(self, mmap, mouse,screen):  
         # current mouse position
         cx, cy = mouse[0] - mmap.city_start[0], mouse[1] - mmap.city_start[1]
         # give budget line follow mouse in the correct direction
@@ -115,12 +115,12 @@ class Draw:
                       int(mmap.city_start[1] + mmap.total * math.sin(radians)))
         self.budget_line = pg.draw.line(screen, GREEN, mmap.city_start, budget_pos, 5)
 
-    def game_end(self, mmap): 
-        self.text_write('Press Return to Next Trial ', 100, BLACK, 600, 650)
+    def game_end(self, mmap,screen): 
+        self.text_write('Press Return to Next Trial ', 100, BLACK, 600, 650,screen)
         
 # helper function
 # ----------------------------------------------------------------------------- 
-    def text_write(self, text, size, color, x, y):  # function that can display any text
+    def text_write(self, text, size, color, x, y,screen):  # function that can display any text
         font_object = pg.font.SysFont(pg.font.get_default_font(), size)
         text_surface = font_object.render(text, True, color)
         text_rectangle = text_surface.get_rect()
@@ -129,19 +129,21 @@ class Draw:
 
 # single trial
 # =============================================================================
-def pygame_trial(all_done, trl_done, map_content, trl_id):
+def pygame_trial(all_done, trl_done, map_content, trl_id, screen):
+    
+    WHITE = (255, 255, 255)
     
     trial = Map(map_content, trl_id)
     pg.display.flip()
     screen.fill(WHITE)
-    draw_map = Draw(trial)
+    draw_map = Draw(trial,screen)
     
     while not trl_done:
         events = pg.event.get()
         for event in events:
             tick_second = round((pg.time.get_ticks()/1000), 2)
             mouse_loc = pg.mouse.get_pos()
-            draw_map.budget(trial,mouse_loc)
+            draw_map.budget(trial,mouse_loc,screen)
             
             pg.event.set_blocked(pg.MOUSEBUTTONDOWN)
             pg.event.set_blocked(pg.MOUSEBUTTONUP)
@@ -160,20 +162,20 @@ def pygame_trial(all_done, trl_done, map_content, trl_id):
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     all_done = True   # very important, otherwise stuck in full screen
-                    pg.display.quit()
+                    pg.quit()
                 if event.key == pg.K_RETURN:
                     trl_done = True
                
             pg.display.flip()
             screen.fill(WHITE)
-            draw_map = Draw(trial)
+            draw_map = Draw(trial,screen)
 
     while trl_done:
         events = pg.event.get()
         for event in events:
        
             screen.fill(WHITE)
-            draw_map.game_end(trial)
+            draw_map.game_end(trial,screen)
             pg.display.flip()
             
             if event.type == pg.KEYDOWN:
@@ -181,49 +183,53 @@ def pygame_trial(all_done, trl_done, map_content, trl_id):
                     trl_done = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
-                    pg.display.quit()   
+                    pg.quit()   
                     
  
                  
     return all_done,trl_done,trial
 
+def num_estimation(screen,map_content,n_trials):    
+    # conditions
+    all_done = False
+    trl_done = False
+    
+    trials = []
+    
+    # running
+    # -------------------------------------------------------------------------
+    while not all_done:
+        for trl_id in range(0, n_trials):
+            all_done,trl_done,trial = pygame_trial(all_done, trl_done, map_content, trl_id, screen)
+            del trial.num_input # saving this variable will cause error
+            trials.append(trial)
+        all_done = True
+    
+    # saving
+    sio.savemat('test_saving.mat', {'trials':trials})    
+    
 # main
 # =============================================================================
 # setting up window, basic features 
-pg.init()
-pg.font.init()
-
-# conditions
-all_done = False
-trl_done = False
-
-# display setup
-screen = pg.display.set_mode((2000, 1500), flags= pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
+    
 WHITE = (255, 255, 255)
 RED = (255, 102, 102)
 GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)
-screen.fill(WHITE)
 
-# load maps
-map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
-n_trial = 2
-trials = []
-
-# running
-# -------------------------------------------------------------------------
-while not all_done:
-    for trl_id in range(0, n_trial):
-        all_done,trl_done,trial = pygame_trial(all_done, trl_done, map_content, trl_id)
-        del trial.num_input # saving this variable will cause error
-        trials.append(trial)
-    all_done = True
-
-# saving
-sio.savemat('test_saving.mat', {'trials':trials})    
-# -------------------------------------------------------------------------
-print("-----------------MAP INFORMATION --------------")
-print("Starting City: " + str(trial.city_start))
-print("city locations: " + str(trial.xy))
-print("---------------- Break ----------------")
-pg.quit()
+if __name__ == "__main__":
+    pg.init()
+    pg.font.init()
+    
+    # display setup
+    screen = pg.display.set_mode((2000, 1500), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
+    
+    screen.fill(WHITE)
+    
+    # load maps
+    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
+    n_trials = 2
+    
+    num_estimation(screen,map_content,n_trials)
+    
+    pg.quit()

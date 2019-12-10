@@ -90,7 +90,7 @@ class Map:
         self.budget_remain = self.budget_dyn[-1] - dist # budget update
        
     def check_end(self): # check if trial end
-        distance_copy = self.distance[self.choice_dyn[-1]] # copy distance list for current city
+        distance_copy = self.distance[self.choice_dyn[-1]].copy() # copy distance list for current city
         for x in self.choice_dyn:
             distance_copy[x] = 0
         if any(i < self.budget_dyn[-1] and i != 0 for i in distance_copy):
@@ -269,39 +269,40 @@ def pygame_trial(all_done, trl_done, map_content, trl_id):
 # main
 # =============================================================================
 # setting up window, basic features 
-pg.init()
-pg.font.init()
-
-# conditions
-all_done = False
-trl_done = False
-
-# display setup
-screen = pg.display.set_mode((2000, 1500), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
-WHITE = (255, 255, 255)
-RED = (255, 102, 102)
-GREEN = (0, 204, 102)
-BLACK = (0, 0, 0)
-screen.fill(WHITE)
-
-# load maps
-map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
-n_trial = 5
-trials = []
-
-# -------------------------------------------------------------------------
-while not all_done:
-    for trl_id in range(0, n_trial):
-        all_done,trial,trl_done = pygame_trial(all_done, trl_done, map_content, trl_id)
-        trials.append(trial)
-    all_done = True
-
-# saving
-sio.savemat('test_saving_basic.mat', {'trials':trials})    
-
-# -------------------------------------------------------------------------
-print("-----------------MAP INFORMATION --------------")
-print("Starting City: " + str(trial.city_start))
-print("city locations: " + str(trial.xy))
-print("---------------- Break ----------------")
-pg.quit()
+if __name__ == "__main__":
+    pg.init()
+    pg.font.init()
+    
+    # conditions
+    all_done = False
+    trl_done = False
+    
+    # display setup
+    screen = pg.display.set_mode((2000, 1500), flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
+    WHITE = (255, 255, 255)
+    RED = (255, 102, 102)
+    GREEN = (0, 204, 102)
+    BLACK = (0, 0, 0)
+    screen.fill(WHITE)
+    
+    # load maps
+    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
+    n_trial = 5
+    trials = []
+    
+    # -------------------------------------------------------------------------
+    while not all_done:
+        for trl_id in range(0, n_trial):
+            all_done,trial,trl_done = pygame_trial(all_done, trl_done, map_content, trl_id)
+            trials.append(trial)
+        all_done = True
+    
+    # saving
+    sio.savemat('test_saving_basic.mat', {'trials':trials})    
+    
+    # -------------------------------------------------------------------------
+    print("-----------------MAP INFORMATION --------------")
+    print("Starting City: " + str(trial.city_start))
+    print("city locations: " + str(trial.xy))
+    print("---------------- Break ----------------")
+    pg.quit()
