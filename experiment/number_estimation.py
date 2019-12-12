@@ -77,17 +77,14 @@ class Map:
         self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
         self.pos = [pg.mouse.get_pos()]
         self.click = [0] # mouse click indicator
+        self.undo_press = [0] # undo indicator
         
-        self.choice_dyn = [None]
-        self.choice_locdyn = [None]
         self.choice_his = [None]   # choice history, index
         self.choice_loc = [None] # choice location history
                 
-        self.budget_dyn = [None]
         self.budget_his = [None] # budget history
 
-        self.n_city = 0 # number of cities connected
-        self.check = 0 # indicator showing if people made a valid choice
+        self.n_city = None # number of cities connected
         self.num_est = [None] # number estimation input
         
     def data(self, mouse, time, text, blk): 
@@ -97,13 +94,11 @@ class Map:
         self.time.append(time)
         self.pos.append(mouse)
         self.click.append(0)
+        self.undo_press.append(0)
         
-        self.choice_dyn.append(None)
-        self.choice_locdyn.append(None)         
         self.choice_his.append(None) 
         self.choice_loc.append(None)
                 
-        self.budget_dyn.append(self.budget_remain)
         self.budget_his.append(self.budget_remain)
    
         self.num_est.append(text)
