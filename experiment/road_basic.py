@@ -5,8 +5,6 @@ from scipy.spatial import distance_matrix
 import numpy as np
 import scipy.io as sio
 
-
-
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
 class Map:
@@ -14,8 +12,7 @@ class Map:
         
         self.load_map(map_content, trl_id)
         self.data_init(blk)
-
-        
+       
 #   different maps
 # ----------------------------------------------------------------------------
     def uniform_map(self):
@@ -31,9 +28,6 @@ class Map:
    
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
-    
-        self.n_city = 0 # number of cities connected
-        self.check = 0 # indicator showing if people made a valid choice
         
     def circle_map(self):
         # map parameters
@@ -53,32 +47,27 @@ class Map:
         
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
-    
-        self.n_city = 0 # number of cities connected
-        self.check = 0 # indicator showing if people made a valid choice
       
     def load_map(self, map_content, trl_id):
         
         self.loadmap = map_content['map_list'][0,trl_id][0,0]
-
+        self.order = None
+        
         self.N = self.loadmap.N.tolist()[0][0]
         self.radius = 10     # radius of city
         self.total = self.loadmap.total   # total budget
         self.budget_remain = self.loadmap.total.copy()   # remaining budget
         
-        self.R = self.loadmap.R
-        self.r = self.loadmap.r
-        self.phi = self.loadmap.phi
+        self.R = self.loadmap.R.tolist()[0]
+        self.r = self.loadmap.r.tolist()[0]
+        self.phi = self.loadmap.phi.tolist()[0]
         self.x = self.loadmap.x.tolist()[0]
         self.y = self.loadmap.y.tolist()[0]
         self.xy = self.loadmap.xy.tolist()
         
         self.city_start = self.loadmap.city_start.tolist()[0]
         self.distance = self.loadmap.distance.tolist()
-        
-        self.n_city = 0 # number of cities connected
-        self.check = 0 # indicator showing if people made a valid choice
-        
+                
 # -----------------------------------------------------------------------------        
     def make_choice(self, mouse):
         for i in range(1, self.N): # do not evaluate the starting point
@@ -101,66 +90,66 @@ class Map:
             return True # not end
         else:
             return False # end
+        
 # -----------------------------------------------------------------------------           
-    def data_init(self,blk):
-        # dynamic 
-        self.choice_dyn = [0]
-        self.choice_locdyn = [self.city_start]
-        self.budget_dyn = [self.total]
-
-        # history
+    def data_init(self, blk):
         self.blk = [blk]
         self.cond = [2] # condition
-        
         self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
         self.pos = [pg.mouse.get_pos()]
+        self.click = [0] # mouse click indicator
+        self.undo_press = [0] # undo indicator
         
+        self.choice_dyn = [0]
+        self.choice_locdyn = [self.city_start]
         self.choice_his = [0]   # choice history, index
         self.choice_loc = [self.city_start] # choice location history
-        
-        self.click = [0] # mouse click indicator
-        
+                
+        self.budget_dyn = [self.total]
         self.budget_his = [self.total] # budget history
-    
-    def data(self, mouse, time, blk): 
-        # dynamic 
-        self.choice_dyn.append(self.index)
-        self.choice_locdyn.append(self.city) 
-        self.budget_dyn.append(self.budget_remain)
-        
-        # history    
-        self.blk.append(blk)
-        self.cond.append(2)
-        
-        self.time.append(time)
-        self.pos.append(mouse)
-        
-        self.choice_his.append(self.index) 
-        self.choice_loc.append(self.city)
-        
-        self.click.append(1)
 
-        self.budget_his.append(self.budget_remain)
-   
-        self.n_city = self.n_city + 1
+        self.n_city = 0 # number of cities connected
+        self.check = 0 # indicator showing if people made a valid choice
+        self.num_est = [None] # number estimation input()
+
+        self.index = 0 # initial choice
+        self.city = self.city_start.copy() # initial choice
         
-        self.check = 0 # clear choice parameters after saving them
-        del self.index, self.city
-    
-    def static_data(self, mouse, time, blk): 
-        # history 
+    def data(self, mouse, time, blk): 
         self.blk.append(blk)
         self.cond.append(2)
-        
         self.time.append(time)
         self.pos.append(mouse)
+        self.click.append(1)
+        self.undo_press.append(0)
         
-        self.choice_his.append(float('nan'))
-        self.choice_loc.append(float('nan'))  
+        self.choice_dyn.append(self.index)
+        self.choice_locdyn.append(self.city)
+        self.choice_his.append(self.index)
+        self.choice_loc.append(self.city)
+                
+        self.budget_dyn.append(self.budget_remain)
+        self.budget_his.append(self.budget_remain)
+                                
+        self.n_city = self.n_city + 1
+        self.check = 0 # change choice indicator after saving them
+        self.num_est.append(None)
+
+        del self.index, self.city   
         
-        self.budget_his.append(float('nan'))
-        
+    def static_data(self, mouse, time, blk): 
+        self.blk.append(blk)
+        self.cond.append(2)
+        self.time.append(time)
+        self.pos.append(mouse)
         self.click.append(0)
+        self.undo_press.append(0)
+        
+        self.choice_his.append(None)
+        self.choice_loc.append(None)  
+        self.budget_his.append(None)
+        
+        self.num_est.append(None)
         
 # visualize the game
 # ============================================================================
@@ -232,15 +221,15 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
            
             elif event.type == pg.MOUSEBUTTONDOWN:
                 draw_map.budget(trial,mouse_loc,screen)
+                trial.click[-1] = 1
                 if trial.check_end(): # not end
                     trial.make_choice(mouse_loc)
                     if trial.check == 1: # made valid choice
                         trial.budget_update()
-                        trial.data(mouse_loc, tick_second,blk)
-                        draw_map.auto_snap(trial,screen)
+                        trial.data(mouse_loc, tick_second, blk)
+                        draw_map.auto_snap(trial,screen)                        
                     else:
-                        trial.static_data(mouse_loc,tick_second,blk)
-                        trial.click[-1] = 1
+                        trial.static_data(mouse_loc, tick_second, blk)
                 else: # end
                     print("The End") # need other end function
                 
@@ -263,7 +252,6 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
     
     while trl_done:
         for event in pg.event.get():
-            
             screen.fill(WHITE)
             draw_map.game_end(trial,screen)
             pg.display.flip() 

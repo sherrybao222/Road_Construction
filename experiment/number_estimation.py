@@ -14,8 +14,6 @@ class Map:
         
         self.load_map(map_content, trl_id)
         self.data_init(blk)
-
-#        self.num_input = pygame_textinput.TextInput()
         
 #   different maps
 # ----------------------------------------------------------------------------
@@ -24,6 +22,7 @@ class Map:
         self.N = 11     # total city number, including start
         self.radius = 7     # radius of city
         self.total = 700    # total budget
+        self.budget_remain = 700    # remaining budget()
         
         self.x = random.sample(range(500, 1400), self.N)    # x axis of all cities
         self.y = random.sample(range(500, 1400), self.N)    # y axis of all cities
@@ -37,7 +36,8 @@ class Map:
         self.N = 11     # total city number, including start
         self.radius = 10     # radius of city
         self.total = 700    # total budget
-
+        self.budget_remain = 700    # remaining budget()
+        
         self.R = 450*450 #circle radius' sqaure
         self.r = np.random.uniform(0, self.R, self.N) 
         self.phi = np.random.uniform(0,2 * math.pi, self.N) 
@@ -49,40 +49,63 @@ class Map:
         
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
-    
+
     def load_map(self, map_content, trl_id):
         
         self.loadmap = map_content['map_list'][0,trl_id][0,0]
         self.order = map_content['order_list'][trl_id]
 
+        self.N = self.loadmap.N.tolist()[0][0]
         self.radius = 10     # radius of city
-        self.total = 700    # total budget
-        
-        self.R = self.loadmap.R
-        self.r = self.loadmap.r
-        self.phi = self.loadmap.phi
-        self.x = self.loadmap.x
-        self.y = self.loadmap.y
-        self.xy = self.loadmap.xy
+        self.total = self.loadmap.total   # total budget
+        self.budget_remain = self.loadmap.total.copy()   # remaining budget()
+
+        self.R = self.loadmap.R.tolist()[0]
+        self.r = self.loadmap.r.tolist()[0]
+        self.phi = self.loadmap.phi.tolist()[0]
+        self.x = self.loadmap.x.tolist()[0]
+        self.y = self.loadmap.y.tolist()[0]
+        self.xy = self.loadmap.xy.tolist()
         
         self.city_start = self.loadmap.city_start.tolist()[0]
-        self.distance = self.loadmap.distance 
+        self.distance = self.loadmap.distance.tolist() 
         
 # -----------------------------------------------------------------------------       
     def data_init(self, blk):
-        # history
         self.blk = [blk]
         self.cond = [1] # condition
         self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
         self.pos = [pg.mouse.get_pos()]
-        self.num_est = [] # number estimation input
-    
+        self.click = [0] # mouse click indicator
+        
+        self.choice_dyn = [None]
+        self.choice_locdyn = [None]
+        self.choice_his = [None]   # choice history, index
+        self.choice_loc = [None] # choice location history
+                
+        self.budget_dyn = [None]
+        self.budget_his = [None] # budget history
+
+        self.n_city = 0 # number of cities connected
+        self.check = 0 # indicator showing if people made a valid choice
+        self.num_est = [None] # number estimation input
+        
     def data(self, mouse, time, text, blk): 
         # history 
         self.blk.append(blk)
         self.cond.append(1)
         self.time.append(time)
         self.pos.append(mouse)
+        self.click.append(0)
+        
+        self.choice_dyn.append(None)
+        self.choice_locdyn.append(None)         
+        self.choice_his.append(None) 
+        self.choice_loc.append(None)
+                
+        self.budget_dyn.append(self.budget_remain)
+        self.budget_his.append(self.budget_remain)
+   
         self.num_est.append(text)
                 
 # visualize the game

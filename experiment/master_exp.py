@@ -31,7 +31,6 @@ orders = [[1,2,3,3,2,1],
 
 # information input
 subject_num = input("Enter the subject number: ")
-gender = input("Enter the gender: ")
 order_ind = int(input("Enter the order indicator: "))
 
 # setting up window, basic features 
