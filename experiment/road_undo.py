@@ -110,8 +110,8 @@ class Map:
         self.blk = [blk]
         self.cond = [3] # condition
         
-        self.time = [0] # mouse click time 
-        self.pos = [0]
+        self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
+        self.pos = [pg.mouse.get_pos()]
         
         self.choice_his = [0]   # choice history, index
         self.choice_loc = [self.city_start] # choice location history
@@ -273,11 +273,12 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
                 trial.static_data(mouse_loc,tick_second,blk)
     
             elif event.type == pg.KEYDOWN:
-                if pg.key.get_pressed() and event.key == pg.K_z:
-                    trial.undo(mouse_loc, tick_second)
+                if (pg.key.get_pressed() and trial.choice_dyn[-1] != 0
+                    and event.key == pg.K_z):
+                    trial.undo(mouse_loc, tick_second, blk)
                     print("budget undo" + str(trial.budget_dyn))
                     
-                if event.key == pg.K_ESCAPE:
+                if event.key == pg.K_ESCAPE:    
                     all_done = True   # very important, otherwise stuck in full screen
                     pg.quit()
                 if event.key == pg.K_RETURN:
@@ -286,9 +287,9 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
     
             elif event.type == pg.KEYUP:
                 if event.key == pg.K_z:
-                    draw_map.budget(trial,mouse_loc)
+                    draw_map.budget(trial,mouse_loc,screen)
                     if len(trial.choice_dyn) >= 2:
-                        draw_map.road(trial)
+                        draw_map.road(trial,screen)
     
            
             pg.display.flip()  

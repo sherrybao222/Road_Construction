@@ -5,6 +5,8 @@ from scipy.spatial import distance_matrix
 import numpy as np
 import scipy.io as sio
 
+
+
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
 class Map:
@@ -12,6 +14,7 @@ class Map:
         
         self.load_map(map_content, trl_id)
         self.data_init(blk)
+
         
 #   different maps
 # ----------------------------------------------------------------------------
@@ -109,8 +112,8 @@ class Map:
         self.blk = [blk]
         self.cond = [2] # condition
         
-        self.time = [0] # mouse click time 
-        self.pos = [0]
+        self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
+        self.pos = [pg.mouse.get_pos()]
         
         self.choice_his = [0]   # choice history, index
         self.choice_loc = [self.city_start] # choice location history

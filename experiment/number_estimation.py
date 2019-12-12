@@ -1,11 +1,11 @@
 import pygame as pg
-import pygame_textinput
 import random
 import math
 from scipy.spatial import distance_matrix
 import numpy as np
 import scipy.io as sio
 
+import pygame_textinput
 
 # generate map and its corresponding parameters about people's choice
 # =============================================================================
@@ -13,8 +13,9 @@ class Map:
     def __init__(self, map_content, trl_id, blk): 
         
         self.load_map(map_content, trl_id)
-        self.num_input = pygame_textinput.TextInput()
         self.data_init(blk)
+
+#        self.num_input = pygame_textinput.TextInput()
         
 #   different maps
 # ----------------------------------------------------------------------------
@@ -30,7 +31,7 @@ class Map:
    
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
-        
+
     def circle_map(self):
         # map parameters
         self.N = 11     # total city number, including start
@@ -139,6 +140,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
     pg.display.flip()
     screen.fill(WHITE)
     draw_map = Draw(trial,screen)
+    num_input = pygame_textinput.TextInput()
     
     while not trl_done:
         events = pg.event.get()
@@ -151,10 +153,10 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
 #            pg.event.set_blocked(pg.MOUSEBUTTONUP)
 
             # allow text-input on the screen
-            trial.num_input.update(events)
-            screen.blit(trial.num_input.get_surface(), (600, 300))
+            num_input.update(events)
+            screen.blit(num_input.get_surface(), (600, 300))
             # save estimation input
-            text = trial.num_input.get_text()
+            text = num_input.get_text()
             trial.data(mouse_loc,tick_second,text,blk)         
             
             if event.type == pg.QUIT:
@@ -202,7 +204,7 @@ def num_estimation(screen,map_content,n_trials,blk):
     while not all_done:
         for trl_id in range(0, n_trials):
             all_done,trl_done,trial = pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk)
-            del trial.num_input # saving this variable will cause error
+#            del trial.num_input # saving this variable will cause error
             trials.append(trial)
         all_done = True
     # saving

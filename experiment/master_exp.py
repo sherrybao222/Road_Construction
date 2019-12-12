@@ -12,9 +12,9 @@ from road_undo import road_undo
 # main
 # =============================================================================
 # trial numbers
-n_trl_num = 2
-n_trl_basic = 5
-n_trl_undo = 5
+n_trl = [2,2,2]
+n_all = 2 * sum(n_trl)
+trials = [float("nan")] * n_all
 
 # load maps
 num_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
@@ -39,18 +39,24 @@ pg.init()
 pg.font.init()
 
 # display setup
-screen = pg.display.set_mode((2000, 1500), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
+screen = pg.display.set_mode((2000, 1500), flags= pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
 WHITE = (255, 255, 255)
 screen.fill(WHITE)
 
 # blocks
-for blk, cond in enumerate(orders[order_ind - 1]):
+start_trl = 0
+for blk, cond in enumerate(orders[order_ind - 1]):   
     if cond == 1:
-        num_estimation(screen,num_map,n_trl_num,blk)
+        trials[start_trl:] = num_estimation(screen,num_map,n_trl[cond-1],blk)
     if cond == 2:
-        road_basic(screen,basic_map,n_trl_basic,blk)
+        trials[start_trl:] = road_basic(screen,basic_map,n_trl[cond-1],blk)
     if cond == 3:    
-        road_undo(screen,undo_map,n_trl_undo,blk)
+        trials[start_trl:] = road_undo(screen,undo_map,n_trl[cond-1],blk)
+    
+    start_trl = start_trl + n_trl[cond-1]
+
+# saving
+sio.savemat('test_all.mat', {'trials':trials})   
 
 pg.quit()
 

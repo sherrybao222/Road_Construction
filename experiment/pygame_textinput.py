@@ -203,4 +203,4 @@ if __name__ == "__main__":
         screen.blit(textinput.get_surface(), (10, 10))
 
         pygame.display.update()
-        clock.tick(30)
+        clock.tick() #30
