@@ -11,6 +11,10 @@ class circle_map:
     def __init__(self):
         # map parameters
         self.N = 11     # total city number, including start
+        self.radius = 10     # radius of city
+        self.total = 700    # total budget
+        self.budget_remain = 700    # remaining budget
+
 
         self.R = 450*450 #circle radius' sqaure
         self.r = np.random.uniform(0, self.R, self.N) 
@@ -19,7 +23,7 @@ class circle_map:
         self.x = self.x.astype(int)
         self.y = np.sqrt(self.r) * np.sin(self.phi) + 950
         self.y = self.y.astype(int)
-        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
+        self.xy = [(self.x[i], self.y[i]) for i in range(0, len(self.x))]   # combine x and y
         
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix

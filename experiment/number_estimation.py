@@ -13,7 +13,7 @@ class Map:
     def __init__(self, map_content, trl_id, blk): 
         
         self.load_map(map_content, trl_id)
-        self.data_init(blk)
+        self.data_init(blk,trl_id)
         
 #   different maps
 # ----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class Map:
         self.N = self.loadmap.N.tolist()[0][0]
         self.radius = 10     # radius of city
         self.total = self.loadmap.total   # total budget
-        self.budget_remain = self.loadmap.total.copy()   # remaining budget()
+        self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
 
         self.R = self.loadmap.R.tolist()[0]
         self.r = self.loadmap.r.tolist()[0]
@@ -71,36 +71,39 @@ class Map:
         self.distance = self.loadmap.distance.tolist() 
         
 # -----------------------------------------------------------------------------       
-    def data_init(self, blk):
+    def data_init(self, blk, trl_id):
         self.blk = [blk]
+        self.trl = [trl_id]
         self.cond = [1] # condition
         self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
         self.pos = [pg.mouse.get_pos()]
         self.click = [0] # mouse click indicator
         self.undo_press = [0] # undo indicator
         
-        self.choice_his = [None]   # choice history, index
-        self.choice_loc = [None] # choice location history
+        self.choice_his = [np.nan]   # choice history, index
+        self.choice_loc = [np.nan] # choice location history
                 
-        self.budget_his = [None] # budget history
+        self.budget_his = [np.nan] # budget history
 
-        self.n_city = None # number of cities connected
-        self.num_est = [None] # number estimation input
+        self.n_city = [np.nan] # number of cities connected
+        self.num_est = [np.nan] # number estimation input
         
-    def data(self, mouse, time, text, blk): 
+    def data(self, mouse, time, text, blk, trl_id): 
         # history 
         self.blk.append(blk)
+        self.trl.append(trl_id)
         self.cond.append(1)
         self.time.append(time)
         self.pos.append(mouse)
         self.click.append(0)
         self.undo_press.append(0)
         
-        self.choice_his.append(None) 
-        self.choice_loc.append(None)
+        self.choice_his.append(np.nan) 
+        self.choice_loc.append(np.nan)
                 
         self.budget_his.append(self.budget_remain)
-   
+        
+        self.n_city.append(np.nan)
         self.num_est.append(text)
                 
 # visualize the game
@@ -119,8 +122,8 @@ class Draw:
     def city_order(self,mmap,screen):
         i = 1
         for order in mmap.order[1:]: # order of connection
-            x = mmap.x[0,order] - 50
-            y = mmap.y[0,order] 
+            x = mmap.x[order] - 50
+            y = mmap.y[order] 
             self.text_write(str(i), 50, BLACK, x, y,screen)
             i = i + 1
         
@@ -175,7 +178,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
             screen.blit(num_input.get_surface(), (600, 300))
             # save estimation input
             text = num_input.get_text()
-            trial.data(mouse_loc,tick_second,text,blk)         
+            trial.data(mouse_loc,tick_second,text,blk,trl_id)         
             
             if event.type == pg.QUIT:
                 all_done = True
@@ -216,7 +219,6 @@ def num_estimation(screen,map_content,n_trials,blk):
     trl_done = False
     
     trials = []
-    
     # running
     # -------------------------------------------------------------------------
     while not all_done:

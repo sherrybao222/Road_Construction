@@ -46,11 +46,11 @@ screen.fill(WHITE)
 start_trl = 0
 for blk, cond in enumerate(orders[order_ind - 1]):   
     if cond == 1:
-        trials[start_trl:] = num_estimation(screen,num_map,n_trl[cond-1],blk)
+        trials[start_trl:] = num_estimation(screen,num_map,n_trl[cond-1],blk+1)
     if cond == 2:
-        trials[start_trl:] = road_basic(screen,basic_map,n_trl[cond-1],blk)
+        trials[start_trl:] = road_basic(screen,basic_map,n_trl[cond-1],blk+1)
     if cond == 3:    
-        trials[start_trl:] = road_undo(screen,undo_map,n_trl[cond-1],blk)
+        trials[start_trl:] = road_undo(screen,undo_map,n_trl[cond-1],blk+1)
     
     start_trl = start_trl + n_trl[cond-1]
 
