@@ -57,7 +57,7 @@ class Map:
 
         self.N = self.loadmap.N.tolist()[0][0]
         self.radius = 10     # radius of city
-        self.total = self.loadmap.total   # total budget
+        self.total = self.loadmap.total.tolist()[0][0]   # total budget
         self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
 
         self.R = self.loadmap.R.tolist()[0]
@@ -178,7 +178,9 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
             screen.blit(num_input.get_surface(), (600, 300))
             # save estimation input
             text = num_input.get_text()
-            trial.data(mouse_loc,tick_second,text,blk,trl_id)         
+            if not text:
+                text = np.nan
+            trial.data(mouse_loc,tick_second,text,blk,trl_id)
             
             if event.type == pg.QUIT:
                 all_done = True

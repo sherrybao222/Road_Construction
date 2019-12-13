@@ -55,7 +55,7 @@ class Map:
 
         self.N = self.loadmap.N.tolist()[0][0]
         self.radius = 10     # radius of city
-        self.total = self.loadmap.total   # total budget
+        self.total = self.loadmap.total.tolist()[0][0]   # total budget
         self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
         
         self.R = self.loadmap.R.tolist()[0]
