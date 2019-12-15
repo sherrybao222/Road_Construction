@@ -10,6 +10,7 @@ import scipy.io as sio
 class Map:
     def __init__(self, map_content, trl_id, blk): 
         
+#        self.circle_map()
         self.load_map(map_content, trl_id)
         self.data_init(blk, trl_id)
        
@@ -31,17 +32,17 @@ class Map:
         
     def circle_map(self):
         # map parameters
-        self.N = 11     # total city number, including start
+        self.N = 1000     # total city number, including start
         self.radius = 10     # radius of city
-        self.total = 700    # total budget
-        self.budget_remain = 700    # remaining budget
+        self.total = 400    # total budget
+        self.budget_remain = 400    # remaining budget
 
-        self.R = 450*450 #circle radius' sqaure
+        self.R = 400*400 #circle radius' sqaure
         self.r = np.random.uniform(0, self.R, self.N) 
         self.phi = np.random.uniform(0,2 * math.pi, self.N) 
         self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
         self.x = self.x.astype(int)
-        self.y = np.sqrt(self.r) * np.sin(self.phi) + 950
+        self.y = np.sqrt(self.r) * np.sin(self.phi) + 800
         self.y = self.y.astype(int)
         self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
         
@@ -298,7 +299,7 @@ if __name__ == "__main__":
     pg.font.init()
       
     # display setup
-    screen = pg.display.set_mode((2000, 1500), flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((2000, 1600), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
  
     screen.fill(WHITE)
     
