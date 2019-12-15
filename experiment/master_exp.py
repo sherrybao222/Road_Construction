@@ -13,8 +13,8 @@ trials = [float("nan")] * n_all
 
 # load maps
 num_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
-basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
-undo_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
+basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic.mat',  struct_as_record=False)
+undo_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_undo.mat',  struct_as_record=False)
 
 # blocks
 orders = [[1,2,3,3,2,1],
@@ -33,7 +33,7 @@ pg.init()
 pg.font.init()
 
 # display setup
-screen = pg.display.set_mode((2000, 1600), flags= pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
+screen = pg.display.set_mode((2000, 1600), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
 WHITE = (255, 255, 255)
 screen.fill(WHITE)
 

@@ -168,7 +168,7 @@ while True:
     
    
 # saving
-sio.savemat('test_basic_undo.mat', {'map_list':map_list, 'diff_list':diff_list,
+sio.savemat('test_basic.mat', {'map_list':map_list, 'diff_list':diff_list,
                                     'optimal_list':optimal_list,'greedy_list':greedy_list,
                                     'optimal_number':optimal_number,'greedy_number':greedy_number})
 
