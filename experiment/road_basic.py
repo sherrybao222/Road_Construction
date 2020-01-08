@@ -243,27 +243,28 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
                 if event.key == pg.K_ESCAPE:
                     all_done = True   # very important, otherwise stuck in full screen
                     pg.quit()
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_RETURN and trial.n_city[-1] != 0:
 #                    pg.event.set_blocked(pg.MOUSEMOTION)
                     trl_done = True
+                    break
     
             pg.display.flip()  
             screen.fill(WHITE)
             draw_map = Draw(trial,screen)
             
     
-    while trl_done:
-        for event in pg.event.get():
-            screen.fill(WHITE)
-            draw_map.game_end(trial,screen)
-            pg.display.flip() 
-            
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
-                    trl_done = False 
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
-                    pg.quit()
+#    while trl_done:
+#        for event in pg.event.get():
+#            screen.fill(WHITE)
+#            draw_map.game_end(trial,screen)
+#            pg.display.flip() 
+#            
+#            if event.type == pg.KEYDOWN:
+#                if event.key == pg.K_RETURN:
+#                    trl_done = False 
+#            if event.type == pg.KEYDOWN:
+#                if event.key == pg.K_ESCAPE:
+#                    pg.quit()
     
     return all_done,trial,trl_done
 
@@ -279,6 +280,7 @@ def road_basic(screen,map_content,n_trials, blk):
         for trl_id in range(0, n_trials):
             all_done,trial,trl_done = pygame_trial(all_done, trl_done, 
                                                    map_content, trl_id, screen, blk)
+            trl_done = False 
             trials.append(trial)
         all_done = True
     # saving
@@ -299,7 +301,7 @@ if __name__ == "__main__":
     pg.font.init()
       
     # display setup
-    screen = pg.display.set_mode((2000, 1600), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((2000, 1600), flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
  
     screen.fill(WHITE)
     

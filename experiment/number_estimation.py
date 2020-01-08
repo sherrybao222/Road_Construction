@@ -189,29 +189,27 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
                 if event.key == pg.K_ESCAPE:
                     all_done = True   # very important, otherwise stuck in full screen
                     pg.quit()
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_RETURN and not np.isnan(float(trial.num_est[-1])):
                     trl_done = True
                
             pg.display.flip()
             screen.fill(WHITE)
             draw_map = Draw(trial,screen)
 
-    while trl_done:
-        events = pg.event.get()
-        for event in events:
-       
-            screen.fill(WHITE)
-            draw_map.game_end(trial,screen)
-            pg.display.flip()
-            
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
-                    trl_done = False 
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
-                    pg.quit()   
-                    
- 
+#    while trl_done:
+#        events = pg.event.get()
+#        for event in events:
+#       
+#            screen.fill(WHITE)
+#            draw_map.game_end(trial,screen)
+#            pg.display.flip()
+#            
+#            if event.type == pg.KEYDOWN:
+#                if event.key == pg.K_RETURN:
+#                    trl_done = False 
+#            if event.type == pg.KEYDOWN:
+#                if event.key == pg.K_ESCAPE:
+#                    pg.quit()   
                  
     return all_done,trl_done,trial
 
@@ -227,6 +225,7 @@ def num_estimation(screen,map_content,n_trials,blk):
         for trl_id in range(0, n_trials):
             all_done,trl_done,trial = pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk)
 #            del trial.num_input # saving this variable will cause error
+            trl_done = False 
             trials.append(trial)
         all_done = True
     # saving
