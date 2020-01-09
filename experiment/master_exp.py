@@ -11,6 +11,9 @@ n_trl = [2,2,2]
 n_all = 2 * sum(n_trl)
 trials = [float("nan")] * n_all
 
+n_1 = 1
+n_2 = 1
+n_3 = 1
 # load maps
 num_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
 basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic.mat',  struct_as_record=False)
@@ -41,7 +44,8 @@ screen.fill(WHITE)
 start_trl = 0
 for blk, cond in enumerate(orders[order_ind - 1]):   
     if cond == 1:
-        trials[start_trl:] = num_estimation(screen,num_map,n_trl[cond-1],blk+1)
+        trials[start_trl:] = num_estimation(screen,num_map,n_trl[cond-1],blk+1,n_1)
+        n_1 = n_1 + 1
     if cond == 2:
         trials[start_trl:] = road_basic(screen,basic_map,n_trl[cond-1],blk+1)
     if cond == 3:    
