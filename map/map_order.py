@@ -8,12 +8,12 @@ import matplotlib.pyplot as plt
 # maps
 # =============================================================================
 class circle_map:    
-    def __init__(self):
+    def __init__(self, budget):
         # map parameters
         self.N = 11     # total city number, including start
         self.radius = 10     # radius of city
-        self.total = 700    # total budget
-        self.budget_remain = 700    # remaining budget
+        self.total = budget    # total budget
+        self.budget_remain = budget    # remaining budget
 
 
         self.R = 450*450 #circle radius' sqaure
@@ -50,12 +50,14 @@ def greedy(mmap):
 
 # main
 # =============================================================================  
-n_map = 2 # number of maps needed
+n_map = 4 # number of maps needed
 map_list = []
 order_list = []
+budget_list = [400,700]
 
 for i in range(0,n_map):
-    mmap = circle_map()
+    budget_index = i%len(budget_list)
+    mmap = circle_map(budget_list[budget_index])
     map_list.append(mmap)
     greedy_index = greedy(mmap) 
     order_list.append(greedy_index)
