@@ -8,10 +8,10 @@ import scipy.io as sio
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
 class Map:
-    def __init__(self, map_content, trl_id, blk): 
+    def __init__(self, map_content, trl_id, blk, map_id): 
         
-        self.load_map(map_content, trl_id)
-        self.data_init(blk,trl_id)
+        self.load_map(map_content, map_id)
+        self.data_init(blk,trl_id,map_id)
 
 #   different maps
 # ----------------------------------------------------------------------------        
@@ -48,9 +48,9 @@ class Map:
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
     
-    def load_map(self, map_content, trl_id):
+    def load_map(self, map_content, map_id):
         
-        self.loadmap = map_content['map_list'][0,trl_id][0,0]
+        self.loadmap = map_content['map_list'][0,map_id][0,0]
         self.order = np.nan
 
         self.N = self.loadmap.N.tolist()[0][0]
@@ -92,9 +92,10 @@ class Map:
             return False # end
 
 # -----------------------------------------------------------------------------            
-    def data_init(self,blk,trl_id):
+    def data_init(self,blk,trl_id,map_id):
         self.blk = [blk]
         self.trl = [trl_id]
+        self.mapid = [map_id]
         self.cond = [3] # condition
         self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
         self.pos = [pg.mouse.get_pos()]
@@ -113,9 +114,10 @@ class Map:
         self.check = 0 # indicator showing if people made a valid choice
         self.num_est = [np.nan] # number estimation input()
         
-    def data(self, mouse, time, blk, trl_id): 
+    def data(self, mouse, time, blk, trl_id, map_id): 
         self.blk.append(blk)
         self.trl.append(trl_id)
+        self.mapid.append(map_id)
         self.cond.append(3)
         self.time.append(time)
         self.pos.append(mouse)
@@ -136,9 +138,10 @@ class Map:
 
         del self.index, self.city
     
-    def undo(self, mouse, time, blk, trl_id):
+    def undo(self, mouse, time, blk, trl_id, map_id):
         self.blk.append(blk)
         self.trl.append(trl_id)
+        self.mapid.append(map_id)
         self.cond.append(3)
         self.time.append(time)
         self.pos.append(mouse)
@@ -156,9 +159,10 @@ class Map:
         self.n_city.append(self.n_city[-1] - 1)
         self.num_est.append(np.nan)
 
-    def static_data(self, mouse, time, blk, trl_id): 
+    def static_data(self, mouse, time, blk, trl_id, map_id): 
         self.blk.append(blk)
         self.trl.append(trl_id)
+        self.mapid.append(map_id)
         self.cond.append(3)
         self.time.append(time)
         self.pos.append(mouse)
@@ -222,9 +226,9 @@ class Draw:
 
 # single trial
 # =============================================================================
-def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
+def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
     
-    trial = Map(map_content, trl_id, blk)
+    trial = Map(map_content, trl_id, blk, map_id)
     pg.display.flip()
     screen.fill(WHITE)
     draw_map = Draw(trial, screen)
@@ -240,7 +244,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
                 
             elif event.type == pg.MOUSEMOTION:
                 draw_map.budget(trial,mouse_loc, screen)
-                trial.static_data(mouse_loc,tick_second,blk,trl_id)
+                trial.static_data(mouse_loc,tick_second,blk,trl_id,map_id)
                 
             elif event.type == pg.MOUSEBUTTONDOWN:
                 draw_map.budget(trial,mouse_loc, screen)
@@ -248,22 +252,22 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
                     trial.make_choice(mouse_loc)
                     if trial.check == 1: # made valid choice
                         trial.budget_update()
-                        trial.data(mouse_loc, tick_second,blk,trl_id)
+                        trial.data(mouse_loc, tick_second,blk,trl_id,map_id)
                         draw_map.auto_snap(trial, screen)
                     else:
-                        trial.static_data(mouse_loc,tick_second,blk,trl_id)
+                        trial.static_data(mouse_loc,tick_second,blk,trl_id,map_id)
                         trial.click[-1] = 1
                 else: # end
                     print("The End") # need other end function
                 
             elif event.type == pg.MOUSEBUTTONUP:
                 draw_map.budget(trial,mouse_loc, screen)
-                trial.static_data(mouse_loc,tick_second,blk,trl_id)
+                trial.static_data(mouse_loc,tick_second,blk,trl_id,map_id)
     
             elif event.type == pg.KEYDOWN:
                 if (pg.key.get_pressed() and trial.choice_dyn[-1] != 0
                     and event.key == pg.K_z):
-                    trial.undo(mouse_loc, tick_second, blk,trl_id)
+                    trial.undo(mouse_loc, tick_second, blk,trl_id,map_id)
                     print("budget undo" + str(trial.budget_dyn))
                     
                 if event.key == pg.K_ESCAPE:    
@@ -300,7 +304,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk):
 
     return all_done,trial,trl_done
 
-def road_undo(screen,map_content,n_trials,blk):
+def road_undo(screen,map_content,n_trials,blk,n_blk):
     # conditions
     all_done = False
     trl_done = False
@@ -310,8 +314,9 @@ def road_undo(screen,map_content,n_trials,blk):
     # -------------------------------------------------------------------------
     while not all_done:
         for trl_id in range(0, n_trials):
+            map_id = trl_id + (n_blk - 1) * n_trials
             all_done,trial,trl_done = pygame_trial(all_done, trl_done, 
-                                                   map_content, trl_id, screen,blk)
+                                                   map_content, trl_id, screen,blk,map_id)
             trl_done = False
             trials.append(trial)
         all_done = True
