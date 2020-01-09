@@ -48,8 +48,10 @@ for blk, cond in enumerate(orders[order_ind - 1]):
         n_1 = n_1 + 1
     if cond == 2:
         trials[start_trl:] = road_basic(screen,basic_map,n_trl[cond-1],blk+1,n_2)
+        n_2 = n_2 + 1
     if cond == 3:    
         trials[start_trl:] = road_undo(screen,undo_map,n_trl[cond-1],blk+1,n_3)
+        n_3 = n_3 + 1
     
     start_trl = start_trl + n_trl[cond-1]
 
@@ -63,7 +65,7 @@ import csv
 # =============================================================================
 
 members = [attr for attr in dir(trials[0]) if not callable(getattr(trials[0], attr)) and not attr.startswith("__")]
-exp = ['blk','cond','trl','time','pos','click','undo_press','choice_his','choice_loc',
+exp = ['blk','cond','trl','mapid','time','pos','click','undo_press','choice_his','choice_loc',
               'budget_his','n_city','num_est']
 info = ['N','R','phi','r','radius','total','x','y','xy','city_start','distance','order']
 
