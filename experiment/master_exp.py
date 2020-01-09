@@ -33,7 +33,7 @@ pg.init()
 pg.font.init()
 
 # display setup
-screen = pg.display.set_mode((2000, 1600), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
+screen = pg.display.set_mode((2000, 1600), flags= pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
 WHITE = (255, 255, 255)
 screen.fill(WHITE)
 

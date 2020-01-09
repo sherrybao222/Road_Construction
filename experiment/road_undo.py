@@ -165,9 +165,9 @@ class Map:
         self.click.append(0)
         self.undo_press.append(0)
         
-        self.choice_his.append(np.nan)
-        self.choice_loc.append(np.nan)  
-        self.budget_his.append(np.nan)
+        self.choice_his.append(self.choice_dyn[-1])
+        self.choice_loc.append(self.choice_locdyn[-1])  
+        self.budget_his.append(self.budget_dyn[-1])
         
         self.n_city.append(self.n_city[-1])
         self.num_est.append(np.nan)
