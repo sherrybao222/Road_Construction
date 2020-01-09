@@ -56,7 +56,7 @@ class Map:
         self.order = map_content['order_list'][trl_id]
 
         self.N = self.loadmap.N.tolist()[0][0]
-        self.radius = 10     # radius of city
+        self.radius = 5     # radius of city
         self.total = self.loadmap.total.tolist()[0][0]   # total budget
         self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
 
@@ -116,8 +116,8 @@ class Draw:
         
     def cities(self,mmap,screen): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
-            self.city = pg.draw.circle(screen, BLACK, city, 10)     
-        self.start = pg.draw.circle(screen, RED, mmap.city_start, 10)
+            self.city = pg.draw.circle(screen, BLACK, city, mmap.radius)     
+        self.start = pg.draw.circle(screen, RED, mmap.city_start, mmap.radius)
 
     def city_order(self,mmap,screen):
         i = 1
@@ -139,7 +139,7 @@ class Draw:
         radians = math.atan2(cy, cx)
         budget_pos = (int(mmap.city_start[0] + mmap.total * math.cos(radians)),
                       int(mmap.city_start[1] + mmap.total * math.sin(radians)))
-        self.budget_line = pg.draw.line(screen, GREEN, mmap.city_start, budget_pos, 5)
+        self.budget_line = pg.draw.line(screen, GREEN, mmap.city_start, budget_pos, 4)
 
     def game_end(self, mmap,screen): 
         self.text_write('Press Return to Next Trial ', 100, BLACK, 600, 650,screen)

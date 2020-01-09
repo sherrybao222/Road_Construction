@@ -54,7 +54,7 @@ class Map:
         self.order = np.nan
 
         self.N = self.loadmap.N.tolist()[0][0]
-        self.radius = 10     # radius of city
+        self.radius = 5     # radius of city
         self.total = self.loadmap.total.tolist()[0][0]   # total budget
         self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
         
@@ -183,7 +183,7 @@ class Draw:
         self.text_write("Score: " + str(mmap.n_city[-1]), 100, BLACK, 1600, 200,screen) # show number of connected cities
          
     def road(self, mmap,screen): # if people have made choice, need to redraw the chosen path every time
-        pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 5)
+        pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 4)
 
     def cities(self,mmap,screen): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
@@ -197,7 +197,7 @@ class Draw:
         radians = math.atan2(cy, cx)
         budget_pos = (int(mmap.choice_locdyn[-1][0] + mmap.budget_dyn[-1] * math.cos(radians)),
                       int(mmap.choice_locdyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians)))
-        self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 5)
+        self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 4)
 
     def auto_snap(self, mmap,screen):
         pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
