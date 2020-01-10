@@ -10,8 +10,8 @@ import scipy.io as sio
 class Map:
     def __init__(self, map_content, trl_id, blk, map_id): 
         
-#        self.circle_map()
-        self.load_map(map_content, map_id)
+        self.circle_map()
+#        self.load_map(map_content, map_id)
         self.data_init(blk, trl_id, map_id)
        
 #   different maps
@@ -32,10 +32,13 @@ class Map:
         
     def circle_map(self):
         # map parameters
-        self.N = 1000     # total city number, including start
-        self.radius = 10     # radius of city
+        self.N = 30     # total city number, including start
+        self.radius = 5     # radius of city
+        
         self.total = 400    # total budget
         self.budget_remain = 400    # remaining budget
+        self.total_a = 400 # agent
+        self.budget_remain_a = 400
 
         self.R = 400*400 #circle radius' sqaure
         self.r = np.random.uniform(0, self.R, self.N) 
@@ -46,9 +49,11 @@ class Map:
         self.y = self.y.astype(int)
         self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
         
-        self.city_start = self.xy[0]    # start city
+        self.city_start = self.xy[0]    # start city of people
+        self.city_start_a = self.xy[1]    # start city of agent
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
-      
+        self.matrix_copy = self.distance.copy()
+        
     def load_map(self, map_content, map_id):
         
         self.loadmap = map_content['map_list'][0,map_id][0,0]
@@ -91,7 +96,29 @@ class Map:
             return True # not end
         else:
             return False # end
+# -----------------------------------------------------------------------------
+    # greedy within budget
+    def greedy_agent(self):
+        dist_greedy = 0 # the current distance sum of greedy path
+        greedy_index = [0] # greedy path starting index
+        i = 0 # current connected city number
         
+        dist_list = self.matrix_copy[self.choice_dyn_a[-1]] # choose the related column/row
+        dist = np.amin(dist_list[dist_list != 0]) # the smallest non-zero distance
+    
+        if (self.budget_remain_a - dist < 0): 
+            
+        else:
+            self.budget_remain_a = self.budget_remain_a - dist 
+            index_np = np.where(dist_list == dist) # find the chosen city index
+            self.matrix_copy[:,greedy_index[-1]] = 0 # cannot choose one city twice
+            self.matrix_copy[greedy_index[-1],:] = 0
+            i = i + 1
+            n_greedy = i
+            greedy_index = np.append(greedy_index,index_np[0])     
+                
+        return n_greedy, greedy_index
+    
 # -----------------------------------------------------------------------------           
     def data_init(self, blk, trl_id, map_id):
         self.blk = [blk]
@@ -107,11 +134,22 @@ class Map:
         self.choice_locdyn = [self.city_start]
         self.choice_his = [0]   # choice history, index
         self.choice_loc = [self.city_start] # choice location history
+        
+        self.choice_dyn_a = [1] # computer
+        self.choice_locdyn_a = [self.city_start_a]
+        self.choice_his_a = [1]   # choice history, index
+        self.choice_loc_a = [self.city_start_a] # choice location history
+
                 
         self.budget_dyn = [self.total]
         self.budget_his = [self.total] # budget history
+        
+        self.budget_dyn_a = [self.total_a]
+        self.budget_his_a = [self.total_a] # budget history
+
 
         self.n_city = [0] # number of cities connected
+        self.n_city_a = [0]
         self.check = 0 # indicator showing if people made a valid choice
         self.num_est = [np.nan] # number estimation input()
         
@@ -168,11 +206,13 @@ class Draw:
          
     def road(self,mmap,screen): # if people have made choice, need to redraw the chosen path every time
         pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 4)
+        pg.draw.lines(screen, BROWN, False, mmap.choice_locdyn_a, 4)
 
     def cities(self,mmap,screen): # draw city dots       
-        for city in mmap.xy[1:]: # exclude start city
+        for city in mmap.xy[2:]: # exclude start city
             self.city = pg.draw.circle(screen, BLACK, city, mmap.radius)     
         self.start = pg.draw.circle(screen, RED, mmap.city_start, mmap.radius)
+        self.start = pg.draw.circle(screen, PINK, mmap.city_start_a, mmap.radius)
         
     def budget(self, mmap, mouse,screen):  
         # current mouse position
@@ -183,11 +223,32 @@ class Draw:
                       int(mmap.choice_locdyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians)))
         self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 4)
 
+    def budget(self, mmap, mouse,screen):  
+        # current sudo mouse position
+        if len(mmap.choice_dyn_a) > 1:
+            cx, cy = 0, 1
+        else:
+            cx, cy = mmap.choice_locdyn_a[-1][0] - mmap.choice_locdyn_a[-2][0], 
+                     mmap.choice_locdyn_a[-1][1] - mmap.choice_locdyn_a[-2][1]
+                     
+        # give budget line follow mouse in the correct direction
+        radians = math.atan2(cy, cx)
+        budget_pos = (int(mmap.choice_locdyn_a[-1][0] + mmap.budget_dyn_a[-1] * math.cos(radians)),
+                      int(mmap.choice_locdyn_a[-1][1] + mmap.budget_dyn_a[-1] * math.sin(radians)))
+        self.budget_line = pg.draw.line(screen, BLUE, mmap.choice_locdyn_a[-1], budget_pos, 4)
+
     def auto_snap(self, mmap,screen):
         pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
+        pg.draw.line(screen, BROWN, mmap.choice_locdyn_a[-2], mmap.choice_locdyn_a[-1], 3)
 
     def instruction_submit(self,screen):
         self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 200,screen)
+
+    def check_end_a(self,screen):
+        self.text_write("Your partner is out of budget", 60, BLACK, 100, 300,screen)
+
+    def check_end(self,screen):
+        self.text_write("You are out of budget", 60, BLACK, 100, 400,screen)
 
     def game_end(self, mmap,screen): 
         self.text_write('Your score is ' + str(mmap.n_city[-1]), 100, BLACK, 700, 750,screen)
@@ -299,6 +360,9 @@ WHITE = (255, 255, 255)
 RED = (255, 102, 102)
 GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)
+BROWN = (102, 51, 0)
+PINK = (255, 153, 204)
+BLUE = (51, 153, 255)
 
 if __name__ == "__main__":
     pg.init()

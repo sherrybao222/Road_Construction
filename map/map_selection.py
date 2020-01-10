@@ -116,20 +116,20 @@ def optimal(mmap,now):
 #------------------------------------------------------------------------------
 # greedy within budget
 def greedy(mmap):
-    dist_greedy = 0
-    greedy_index = [0]
-    i = 0
+    dist_greedy = 0 # the current distance sum of greedy path
+    greedy_index = [0] # greedy path starting index
+    i = 0 # current connected city number
     matrix_copy = mmap.distance.copy()
     while i <= mmap.N-2:
-        dist_list = matrix_copy[greedy_index[i]]
-        dist = np.amin(dist_list[dist_list != 0])
+        dist_list = matrix_copy[greedy_index[i]] # choose the related column/row
+        dist = np.amin(dist_list[dist_list != 0]) # the smallest non-zero distance
     
-        if (dist_greedy + dist > mmap.total):
+        if (dist_greedy + dist > mmap.total): 
             break
         else:
-            dist_greedy = dist_greedy + dist
-            index_np = np.where(dist_list == dist)
-            matrix_copy[:,greedy_index[i]] = 0
+            dist_greedy = dist_greedy + dist # update current distance sum of greedy path
+            index_np = np.where(dist_list == dist) # find the chosen city index
+            matrix_copy[:,greedy_index[i]] = 0 
             matrix_copy[greedy_index[i],:] = 0
             i = i + 1
             n_greedy = i
