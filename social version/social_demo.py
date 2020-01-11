@@ -97,28 +97,39 @@ class Map:
         else:
             return False # end
 # -----------------------------------------------------------------------------
-    # greedy within budget
-    def greedy_agent(self):
-        dist_greedy = 0 # the current distance sum of greedy path
-        greedy_index = [0] # greedy path starting index
-        i = 0 # current connected city number
-        
+    def make_choice_a(self):        
         dist_list = self.matrix_copy[self.choice_dyn_a[-1]] # choose the related column/row
         dist = np.amin(dist_list[dist_list != 0]) # the smallest non-zero distance
-    
-        if (self.budget_remain_a - dist < 0): 
+
             
-        else:
-            self.budget_remain_a = self.budget_remain_a - dist 
-            index_np = np.where(dist_list == dist) # find the chosen city index
-            self.matrix_copy[:,greedy_index[-1]] = 0 # cannot choose one city twice
-            self.matrix_copy[greedy_index[-1],:] = 0
-            i = i + 1
-            n_greedy = i
-            greedy_index = np.append(greedy_index,index_np[0])     
+        self.index_a = np.where(dist_list == dist)[0][0] # find the chosen city index
+        self.city_a = self.xy[self.index_a]
+        self.matrix_copy[:, self.choice_dyn_a[-1]] = 0 # cannot choose one city twice
+        self.matrix_copy[self.choice_dyn_a[-1], :] = 0
+
+        dist = self.distance[self.index_a][self.choice_dyn_a[-1]] # get distance from current choice to previous choice
+        self.budget_remain_a = self.budget_dyn_a[-1] - dist  # budget update
+        
+        self.choice_dyn_a.append(self.index_a)
+        self.choice_locdyn_a.append(self.city_a)
+        self.choice_his_a.append(self.index_a)
+        self.choice_loc_a.append(self.city_a)
                 
-        return n_greedy, greedy_index
-    
+        self.budget_dyn_a.append(self.budget_remain_a)
+        self.budget_his_a.append(self.budget_remain_a)
+                                
+        self.n_city.append(self.n_city[-1] + 1)
+        self.check = 0 # change choice indicator after saving them
+        self.num_est.append(np.nan)
+                
+    def check_end_a(self): # check if trial end
+        dist_list = self.matrix_copy[self.choice_dyn_a[-1]] # choose the related column/row
+        dist = np.amin(dist_list[dist_list != 0]) # the smallest non-zero distance
+        
+        if (self.budget_remain_a - dist < 0):
+            return False # not end
+        else:
+            return True # end  
 # -----------------------------------------------------------------------------           
     def data_init(self, blk, trl_id, map_id):
         self.blk = [blk]
@@ -223,15 +234,14 @@ class Draw:
                       int(mmap.choice_locdyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians)))
         self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 4)
 
-    def budget(self, mmap, mouse,screen):  
+    def budget_a(self, mmap, screen):  
         # current sudo mouse position
-        if len(mmap.choice_dyn_a) > 1:
+        if len(mmap.choice_dyn_a) <= 1:
             cx, cy = 0, 1
         else:
-            cx, cy = mmap.choice_locdyn_a[-1][0] - mmap.choice_locdyn_a[-2][0], 
-                     mmap.choice_locdyn_a[-1][1] - mmap.choice_locdyn_a[-2][1]
-                     
-        # give budget line follow mouse in the correct direction
+            cx, cy = (mmap.choice_locdyn_a[-1][0] - mmap.choice_locdyn_a[-2][0], 
+                     mmap.choice_locdyn_a[-1][1] - mmap.choice_locdyn_a[-2][1])                   
+        # give budget line follow sudo mouse in the correct direction
         radians = math.atan2(cy, cx)
         budget_pos = (int(mmap.choice_locdyn_a[-1][0] + mmap.budget_dyn_a[-1] * math.cos(radians)),
                       int(mmap.choice_locdyn_a[-1][1] + mmap.budget_dyn_a[-1] * math.sin(radians)))
@@ -271,13 +281,22 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
     pg.display.flip()
     screen.fill(WHITE)
     draw_map = Draw(trial,screen)
+    your_turn = False
     
     while not trl_done:
         for event in pg.event.get():
             tick_second = round((pg.time.get_ticks()/1000), 2)
             mouse_loc = pg.mouse.get_pos()
             draw_map.budget(trial, mouse_loc,screen)
+            draw_map.budget_a(trial, screen)
             
+            if your_turn == False:
+                if trial.check_end_a():
+                    trial.make_choice_a()
+                else:
+                    draw_map.check_end_a()
+                your_turn = True
+                                    
             if event.type == pg.QUIT:
                 all_done = True
     
@@ -288,16 +307,20 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
             elif event.type == pg.MOUSEBUTTONDOWN:
                 draw_map.budget(trial,mouse_loc,screen)
                 trial.click[-1] = 1
-                if trial.check_end(): # not end
-                    trial.make_choice(mouse_loc)
-                    if trial.check == 1: # made valid choice
-                        trial.budget_update()
-                        trial.data(mouse_loc, tick_second, blk, trl_id, map_id)
-                        draw_map.auto_snap(trial,screen)                        
-                    else:
-                        trial.static_data(mouse_loc, tick_second, blk, trl_id, map_id)
-                else: # end
-                    print("The End") # need other end function
+                if your_turn == True:
+                    if trial.check_end(): # not end
+                        trial.make_choice(mouse_loc)
+                        if trial.check == 1: # made valid choice
+                            trial.budget_update()
+                            trial.data(mouse_loc, tick_second, blk, trl_id, map_id)
+                            draw_map.auto_snap(trial,screen) 
+                            your_turn = False
+                        else:
+                            trial.static_data(mouse_loc, tick_second, blk, trl_id, map_id)
+                    else: # end
+                        draw_map.check_end()
+                else:
+                    trial.static_data(mouse_loc,tick_second,blk,trl_id,map_id)
                 
             elif event.type == pg.MOUSEBUTTONUP:
                 draw_map.budget(trial,mouse_loc,screen)
@@ -369,7 +392,7 @@ if __name__ == "__main__":
     pg.font.init()
       
     # display setup
-    screen = pg.display.set_mode((2000, 1600), flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((2000, 1600), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
  
     screen.fill(WHITE)
     
@@ -377,7 +400,8 @@ if __name__ == "__main__":
     map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
     n_trials = 5
     blk = 2 # set some number
+    n_blk = 1
  
-    trials = road_basic(screen,map_content,n_trials,blk)
+    trials = road_basic(screen,map_content,n_trials,blk,n_blk)
     
     pg.quit()

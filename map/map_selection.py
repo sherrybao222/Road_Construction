@@ -129,7 +129,7 @@ def greedy(mmap):
         else:
             dist_greedy = dist_greedy + dist # update current distance sum of greedy path
             index_np = np.where(dist_list == dist) # find the chosen city index
-            matrix_copy[:,greedy_index[i]] = 0 
+            matrix_copy[:,greedy_index[i]] = 0 # cannot choose one city twice
             matrix_copy[greedy_index[i],:] = 0
             i = i + 1
             n_greedy = i
