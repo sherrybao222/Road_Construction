@@ -305,7 +305,7 @@ if __name__ == "__main__":
     pg.font.init()
       
     # display setup
-    screen = pg.display.set_mode((2000, 1600), flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((2000, 1600), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
  
     screen.fill(WHITE)
     
@@ -313,7 +313,8 @@ if __name__ == "__main__":
     map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
     n_trials = 5
     blk = 2 # set some number
+    n_blk = 1
  
-    trials = road_basic(screen,map_content,n_trials,blk)
+    trials = road_basic(screen,map_content,n_trials,blk,n_blk)
     
     pg.quit()

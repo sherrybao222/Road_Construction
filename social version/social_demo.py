@@ -50,9 +50,14 @@ class Map:
         self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
         
         self.city_start = self.xy[0]    # start city of people
-        self.city_start_a = self.xy[1]    # start city of agent
+#        self.city_start_a = self.xy[1]    # start city of agent
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
         self.matrix_copy = self.distance.copy()
+        
+        dist_list = self.matrix_copy[0] # choose the related column/row
+        dist = np.amin(dist_list[dist_list != 0]) # the smallest non-zero distance          
+        self.city_start_a_ind = np.where(dist_list == dist)[0][0] # find the chosen city index
+        self.city_start_a = self.xy[self.city_start_a_ind]
 
         self.matrix_copy[:, 0] = 0 # cannot choose one city twice
         self.matrix_copy[0, :] = 0
@@ -152,9 +157,9 @@ class Map:
         self.choice_his = [0]   # choice history, index
         self.choice_loc = [self.city_start] # choice location history
         
-        self.choice_dyn_a = [1] # computer
+        self.choice_dyn_a = [self.city_start_a_ind] # computer
         self.choice_locdyn_a = [self.city_start_a]
-        self.choice_his_a = [1]   # choice history, index
+        self.choice_his_a = [self.city_start_a_ind]   # choice history, index
         self.choice_loc_a = [self.city_start_a] # choice location history
 
                 
@@ -218,24 +223,31 @@ class Map:
 # ============================================================================
 class Draw: 
     def __init__(self, mmap,screen):
+        self.budget(mmap, pg.mouse.get_pos(),screen)
+        self.budget_a(mmap, screen)
+
         self.instruction_submit(screen)
         self.cities(mmap,screen) # draw city dots
         if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road(mmap,screen)
         if len(mmap.choice_dyn_a) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road_a(mmap,screen)
-        self.text_write("Score: " + str(mmap.n_city[-1] + mmap.n_city_a[-1]), 100, BLACK, 1600, 200,screen) # show number of connected cities
+        
+        self.text_write("Score: " + str(mmap.n_city[-1] + mmap.n_city_a[-1]), 100, BLACK, 1600, 200, screen) # show number of connected cities
+        
         if mmap.check_end_a_ind:
              self.check_end_a(screen)
         if mmap.check_end_ind:
              self.check_end(screen)
+             
     def road(self,mmap,screen): # if people have made choice, need to redraw the chosen path every time
         pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 3)
+        
     def road_a(self,mmap,screen): # if people have made choice, need to redraw the chosen path every time
         pg.draw.lines(screen, BROWN, False, mmap.choice_locdyn_a, 3)
 
     def cities(self,mmap,screen): # draw city dots       
-        for city in mmap.xy[2:]: # exclude start city
+        for city in mmap.xy[1:]: # exclude start city
             self.city = pg.draw.circle(screen, BLACK, city, mmap.radius)     
         self.start = pg.draw.circle(screen, RED, mmap.city_start, mmap.radius)
         self.start = pg.draw.circle(screen, PINK, mmap.city_start_a, mmap.radius)
@@ -269,6 +281,7 @@ class Draw:
         pg.draw.line(screen, BROWN, mmap.choice_locdyn_a[-2], mmap.choice_locdyn_a[-1], 3)
 
     def instruction_submit(self,screen):
+        self.text_write("You are controlling the green budget", 60, BLACK, 100, 100,screen)
         self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 200,screen)
 
     def check_end_a(self,screen):
@@ -298,38 +311,54 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
     pg.display.flip()
     screen.fill(WHITE)
     draw_map = Draw(trial,screen)
-    your_turn = False
+    your_turn = True
+    marker = 0
+    
     
     while not trl_done:
         
+        if not trial.check_end(): 
+            trial.check_end_ind = 1
+            your_turn = False
+
         if your_turn == False:
+           
             if trial.check_end_a():
+                
+                pg.time.delay(1200)
+                
                 trial.make_choice_a()
                 draw_map.auto_snap_a(trial,screen) 
-                draw_map.budget_a(trial, screen)
-                
-                pygame.display.update()
+#                draw_map.budget_a(trial, screen)
+#                draw_map.budget(trial, pg.mouse.get_pos(),screen)  
+      
             else:
                 trial.check_end_a_ind = 1
+                
+            screen.fill(WHITE)
+            draw_map = Draw(trial,screen)
+            pg.display.flip()  
+
+                
             if  trial.check_end(): 
                 your_turn = True
-
+        
+        
         for event in pg.event.get():
             tick_second = round((pg.time.get_ticks()/1000), 2)
             mouse_loc = pg.mouse.get_pos()
-            draw_map.budget(trial, mouse_loc,screen)
-            draw_map.budget_a(trial, screen)
-            
-                                    
+#            draw_map.budget(trial, mouse_loc,screen)
+#            draw_map.budget_a(trial, screen)
+                                                
             if event.type == pg.QUIT:
                 all_done = True
     
             elif event.type == pg.MOUSEMOTION:
-                draw_map.budget(trial,mouse_loc,screen)
+#                draw_map.budget(trial,mouse_loc,screen)
                 trial.static_data(mouse_loc,tick_second,blk,trl_id,map_id)
            
             elif event.type == pg.MOUSEBUTTONDOWN:
-                draw_map.budget(trial,mouse_loc,screen)
+#                draw_map.budget(trial,mouse_loc,screen)
                 trial.click[-1] = 1
                 if your_turn == True:
                     if trial.check_end(): # not end
@@ -338,11 +367,8 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                             trial.budget_update()
                             trial.data(mouse_loc, tick_second, blk, trl_id, map_id)
                             draw_map.auto_snap(trial,screen) 
-                            your_turn = False
+                            marker = 1
                             
-                            if not trial.check_end(): 
-                                trial.check_end_ind = 1
-                                your_turn = False
                         else:
                             trial.static_data(mouse_loc, tick_second, blk, trl_id, map_id)
                     else: # end
@@ -350,8 +376,12 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                     
                 
             elif event.type == pg.MOUSEBUTTONUP:
-                draw_map.budget(trial,mouse_loc,screen)
+#                draw_map.budget(trial,mouse_loc,screen)
                 trial.static_data(mouse_loc,tick_second,blk,trl_id,map_id)
+                if marker == 1:
+                    your_turn = False
+                    marker = 0
+#                    pg.time.delay(1300)
     
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
@@ -361,11 +391,10 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
 #                    pg.event.set_blocked(pg.MOUSEMOTION)
                     trl_done = True
                     break
-
-            pg.display.flip()  
-            screen.fill(WHITE)
-            draw_map = Draw(trial,screen)
-            
+        
+        screen.fill(WHITE)
+        draw_map = Draw(trial,screen)
+        pg.display.flip()  
     
 #    while trl_done:
 #        for event in pg.event.get():
@@ -420,12 +449,8 @@ if __name__ == "__main__":
       
     # display setup
     screen = pg.display.set_mode((2000, 1600), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
-    
-    # Fill background
-    background = pg.Surface(screen.get_size())
-    background = background.convert()
-    background.fill(WHITE)
- 
+        
+    # Fill background 
     screen.fill(WHITE)
     
     # load maps
