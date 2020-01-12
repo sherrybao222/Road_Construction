@@ -137,7 +137,7 @@ class Map:
         self.num_est.append(np.nan)
                 
     def check_end_a(self): # check if trial end
-        dist_list = self.matrix_copy[self.choice_dyn_a[-1]] # choose the related column/row
+        dist_list = self.distance[self.choice_dyn_a[-1]] # choose the related column/row
         dist = np.amin(dist_list[dist_list != 0]) # the smallest non-zero distance
         
         if (self.budget_remain_a - dist < 0):
