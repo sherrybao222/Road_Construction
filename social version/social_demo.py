@@ -32,7 +32,7 @@ class Map:
         
     def circle_map(self):
         # map parameters
-        self.N = 30     # total city number, including start
+        self.N = 20     # total city number, including start
         self.radius = 5     # radius of city
         
         self.total = 400    # total budget
@@ -40,7 +40,7 @@ class Map:
         self.total_a = 400 # agent
         self.budget_remain_a = 400
 
-        self.R = 400*400 #circle radius' sqaure
+        self.R = 300*300 #circle radius' sqaure
         self.r = np.random.uniform(0, self.R, self.N) 
         self.phi = np.random.uniform(0,2 * math.pi, self.N) 
         self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
@@ -87,7 +87,8 @@ class Map:
         for i in range(1, self.N): # do not evaluate the starting point
             x2, y2 = mouse # mouse location
             self.mouse_distance = math.hypot(self.x[i] - x2, self.y[i] - y2)
-            if (self.mouse_distance <= self.radius) and (i not in self.choice_dyn): # cannot choose what has been chosen
+            if (self.mouse_distance <= self.radius) and (i not in self.choice_dyn 
+                                                           and i not in self.choice_dyn_a): # cannot choose what has been chosen
                 self.index = i # index of chosen city
                 self.city = self.xy[i] # location of chosen city
                 self.check = 1 # indicator showing people made a valid choice
@@ -103,10 +104,12 @@ class Map:
         distance_copy = self.distance[self.choice_dyn[-1]].copy() # copy distance list for current city
         for x in self.choice_dyn:
             distance_copy[x] = 0
+        for x in self.choice_dyn_a:
+            distance_copy[x] = 0
         if any(i < self.budget_dyn[-1] and i != 0 for i in distance_copy):
             return True # not end
         else:
-            return False # end
+            return False # not end
 # -----------------------------------------------------------------------------
     def make_choice_a(self):        
         dist_list = self.matrix_copy[self.choice_dyn_a[-1]] # choose the related column/row
@@ -138,9 +141,9 @@ class Map:
         dist = np.amin(dist_list[dist_list != 0]) # the smallest non-zero distance
         
         if (self.budget_remain_a - dist < 0):
-            return False # not end
+            return False # end
         else:
-            return True # end  
+            return True # not end  
 # -----------------------------------------------------------------------------           
     def data_init(self, blk, trl_id, map_id):
         self.blk = [blk]
@@ -312,38 +315,40 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
     screen.fill(WHITE)
     draw_map = Draw(trial,screen)
     your_turn = True
-    marker = 0
-    
+    marker = 0    
     
     while not trl_done:
         
-        if not trial.check_end(): 
-            trial.check_end_ind = 1
-            your_turn = False
-
         if your_turn == False:
            
-            if trial.check_end_a():
-                
-                pg.time.delay(1200)
-                
+            if trial.check_end_a():               
+                pg.time.delay(1200)               
                 trial.make_choice_a()
                 draw_map.auto_snap_a(trial,screen) 
 #                draw_map.budget_a(trial, screen)
-#                draw_map.budget(trial, pg.mouse.get_pos(),screen)  
-      
+#                draw_map.budget(trial, pg.mouse.get_pos(),screen)   
+                if not trial.check_end_a():  
+                    trial.check_end_a_ind = 1
             else:
                 trial.check_end_a_ind = 1
                 
-            screen.fill(WHITE)
-            draw_map = Draw(trial,screen)
-            pg.display.flip()  
-
-                
             if  trial.check_end(): 
                 your_turn = True
-        
-        
+            else:
+                trial.check_end_ind = 1
+                your_turn = False
+                
+          
+        screen.fill(WHITE)
+        draw_map = Draw(trial,screen)
+        pg.display.flip()  
+
+            
+        if marker == 1:
+            your_turn = False
+            marker = 0
+
+                
         for event in pg.event.get():
             tick_second = round((pg.time.get_ticks()/1000), 2)
             mouse_loc = pg.mouse.get_pos()
@@ -378,9 +383,9 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
             elif event.type == pg.MOUSEBUTTONUP:
 #                draw_map.budget(trial,mouse_loc,screen)
                 trial.static_data(mouse_loc,tick_second,blk,trl_id,map_id)
-                if marker == 1:
-                    your_turn = False
-                    marker = 0
+                if  not trial.check_end(): 
+                    trial.check_end_ind = 1
+                    
 #                    pg.time.delay(1300)
     
             elif event.type == pg.KEYDOWN:
@@ -391,23 +396,11 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
 #                    pg.event.set_blocked(pg.MOUSEMOTION)
                     trl_done = True
                     break
+
         
         screen.fill(WHITE)
         draw_map = Draw(trial,screen)
         pg.display.flip()  
-    
-#    while trl_done:
-#        for event in pg.event.get():
-#            screen.fill(WHITE)
-#            draw_map.game_end(trial,screen)
-#            pg.display.flip() 
-#            
-#            if event.type == pg.KEYDOWN:
-#                if event.key == pg.K_RETURN:
-#                    trl_done = False 
-#            if event.type == pg.KEYDOWN:
-#                if event.key == pg.K_ESCAPE:
-#                    pg.quit()
     
     return all_done,trial,trl_done
 
@@ -446,6 +439,7 @@ BLUE = (51, 153, 255)
 if __name__ == "__main__":
     pg.init()
     pg.font.init()
+#    pg.mouse.set_visible(False)
       
     # display setup
     screen = pg.display.set_mode((2000, 1600), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
