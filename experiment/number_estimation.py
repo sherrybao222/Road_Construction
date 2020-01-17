@@ -3,6 +3,7 @@ import random
 import math
 from scipy.spatial import distance_matrix
 import numpy as np
+import numbers
 import scipy.io as sio
 
 import pygame_textinput
@@ -112,6 +113,8 @@ class Map:
 # =============================================================================
 class Draw: 
     def __init__(self, mmap,screen):
+        self.budget(mmap, pg.mouse.get_pos(),screen)
+        
         self.cities(mmap,screen) 
         self.city_order(mmap,screen)
         self.num_est(mmap,screen)
@@ -160,26 +163,32 @@ class Draw:
 def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
     
     trial = Map(map_content, trl_id, blk, map_id)
-    pg.display.flip()
     screen.fill(WHITE)
     draw_map = Draw(trial,screen)
+    pg.display.flip()  
     num_input = pygame_textinput.TextInput()
     
     while not trl_done:
         events = pg.event.get()
+        
+        # allow text-input on the screen
+        screen.fill(WHITE)
+        num_input.update(events)
+        screen.blit(num_input.get_surface(), (600, 300))
+        draw_map = Draw(trial,screen)
+        pg.display.flip()  
+        
+        # save estimation input
+        text = num_input.get_text()
+
         for event in events:
             tick_second = round((pg.time.get_ticks()/1000), 2)
             mouse_loc = pg.mouse.get_pos()
-            draw_map.budget(trial,mouse_loc,screen)
+#            draw_map.budget(trial,mouse_loc,screen)
             
 #            pg.event.set_blocked(pg.MOUSEBUTTONDOWN)
 #            pg.event.set_blocked(pg.MOUSEBUTTONUP)
 
-            # allow text-input on the screen
-            num_input.update(events)
-            screen.blit(num_input.get_surface(), (600, 300))
-            # save estimation input
-            text = num_input.get_text()
             if not text:
                 text = np.nan
             trial.data(mouse_loc,tick_second,text,blk,trl_id,map_id)
@@ -191,12 +200,14 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                 if event.key == pg.K_ESCAPE:
                     all_done = True   # very important, otherwise stuck in full screen
                     pg.quit()
-                if event.key == pg.K_RETURN and not np.isnan(float(trial.num_est[-1])):
-                    trl_done = True
+                try: 
+                    float(trial.num_est[-1])
+                    if event.key == pg.K_RETURN and not np.isnan(float(trial.num_est[-1])):
+                        trl_done = True
+                except: "Value error"
+                
                
-            pg.display.flip()
-            screen.fill(WHITE)
-            draw_map = Draw(trial,screen)
+#        pg.display.flip()  
 
 #    while trl_done:
 #        events = pg.event.get()
@@ -250,15 +261,16 @@ if __name__ == "__main__":
     pg.font.init()
     
     # display setup
-    screen = pg.display.set_mode((2000, 1500), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((2000, 1500), flags= pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
     
     screen.fill(WHITE)
     
     # load maps
     map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
     n_trials = 2
-    blk = 1 # set some number
+    blk = 1 # set some number\
+    n_blk = 1
     
-    trials = num_estimation(screen,map_content,n_trials,blk)
+    trials = num_estimation(screen,map_content,n_trials,blk,n_blk)
     
     pg.quit()

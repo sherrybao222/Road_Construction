@@ -311,43 +311,17 @@ class Draw:
 def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
     
     trial = Map(map_content, trl_id, blk, map_id)
-    pg.display.flip()
-    screen.fill(WHITE)
-    draw_map = Draw(trial,screen)
+#    pg.display.flip()
+#    screen.fill(WHITE)
+#    draw_map = Draw(trial,screen)
     your_turn = True
     marker = 0    
     
     while not trl_done:
         
-        if your_turn == False:
-           
-            if trial.check_end_a():               
-                pg.time.delay(1200)               
-                trial.make_choice_a()
-                draw_map.auto_snap_a(trial,screen) 
-#                draw_map.budget_a(trial, screen)
-#                draw_map.budget(trial, pg.mouse.get_pos(),screen)   
-                if not trial.check_end_a():  
-                    trial.check_end_a_ind = 1
-            else:
-                trial.check_end_a_ind = 1
-                
-            if  trial.check_end(): 
-                your_turn = True
-            else:
-                trial.check_end_ind = 1
-                your_turn = False
-                
-          
         screen.fill(WHITE)
         draw_map = Draw(trial,screen)
         pg.display.flip()  
-
-            
-        if marker == 1:
-            your_turn = False
-            marker = 0
-
                 
         for event in pg.event.get():
             tick_second = round((pg.time.get_ticks()/1000), 2)
@@ -397,10 +371,32 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                     trl_done = True
                     break
 
+        if your_turn == False:
+           
+            if trial.check_end_a():               
+                pg.time.delay(1200)               
+                trial.make_choice_a()
+                draw_map.auto_snap_a(trial,screen) 
+#                draw_map.budget_a(trial, screen)
+#                draw_map.budget(trial, pg.mouse.get_pos(),screen)   
+                if not trial.check_end_a():  
+                    trial.check_end_a_ind = 1
+            else:
+                trial.check_end_a_ind = 1
+                
+            if  trial.check_end(): 
+                your_turn = True
+            else:
+                trial.check_end_ind = 1
+                your_turn = False
+
+        if marker == 1:
+            your_turn = False
+            marker = 0
         
-        screen.fill(WHITE)
-        draw_map = Draw(trial,screen)
-        pg.display.flip()  
+#        screen.fill(WHITE)
+#        draw_map = Draw(trial,screen)
+#        pg.display.flip()  
     
     return all_done,trial,trl_done
 
