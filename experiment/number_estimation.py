@@ -3,7 +3,6 @@ import random
 import math
 from scipy.spatial import distance_matrix
 import numpy as np
-import numbers
 import scipy.io as sio
 
 import pygame_textinput
@@ -186,9 +185,6 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
             mouse_loc = pg.mouse.get_pos()
 #            draw_map.budget(trial,mouse_loc,screen)
             
-#            pg.event.set_blocked(pg.MOUSEBUTTONDOWN)
-#            pg.event.set_blocked(pg.MOUSEBUTTONUP)
-
             if not text:
                 text = np.nan
             trial.data(mouse_loc,tick_second,text,blk,trl_id,map_id)
@@ -206,9 +202,6 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                         trl_done = True
                 except: "Value error"
                 
-               
-#        pg.display.flip()  
-
 #    while trl_done:
 #        events = pg.event.get()
 #        for event in events:

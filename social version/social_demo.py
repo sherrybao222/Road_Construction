@@ -237,11 +237,11 @@ class Draw:
             self.road_a(mmap,screen)
         
         self.text_write("Score: " + str(mmap.n_city[-1] + mmap.n_city_a[-1]), 100, BLACK, 1600, 200, screen) # show number of connected cities
-        
-        if mmap.check_end_a_ind:
-             self.check_end_a(screen)
+
         if mmap.check_end_ind:
              self.check_end(screen)
+        if mmap.check_end_a_ind:
+             self.check_end_a(screen)
              
     def road(self,mmap,screen): # if people have made choice, need to redraw the chosen path every time
         pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 3)
