@@ -291,7 +291,7 @@ def road_basic(screen,map_content,n_trials, blk, n_blk):
     # -------------------------------------------------------------------------
     while not all_done:
         for trl_id in range(0, n_trials):
-            map_id = (trl_id + 1) + (n_blk - 1) * n_trials
+            map_id = trl_id  + (n_blk - 1) * n_trials
             all_done,trial,trl_done = pygame_trial(all_done, trl_done, map_content, 
                                                    trl_id + 1, screen, blk, map_id)
             trl_done = False 
@@ -320,7 +320,7 @@ if __name__ == "__main__":
     screen.fill(WHITE)
     
     # load maps
-    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_undo.mat',  struct_as_record=False)
+    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic.mat',  struct_as_record=False)
     n_trials = 5
     blk = 2 # set some number
     n_blk = 1

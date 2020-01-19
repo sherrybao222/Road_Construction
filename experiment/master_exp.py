@@ -10,7 +10,7 @@ from road_undo import road_undo
 n_trl = [2,2,2]
 n_all = 2 * sum(n_trl)
 trials = [float("nan")] * n_all
-
+# map numbers
 n_1 = 1
 n_2 = 1
 n_3 = 1
@@ -29,7 +29,7 @@ orders = [[1,2,3,3,2,1],
 
 # information input
 subject_num = input("Enter the subject number: ")
-order_ind = int(input("Enter the order indicator: "))
+order_ind = int(subject_num)%6
 
 # setting up window, basic features 
 pg.init()
@@ -38,7 +38,7 @@ pg.font.init()
 # display setup
 screen = pg.display.set_mode((2000, 1600), flags= pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
 WHITE = (255, 255, 255)
-screen.fill(WHITE)
+#screen.fill(WHITE)
 
 # blocks
 start_trl = 0

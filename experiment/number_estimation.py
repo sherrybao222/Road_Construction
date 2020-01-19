@@ -229,7 +229,7 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk):
     # -------------------------------------------------------------------------
     while not all_done:
         for trl_id in range(0, n_trials):
-            map_id = (trl_id + 1) + (n_blk - 1) * n_trials
+            map_id = trl_id  + (n_blk - 1) * n_trials
             all_done,trl_done,trial = pygame_trial(all_done, trl_done, map_content, 
                                                    trl_id + 1, screen, blk, map_id)
 #            del trial.num_input # saving this variable will cause error
