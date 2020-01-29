@@ -54,13 +54,14 @@ class Map:
         
         self.loadmap = map_content['map_list'][0,map_id][0,0]
         self.order = map_content['order_list'][map_id]
+        self.position = map_content['pos_list'][map_id]
 
         self.N = self.loadmap.N.tolist()[0][0]
         self.radius = 5     # radius of city
         self.total = self.loadmap.total.tolist()[0][0]   # total budget
         self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
 
-        self.R = self.loadmap.R.tolist()[0]
+        self.R = self.loadmap.R.tolist()[0][0]
         self.r = self.loadmap.r.tolist()[0]
         self.phi = self.loadmap.phi.tolist()[0]
         self.x = self.loadmap.x.tolist()[0]
@@ -126,9 +127,9 @@ class Draw:
     def city_order(self,mmap,screen):
         i = 1
         for order in mmap.order[1:]: # order of connection
-            x = mmap.x[order] - 50
-            y = mmap.y[order] 
-            self.text_write(str(i), 50, BLACK, x, y,screen)
+            x = mmap.position[order][0] 
+            y = mmap.position[order][1] 
+            self.text_write(str(i), 40, BLACK, x, y, screen)
             i = i + 1
         
     def num_est(self, mmap,screen):

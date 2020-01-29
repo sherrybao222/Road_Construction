@@ -3,7 +3,12 @@ import numpy as np
 import math
 import scipy.io as sio
 import operator 
+from itertools import permutations 
+import random
 import matplotlib.pyplot as plt
+import scipy
+import scipy.optimize as optimize
+
 
 # maps
 # =============================================================================
@@ -16,7 +21,7 @@ class circle_map:
         self.budget_remain = budget    # remaining budget
 
 
-        self.R = 450*450 #circle radius' sqaure
+        self.R = 400*400 #circle radius' sqaure
         self.r = np.random.uniform(0, self.R, self.N) 
         self.phi = np.random.uniform(0,2 * math.pi, self.N) 
         self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
@@ -46,21 +51,68 @@ def greedy(mmap):
         i = i + 1
         index_greedy[i] = index_np[0]
     
-    return index_greedy
+    return index_greedy, 'greedy'
+
+# =============================================================================
+# optimal all cities
+# calculate path length
+def optimal(mmap):
+    paths = permutations(range(1,mmap.N)) 
+    paths_list = list(paths)
+    dist = np.zeros(len(paths_list))
+    index = 0
+    for path in paths_list: 
+        now = 0 
+        dist[index] = 0
+        for i in range(0,mmap.N-1):
+            dist[index] = dist[index] + mmap.distance[now][path[i]]
+            now = path[i]
+        index = index + 1
+
+    dict_path = dict(zip(paths_list, dist)) 
+    sorted_path = sorted(dict_path.items(), key=operator.itemgetter(1))
+    optimal_index_wozero = sorted_path[0][0]
+    optimal_index = (0,) + optimal_index_wozero
+    
+    return optimal_index, 'optimal'
+
+# =============================================================================
+# repulsive force field
+def field(pos, city_x,city_y,sigma):
+        
+    return sum(scipy.exp(-((city_x - pos[0])**2+(city_y - pos[1])**2)/(2*sigma**2))/(2*math.pi*sigma**2))
+
+def field_pos(mmap):
+    position = []
+    for i in range(0,11):
+        initial_guess = [1, 1]
+        cons = {'type': 'eq', 
+            'fun': lambda pos: (pos[0] - mmap.x[i])**2 + (pos[1] - mmap.y[i])**2 - 30**2}
+        result = optimize.minimize(field, initial_guess, 
+                                   args=(mmap.x,mmap.y,30),constraints=cons)
+        position.append(result.x)
+    return position
+
 
 # main
 # =============================================================================  
 n_map = 4 # number of maps needed
 map_list = []
 order_list = []
+name_list = []
+pos_list = []
 budget_list = [400,700]
 
 for i in range(0,n_map):
     budget_index = i%len(budget_list)
     mmap = circle_map(budget_list[budget_index])
+    pos = field_pos(mmap)
+    my_list = [greedy]#,optimal]
+    [index,name] = random.choice(my_list)(mmap)
     map_list.append(mmap)
-    greedy_index = greedy(mmap) 
-    order_list.append(greedy_index)
+    order_list.append(index)
+    name_list.append(name)
+    pos_list.append(pos)
     
     # draw
 #    plt.plot(operator.itemgetter(*order_list[i])(mmap.x), 
@@ -71,4 +123,4 @@ for i in range(0,n_map):
 #    plt.show() 
    
 # saving
-sio.savemat('test.mat', {'map_list':map_list,'order_list':order_list})
+sio.savemat('test.mat', {'map_list':map_list,'order_list':order_list,'name_list':name_list,'pos_list':pos_list})
