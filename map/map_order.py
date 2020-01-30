@@ -8,6 +8,8 @@ import random
 import matplotlib.pyplot as plt
 import scipy
 import scipy.optimize as optimize
+from itertools import chain
+
 
 
 # maps
@@ -105,10 +107,17 @@ order_list = []
 name_list = []
 pos_list = []
 budget_list = [400,700]
-
-for i in range(0,n_map):
+i = 0
+while True:
     budget_index = i%len(budget_list)
+
     mmap = circle_map(budget_list[budget_index])
+    
+    distance_copy = mmap.distance.copy()
+    distance_copy = chain.from_iterable(zip(*distance_copy))
+    
+    if any(i < 10 and i != 0 for i in list(distance_copy)):
+        continue    
     pos = field_pos(mmap)
     if map_ind[i] == 0:
         [index,name] = greedy(mmap)
@@ -118,7 +127,10 @@ for i in range(0,n_map):
     order_list.append(index)
     name_list.append(name)
     pos_list.append(pos)
-    
+    i = i + 1
+    if len(map_list) == n_map:
+        break
+
     # draw
 #    plt.plot(operator.itemgetter(*order_list[i])(mmap.x), 
 #             operator.itemgetter(*order_list[i])(mmap.y), 'bo-')

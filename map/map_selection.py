@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import scipy.io as sio
 from anytree import Node
 from anytree.exporter import DictExporter
+from itertools import chain
+
 # helper functions
 # =============================================================================
 # remove list nesting
@@ -150,6 +152,12 @@ exporter = DictExporter()
 
 while True:
     mmap = circle_map()
+    
+    distance_copy = mmap.distance.copy()
+    distance_copy = chain.from_iterable(zip(*distance_copy))
+    
+    if any(i < 10 and i != 0 for i in list(distance_copy)):
+        continue
     root_ = Node(0, budget = mmap.total)
     optimal(mmap,root_) 
     n_greedy, greedy_index = greedy(mmap)

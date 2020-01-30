@@ -130,6 +130,7 @@ class Draw:
             x = mmap.position[order][0] 
             y = mmap.position[order][1] 
             self.text_write(str(i), 40, BLACK, x, y, screen)
+            pg.draw.circle(screen, RED, [int(x), int(y)], 4)
             i = i + 1
         
     def num_est(self, mmap,screen):
@@ -255,7 +256,7 @@ if __name__ == "__main__":
     pg.font.init()
     
     # display setup
-    screen = pg.display.set_mode((2000, 1500), flags= pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((2000, 1500), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
     
     screen.fill(WHITE)
     
