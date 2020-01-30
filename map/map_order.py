@@ -17,7 +17,7 @@ from itertools import chain
 class circle_map:    
     def __init__(self, budget):
         # map parameters
-        self.N = 11     # total city number, including start
+        self.N = 11    # total city number, including start
         self.radius = 10     # radius of city
         self.total = budget    # total budget
         self.budget_remain = budget    # remaining budget
@@ -81,17 +81,19 @@ def optimal(mmap):
 # =============================================================================
 # repulsive force field
 def field(pos, city_x,city_y,sigma):
-        
-    return sum(scipy.exp(-((city_x - pos[0])**2+(city_y - pos[1])**2)/(2*sigma**2))/(2*math.pi*sigma**2))
+    x,y = pos 
+    return sum(scipy.exp(-((city_x - x)**2+(city_y - y)**2)/(2*sigma**2))/(2*math.pi*sigma**2))
 
 def field_pos(mmap):
     position = []
-    for i in range(0,11):
-        initial_guess = [1, 1]
-        cons = {'type': 'eq', 
-            'fun': lambda pos: (pos[0] - mmap.x[i])**2 + (pos[1] - mmap.y[i])**2 - 30**2}
-        result = optimize.minimize(field, initial_guess, 
-                                   args=(mmap.x,mmap.y,30),constraints=cons)
+    for i in range(0,mmap.N):
+#        initial_guess = [1000, 750]
+#        cons = {'type': 'eq', 
+#            'fun': lambda pos: (pos[0] - mmap.x[i])**2 + (pos[1] - mmap.y[i])**2 - 20**2}
+#        result = optimize.minimize(field, initial_guess, 
+#                                   args=(mmap.x,mmap.y,50),constraints=cons)
+        bounds = [(mmap.x[i]-20, mmap.x[i]+20), (mmap.y[i]-20, mmap.y[i]+20)]
+        result = optimize.shgo(field, bounds, args=(mmap.x,mmap.y,20))
         position.append(result.x)
     return position
 
@@ -100,7 +102,7 @@ def field_pos(mmap):
 # =============================================================================  
 n_map = 4 # number of maps needed
 map_ind = int(n_map/2)*[0]
-map_ind.extend(int(n_map/2)*[1])
+map_ind.extend(int(n_map/2)*[0])
 random.shuffle(map_ind)
 map_list = []
 order_list = []

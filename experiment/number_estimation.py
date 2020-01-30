@@ -130,7 +130,7 @@ class Draw:
             x = mmap.position[order][0] 
             y = mmap.position[order][1] 
             self.text_write(str(i), 40, BLACK, x, y, screen)
-            pg.draw.circle(screen, RED, [int(x), int(y)], 4)
+#            pg.draw.circle(screen, RED, [int(x), int(y)], 4)
             i = i + 1
         
     def num_est(self, mmap,screen):
