@@ -97,6 +97,9 @@ def field_pos(mmap):
 # main
 # =============================================================================  
 n_map = 4 # number of maps needed
+map_ind = int(n_map/2)*[0]
+map_ind.extend(int(n_map/2)*[1])
+random.shuffle(map_ind)
 map_list = []
 order_list = []
 name_list = []
@@ -107,8 +110,10 @@ for i in range(0,n_map):
     budget_index = i%len(budget_list)
     mmap = circle_map(budget_list[budget_index])
     pos = field_pos(mmap)
-    my_list = [greedy]#,optimal]
-    [index,name] = random.choice(my_list)(mmap)
+    if map_ind[i] == 0:
+        [index,name] = greedy(mmap)
+    else:
+        [index,name] = optimal(mmap)
     map_list.append(mmap)
     order_list.append(index)
     name_list.append(name)
