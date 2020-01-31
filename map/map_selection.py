@@ -55,7 +55,7 @@ class circle_map:
     def __init__(self):
         # map parameters
         self.N = 30     # total city number, including start
-        self.total = 400    # total budget
+        self.total = 700    # total budget
 
         self.R = 400*400 #circle radius' sqaure
         self.r = np.random.uniform(0, self.R, self.N) 
@@ -141,7 +141,7 @@ def greedy(mmap):
 
 # main
 # =============================================================================   
-n_map = 5 # number of maps needed
+n_map = 1 # number of maps needed
 map_list = []
 optimal_list = []
 greedy_list = []
@@ -174,25 +174,39 @@ while True:
     if len(map_list) == n_map:
         break
     
+depth = []
+leaves = root_.leaves
+for leave in leaves:
+    depth.append(leave.depth)
+plt.hist(depth)    
+
+from anytree import Walker
+w = Walker()
+path = w.walk(root_, leaves[depth.index(max(depth))])
+optimal_index = [0]
+for item in path[2]:
+    optimal_index.append(item.name)
    
-# saving
-sio.savemat('test_basic.mat', {'map_list':map_list, 'diff_list':diff_list,
-                                    'optimal_list':optimal_list,'greedy_list':greedy_list,
-                                    'optimal_number':optimal_number,'greedy_number':greedy_number})
+## saving
+#sio.savemat('test_basic_100.mat', {'map_list':map_list, 'diff_list':diff_list,
+#                                    'optimal_list':optimal_list,'greedy_list':greedy_list,
+#                                    'optimal_number':optimal_number,'greedy_number':greedy_number})
+#
+## draw 
 
-# draw 
-#plt.plot(operator.itemgetter(*optimal_index)(mmap.x), 
-#         operator.itemgetter(*optimal_index)(mmap.y), 'ro-')
-#plt.plot(operator.itemgetter(*greedy_index)(mmap.x), 
-#         operator.itemgetter(*greedy_index)(mmap.y), 'bo-')
-#
-#plt.plot(mmap.x[1:],mmap.y[1:],'go')
-#plt.plot(mmap.x[0],mmap.y[0],'cv')
-#
-#plt.gca().set_aspect('equal', adjustable='box')
+plt.plot(operator.itemgetter(*optimal_index)(map_list[0].x), 
+         operator.itemgetter(*optimal_index)(map_list[0].y), 'ro-')
+plt.plot(operator.itemgetter(*greedy_list[0])(map_list[0].x), 
+         operator.itemgetter(*greedy_list[0])(map_list[0].y), 'bo-')
+
+plt.plot(map_list[0].x[1:],map_list[0].y[1:],'go')
+plt.plot(map_list[0].x[0],map_list[0].y[0],'cv')
+
+plt.xlim(0, 1500)
+plt.ylim(0, 1500)
+plt.gca().set_aspect('equal', adjustable='box')
 #plt.axis('scaled')
-#
-#plt.show()
-#print(diff)
 
+plt.show()
+#print(diff)
 

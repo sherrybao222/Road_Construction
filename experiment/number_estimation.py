@@ -147,8 +147,8 @@ class Draw:
                       int(mmap.city_start[1] + mmap.total * math.sin(radians)))
         self.budget_line = pg.draw.line(screen, GREEN, mmap.city_start, budget_pos, 4)
 
-    def game_end(self, mmap,screen): 
-        self.text_write('Press Return to Next Trial ', 100, BLACK, 600, 650,screen)
+    def game_end(self, screen): 
+        self.text_write('Number estimation trial', 100, BLACK, 600, 650,screen)
         
 # helper function
 # ----------------------------------------------------------------------------- 
@@ -231,6 +231,8 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk):
     # -------------------------------------------------------------------------
     while not all_done:
         for trl_id in range(0, n_trials):
+#            if trl_id == 0:
+#                Draw.game_end(screen)
             map_id = trl_id  + (n_blk - 1) * n_trials
             all_done,trl_done,trial = pygame_trial(all_done, trl_done, map_content, 
                                                    trl_id + 1, screen, blk, map_id)
