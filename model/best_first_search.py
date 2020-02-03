@@ -1,23 +1,8 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import numpy as np
 from anytree import Node
 import math
 import random
-
-whole_budget = 1
-budget_remain = whole_budget
-
-# generate random dot
-N = 10
-x = np.random.rand(N)
-y = np.random.rand(N)
-city = [(x[i], y[i]) for i in range(0, len(x))] 
-name = list(map(str, list(range(0,N))))
-dict_city = dict(zip(name, city)) 
-
-dict_city_remain = dict_city.copy()
+from scipy.spatial import distance_matrix
 
 
 # define class for returning multiple values
@@ -28,7 +13,7 @@ class ReturnValue:
      self.cities_remain = cities_remain
 #----------------------------------------------------------------------
 
-def calculate_value(node,cities,budget,n_c):
+def calculate_value(node, cities, dist, budget, n_c):
     # weight
     w_c = 1
     w_u = 1
@@ -37,21 +22,44 @@ def calculate_value(node,cities,budget,n_c):
     n_u = 0
     
     cities_remain = cities.copy()
-    del cities_remain[node]
-    
+    del cities_remain[node.name] # delete the current chosen node
+
     for c in cities_remain:
-        if ((cities[c][0] - cities[node][0])**2 + \
-           (cities[c][1] - cities[node][1])**2 )<= budget**2:
+        if dist[node.name][c] <= budget:
             n_u = n_u + 1
             
     if n_u == 0:
-        determined = 1
+        node.determined = 1
     else:
-        determined = 0
+        node.determined = 0
     
     value = w_c * n_c + w_u * n_u + w_b * budget
     
-    return ReturnValue(value,determined,cities_remain)
+    node.value = value
+    node.budget = budget
+    node.n_c = n_c
+    node.city = cities_remain
+    
+#------------------------------------------------------------------------
+def determined(root):
+    try:
+        n =  max(root.children,key=lambda node:node.value)
+        if bool(n.children):
+            determined = 1
+        else:
+            if n.determined == 1:
+                determined = 1  
+            else:
+                determined = 0
+                
+    except:
+        if root.determined == 1:
+            determined = 1  
+        else:
+            determined = 0
+
+
+    return determined
     
 #------------------------------------------------------------------------
 
@@ -61,30 +69,21 @@ def select_node(root):
     
     while bool(n.children):
         n =  max(n.children,key=lambda node:node.value)
-        
+    
     return n
 
 #------------------------------------------------------------------------
 
-def expand_node(n,cities,budget,n_c):
+def expand_node(n, dist):
     
     s = n.name
-    
-    cities_remain = cities.copy()
-    del cities_remain[s]
-    
-    for child in cities_remain:
-
-        dist = math.sqrt((cities[child][0] - cities[s][0])**2 + \
-                         (cities[child][1] - cities[s][1])**2)
-        if dist <= budget:
-            budget_remain = budget - dist
-            n_cc = n_c + 1
-            child_result = calculate_value(child,cities_remain,
-                                           budget_remain,n_cc)
-            Node(child, value = child_result.value, parent = n,
-                 budget = budget_remain,n_c = n_cc,
-                 city = cities_remain)
+        
+    for child in n.city:
+        if dist[s][child] <= n.budget:
+            c = Node(child, parent = n)
+            budget_remain = n.budget - dist[s][child]
+            n_cc = n.n_c + 1
+            calculate_value(c, n.city, dist, budget_remain, n_cc)
         
 #    V_max = max(c.value)
     
@@ -109,58 +108,84 @@ def stop(gamma):
     return random.random() < gamma
 
 #------------------------------------------------------------------------   
-def make_move(root,cities,budget,n_c,result):
+def make_move(root): # cities,budget,n_c,
     
 #    if lapse(lambda_):
 #        return ramdom_move(s)
 #    else:
+                
+    gamma = 0     
     
-    
-    for child in result.cities_remain:
-        
-        dist = math.sqrt((cities[child][0] - cities[root.name][0])**2 + \
-                         (cities[child][1] - cities[root.name][1])**2)
-        
-        if dist <= budget:
-            
-            budget_remain = budget - dist
-            n_cc = n_c + 1
-            child_result = calculate_value(child,result.cities_remain,
-                                           budget_remain,n_cc)
-            Node(child, value = child_result.value, parent = root,
-                 budget = budget_remain, n_c = n_cc,
-                 city = result.cities_remain)
-#        else:
-#            budget_remain = budget
-#            n_cc = n_c
-            
-    gamma = 0.5     
-    
-    while (not stop(gamma)) and (not result.determined):
+    while (not stop(gamma)) and (not determined(root)):
         n = select_node(root)
-        expand_node(n,n.city,n.budget,n.n_c)
+        expand_node(n,dist_city)
         backpropagate(n,root) 
             
     n =  max(root.children,key=lambda node:node.value)
      
     return n
 #--------------------------------------------------------------------------
-    
-n_c = 0 # number of connected cities
-now = Node('0') # start point
-result = calculate_value(now.name,dict_city_remain,budget_remain,n_c)
+class Map:
+    def __init__(self):#, map_content, map_id): 
+        
+        self.circle_map()
+#        self.load_map(map_content, map_id)
 
-while result.determined == 0:
+    def circle_map(self):
+        # map parameters
+        self.N = 30     # total city number, including start
+        self.radius = 10     # radius of city
+        self.total = 400    # total budget
+        self.budget_remain = 400    # remaining budget
+
+        self.R = 400*400 #circle radius' sqaure
+        self.r = np.random.uniform(0, self.R, self.N) 
+        self.phi = np.random.uniform(0,2 * math.pi, self.N) 
+        self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
+        self.x = self.x.astype(int)
+        self.y = np.sqrt(self.r) * np.sin(self.phi) + 800
+        self.y = self.y.astype(int)
+        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
+        
+        self.city_start = self.xy[0]    # start city
+        self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
+      
+    def load_map(self, map_content, map_id):
+        
+        self.loadmap = map_content['map_list'][0,map_id][0,0]
+        self.order = np.nan
+        
+        self.N = self.loadmap.N.tolist()[0][0]
+        self.radius = 5     # radius of city
+        self.total = self.loadmap.total.tolist()[0][0]   # total budget
+        self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
+        
+        self.R = self.loadmap.R.tolist()[0]
+        self.r = self.loadmap.r.tolist()[0]
+        self.phi = self.loadmap.phi.tolist()[0]
+        self.x = self.loadmap.x.tolist()[0]
+        self.y = self.loadmap.y.tolist()[0]
+        self.xy = self.loadmap.xy.tolist()
+        
+        self.city_start = self.loadmap.city_start.tolist()[0]
+        self.distance = self.loadmap.distance.tolist()
+
+
+trial = Map()
+dict_city = dict(zip(list(range(0,trial.N)), trial.xy)) 
+dict_city_remain = dict_city.copy()
+dist_city = trial.distance.copy()
+# -------------------------------------------------------------------------
+# main 
+start = Node(0)
+n_c = 0 # number of connected cities
+# calculate start node value
+calculate_value(start, dict_city_remain, dist_city, trial.budget_remain, n_c) 
+now = start
+
+while not determined(now):
     
-    choice = make_move(now,dict_city,budget_remain,n_c,result)
-    print(choice.name)
-    del dict_city_remain[now.name]
-    
-    dist = math.sqrt((dict_city[choice.name][0] - dict_city[now.name][0])**2 + \
-                     (dict_city[choice.name][1] - dict_city[now.name][1])**2)
-    budget_remain = budget_remain - dist
+    choice = make_move(now)
     now = choice
-    n_c = n_c + 1
-    result = calculate_value(now.name,dict_city_remain,budget_remain,n_c)
-    #del dict_city_remain[choice.name]
+    print(now.name)
     
