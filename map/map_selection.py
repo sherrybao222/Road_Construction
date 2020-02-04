@@ -9,6 +9,8 @@ import scipy.io as sio
 from anytree import Node
 from anytree.exporter import DictExporter
 from itertools import chain
+from anytree import Walker
+
 
 # helper functions
 # =============================================================================
@@ -55,14 +57,14 @@ class circle_map:
     def __init__(self):
         # map parameters
         self.N = 30     # total city number, including start
-        self.total = 700    # total budget
+        self.total = 300    # total budget
 
-        self.R = 400*400 #circle radius' sqaure
+        self.R = 200*200 #circle radius' sqaure
         self.r = np.random.uniform(0, self.R, self.N) 
         self.phi = np.random.uniform(0,2 * math.pi, self.N) 
-        self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
+        self.x = np.sqrt(self.r) * np.cos(self.phi)
         self.x = self.x.astype(int)
-        self.y = np.sqrt(self.r) * np.sin(self.phi) + 800
+        self.y = np.sqrt(self.r) * np.sin(self.phi)
         self.y = self.y.astype(int)
         self.xy = [(self.x[i], self.y[i]) for i in range(0, len(self.x))]   # combine x and y
         
@@ -131,6 +133,8 @@ def greedy(mmap):
         else:
             dist_greedy = dist_greedy + dist # update current distance sum of greedy path
             index_np = np.where(dist_list == dist) # find the chosen city index
+            if len(index_np) > 1:
+                index_np = random.choice(index_np)
             matrix_copy[:,greedy_index[i]] = 0 # cannot choose one city twice
             matrix_copy[greedy_index[i],:] = 0
             i = i + 1
@@ -141,15 +145,16 @@ def greedy(mmap):
 
 # main
 # =============================================================================   
-n_map = 1 # number of maps needed
+n_map = 100 # number of maps needed
 map_list = []
+breath_first_tree = []
 optimal_list = []
 greedy_list = []
 optimal_number = []
 greedy_number = []
 diff_list = []
 exporter = DictExporter()
-
+index = 0
 while True:
     mmap = circle_map()
     
@@ -160,53 +165,63 @@ while True:
         continue
     root_ = Node(0, budget = mmap.total)
     optimal(mmap,root_) 
+    
     n_greedy, greedy_index = greedy(mmap)
     diff =  abs(root_.height - n_greedy)
     
     if diff >= 1:
         map_list.append(mmap)
-        optimal_list.append(exporter.export(root_))
+        
+        depth = []
+        leaves = root_.leaves
+        for leave in leaves:
+            depth.append(leave.depth)
+        plt.hist(depth) # plot path length summary for the current map
+        plt.savefig('path_length/path_length_' + str(index) + '.png')
+        plt.clf()
+        index = index + 1
+    
+        w = Walker()
+        path = w.walk(root_, leaves[depth.index(max(depth))])
+        optimal_index = [0]
+        for item in path[2]:
+            optimal_index.append(item.name)
+
+        breath_first_tree.append(exporter.export(root_))
+        optimal_list.append(optimal_index)
         greedy_list.append(greedy_index)
         optimal_number.append(root_.height)
         greedy_number.append(n_greedy)
         diff_list.append(diff)
         
+        print(index)
     if len(map_list) == n_map:
         break
     
-depth = []
-leaves = root_.leaves
-for leave in leaves:
-    depth.append(leave.depth)
-plt.hist(depth)    
 
-from anytree import Walker
-w = Walker()
-path = w.walk(root_, leaves[depth.index(max(depth))])
-optimal_index = [0]
-for item in path[2]:
-    optimal_index.append(item.name)
    
-## saving
-#sio.savemat('test_basic_100.mat', {'map_list':map_list, 'diff_list':diff_list,
-#                                    'optimal_list':optimal_list,'greedy_list':greedy_list,
-#                                    'optimal_number':optimal_number,'greedy_number':greedy_number})
-#
+# saving
+sio.savemat('test_basic_map.mat', {'map_list':map_list})
+sio.savemat('test_basic_tree.mat', {'breath_first_tree':breath_first_tree})
+sio.savemat('test_basic_summary.mat', {'diff_list':diff_list,
+                                    'optimal_list':optimal_list,'greedy_list':greedy_list,
+                                    'optimal_number':optimal_number,'greedy_number':greedy_number})
+
+    
 ## draw 
-
-plt.plot(operator.itemgetter(*optimal_index)(map_list[0].x), 
-         operator.itemgetter(*optimal_index)(map_list[0].y), 'ro-')
-plt.plot(operator.itemgetter(*greedy_list[0])(map_list[0].x), 
-         operator.itemgetter(*greedy_list[0])(map_list[0].y), 'bo-')
-
-plt.plot(map_list[0].x[1:],map_list[0].y[1:],'go')
-plt.plot(map_list[0].x[0],map_list[0].y[0],'cv')
-
-plt.xlim(0, 1500)
-plt.ylim(0, 1500)
-plt.gca().set_aspect('equal', adjustable='box')
-#plt.axis('scaled')
-
-plt.show()
-#print(diff)
+#plt.plot(operator.itemgetter(*optimal_index)(map_list[0].x), 
+#         operator.itemgetter(*optimal_index)(map_list[0].y), 'ro-')
+#plt.plot(operator.itemgetter(*greedy_list[0])(map_list[0].x), 
+#         operator.itemgetter(*greedy_list[0])(map_list[0].y), 'bo-')
+#
+#plt.plot(map_list[0].x[1:],map_list[0].y[1:],'go')
+#plt.plot(map_list[0].x[0],map_list[0].y[0],'cv')
+#
+#plt.xlim(0, 1500)
+#plt.ylim(0, 1500)
+#plt.gca().set_aspect('equal', adjustable='box')
+##plt.axis('scaled')
+#
+#plt.show()
+##print(diff)
 

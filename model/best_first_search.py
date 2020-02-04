@@ -15,7 +15,7 @@ class ReturnValue:
 
 def calculate_value(node, cities, dist, budget, n_c):
     # weight
-    w_c = 1
+    w_c = 1000
     w_u = 1
     w_b = 1
     
@@ -133,7 +133,7 @@ class Map:
 
     def circle_map(self):
         # map parameters
-        self.N = 30     # total city number, including start
+        self.N = 15     # total city number, including start
         self.radius = 10     # radius of city
         self.total = 400    # total budget
         self.budget_remain = 400    # remaining budget
@@ -183,9 +183,21 @@ n_c = 0 # number of connected cities
 calculate_value(start, dict_city_remain, dist_city, trial.budget_remain, n_c) 
 now = start
 
-while not determined(now):
+while True:
     
     choice = make_move(now)
     now = choice
     print(now.name)
-    
+    if now.determined == 1:
+        break
+
+from anytree import RenderTree
+for pre, _, node in RenderTree(start):
+     print("%s%s:%s" % (pre, node.name,node.value))
+     
+#from anytree.exporter import DotExporter
+#for line in DotExporter(start):
+#    print(line)
+#
+#from anytree.exporter import UniqueDotExporter
+#UniqueDotExporter(start).to_dotfile("tree.dot")
