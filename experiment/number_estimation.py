@@ -129,14 +129,14 @@ class Draw:
         for order in mmap.order[1:]: # order of connection
             x = mmap.position[order][0] 
             y = mmap.position[order][1] 
-            self.text_write(str(i), 40, BLACK, x, y, screen)
+            text_write(str(i), 40, BLACK, x, y, screen)
 #            pg.draw.circle(screen, RED, [int(x), int(y)], 4)
             i = i + 1
         
     def num_est(self, mmap,screen):
-        self.text_write('How many cities can you connect? ', 60, BLACK, 100, 200,screen)
-        self.text_write("Type your answer here: ", 60, BLACK, 100, 300,screen)
-        self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 400,screen)
+        text_write('How many cities can you connect? ', 60, BLACK, 100, 200,screen)
+        text_write("Type your answer here: ", 60, BLACK, 100, 300,screen)
+        text_write("Press Return to SUBMIT", 60, BLACK, 100, 400,screen)
         
     def budget(self, mmap, mouse,screen):  
         # current mouse position
@@ -147,17 +147,19 @@ class Draw:
                       int(mmap.city_start[1] + mmap.total * math.sin(radians)))
         self.budget_line = pg.draw.line(screen, GREEN, mmap.city_start, budget_pos, 4)
 
-    def game_end(self, screen): 
-        self.text_write('Number estimation trial', 100, BLACK, 600, 650,screen)
+# instruction
+# =============================================================================
+def game_start(screen): 
+    text_write('Number Estimation', 100, BLACK, 600, 650, screen)
         
 # helper function
-# ----------------------------------------------------------------------------- 
-    def text_write(self, text, size, color, x, y,screen):  # function that can display any text
-        font_object = pg.font.SysFont(pg.font.get_default_font(), size)
-        text_surface = font_object.render(text, True, color)
-        text_rectangle = text_surface.get_rect()
-        text_rectangle.center = x, y
-        screen.blit(text_surface, text_rectangle.center)
+# =============================================================================
+def text_write(text, size, color, x, y,screen):  # function that can display any text
+    font_object = pg.font.SysFont(pg.font.get_default_font(), size)
+    text_surface = font_object.render(text, True, color)
+    text_rectangle = text_surface.get_rect()
+    text_rectangle.center = x, y
+    screen.blit(text_surface, text_rectangle.center)
 
 # single trial
 # =============================================================================
@@ -226,7 +228,26 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk):
     all_done = False
     trl_done = False
     
-    trials = []
+    trials = []   
+    
+    # instruction
+    # -------------------------------------------------------------------------    
+    ins = True
+    while ins:
+        events = pg.event.get()
+        for event in events:
+       
+            screen.fill(WHITE)
+            game_start(screen)
+            pg.display.flip()  
+            
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    ins = False 
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.quit()   
+
     # running
     # -------------------------------------------------------------------------
     while not all_done:
@@ -258,7 +279,7 @@ if __name__ == "__main__":
     pg.font.init()
     
     # display setup
-    screen = pg.display.set_mode((2000, 1500), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((2000, 1600), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
     
     screen.fill(WHITE)
     

@@ -168,7 +168,7 @@ class Draw:
         self.cities(mmap,screen) # draw city dots
         if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road(mmap,screen)
-        self.text_write("Score: " + str(mmap.n_city[-1]), 100, BLACK, 1600, 200,screen) # show number of connected cities
+        text_write("Score: " + str(mmap.n_city[-1]), 100, BLACK, 1600, 200,screen) # show number of connected cities
 
         if mmap.check_end_ind:
              self.check_end(screen)
@@ -194,23 +194,24 @@ class Draw:
         pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
 
     def instruction_submit(self,screen):
-        self.text_write("Press Return to SUBMIT", 60, BLACK, 100, 200,screen)
+        text_write("Press Return to SUBMIT", 60, BLACK, 100, 200,screen)
 
     def check_end(self,screen):
-        self.text_write("You are out of budget", 60, RED, 100, 400,screen)
+        text_write("You are out of budget", 60, RED, 100, 400,screen)
 
-    def game_end(self, mmap,screen): 
-        self.text_write('Your score is ' + str(mmap.n_city[-1]), 100, BLACK, 700, 750,screen)
-        self.text_write('Press Return to Next Trial ', 100, BLACK, 600, 850,screen)
+# instruction
+# =============================================================================
+def game_start(screen): 
+    text_write('Road Construction', 100, BLACK, 700, 750,screen)
 
 # helper function
-# ----------------------------------------------------------------------------- 
-    def text_write(self, text, size, color, x, y,screen):  # function that can display any text
-        font_object = pg.font.SysFont(pg.font.get_default_font(), size)
-        text_surface = font_object.render(text, True, color)
-        text_rectangle = text_surface.get_rect()
-        text_rectangle.center = x, y
-        screen.blit(text_surface, text_rectangle.center)
+# =============================================================================
+def text_write(text, size, color, x, y,screen):  # function that can display any text
+    font_object = pg.font.SysFont(pg.font.get_default_font(), size)
+    text_surface = font_object.render(text, True, color)
+    text_rectangle = text_surface.get_rect()
+    text_rectangle.center = x, y
+    screen.blit(text_surface, text_rectangle.center)
 
 # single trial
 # =============================================================================
@@ -287,7 +288,26 @@ def road_basic(screen,map_content,n_trials, blk, n_blk):
     trl_done = False
     
     trials = []
-    
+
+    # instruction
+    # -------------------------------------------------------------------------    
+    ins = True
+    while ins:
+        events = pg.event.get()
+        for event in events:
+       
+            screen.fill(WHITE)
+            game_start(screen)
+            pg.display.flip()  
+            
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    ins = False 
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.quit()   
+
+    # running    
     # -------------------------------------------------------------------------
     while not all_done:
         for trl_id in range(0, n_trials):
