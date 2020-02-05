@@ -10,7 +10,7 @@ import pygame_textinput
 # generate map and its corresponding parameters about people's choice
 # =============================================================================
 class Map:
-    def __init__(self, map_content, trl_id, blk,map_id): 
+    def __init__(self, map_content, trl_id, blk, map_id): 
         
         self.load_map(map_content, map_id)
         self.data_init(blk,trl_id,map_id)
@@ -151,6 +151,14 @@ class Draw:
 # =============================================================================
 def game_start(screen): 
     text_write('Number Estimation', 100, BLACK, 600, 650, screen)
+
+def trial_start(screen):
+    text_write('This is Number Estimation. The green line is your budget line,',90, BLACK, 50, 300, screen)
+    text_write('and you are asked to estimate the number of dots you can ', 90, BLACK, 50, 400,screen)
+    text_write('connect with the given budget. Please remember that the dots', 90, BLACK, 50, 500,screen)
+    text_write('must be connected in the labeled order.', 90, BLACK, 50, 600,screen)
+    text_write('You will type your response in a textbox.', 90, BLACK, 50, 700, screen)
+    text_write('Press Enter to see an example.', 90, BLACK, 50, 900, screen)
         
 # helper function
 # =============================================================================
@@ -223,12 +231,22 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                  
     return all_done,trl_done,trial
 
-def num_estimation(screen,map_content,n_trials,blk,n_blk):    
+def num_estimation(screen,map_content,n_trials,blk,n_blk,mode):    
     # conditions
     all_done = False
     trl_done = False
     
-    trials = []   
+    trials = [] 
+    
+    if mode == 'game':
+        screen.fill(WHITE)
+        game_start(screen)
+        pg.display.flip()
+    elif mode == 'try':
+        screen.fill(WHITE)
+        trial_start(screen)
+        pg.display.flip()
+
     
     # instruction
     # -------------------------------------------------------------------------    
@@ -237,9 +255,6 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk):
         events = pg.event.get()
         for event in events:
        
-            screen.fill(WHITE)
-            game_start(screen)
-            pg.display.flip()  
             
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
@@ -288,7 +303,8 @@ if __name__ == "__main__":
     n_trials = 2
     blk = 1 # set some number\
     n_blk = 1
+    mode = 'game'
     
-    trials = num_estimation(screen,map_content,n_trials,blk,n_blk)
+    trials = num_estimation(screen,map_content,n_trials,blk,n_blk,mode)
     
     pg.quit()

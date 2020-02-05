@@ -3,6 +3,7 @@ import scipy.io as sio
 from number_estimation import num_estimation
 from road_basic import road_basic
 from road_undo import road_undo
+from training import training
 
 # main
 # =============================================================================
@@ -36,21 +37,29 @@ pg.init()
 pg.font.init()
 
 # display setup
-screen = pg.display.set_mode((2000, 1600), flags= pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
+screen = pg.display.set_mode((2000, 1600), flags=pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
 WHITE = (255, 255, 255)
-#screen.fill(WHITE)
 
-# blocks
+# training session
+screen.fill(WHITE)
+training(screen)
+mode_1 = 'try'
+num_estimation(screen,num_map,2,0,n_1,mode_1)
+road_basic(screen,basic_map,2,0,n_1,mode_1)
+road_undo(screen,undo_map,2,0,n_1,mode_1)
+
+# game blocks
+mode_2 = 'game'
 start_trl = 0
 for blk, cond in enumerate(orders[order_ind - 1]):   
     if cond == 1:
-        trials[start_trl:] = num_estimation(screen,num_map,n_trl[cond-1],blk+1,n_1)
+        trials[start_trl:] = num_estimation(screen,num_map,n_trl[cond-1],blk+1,n_1,mode_2)
         n_1 = n_1 + 1
     if cond == 2:
-        trials[start_trl:] = road_basic(screen,basic_map,n_trl[cond-1],blk+1,n_2)
+        trials[start_trl:] = road_basic(screen,basic_map,n_trl[cond-1],blk+1,n_2,mode_2)
         n_2 = n_2 + 1
     if cond == 3:    
-        trials[start_trl:] = road_undo(screen,undo_map,n_trl[cond-1],blk+1,n_3)
+        trials[start_trl:] = road_undo(screen,undo_map,n_trl[cond-1],blk+1,n_3,mode_2)
         n_3 = n_3 + 1
     
     start_trl = start_trl + n_trl[cond-1]

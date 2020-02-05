@@ -224,6 +224,14 @@ class Draw:
 # =============================================================================
 def game_start(screen): 
     text_write('Road Constructions with Undo', 100, BLACK, 700, 700,screen)
+    
+def trial_start(screen):
+    text_write('This is Road Construction with Undo. The green line is your',90, BLACK, 50, 300, screen)
+    text_write('budget line, and you are asked to connect as many dots as', 90, BLACK, 50, 400,screen)
+    text_write('possible with the given budget. You will see your score on the', 90, BLACK, 50, 500,screen)
+    text_write('screen, and you can press Z to undo your connections.', 90, BLACK, 50, 600,screen)
+    text_write('In the end, you will need to press Enter to submit your response. ', 90, BLACK, 50, 700,screen)
+    text_write('Press Enter to see an example.', 90, BLACK, 50, 900, screen)
 
 # helper function
 # =============================================================================
@@ -312,12 +320,21 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
 
     return all_done,trial,trl_done
 
-def road_undo(screen,map_content,n_trials,blk,n_blk):
+def road_undo(screen,map_content,n_trials,blk,n_blk,mode):
     # conditions
     all_done = False
     trl_done = False
     
     trials = []
+
+    if mode == 'game':
+        screen.fill(WHITE)
+        game_start(screen)
+        pg.display.flip()
+    elif mode == 'try':
+        screen.fill(WHITE)
+        trial_start(screen)
+        pg.display.flip()
 
     # instruction
     # -------------------------------------------------------------------------    
@@ -325,11 +342,7 @@ def road_undo(screen,map_content,n_trials,blk,n_blk):
     while ins:
         events = pg.event.get()
         for event in events:
-       
-            screen.fill(WHITE)
-            game_start(screen)
-            pg.display.flip()  
-            
+                   
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
                     ins = False 
@@ -377,7 +390,8 @@ if __name__ == "__main__":
     n_trials = 5
     blk = 3 # set to some number
     n_blk = 1
+    mode = 'game'
     
-    trials = road_undo(screen,map_content,n_trials,blk,n_blk)
+    trials = road_undo(screen,map_content,n_trials,blk,n_blk,mode)
 
     pg.quit()

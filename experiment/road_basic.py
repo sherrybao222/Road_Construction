@@ -204,6 +204,13 @@ class Draw:
 def game_start(screen): 
     text_write('Road Construction', 100, BLACK, 700, 750,screen)
 
+def trial_start(screen):
+    text_write('This is Road Construction. The green line is your budget line,',90, BLACK, 50, 300, screen)
+    text_write('and you are asked to connect as many dots as possible with', 90, BLACK, 50, 400,screen)
+    text_write('the given budget. You will see your score on the screen,', 90, BLACK, 50, 500,screen)
+    text_write('and press Enter to submit your response.', 90, BLACK, 50, 600,screen)
+    text_write('Press Enter to see an example.', 90, BLACK, 50, 800, screen)
+
 # helper function
 # =============================================================================
 def text_write(text, size, color, x, y,screen):  # function that can display any text
@@ -282,12 +289,21 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
     
     return all_done,trial,trl_done
 
-def road_basic(screen,map_content,n_trials, blk, n_blk):
+def road_basic(screen,map_content,n_trials, blk, n_blk, mode):
      # conditions
     all_done = False
     trl_done = False
     
     trials = []
+    
+    if mode == 'game':
+        screen.fill(WHITE)
+        game_start(screen)
+        pg.display.flip()
+    elif mode == 'try':
+        screen.fill(WHITE)
+        trial_start(screen)
+        pg.display.flip()
 
     # instruction
     # -------------------------------------------------------------------------    
@@ -295,11 +311,7 @@ def road_basic(screen,map_content,n_trials, blk, n_blk):
     while ins:
         events = pg.event.get()
         for event in events:
-       
-            screen.fill(WHITE)
-            game_start(screen)
-            pg.display.flip()  
-            
+                   
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
                     ins = False 
@@ -344,7 +356,8 @@ if __name__ == "__main__":
     n_trials = 5
     blk = 2 # set some number
     n_blk = 1
- 
-    trials = road_basic(screen,map_content,n_trials,blk,n_blk)
+    mode = 'game'
+    
+    trials = road_basic(screen,map_content,n_trials,blk,n_blk,mode)
     
     pg.quit()
