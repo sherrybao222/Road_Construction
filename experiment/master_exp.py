@@ -8,7 +8,7 @@ from training import training
 # main
 # =============================================================================
 # trial numbers
-n_trl = [2,2,2]
+n_trl = [12,12,12]
 n_all = 2 * sum(n_trl)
 trials = [float("nan")] * n_all
 # map numbers
@@ -16,8 +16,12 @@ n_1 = 1
 n_2 = 1
 n_3 = 1
 # load maps
+train_num_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_test.mat',  struct_as_record=False)
+train_basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
+train_undo_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_test_undo.mat',  struct_as_record=False)
+
 num_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
-basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic.mat',  struct_as_record=False)
+basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_24.mat',  struct_as_record=False)
 undo_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_undo.mat',  struct_as_record=False)
 
 # blocks
@@ -37,16 +41,16 @@ pg.init()
 pg.font.init()
 
 # display setup
-screen = pg.display.set_mode((2000, 1600), flags=pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
+screen = pg.display.set_mode((2000, 1600), flags=pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
 WHITE = (255, 255, 255)
 
 # training session
 screen.fill(WHITE)
 training(screen)
 mode_1 = 'try'
-num_estimation(screen,num_map,2,0,n_1,mode_1)
-road_basic(screen,basic_map,2,0,n_1,mode_1)
-road_undo(screen,undo_map,2,0,n_1,mode_1)
+#num_estimation(screen,train_num_map,2,0,1,mode_1)
+#road_basic(screen,train_basic_map,2,0,1,mode_1)
+#road_undo(screen,train_undo_map,2,0,1,mode_1)
 
 # game blocks
 mode_2 = 'game'

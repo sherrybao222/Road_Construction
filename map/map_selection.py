@@ -40,11 +40,11 @@ class uniform_map:
 class gaussian_map:
     def __init__(self):
         # map parameters
-        self.N = 11 # total city number, including start
-        self.total = 100 # total budget
+        self.N = 30 # total city number, including start
+        self.total = 300 # total budget
         
         mean = [0, 0]
-        cov = [[33333, 0], [0, 33333]]  # diagonal covariance
+        cov = [[200, 0], [0, 200]]  # diagonal covariance
         
         self.xy = np.random.multivariate_normal(mean, cov, self.N)
         self.x, self.y = self.xy.T #transpose
@@ -133,7 +133,7 @@ def greedy(mmap):
         else:
             dist_greedy = dist_greedy + dist # update current distance sum of greedy path
             index_np = np.where(dist_list == dist) # find the chosen city index
-            if len(index_np) > 1:
+            if len(index_np[0]) > 1:
                 index_np = random.choice(index_np)
             matrix_copy[:,greedy_index[i]] = 0 # cannot choose one city twice
             matrix_copy[greedy_index[i],:] = 0
@@ -145,7 +145,7 @@ def greedy(mmap):
 
 # main
 # =============================================================================   
-n_map = 100 # number of maps needed
+n_map = 500 # number of maps needed
 map_list = []
 breath_first_tree = []
 optimal_list = []
@@ -154,7 +154,7 @@ optimal_number = []
 greedy_number = []
 diff_list = []
 exporter = DictExporter()
-index = 0
+index = 500
 while True:
     mmap = circle_map()
     
@@ -176,7 +176,7 @@ while True:
         leaves = root_.leaves
         for leave in leaves:
             depth.append(leave.depth)
-        plt.hist(depth) # plot path length summary for the current map
+        plt.hist(depth,range(len(set(depth))+2),align='left') # plot path length summary for the current map
         plt.savefig('path_length/path_length_' + str(index) + '.png')
         plt.clf()
         index = index + 1
@@ -201,9 +201,9 @@ while True:
 
    
 # saving
-sio.savemat('test_basic_map.mat', {'map_list':map_list})
-sio.savemat('test_basic_tree.mat', {'breath_first_tree':breath_first_tree})
-sio.savemat('test_basic_summary.mat', {'diff_list':diff_list,
+sio.savemat('basic_map_500.mat', {'map_list':map_list})
+sio.savemat('basic_tree_500.mat', {'breath_first_tree':breath_first_tree})
+sio.savemat('basic_summary_500.mat', {'diff_list':diff_list,
                                     'optimal_list':optimal_list,'greedy_list':greedy_list,
                                     'optimal_number':optimal_number,'greedy_number':greedy_number})
 

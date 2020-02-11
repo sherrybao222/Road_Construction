@@ -52,7 +52,7 @@ class Map:
         
         self.loadmap = map_content['map_list'][0,map_id][0,0]
         self.order = np.nan
-
+        
         self.N = self.loadmap.N.tolist()[0][0]
         self.radius = 5     # radius of city
         self.total = self.loadmap.total.tolist()[0][0]   # total budget
@@ -61,11 +61,11 @@ class Map:
         self.R = self.loadmap.R.tolist()[0]
         self.r = self.loadmap.r.tolist()[0]
         self.phi = self.loadmap.phi.tolist()[0]
-        self.x = self.loadmap.x.tolist()[0]
-        self.y = self.loadmap.y.tolist()[0]
-        self.xy = self.loadmap.xy.tolist()
+        self.x = [x + 1000 for x in self.loadmap.x.tolist()[0]] 
+        self.y = [x + 800 for x in self.loadmap.y.tolist()[0]]
+        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
         
-        self.city_start = self.loadmap.city_start.tolist()[0]
+        self.city_start = self.xy[0]    # start city
         self.distance = self.loadmap.distance.tolist()
 
 # -----------------------------------------------------------------------------          

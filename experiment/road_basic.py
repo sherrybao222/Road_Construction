@@ -10,7 +10,7 @@ import scipy.io as sio
 class Map:
     def __init__(self, map_content, trl_id, blk, map_id): 
         
-#        self.circle_map()
+#        self.gaussian_map()
         self.load_map(map_content, map_id)
         self.data_init(blk, trl_id, map_id)
        
@@ -29,7 +29,22 @@ class Map:
    
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
+    
+    def gaussian_map(self):
+        # map parameters
+        self.N = 30 # total city number, including start
+        self.total = 300 # total budget
+        self.radius = 3
         
+        mean = [1000, 800]
+        cov = [[10000, 0], [0, 10000]]  # diagonal covariance
+        
+        self.xy = np.random.multivariate_normal(mean, cov, self.N).astype(int)
+        self.x, self.y = self.xy.T #transpose
+   
+        self.city_start = self.xy[0] # start city
+        self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000) # city distance matrix
+    
     def circle_map(self):
         # map parameters
         self.N = 1000     # total city number, including start
@@ -51,7 +66,8 @@ class Map:
       
     def load_map(self, map_content, map_id):
         
-        self.loadmap = map_content['map_list'][0,map_id][0,0]
+        try: self.loadmap = map_content['map_list'][0,map_id][0,0]
+        except:  self.loadmap = map_content['map_list'][map_id][0,0][0,0]
         self.order = np.nan
         
         self.N = self.loadmap.N.tolist()[0][0]
@@ -62,11 +78,11 @@ class Map:
         self.R = self.loadmap.R.tolist()[0]
         self.r = self.loadmap.r.tolist()[0]
         self.phi = self.loadmap.phi.tolist()[0]
-        self.x = self.loadmap.x.tolist()[0]
-        self.y = self.loadmap.y.tolist()[0]
-        self.xy = self.loadmap.xy.tolist()
+        self.x = [x + 1000 for x in self.loadmap.x.tolist()[0]] 
+        self.y = [x + 800 for x in self.loadmap.y.tolist()[0]]
+        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
         
-        self.city_start = self.loadmap.city_start.tolist()[0]
+        self.city_start = self.xy[0]    # start city
         self.distance = self.loadmap.distance.tolist()
                 
 # -----------------------------------------------------------------------------        
@@ -352,7 +368,7 @@ if __name__ == "__main__":
     screen.fill(WHITE)
     
     # load maps
-    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic.mat',  struct_as_record=False)
+    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
     n_trials = 5
     blk = 2 # set some number
     n_blk = 1

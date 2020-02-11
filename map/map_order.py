@@ -23,7 +23,7 @@ class circle_map:
         self.budget_remain = budget    # remaining budget
 
 
-        self.R = 400*400 #circle radius' sqaure
+        self.R = 150*150 #circle radius' sqaure
         self.r = np.random.uniform(0, self.R, self.N) 
         self.phi = np.random.uniform(0,2 * math.pi, self.N) 
         self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
@@ -100,15 +100,15 @@ def field_pos(mmap):
 
 # main
 # =============================================================================  
-n_map = 4 # number of maps needed
+n_map = 2 # number of maps needed
 map_ind = int(n_map/2)*[0]
-map_ind.extend(int(n_map/2)*[0])
+map_ind.extend(int(n_map/2)*[1])
 random.shuffle(map_ind)
 map_list = []
 order_list = []
 name_list = []
 pos_list = []
-budget_list = [400,700]
+budget_list = [200,350,500]
 i = 0
 while True:
     budget_index = i%len(budget_list)
@@ -142,4 +142,4 @@ while True:
 #    plt.show() 
    
 # saving
-sio.savemat('test.mat', {'map_list':map_list,'order_list':order_list,'name_list':name_list,'pos_list':pos_list})
+sio.savemat('training_test.mat', {'map_list':map_list,'order_list':order_list,'name_list':name_list,'pos_list':pos_list})

@@ -5,7 +5,7 @@ from scipy.spatial import distance_matrix
 class Map:    
     def __init__(self, map_content, trl_id):
         
-        self.loadmap = map_content['map_list'][0,trl_id][0,0]
+        self.loadmap = map_content['map_list'][trl_id][0,0][0,0]#[0,trl_id][0,0]
         self.order = np.nan
 
         self.N = self.loadmap.N.tolist()[0][0]
@@ -17,9 +17,9 @@ class Map:
         self.r = self.loadmap.r.tolist()[0]
         self.phi = [every + 180 for every in self.loadmap.phi.tolist()[0]]
         
-        self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
+        self.x = np.sqrt(self.r) * np.cos(self.phi)
         self.x = self.x.astype(int)
-        self.y = np.sqrt(self.r) * np.sin(self.phi) + 800
+        self.y = np.sqrt(self.r) * np.sin(self.phi)
         self.y = self.y.astype(int)
         self.xy = [(self.x[i], self.y[i]) for i in range(0, len(self.x))]   # combine x and y
         
@@ -28,7 +28,7 @@ class Map:
 
 
 new_list = []
-basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic.mat',  struct_as_record=False)
+basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_24.mat',  struct_as_record=False)
 for i in range(0,len(basic_map['map_list'][0])):
     map_ = Map(basic_map, i)
     new_list.append(map_)
