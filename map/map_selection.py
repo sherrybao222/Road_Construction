@@ -10,7 +10,7 @@ from anytree import Node
 from anytree.exporter import DictExporter
 from itertools import chain
 from anytree import Walker
-
+import json
 
 # helper functions
 # =============================================================================
@@ -60,12 +60,12 @@ class circle_map:
         self.total = 300    # total budget
 
         self.R = 200*200 #circle radius' sqaure
-        self.r = np.random.uniform(0, self.R, self.N) 
-        self.phi = np.random.uniform(0,2 * math.pi, self.N) 
+        self.r = np.random.uniform(0, self.R, self.N).tolist() 
+        self.phi = np.random.uniform(0,2 * math.pi, self.N).tolist()  
         self.x = np.sqrt(self.r) * np.cos(self.phi)
-        self.x = self.x.astype(int)
+        self.x = self.x.astype(int).tolist() 
         self.y = np.sqrt(self.r) * np.sin(self.phi)
-        self.y = self.y.astype(int)
+        self.y = self.y.astype(int).tolist() 
         self.xy = [(self.x[i], self.y[i]) for i in range(0, len(self.x))]   # combine x and y
         
         self.city_start = self.xy[0]    # start city
@@ -73,9 +73,8 @@ class circle_map:
 
 # different paths
 # =============================================================================         
-# optimal within budget
+# optimal within budget: calculate all possible paths
 def optimal_(mmap):
-    # calculate all possible paths within budget
     for i in reversed(range(1,mmap.N)):
         pool = combinations(range(1,mmap.N), i)
         paths = [list(permutations(x)) for x in pool]
@@ -104,9 +103,8 @@ def optimal_(mmap):
     
     return n_optimal, optimal_index, sorted_path
 #------------------------------------------------------------------------------
-
+# breath first search with budget
 def optimal(mmap,now):
-    # breath first search (only budget)
     all_ = list(range(0, mmap.N))
     for j in now.path:
         all_.remove(j.name)
@@ -141,11 +139,11 @@ def greedy(mmap):
             n_greedy = i
             greedy_index = np.append(greedy_index,index_np[0])     
             
-    return n_greedy, greedy_index
+    return n_greedy, greedy_index.tolist()
 
 # main
 # =============================================================================   
-n_map = 500 # number of maps needed
+n_map = 2 # number of maps needed
 map_list = []
 breath_first_tree = []
 optimal_list = []
@@ -154,7 +152,7 @@ optimal_number = []
 greedy_number = []
 diff_list = []
 exporter = DictExporter()
-index = 500
+index = 0
 while True:
     mmap = circle_map()
     
@@ -170,6 +168,10 @@ while True:
     diff =  abs(root_.height - n_greedy)
     
     if diff >= 1:
+        # make mmap json serializable
+        mmap.distance = mmap.distance.tolist()
+        mmap = mmap.__dict__ 
+
         map_list.append(mmap)
         
         depth = []
@@ -177,7 +179,7 @@ while True:
         for leave in leaves:
             depth.append(leave.depth)
         plt.hist(depth,range(len(set(depth))+2),align='left') # plot path length summary for the current map
-        plt.savefig('path_length/path_length_' + str(index) + '.png')
+#        plt.savefig('path_length/path_length_' + str(index) + '.png')
         plt.clf()
         index = index + 1
     
@@ -197,17 +199,30 @@ while True:
         print(index)
     if len(map_list) == n_map:
         break
-    
 
+with open('basic_map_training','w') as file: 
+    json.dump(map_list,file)
+with open('basic_tree_training','w') as file: 
+    json.dump(breath_first_tree,file)
+with open('basic_summary_training','w') as file: 
+    json.dump((diff_list,optimal_list,greedy_list,optimal_number,greedy_number),file) 
+
+# saving yaml
+#import yaml
+#with open('basic_map', 'w') as file:
+#    yaml.dump(map_list, file)
+#with open('basic_tree','w') as file: 
+#    yaml.dump(breath_first_tree,file)
+#with open('basic_summary','w') as file: 
+#    yaml.dump((diff_list,optimal_list,greedy_list,optimal_number,greedy_number),file) 
    
-# saving
-sio.savemat('basic_map_500.mat', {'map_list':map_list})
-sio.savemat('basic_tree_500.mat', {'breath_first_tree':breath_first_tree})
-sio.savemat('basic_summary_500.mat', {'diff_list':diff_list,
-                                    'optimal_list':optimal_list,'greedy_list':greedy_list,
-                                    'optimal_number':optimal_number,'greedy_number':greedy_number})
+# saving mat file
+#sio.savemat('basic_map_test.mat', {'map_list':map_list})
+#sio.savemat('basic_tree_test.mat', {'breath_first_tree':breath_first_tree})
+#sio.savemat('basic_summary_test.mat', {'diff_list':diff_list,
+#                                    'optimal_list':optimal_list,'greedy_list':greedy_list,
+#                                    'optimal_number':optimal_number,'greedy_number':greedy_number})
 
-    
 ## draw 
 #plt.plot(operator.itemgetter(*optimal_index)(map_list[0].x), 
 #         operator.itemgetter(*optimal_index)(map_list[0].y), 'ro-')
@@ -224,4 +239,8 @@ sio.savemat('basic_summary_500.mat', {'diff_list':diff_list,
 #
 #plt.show()
 ##print(diff)
-
+    
+#with open('basic_map.yaml') as file:
+#    # The FullLoader parameter handles the conversion from YAML
+#    # scalar values to Python the dictionary format
+#    fruits_list = yaml.load(file,Loader=yaml.Loader)

@@ -1,11 +1,22 @@
 import scipy.io as sio
 
-# load maps
-basic_1 = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_map.mat',  struct_as_record=False)['map_list'][0]
-basic_2 = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_map_500.mat',  struct_as_record=False)['map_list'][0]
+## load maps from mat file
+#basic_1 = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_map.mat',  struct_as_record=False)['map_list'][0]
+#basic_2 = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_map_500.mat',  struct_as_record=False)['map_list'][0]
+#
+#diff_list_1 = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_summary.mat',  struct_as_record=False)['diff_list'][0]
+#diff_list_2 = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_summary_500.mat',  struct_as_record=False)['diff_list'][0]
 
-diff_list_1 = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_summary.mat',  struct_as_record=False)['diff_list'][0]
-diff_list_2 = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_basic_summary_500.mat',  struct_as_record=False)['diff_list'][0]
+# load map from json
+import json
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_map','r') as file: 
+    basic_1 = json.load(file)
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_summary','r') as file: 
+    diff_list_1 = json.load(file)[0] 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_map_500','r') as file: 
+    basic_2 = json.load(file)
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_summary_500','r') as file: 
+    diff_list_2 = json.load(file)[0] 
 
 basic_map = []
 
@@ -42,6 +53,9 @@ if len(basic_map) < 24:
         elif diff_list_2[ind] == 4 and num_4 < 6:
             basic_map.append(basic_2[ind])
             num_4 = num_4 + 1
-            
-# saving
-sio.savemat('trbasic_map_24.mat', {'map_list':basic_map})
+#
+# pickle
+with open('basic_map_24','w') as file: 
+    json.dump(basic_map,file)            
+# saving mat
+sio.savemat('basic_map_24.mat', {'map_list':basic_map})

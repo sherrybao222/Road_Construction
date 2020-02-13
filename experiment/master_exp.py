@@ -4,25 +4,43 @@ from number_estimation import num_estimation
 from road_basic import road_basic
 from road_undo import road_undo
 from training import training
+import json
 
 # main
 # =============================================================================
 # trial numbers
-n_trl = [12,12,12]
+n_trl = [1,1,1]
 n_all = 2 * sum(n_trl)
 trials = [float("nan")] * n_all
+
 # map numbers
 n_1 = 1
 n_2 = 1
 n_3 = 1
-# load maps
-train_num_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_test.mat',  struct_as_record=False)
-train_basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
-train_undo_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_test_undo.mat',  struct_as_record=False)
 
-num_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
-basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_24.mat',  struct_as_record=False)
-undo_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_undo.mat',  struct_as_record=False)
+## load maps from mat
+#train_num_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_test.mat',  struct_as_record=False)
+#train_basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
+#train_undo_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_test_undo.mat',  struct_as_record=False)
+#
+#num_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
+#basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_24.mat',  struct_as_record=False)
+#undo_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_undo.mat',  struct_as_record=False)
+
+# load maps from json
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_training','r') as file: 
+    train_num_map = json.load(file) 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_map_training','r') as file: 
+    train_basic_map = json.load(file) 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/undo_map_training','r') as file: 
+    train_undo_map = json.load(file) 
+
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_24','r') as file: 
+    num_map = json.load(file) 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_24','r') as file: 
+    basic_map = json.load(file) 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/undo_map_24','r') as file: 
+    undo_map = json.load(file) 
 
 # blocks
 orders = [[1,2,3,3,2,1],
@@ -41,16 +59,18 @@ pg.init()
 pg.font.init()
 
 # display setup
-screen = pg.display.set_mode((2000, 1600), flags=pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
+WIDTH = 2000
+HEIGHT = 1500
+screen = pg.display.set_mode((WIDTH, HEIGHT))#, flags=pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
 WHITE = (255, 255, 255)
 
 # training session
 screen.fill(WHITE)
 training(screen)
 mode_1 = 'try'
-#num_estimation(screen,train_num_map,2,0,1,mode_1)
-#road_basic(screen,train_basic_map,2,0,1,mode_1)
-#road_undo(screen,train_undo_map,2,0,1,mode_1)
+num_estimation(screen,train_num_map,2,0,1,mode_1)
+road_basic(screen,train_basic_map,2,0,1,mode_1)
+road_undo(screen,train_undo_map,2,0,1,mode_1)
 
 # game blocks
 mode_2 = 'game'
@@ -72,15 +92,22 @@ pg.quit()
 
 # saving mat
 sio.savemat('test_all.mat', {'trials':trials})   
+# saving json
+trial_json = [0]*len(trials)
+for trl in range(len(trials)):
+    trial_json[trl] = trials[trl].__dict__
+with open('test_all','w') as file: 
+    json.dump(trial_json,file)
 
+# =============================================================================
 # saving csv
 import csv
-# =============================================================================
 
 members = [attr for attr in dir(trials[0]) if not callable(getattr(trials[0], attr)) and not attr.startswith("__")]
+if 'position' in members: members.remove('position')
 exp = ['blk','cond','trl','mapid','time','pos','click','undo_press','choice_his','choice_loc',
               'budget_his','n_city','num_est']
-info = ['N','R','phi','r','radius','total','x','y','xy','city_start','distance','order']
+info = ['blk','cond','trl','mapid','N','R','phi','r','radius','total','x','y','xy','city_start','distance','order']
 
 #exps = []
 #infos = []
@@ -93,19 +120,19 @@ for member in members:
         flat_list = [item for sublist in attr for item in sublist]
 #        exps.append(flat_list)
         dict_exp[member] = flat_list        
-    else:
+    if member in set(info):
+        if member in set(['blk','cond','trl','mapid']):
+            attr = [x[0] for x in attr]
         dict_info[member] = attr
 #        infos.append(attr)
         
-writefile = 'test_exp.csv'
-with open( writefile, 'w' ) as f:
+with open('test_exp.csv', 'w' ) as f:
     writer = csv.writer(f)
     writer.writerow(exp)
     all_values = [dict_exp[exp[i]] for i in range(len(exp))]
     writer.writerows(zip(*all_values))
 
-writefile = 'test_info.csv'
-with open( writefile, 'w' ) as f:
+with open('test_info.csv', 'w' ) as f:
     writer = csv.writer(f)
     writer.writerow(info)
     all_values = [dict_info[info[i]] for i in range(len(info))]

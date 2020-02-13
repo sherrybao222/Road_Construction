@@ -4,6 +4,7 @@ import math
 from scipy.spatial import distance_matrix
 import numpy as np
 import scipy.io as sio
+import pickle
 
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
@@ -66,24 +67,23 @@ class Map:
       
     def load_map(self, map_content, map_id):
         
-        try: self.loadmap = map_content['map_list'][0,map_id][0,0]
-        except:  self.loadmap = map_content['map_list'][map_id][0,0][0,0]
+        self.loadmap = map_content[map_id]
         self.order = np.nan
         
-        self.N = self.loadmap.N.tolist()[0][0]
+        self.N = self.loadmap['N']
         self.radius = 5     # radius of city
-        self.total = self.loadmap.total.tolist()[0][0]   # total budget
-        self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
+        self.total = self.loadmap['total']   # total budget
+        self.budget_remain = self.loadmap['total'] # remaining budget()
         
-        self.R = self.loadmap.R.tolist()[0]
-        self.r = self.loadmap.r.tolist()[0]
-        self.phi = self.loadmap.phi.tolist()[0]
-        self.x = [x + 1000 for x in self.loadmap.x.tolist()[0]] 
-        self.y = [x + 800 for x in self.loadmap.y.tolist()[0]]
+        self.R = self.loadmap['R']
+        self.r = self.loadmap['r']
+        self.phi = self.loadmap['phi']
+        self.x = [x + int(WIDTH/2) for x in self.loadmap['x']] 
+        self.y = [x + int(HEIGHT/2) for x in self.loadmap['y']]
         self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
         
         self.city_start = self.xy[0]    # start city
-        self.distance = self.loadmap.distance.tolist()
+        self.distance = self.loadmap['distance']
                 
 # -----------------------------------------------------------------------------        
     def make_choice(self, mouse):
@@ -184,7 +184,7 @@ class Draw:
         self.cities(mmap,screen) # draw city dots
         if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road(mmap,screen)
-        text_write("Score: " + str(mmap.n_city[-1]), 100, BLACK, 1600, 200,screen) # show number of connected cities
+        text_write("Score: " + str(mmap.n_city[-1]), 100, BLACK, WIDTH-200, 100, screen) # show number of connected cities
 
         if mmap.check_end_ind:
              self.check_end(screen)
@@ -210,22 +210,22 @@ class Draw:
         pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
 
     def instruction_submit(self,screen):
-        text_write("Press Return to SUBMIT", 60, BLACK, 100, 200,screen)
+        text_write("Press Return to SUBMIT", 30, BLACK, 100, 200, screen)
 
     def check_end(self,screen):
-        text_write("You are out of budget", 60, RED, 100, 400,screen)
+        text_write("You are out of budget", 30, RED, 100, 400, screen)
 
 # instruction
 # =============================================================================
 def game_start(screen): 
-    text_write('Road Construction', 100, BLACK, 700, 750,screen)
+    text_write('Road Construction', 100, BLACK, int(WIDTH/2), int(HEIGHT/2), screen)
 
 def trial_start(screen):
-    text_write('This is Road Construction. The green line is your budget line,',90, BLACK, 50, 300, screen)
-    text_write('and you are asked to connect as many dots as possible with', 90, BLACK, 50, 400,screen)
-    text_write('the given budget. You will see your score on the screen,', 90, BLACK, 50, 500,screen)
-    text_write('and press Enter to submit your response.', 90, BLACK, 50, 600,screen)
-    text_write('Press Enter to see an example.', 90, BLACK, 50, 800, screen)
+    text_write('This is Road Construction. The green line is your budget line,',50, BLACK, 50, 300, screen)
+    text_write('and you are asked to connect as many dots as possible with', 50, BLACK, 50, 400,screen)
+    text_write('the given budget. You will see your score on the screen,', 50, BLACK, 50, 500,screen)
+    text_write('and press Enter to submit your response.', 50, BLACK, 50, 600,screen)
+    text_write('Press Enter to see an example.', 50, BLACK, 50, 800, screen)
 
 # helper function
 # =============================================================================
@@ -283,6 +283,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     all_done = True   # very important, otherwise stuck in full screen
+                    pg.display.quit()
                     pg.quit()
                 if event.key == pg.K_RETURN and trial.n_city[-1] != 0:
 #                    pg.event.set_blocked(pg.MOUSEMOTION)
@@ -333,6 +334,7 @@ def road_basic(screen,map_content,n_trials, blk, n_blk, mode):
                     ins = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
+                    pg.display.quit()
                     pg.quit()   
 
     # running    
@@ -358,17 +360,24 @@ RED = (255, 102, 102)
 GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)
 
+WIDTH = 2000
+HEIGHT = 1500
+
 if __name__ == "__main__":
     pg.init()
     pg.font.init()
       
     # display setup
-    screen = pg.display.set_mode((2000, 1600), flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
  
     screen.fill(WHITE)
     
     # load maps
-    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
+#    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
+    import json
+    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_24','r') as file: 
+        map_content = json.load(file) 
+
     n_trials = 5
     blk = 2 # set some number
     n_blk = 1
@@ -376,4 +385,5 @@ if __name__ == "__main__":
     
     trials = road_basic(screen,map_content,n_trials,blk,n_blk,mode)
     
+    pg.display.quit()
     pg.quit()

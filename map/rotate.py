@@ -1,40 +1,51 @@
 import scipy.io as sio
 import numpy as np
-from scipy.spatial import distance_matrix
+import json
 
 class Map:    
     def __init__(self, map_content, trl_id):
         
-        self.loadmap = map_content['map_list'][trl_id][0,0][0,0]#[0,trl_id][0,0]
+        self.loadmap = map_content[trl_id]
         self.order = np.nan
-
-        self.N = self.loadmap.N.tolist()[0][0]
-        self.radius = 10     # radius of city
-        self.total = self.loadmap.total.tolist()[0][0]   # total budget
-        self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
         
-        self.R = self.loadmap.R.tolist()[0]
-        self.r = self.loadmap.r.tolist()[0]
-        self.phi = [every + 180 for every in self.loadmap.phi.tolist()[0]]
+        self.N = self.loadmap['N']
+        self.total = self.loadmap['total']   # total budget
+        self.budget_remain = self.loadmap['total'] # remaining budget()
         
+        self.R = self.loadmap['R']
+        self.r = self.loadmap['r']
+        self.phi = [every + 180 for every in self.loadmap['phi']]
         self.x = np.sqrt(self.r) * np.cos(self.phi)
-        self.x = self.x.astype(int)
+        self.x = self.x.astype(int).tolist()
         self.y = np.sqrt(self.r) * np.sin(self.phi)
-        self.y = self.y.astype(int)
+        self.y = self.y.astype(int).tolist()
         self.xy = [(self.x[i], self.y[i]) for i in range(0, len(self.x))]   # combine x and y
         
         self.city_start = self.xy[0]    # start city
-        self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
+        self.distance = self.loadmap['distance']
 
+#with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_24','r') as file: 
+#    basic_map = json.load(file) 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_map_training','r') as file: 
+    basic_map = json.load(file) 
 
 new_list = []
-basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_24.mat',  struct_as_record=False)
-for i in range(0,len(basic_map['map_list'][0])):
+    
+for i in range(0,len(basic_map)): #[0]
     map_ = Map(basic_map, i)
+    map_ = map_.__dict__
     new_list.append(map_)
     
-# saving
-sio.savemat('test_undo.mat', {'map_list':new_list})
+## saving mat file
+#sio.savemat('undo_map_24.mat', {'map_list':new_list})
+## saving json
+#with open('undo_map_24','w') as file: 
+#    json.dump(new_list,file)
 
+# saving mat file
+sio.savemat('undo_map_training.mat', {'map_list':new_list})
+# saving json
+with open('undo_map_training','w') as file: 
+    json.dump(new_list,file)
     
 

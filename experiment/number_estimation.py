@@ -52,24 +52,24 @@ class Map:
 
     def load_map(self, map_content, map_id):
         
-        self.loadmap = map_content['map_list'][0,map_id][0,0]
-        self.order = map_content['order_list'][map_id]
-        self.position = map_content['pos_list'][map_id]
-
-        self.N = self.loadmap.N.tolist()[0][0]
-        self.radius = 5     # radius of city
-        self.total = self.loadmap.total.tolist()[0][0]   # total budget
-        self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
-
-        self.R = self.loadmap.R.tolist()[0][0]
-        self.r = self.loadmap.r.tolist()[0]
-        self.phi = self.loadmap.phi.tolist()[0]
-        self.x = self.loadmap.x.tolist()[0]
-        self.y = self.loadmap.y.tolist()[0]
-        self.xy = self.loadmap.xy.tolist()
+        self.loadmap = map_content[0][map_id]
+        self.order = map_content[1][map_id]
+        self.position = map_content[3][map_id]
         
-        self.city_start = self.loadmap.city_start.tolist()[0]
-        self.distance = self.loadmap.distance.tolist() 
+        self.N = self.loadmap['N']
+        self.radius = 5     # radius of city
+        self.total = self.loadmap['total']   # total budget
+        self.budget_remain = self.loadmap['total'] # remaining budget()
+        
+        self.R = self.loadmap['R']
+        self.r = self.loadmap['r']
+        self.phi = self.loadmap['phi']
+        self.x = [x + int(WIDTH/2) for x in self.loadmap['x']] 
+        self.y = [y + int(HEIGHT/2) for y in self.loadmap['y']]
+        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
+        
+        self.city_start = self.xy[0]    # start city
+        self.distance = self.loadmap['distance']
         
 # -----------------------------------------------------------------------------       
     def data_init(self, blk, trl_id, map_id):
@@ -127,16 +127,16 @@ class Draw:
     def city_order(self,mmap,screen):
         i = 1
         for order in mmap.order[1:]: # order of connection
-            x = mmap.position[order][0] 
-            y = mmap.position[order][1] 
-            text_write(str(i), 40, BLACK, x, y, screen)
+            x = mmap.position[order][0] + int(WIDTH/2)
+            y = mmap.position[order][1] + int(HEIGHT/2)
+            text_write(str(i), 20, BLACK, x, y, screen)
 #            pg.draw.circle(screen, RED, [int(x), int(y)], 4)
             i = i + 1
         
     def num_est(self, mmap,screen):
-        text_write('How many cities can you connect? ', 60, BLACK, 100, 200,screen)
-        text_write("Type your answer here: ", 60, BLACK, 100, 300,screen)
-        text_write("Press Return to SUBMIT", 60, BLACK, 100, 400,screen)
+        text_write('How many cities can you connect? ', 30, BLACK, 100, 100,screen)
+        text_write("Type your answer here: ", 30, BLACK, 100, 200,screen)
+        text_write("Press Return to SUBMIT", 30, BLACK, 100, 300,screen)
         
     def budget(self, mmap, mouse,screen):  
         # current mouse position
@@ -150,15 +150,15 @@ class Draw:
 # instruction
 # =============================================================================
 def game_start(screen): 
-    text_write('Number Estimation', 100, BLACK, 600, 650, screen)
+    text_write('Number Estimation', 100, BLACK, int(WIDTH/2), int(HEIGHT/2), screen)
 
 def trial_start(screen):
-    text_write('This is Number Estimation. The green line is your budget line,',90, BLACK, 50, 300, screen)
-    text_write('and you are asked to estimate the number of dots you can ', 90, BLACK, 50, 400,screen)
-    text_write('connect with the given budget. Please remember that the dots', 90, BLACK, 50, 500,screen)
-    text_write('must be connected in the labeled order.', 90, BLACK, 50, 600,screen)
-    text_write('You will type your response in a textbox.', 90, BLACK, 50, 700, screen)
-    text_write('Press Enter to see an example.', 90, BLACK, 50, 900, screen)
+    text_write('This is Number Estimation. The green line is your budget line,',50, BLACK, 50, 300, screen)
+    text_write('and you are asked to estimate the number of dots you can ', 50, BLACK, 50, 400,screen)
+    text_write('connect with the given budget. Please remember that the dots', 50, BLACK, 50, 500,screen)
+    text_write('must be connected in the labeled order.', 50, BLACK, 50, 600,screen)
+    text_write('You will type your response in a textbox.', 50, BLACK, 50, 700, screen)
+    text_write('Press Enter to see an example.', 50, BLACK, 50, 900, screen)
         
 # helper function
 # =============================================================================
@@ -207,6 +207,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     all_done = True   # very important, otherwise stuck in full screen
+                    pg.display.quit()
                     pg.quit()
                 try: 
                     float(trial.num_est[-1])
@@ -261,6 +262,7 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk,mode):
                     ins = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
+                    pg.display.quit()
                     pg.quit()   
 
     # running
@@ -289,17 +291,24 @@ RED = (255, 102, 102)
 GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)
 
+WIDTH = 2000
+HEIGHT = 1500
+
 if __name__ == "__main__":
     pg.init()
     pg.font.init()
     
     # display setup
-    screen = pg.display.set_mode((2000, 1600), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((WIDTH, HEIGHT), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
     
     screen.fill(WHITE)
     
     # load maps
-    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
+#    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
+    import json
+    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_test','r') as file: 
+        map_content = json.load(file) 
+
     n_trials = 2
     blk = 1 # set some number\
     n_blk = 1
@@ -307,4 +316,5 @@ if __name__ == "__main__":
     
     trials = num_estimation(screen,map_content,n_trials,blk,n_blk,mode)
     
+    pg.display.quit()
     pg.quit()

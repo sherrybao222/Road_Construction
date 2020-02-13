@@ -9,8 +9,7 @@ import matplotlib.pyplot as plt
 import scipy
 import scipy.optimize as optimize
 from itertools import chain
-
-
+import json
 
 # maps
 # =============================================================================
@@ -24,12 +23,12 @@ class circle_map:
 
 
         self.R = 150*150 #circle radius' sqaure
-        self.r = np.random.uniform(0, self.R, self.N) 
-        self.phi = np.random.uniform(0,2 * math.pi, self.N) 
-        self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
-        self.x = self.x.astype(int)
-        self.y = np.sqrt(self.r) * np.sin(self.phi) + 950
-        self.y = self.y.astype(int)
+        self.r = np.random.uniform(0, self.R, self.N).tolist() 
+        self.phi = np.random.uniform(0,2 * math.pi, self.N).tolist() 
+        self.x = np.sqrt(self.r) * np.cos(self.phi) 
+        self.x = self.x.astype(int).tolist() 
+        self.y = np.sqrt(self.r) * np.sin(self.phi) 
+        self.y = self.y.astype(int).tolist() 
         self.xy = [(self.x[i], self.y[i]) for i in range(0, len(self.x))]   # combine x and y
         
         self.city_start = self.xy[0]    # start city
@@ -53,7 +52,7 @@ def greedy(mmap):
         i = i + 1
         index_greedy[i] = index_np[0]
     
-    return index_greedy, 'greedy'
+    return index_greedy.tolist(), 'greedy'
 
 # =============================================================================
 # optimal all cities
@@ -94,7 +93,7 @@ def field_pos(mmap):
 #                                   args=(mmap.x,mmap.y,50),constraints=cons)
         bounds = [(mmap.x[i]-20, mmap.x[i]+20), (mmap.y[i]-20, mmap.y[i]+20)]
         result = optimize.shgo(field, bounds, args=(mmap.x,mmap.y,20))
-        position.append(result.x)
+        position.append(result.x.tolist())
     return position
 
 
@@ -110,6 +109,7 @@ name_list = []
 pos_list = []
 budget_list = [200,350,500]
 i = 0
+
 while True:
     budget_index = i%len(budget_list)
 
@@ -125,6 +125,10 @@ while True:
         [index,name] = greedy(mmap)
     else:
         [index,name] = optimal(mmap)
+    # make mmap json serializable    
+    mmap.distance = mmap.distance.tolist()
+    mmap = mmap.__dict__
+    
     map_list.append(mmap)
     order_list.append(index)
     name_list.append(name)
@@ -132,6 +136,18 @@ while True:
     i = i + 1
     if len(map_list) == n_map:
         break
+   
+## saving
+#sio.savemat('num_24.mat', {'map_list':map_list,'order_list':order_list,'name_list':name_list,'pos_list':pos_list})
+## saving json
+#with open('num_24','w') as file: 
+#    json.dump((map_list,order_list,name_list,pos_list),file)
+
+# saving
+sio.savemat('num_training.mat', {'map_list':map_list,'order_list':order_list,'name_list':name_list,'pos_list':pos_list})
+# saving json
+with open('num_training','w') as file: 
+    json.dump((map_list,order_list,name_list,pos_list),file)
 
     # draw
 #    plt.plot(operator.itemgetter(*order_list[i])(mmap.x), 
@@ -140,6 +156,3 @@ while True:
 #        plt.text(mmap.x[txt],mmap.y[txt],i, fontsize=11)
 #    plt.plot(mmap.x,mmap.y,'go')
 #    plt.show() 
-   
-# saving
-sio.savemat('training_test.mat', {'map_list':map_list,'order_list':order_list,'name_list':name_list,'pos_list':pos_list})
