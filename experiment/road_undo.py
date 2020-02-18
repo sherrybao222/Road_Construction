@@ -177,18 +177,62 @@ class Map:
         
         self.n_city.append(self.n_city[-1])
         self.num_est.append(np.nan)
+
+# score bar
+# ============================================================================
+class ScoreBar:
+    def __init__(self,mmap):
+        # only call once when initiated for this part
+        # score bar parameters
+        self.width = 100
+        self.height = 500
+        self.box = 12
+        self.top = 200 # distance to screen top
+
+        # center for labels
+        self.box_center()
+        # calculate incentive: N^2
+        self.incentive()
+        # incentive score indicator
+        self.indicator(mmap)
+
+    def box_center(self):
+        self.box_height = self.height / self.box
+        self.center_list = []
+        self.uni_height = self.box_height / 2
+        self.x = self.width / 2 + 1500 # larger the number, further to right
+
+        for i in range(self.box):
+            y =  i * self.box_height + self.uni_height
+            loc = self.x, y
+            self.center_list.append(loc)
+
+    def incentive(self):
+        self.score = list(range(1,self.box+1))
+        self.incentive_score = []
+        for i in self.score:
+            i = i ** 2
+            self.incentive_score.append(i)
+
+    def indicator(self, mmap): # call this function to updates arrow location
+        self.indicator_loc = self.center_list[mmap.n_city[-1]]
+        self.indicator_loc_best = self.center_list[max(mmap.n_city)]
         
 # visualize the game
 # ============================================================================
 class Draw: 
-    def __init__(self, mmap,screen):
+    def __init__(self, mmap,screen,scorebar):
         self.budget(mmap, pg.mouse.get_pos(),screen)
 
         self.instruction_undo(screen)
         self.cities(mmap,screen) # draw city dots
+        self.number(scorebar, screen)
+        self.white_arrow(scorebar, screen)
+        self.arrow(scorebar,screen)
+        
         if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road(mmap,screen)
-        text_write("Score: " + str(mmap.n_city[-1]), 100, BLACK, WIDTH-200, 200,screen) # show number of connected cities
+#        text_write("Score: " + str(mmap.n_city[-1]), 100, BLACK, WIDTH-200, 200,screen) # show number of connected cities
 
         if mmap.check_end_ind:
              self.check_end(screen)
@@ -215,23 +259,56 @@ class Draw:
 
     def instruction_undo(self,screen): 
         text_write("Press Z to UNDO", 30, BLACK, 100, 200,screen)
-        text_write("Press Return to SUBMIT", 30, BLACK, 100, 300,screen)
+        text_write("Press SPACE to SUBMIT", 30, BLACK, 100, 300,screen)
 
     def check_end(self,screen):
         text_write("You are out of budget", 30, RED, 100, 400,screen)
 
+# ---------------------------------------------------------------------------------
+    def number(self, scorebar, screen):
+        left = scorebar.center_list[0][0] - 25
+        for i in range(scorebar.box):
+            loc = scorebar.center_list[i]
+            text = scorebar.incentive_score[i]
+            text_write(str(text), int(scorebar.box_height - 15), BLACK, loc[0], loc[1]+scorebar.top , screen) # larger number, further to right
+            pg.draw.rect(screen, BLACK, (left, loc[1]+scorebar.top-scorebar.uni_height, 
+                                         scorebar.width, scorebar.box_height), 2)  # width for line thickness
+    def arrow(self, scorebar,screen):
+        # arrow parameter
+        point = (scorebar.indicator_loc[0] - 30, scorebar.indicator_loc[1]+scorebar.top+10)
+        v2 = point[0] - 20, point[1] + 20
+        v3 = point[0] - 20, point[1] + 10
+        v4 = point[0] - 40, point[1] + 10
+        v5 = point[0] - 40, point[1] - 10
+        v6 = point[0] - 20, point[1] - 10
+        v7 = point[0] - 20, point[1] - 20
+        self.vertices = [point, v2, v3, v4, v5, v6, v7]
+        pg.draw.polygon(screen, BLACK, self.vertices)
+
+    def white_arrow(self, scorebar,screen):
+        # arrow parameter
+        point = (scorebar.indicator_loc_best[0] - 30, scorebar.indicator_loc_best[1]+scorebar.top+10)
+        v2 = point[0] - 20, point[1] + 20
+        v3 = point[0] - 20, point[1] + 10
+        v4 = point[0] - 40, point[1] + 10
+        v5 = point[0] - 40, point[1] - 10
+        v6 = point[0] - 20, point[1] - 10
+        v7 = point[0] - 20, point[1] - 20
+        self.vertices = [point, v2, v3, v4, v5, v6, v7]
+        pg.draw.polygon(screen, WHITE, self.vertices)
+
 # instruction
 # =============================================================================
 def game_start(screen): 
-    text_write('Road Constructions with Undo', 100, BLACK, int(WIDTH/2), int(HEIGHT/2), screen)
+    text_write('Road Constructions with Undo', 100, BLACK, 300, int(HEIGHT/2), screen)
     
 def trial_start(screen):
     text_write('This is Road Construction with Undo. The green line is your',50, BLACK, 50, 300, screen)
     text_write('budget line, and you are asked to connect as many dots as', 50, BLACK, 50, 400,screen)
     text_write('possible with the given budget. You will see your score on the', 50, BLACK, 50, 500,screen)
     text_write('screen, and you can press Z to undo your connections.', 50, BLACK, 50, 600,screen)
-    text_write('In the end, you will need to press Enter to submit your response. ', 50, BLACK, 50, 700,screen)
-    text_write('Press Enter to see an example.', 50, BLACK, 50, 900, screen)
+    text_write('In the end, you will need to press SPACE to submit your response. ', 50, BLACK, 50, 700,screen)
+    text_write('Press SPACE to see an example.', 50, BLACK, 50, 900, screen)
 
 # helper function
 # =============================================================================
@@ -247,11 +324,12 @@ def text_write(text, size, color, x, y,screen):  # function that can display any
 def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
     
     trial = Map(map_content, trl_id, blk, map_id)
+    scorebar = ScoreBar(trial)
 
     while not trl_done:
         
-        screen.fill(WHITE)
-        draw_map = Draw(trial,screen)
+        screen.fill(GREY)
+        draw_map = Draw(trial,screen,scorebar)
         pg.display.flip()  
         
         for event in pg.event.get():      
@@ -274,6 +352,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                         trial.budget_update()
                         trial.data(mouse_loc, tick_second,blk,trl_id,map_id)
                         draw_map.auto_snap(trial, screen)
+                        scorebar.indicator(trial)
                     else:
                         trial.static_data(mouse_loc,tick_second,blk,trl_id,map_id)
                         trial.click[-1] = 1
@@ -290,13 +369,14 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                 if (pg.key.get_pressed() and trial.choice_dyn[-1] != 0
                     and event.key == pg.K_z):
                     trial.undo(mouse_loc, tick_second, blk,trl_id,map_id)
+                    scorebar.indicator(trial)
 #                    print("budget undo" + str(trial.budget_dyn))
                     
                 if event.key == pg.K_ESCAPE:    
                     all_done = True   # very important, otherwise stuck in full screen
                     pg.display.quit()
                     pg.quit()
-                if event.key == pg.K_RETURN and trial.n_city[-1] != 0:
+                if event.key == pg.K_SPACE and trial.n_city[-1] != 0:
 #                    pg.event.set_blocked(pg.MOUSEMOTION)
                     trl_done = True
     
@@ -308,7 +388,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
 #    while trl_done:
 #        for event in pg.event.get():
 #            
-#            screen.fill(WHITE)
+#            screen.fill(GREY)
 #            draw_map.game_end(trial, screen)
 #            pg.display.flip() 
 #            
@@ -329,11 +409,11 @@ def road_undo(screen,map_content,n_trials,blk,n_blk,mode):
     trials = []
 
     if mode == 'game':
-        screen.fill(WHITE)
+        screen.fill(GREY)
         game_start(screen)
         pg.display.flip()
     elif mode == 'try':
-        screen.fill(WHITE)
+        screen.fill(GREY)
         trial_start(screen)
         pg.display.flip()
 
@@ -345,7 +425,7 @@ def road_undo(screen,map_content,n_trials,blk,n_blk,mode):
         for event in events:
                    
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_SPACE:
                     ins = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
@@ -372,14 +452,15 @@ def road_undo(screen,map_content,n_trials,blk,n_blk,mode):
 # main
 # =============================================================================
 # setting up window, basic features 
-    
-WHITE = (255, 255, 255)
+
+WHITE = (255, 255, 255)    
+GREY = (222, 222, 222)
 RED = (255, 102, 102)
 GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)   
 
-WIDTH = 2000
-HEIGHT = 1500 
+WIDTH = 1900
+HEIGHT = 1000
 
 if __name__ == "__main__":
     pg.init()
@@ -388,10 +469,13 @@ if __name__ == "__main__":
     # display setup
     screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
 
-    screen.fill(WHITE)
+    screen.fill(GREY)
     
     # load maps
-    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_undo.mat',  struct_as_record=False)
+    import json
+    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/undo_map_24','r') as file: 
+        map_content = json.load(file) 
+
     n_trials = 5
     blk = 3 # set to some number
     n_blk = 1

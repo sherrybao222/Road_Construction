@@ -18,10 +18,10 @@ class ScoreBar:
         # score bar parameters
         self.width = 100
         self.height = 500
-        self.box = 8
+        self.box = 12
 
         # center for labels
-        self.box_center(self.width, self.height)
+        self.box_center()
 
         # incentive score indicator
         self.index = 0
@@ -30,28 +30,29 @@ class ScoreBar:
         # calculate incentive: N^2
         self.incentive()
 
-    def box_center(self, width, height):
+    def box_center(self):
         self.box_height = self.height / self.box
         self.center_list = []
         self.uni_height = self.box_height / 2
         self.x = self.width / 2 + 1500 # larger the number, further to right
 
-        for i in range(10):
+        for i in range(self.box):
             y =  i * self.box_height + self.uni_height
             loc = self.x, y
             self.center_list.append(loc)
+
+    def incentive(self):
+        self.score = list(range(1,self.box+1))
+        self.incentive_score = []
+        for i in self.score:
+            i = i ** 2
+            self.incentive_score.append(i)
 
     def indicator(self): # call this function to updates arrow location
         self.index += 1
         self.indicator_loc = self.center_list[self.index]
         return self.index
 
-    def incentive(self):
-        self.score = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        self.incentive_score = []
-        for i in self.score:
-            i = i ** 2
-            self.incentive_score.append(i)
 
 
 class Draw:
@@ -59,8 +60,6 @@ class Draw:
     def __init__(self, scorebar, screen):
         #bar parameters
         self.top = 200
-        width = scorebar.width
-        height = scorebar.height
 
         # draw/label incentive number on the screen
         self.number(scorebar,screen)
@@ -68,7 +67,7 @@ class Draw:
 
     def number(self, scorebar, screen):
         left = scorebar.center_list[0][0] - 25
-        for i in range(10):
+        for i in range(scorebar.box):
             loc = scorebar.center_list[i]
             text = scorebar.incentive_score[i]
             text_write(str(text), int(scorebar.box_height - 15), BLACK, loc[0], loc[1]+self.top , screen) # larger number, further to right
@@ -88,6 +87,7 @@ class Draw:
 
 
 WHITE = (255, 255, 255)
+GREY = (222, 222, 222)
 BLACK = (0, 0, 0)
 
 WIDTH = 1900
@@ -99,8 +99,8 @@ if __name__ == "__main__":
     pg.font.init()
     
     # display setup
-    screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
-    screen.fill(WHITE)
+    screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
+    screen.fill(GREY)
     score1 = ScoreBar()
     arrow = Draw(score1, screen)
     pg.display.flip()
@@ -111,7 +111,7 @@ if __name__ == "__main__":
                 pg.quit()
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
-                    screen.fill(WHITE)
+                    screen.fill(GREY)
                     score1.indicator()
                     arrow = Draw(score1, screen)
                     pg.display.update()

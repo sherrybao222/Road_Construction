@@ -143,7 +143,7 @@ def greedy(mmap):
 
 # main
 # =============================================================================   
-n_map = 2 # number of maps needed
+n_map = 500 # number of maps needed
 map_list = []
 breath_first_tree = []
 optimal_list = []
@@ -152,7 +152,7 @@ optimal_number = []
 greedy_number = []
 diff_list = []
 exporter = DictExporter()
-index = 0
+index = 1500
 while True:
     mmap = circle_map()
     
@@ -178,9 +178,9 @@ while True:
         leaves = root_.leaves
         for leave in leaves:
             depth.append(leave.depth)
-        plt.hist(depth,range(len(set(depth))+2),align='left') # plot path length summary for the current map
+#        plt.hist(depth,range(len(set(depth))+2),align='left') # plot path length summary for the current map
 #        plt.savefig('path_length/path_length_' + str(index) + '.png')
-        plt.clf()
+#        plt.clf()
         index = index + 1
     
         w = Walker()
@@ -200,11 +200,11 @@ while True:
     if len(map_list) == n_map:
         break
 
-with open('basic_map_training','w') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_map_1500','w') as file: 
     json.dump(map_list,file)
-with open('basic_tree_training','w') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_tree_1500','w') as file: 
     json.dump(breath_first_tree,file)
-with open('basic_summary_training','w') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_summary_1500','w') as file: 
     json.dump((diff_list,optimal_list,greedy_list,optimal_number,greedy_number),file) 
 
 # saving yaml

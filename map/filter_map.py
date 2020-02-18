@@ -10,52 +10,48 @@ import scipy.io as sio
 # load map from json
 import json
 with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_map','r') as file: 
-    basic_1 = json.load(file)
+    basic_all = json.load(file)
 with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_summary','r') as file: 
-    diff_list_1 = json.load(file)[0] 
+    diff_list = json.load(file)[0] 
 with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_map_500','r') as file: 
-    basic_2 = json.load(file)
+    basic_all.extend(json.load(file))
 with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_summary_500','r') as file: 
-    diff_list_2 = json.load(file)[0] 
+    diff_list.extend(json.load(file)[0]) 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_map_1000','r') as file: 
+    basic_all.extend(json.load(file))
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_summary_1000','r') as file: 
+    diff_list.extend(json.load(file)[0]) 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_map_1500','r') as file: 
+    basic_all.extend(json.load(file))
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_summary_1500','r') as file: 
+    diff_list.extend(json.load(file)[0]) 
+
 
 basic_map = []
+num = [0,0,0,0]
+ind = 0
 
-num_1 = 0
-num_2 = 0
-num_3 = 0
-num_4 = 0
+def filter_map(basic_map, basic_all, diff_list, num, ind):
+    if diff_list[ind] == 4 and num[0] < 48:
+        basic_map.append(basic_all[ind])
+        num[0] = num[0] + 1
+#    elif diff_list[ind] == 2 and num[1] < 6:
+#        basic_map.append(basic_all[ind])
+#        num[1] = num[1] + 1
+#    elif diff_list[ind] == 3 and num[2] < 6:
+#        basic_map.append(basic_all[ind])
+#        num[2] = num[2] + 1
+#    elif diff_list[ind] == 4 and num[3] < 6:
+#        basic_map.append(basic_all[ind])
+#        num[3] = num[3] + 1
 
-for ind in range(500):
-    if diff_list_1[ind] == 1 and num_1 < 6:
-        basic_map.append(basic_1[ind])
-        num_1 = num_1 + 1
-    elif diff_list_1[ind] == 2 and num_2 < 6:
-        basic_map.append(basic_1[ind])
-        num_2 = num_2 + 1
-    elif diff_list_1[ind] == 3 and num_3 < 6:
-        basic_map.append(basic_1[ind])
-        num_3 = num_3 + 1
-    elif diff_list_1[ind] == 4 and num_4 < 6:
-        basic_map.append(basic_1[ind])
-        num_4 = num_4 + 1
 
-if len(basic_map) < 24:
-    for ind in range(500):
-        if diff_list_2[ind] == 1 and num_1 < 6:
-            basic_map.append(basic_2[ind])
-            num_1 = num_1 + 1
-        elif diff_list_2[ind] == 2 and num_2 < 6:
-            basic_map.append(basic_2[ind])
-            num_2 = num_2 + 1
-        elif diff_list_2[ind] == 3 and num_3 < 6:
-            basic_map.append(basic_2[ind])
-            num_3 = num_3 + 1
-        elif diff_list_2[ind] == 4 and num_4 < 6:
-            basic_map.append(basic_2[ind])
-            num_4 = num_4 + 1
+while len(basic_map) < 48 and ind < 2000:
+    filter_map(basic_map, basic_all, diff_list, num, ind)
+    ind = ind + 1
 #
-# pickle
-with open('basic_map_24','w') as file: 
+# json
+with open('basic_map_48_all4','w') as file: 
     json.dump(basic_map,file)            
 # saving mat
-sio.savemat('basic_map_24.mat', {'map_list':basic_map})
+sio.savemat('basic_map_48_all4.mat', {'map_list':basic_map})
