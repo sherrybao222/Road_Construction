@@ -174,7 +174,7 @@ def text_write(text, size, color, x, y,screen):  # function that can display any
 def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
     
     trial = Map(map_content, trl_id, blk, map_id)
-    screen.fill(WHITE)
+    screen.fill(GREY)
     draw_map = Draw(trial,screen)
     pg.display.flip()  
     num_input = pygame_textinput.TextInput()
@@ -183,7 +183,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
         events = pg.event.get()
         
         # allow text-input on the screen
-        screen.fill(WHITE)
+        screen.fill(GREY)
         num_input.update(events)
         screen.blit(num_input.get_surface(), (600, 300))
         draw_map = Draw(trial,screen)
@@ -219,7 +219,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
 #        events = pg.event.get()
 #        for event in events:
 #       
-#            screen.fill(WHITE)
+#            screen.fill(GREY)
 #            draw_map.game_end(trial,screen)
 #            pg.display.flip()
 #            
@@ -240,11 +240,11 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk,mode):
     trials = [] 
     
     if mode == 'game':
-        screen.fill(WHITE)
+        screen.fill(GREY)
         game_start(screen)
         pg.display.flip()
     elif mode == 'try':
-        screen.fill(WHITE)
+        screen.fill(GREY)
         trial_start(screen)
         pg.display.flip()
 
@@ -286,7 +286,7 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk,mode):
 # =============================================================================
 # setting up window, basic features 
     
-WHITE = (255, 255, 255)
+GREY = (222, 222, 222)
 RED = (255, 102, 102)
 GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)
@@ -301,7 +301,7 @@ if __name__ == "__main__":
     # display setup
     screen = pg.display.set_mode((WIDTH, HEIGHT), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
     
-    screen.fill(WHITE)
+    screen.fill(GREY)
     
     # load maps
 #    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)

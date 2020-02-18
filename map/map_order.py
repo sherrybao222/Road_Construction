@@ -51,8 +51,19 @@ def greedy(mmap):
         matrix_copy[int(index_greedy[i]),:] = 0
         i = i + 1
         index_greedy[i] = index_np[0]
-    
-    return index_greedy.tolist(), 'greedy'
+        
+# calculate correct answer    
+# ---------------------------------------------------------------------------
+    correct = 0
+    path = 0
+    ind = 0
+    while path < mmap.total:
+        path = path + mmap.distance[index_greedy[ind]][index_greedy[ind+1]]
+        if path <= mmap.total:
+            correct = correct + 1
+            ind = ind + 1
+
+    return index_greedy.tolist(), correct, 'greedy'
 
 # =============================================================================
 # optimal all cities
@@ -74,8 +85,19 @@ def optimal(mmap):
     sorted_path = sorted(dict_path.items(), key=operator.itemgetter(1))
     optimal_index_wozero = sorted_path[0][0]
     optimal_index = (0,) + optimal_index_wozero
+
+# calculate correct answer    
+# ---------------------------------------------------------------------------
+    correct = 0
+    path = 0
+    ind = 0
+    while path < mmap.total:
+        path = path + mmap.distance[optimal_index[ind]][optimal_index[ind+1]]
+        if path <= mmap.total:
+            correct = correct + 1
+            ind = ind + 1
     
-    return optimal_index, 'optimal'
+    return optimal_index, correct, 'optimal'
 
 # =============================================================================
 # repulsive force field
@@ -99,21 +121,21 @@ def field_pos(mmap):
 
 # main
 # =============================================================================  
-n_map = 2 # number of maps needed
+n_map = 48 # number of maps needed
 map_ind = int(n_map/2)*[0]
 map_ind.extend(int(n_map/2)*[1])
 random.shuffle(map_ind)
 map_list = []
 order_list = []
+correct_list = []
 name_list = []
 pos_list = []
-budget_list = [200,350,500]
+budget_list = [200,350,500]* int(n_map/3)
+random.shuffle(budget_list)
 i = 0
 
 while True:
-    budget_index = i%len(budget_list)
-
-    mmap = circle_map(budget_list[budget_index])
+    mmap = circle_map(budget_list[i])
     
     distance_copy = mmap.distance.copy()
     distance_copy = chain.from_iterable(zip(*distance_copy))
@@ -122,32 +144,34 @@ while True:
         continue    
     pos = field_pos(mmap)
     if map_ind[i] == 0:
-        [index,name] = greedy(mmap)
+        [index,correct,name] = greedy(mmap)
     else:
-        [index,name] = optimal(mmap)
+        [index,correct,name] = optimal(mmap)
     # make mmap json serializable    
     mmap.distance = mmap.distance.tolist()
     mmap = mmap.__dict__
     
     map_list.append(mmap)
     order_list.append(index)
+    correct_list.append(correct)
     name_list.append(name)
     pos_list.append(pos)
     i = i + 1
     if len(map_list) == n_map:
         break
    
-## saving
-#sio.savemat('num_24.mat', {'map_list':map_list,'order_list':order_list,'name_list':name_list,'pos_list':pos_list})
-## saving json
-#with open('num_24','w') as file: 
-#    json.dump((map_list,order_list,name_list,pos_list),file)
-
 # saving
-sio.savemat('num_training.mat', {'map_list':map_list,'order_list':order_list,'name_list':name_list,'pos_list':pos_list})
+sio.savemat('num_48.mat', {'map_list':map_list,'order_list':order_list,
+                           'correct_list':correct_list,'name_list':name_list,'pos_list':pos_list})
 # saving json
-with open('num_training','w') as file: 
+with open('num_48','w') as file: 
     json.dump((map_list,order_list,name_list,pos_list),file)
+#
+## saving
+#sio.savemat('num_training.mat', {'map_list':map_list,'order_list':order_list,'name_list':name_list,'pos_list':pos_list})
+## saving json
+#with open('num_training','w') as file: 
+#    json.dump((map_list,order_list,name_list,pos_list),file)
 
     # draw
 #    plt.plot(operator.itemgetter(*order_list[i])(mmap.x), 

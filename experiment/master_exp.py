@@ -9,7 +9,7 @@ import json
 # main
 # =============================================================================
 # trial numbers
-n_trl = [1,1,1]
+n_trl = [2,2,2]
 #n_trl = [24,24,24]
 n_all = 2 * sum(n_trl)
 trials = [float("nan")] * n_all
@@ -60,13 +60,13 @@ pg.init()
 pg.font.init()
 
 # display setup
-WIDTH = 2000
-HEIGHT = 1500
+WIDTH = 1900
+HEIGHT = 1000
 screen = pg.display.set_mode((WIDTH, HEIGHT))#, flags=pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
-WHITE = (255, 255, 255)
+GREY = (222, 222, 222)
 
 # training session
-screen.fill(WHITE)
+screen.fill(GREY)
 training(screen)
 mode_1 = 'try'
 num_estimation(screen,train_num_map,2,0,1,mode_1)
