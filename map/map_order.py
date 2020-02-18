@@ -153,6 +153,7 @@ while True:
     
     map_list.append(mmap)
     order_list.append(index)
+    del index
     correct_list.append(correct)
     name_list.append(name)
     pos_list.append(pos)
@@ -165,7 +166,7 @@ sio.savemat('num_48.mat', {'map_list':map_list,'order_list':order_list,
                            'correct_list':correct_list,'name_list':name_list,'pos_list':pos_list})
 # saving json
 with open('num_48','w') as file: 
-    json.dump((map_list,order_list,name_list,pos_list),file)
+    json.dump((map_list,order_list,correct_list,name_list,pos_list),file)
 #
 ## saving
 #sio.savemat('num_training.mat', {'map_list':map_list,'order_list':order_list,'name_list':name_list,'pos_list':pos_list})

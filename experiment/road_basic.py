@@ -203,7 +203,7 @@ class ScoreBar:
             self.center_list.append(loc)
 
     def incentive(self):
-        self.score = list(range(1,self.box+1))
+        self.score = list(range(0,self.box))
         self.incentive_score = []
         for i in self.score:
             i = i ** 2

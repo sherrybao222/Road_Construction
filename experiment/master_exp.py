@@ -36,11 +36,11 @@ with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/b
 with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/undo_map_training','r') as file: 
     train_undo_map = json.load(file) 
 
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_24','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_48','r') as file: 
     num_map = json.load(file) 
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_24','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_48_all4','r') as file: 
     basic_map = json.load(file) 
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/undo_map_24','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/undo_map_48_all4','r') as file: 
     undo_map = json.load(file) 
 
 # blocks
@@ -62,7 +62,7 @@ pg.font.init()
 # display setup
 WIDTH = 1900
 HEIGHT = 1000
-screen = pg.display.set_mode((WIDTH, HEIGHT))#, flags=pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
+screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
 GREY = (222, 222, 222)
 
 # training session

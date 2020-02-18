@@ -136,7 +136,7 @@ class Draw:
     def num_est(self, mmap,screen):
         text_write('How many cities can you connect? ', 30, BLACK, 100, 100,screen)
         text_write("Type your answer here: ", 30, BLACK, 100, 200,screen)
-        text_write("Press Return to SUBMIT", 30, BLACK, 100, 300,screen)
+        text_write("Press SPACE to SUBMIT", 30, BLACK, 100, 300,screen)
         
     def budget(self, mmap, mouse,screen):  
         # current mouse position
@@ -158,7 +158,7 @@ def trial_start(screen):
     text_write('connect with the given budget. Please remember that the dots', 50, BLACK, 50, 500,screen)
     text_write('must be connected in the labeled order.', 50, BLACK, 50, 600,screen)
     text_write('You will type your response in a textbox.', 50, BLACK, 50, 700, screen)
-    text_write('Press Enter to see an example.', 50, BLACK, 50, 900, screen)
+    text_write('Press SPACE to see an example.', 50, BLACK, 50, 900, screen)
         
 # helper function
 # =============================================================================
@@ -211,7 +211,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                     pg.quit()
                 try: 
                     float(trial.num_est[-1])
-                    if event.key == pg.K_RETURN and not np.isnan(float(trial.num_est[-1])):
+                    if event.key == pg.K_SPACE and not np.isnan(float(trial.num_est[-1])):
                         trl_done = True
                 except: "Value error"
                 
@@ -258,7 +258,7 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk,mode):
        
             
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_SPACE:
                     ins = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:

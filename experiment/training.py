@@ -31,7 +31,7 @@ def training(screen):
     # -------------------------------------------------------------------------    
     ins = True
     
-    screen.fill(WHITE)
+    screen.fill(GREY)
     ins_1(screen)
     pg.display.flip()  
 
@@ -40,7 +40,7 @@ def training(screen):
         for event in events:
             
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_SPACE:
                     ins = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
@@ -48,7 +48,7 @@ def training(screen):
 
     ins = True
 
-    screen.fill(WHITE)
+    screen.fill(GREY)
     ins_2(screen)
     pg.display.flip()  
     
@@ -57,7 +57,7 @@ def training(screen):
         for event in events:
             
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_SPACE:
                     ins = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
@@ -67,8 +67,7 @@ def training(screen):
 # main
 # =============================================================================
 # setting up window, basic features 
-    
-WHITE = (255, 255, 255)
+GREY = (222, 222, 222)    
 RED = (255, 102, 102)
 GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)    
@@ -80,7 +79,7 @@ if __name__ == "__main__":
     # display setup
     screen = pg.display.set_mode((2000, 1600), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
 
-    screen.fill(WHITE)
+    screen.fill(GREY)
         
     training(screen)
 
