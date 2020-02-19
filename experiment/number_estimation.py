@@ -54,7 +54,7 @@ class Map:
         
         self.loadmap = map_content[0][map_id]
         self.order = map_content[1][map_id]
-        self.position = map_content[3][map_id]
+        self.position = map_content[4][map_id]
         
         self.N = self.loadmap['N']
         self.radius = 5     # radius of city
@@ -150,7 +150,7 @@ class Draw:
 # instruction
 # =============================================================================
 def game_start(screen): 
-    text_write('Number Estimation', 100, BLACK, int(WIDTH/2), int(HEIGHT/2), screen)
+    text_write('Number Estimation', 100, BLACK, 400, int(HEIGHT/2), screen)
 
 def trial_start(screen):
     text_write('This is Number Estimation. The green line is your budget line,',50, BLACK, 50, 300, screen)
@@ -185,7 +185,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
         # allow text-input on the screen
         screen.fill(GREY)
         num_input.update(events)
-        screen.blit(num_input.get_surface(), (600, 300))
+        screen.blit(num_input.get_surface(), (400, 200))
         draw_map = Draw(trial,screen)
         pg.display.flip()  
         
@@ -291,8 +291,8 @@ RED = (255, 102, 102)
 GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)
 
-WIDTH = 2000
-HEIGHT = 1500
+WIDTH = 1900
+HEIGHT = 1000
 
 if __name__ == "__main__":
     pg.init()
@@ -306,7 +306,7 @@ if __name__ == "__main__":
     # load maps
 #    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
     import json
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_test','r') as file: 
+    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_48','r') as file: 
         map_content = json.load(file) 
 
     n_trials = 2

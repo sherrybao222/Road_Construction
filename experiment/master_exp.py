@@ -9,7 +9,7 @@ import json
 # main
 # =============================================================================
 # trial numbers
-n_trl = [2,2,2]
+n_trl = [24,24,24]
 #n_trl = [24,24,24]
 n_all = 2 * sum(n_trl)
 trials = [float("nan")] * n_all

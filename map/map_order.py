@@ -121,7 +121,7 @@ def field_pos(mmap):
 
 # main
 # =============================================================================  
-n_map = 48 # number of maps needed
+n_map = 6 # number of maps needed
 map_ind = int(n_map/2)*[0]
 map_ind.extend(int(n_map/2)*[1])
 random.shuffle(map_ind)
@@ -161,18 +161,19 @@ while True:
     if len(map_list) == n_map:
         break
    
-# saving
-sio.savemat('num_48.mat', {'map_list':map_list,'order_list':order_list,
-                           'correct_list':correct_list,'name_list':name_list,'pos_list':pos_list})
-# saving json
-with open('num_48','w') as file: 
-    json.dump((map_list,order_list,correct_list,name_list,pos_list),file)
-#
 ## saving
-#sio.savemat('num_training.mat', {'map_list':map_list,'order_list':order_list,'name_list':name_list,'pos_list':pos_list})
+#sio.savemat('num_48.mat', {'map_list':map_list,'order_list':order_list,
+#                           'correct_list':correct_list,'name_list':name_list,'pos_list':pos_list})
 ## saving json
-#with open('num_training','w') as file: 
-#    json.dump((map_list,order_list,name_list,pos_list),file)
+#with open('num_48','w') as file: 
+#    json.dump((map_list,order_list,correct_list,name_list,pos_list),file)
+#
+# saving
+sio.savemat('num_training.mat', {'map_list':map_list,'order_list':order_list,
+                                 'correct_list':correct_list,'name_list':name_list,'pos_list':pos_list})
+# saving json
+with open('num_training','w') as file: 
+    json.dump((map_list,order_list,correct_list,name_list,pos_list),file)
 
     # draw
 #    plt.plot(operator.itemgetter(*order_list[i])(mmap.x), 
