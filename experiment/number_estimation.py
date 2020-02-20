@@ -150,15 +150,17 @@ class Draw:
 # instruction
 # =============================================================================
 def game_start(screen): 
-    text_write('Number Estimation', 100, BLACK, 400, int(HEIGHT/2), screen)
+    text_write('Number Estimation', 100, BLACK, 400, int(HEIGHT/3), screen)
+    text_write('Type your estimation', 70, BLACK, 400, int(HEIGHT/3)+70, screen)
+    text_write('Press SPACE to submit', 70, BLACK, 400, int(HEIGHT/3)+140, screen)
 
 def trial_start(screen):
-    text_write('This is Number Estimation. The green line is your budget line,',50, BLACK, 50, 300, screen)
-    text_write('and you are asked to estimate the number of dots you can ', 50, BLACK, 50, 400,screen)
-    text_write('connect with the given budget. Please remember that the dots', 50, BLACK, 50, 500,screen)
-    text_write('must be connected in the labeled order.', 50, BLACK, 50, 600,screen)
-    text_write('You will type your response in a textbox.', 50, BLACK, 50, 700, screen)
-    text_write('Press SPACE to see an example.', 50, BLACK, 50, 900, screen)
+    text_write('This is Number Estimation',50, BLACK, 50, 200, screen)
+    text_write('The green line is your budget line, and you can rotate it by using your mouse.', 50, BLACK, 50, 400,screen)
+    text_write('You are asked to estimate the number of cities you can connect with the given budget. ', 50, BLACK, 50, 500,screen)
+    text_write('Please remember that all cities must be connected in a labeled order. ', 50, BLACK, 50, 600,screen)
+    text_write('You will type your response in a textbox, and press Space to continue. ', 50, BLACK, 50, 700, screen)
+    text_write('Press SPACE to see examples', 50, BLACK, 50, 900, screen)
         
 # helper function
 # =============================================================================

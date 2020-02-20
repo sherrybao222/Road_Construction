@@ -283,14 +283,16 @@ class Draw:
 # instruction
 # =============================================================================
 def game_start(screen): 
-    text_write('Road Construction', 100, BLACK, 400, int(HEIGHT/2), screen)
+    text_write('Road Construction', 100, BLACK, 400, int(HEIGHT/3), screen)
+    text_write('Press SPACE to submit', 70, BLACK, 400, int(HEIGHT/3)+140, screen)
 
 def trial_start(screen):
-    text_write('This is Road Construction. The green line is your budget line,',50, BLACK, 50, 300, screen)
-    text_write('and you are asked to connect as many dots as possible with', 50, BLACK, 50, 400,screen)
-    text_write('the given budget. You will see your score on the screen,', 50, BLACK, 50, 500,screen)
-    text_write('and press SPACE to submit your response.', 50, BLACK, 50, 600,screen)
-    text_write('Press SPACE to see an example.', 50, BLACK, 50, 800, screen)
+    text_write('This is Road Construction',50, BLACK, 50, 200, screen)
+    text_write('The green line is your budget line, and you can rotate it by using your mouse.', 50, BLACK, 50, 400,screen)
+    text_write('You are asked to connect as many cities as possible with the given budget.', 50, BLACK, 50, 500,screen)
+    text_write('The score bar indicates your score in respect to the number of cities connected. ', 50, BLACK, 50, 600,screen)
+    text_write('You will need to press Space to submit your final score.  ', 50, BLACK, 50, 700,screen)
+    text_write('Press SPACE to examples.', 50, BLACK, 50, 900, screen)
 
 # helper function
 # =============================================================================
