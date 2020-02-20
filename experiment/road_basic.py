@@ -195,7 +195,7 @@ class ScoreBar:
         self.box_height = self.height / self.box
         self.center_list = []
         self.uni_height = self.box_height / 2
-        self.x = self.width / 2 + 1500 # larger the number, further to right
+        self.x = self.width / 2 + 1300 # larger the number, further to right
 
         for i in range(self.box):
             y =  i * self.box_height + self.uni_height
@@ -284,7 +284,7 @@ class Draw:
 # =============================================================================
 def game_start(screen): 
     text_write('Road Construction', 100, BLACK, 400, int(HEIGHT/3), screen)
-    text_write('Press SPACE to submit', 70, BLACK, 400, int(HEIGHT/3)+140, screen)
+    text_write('Press SPACE to submit', 60, BLACK, 400, int(HEIGHT/3)+200, screen)
 
 def trial_start(screen):
     text_write('This is Road Construction',50, BLACK, 50, 200, screen)

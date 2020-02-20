@@ -9,8 +9,7 @@ import json
 # main
 # =============================================================================
 # trial numbers
-n_trl = [24,24,24]
-#n_trl = [24,24,24]
+n_trl = [1,1,1]
 n_all = 2 * sum(n_trl)
 trials = [float("nan")] * n_all
 
@@ -29,6 +28,8 @@ n_3 = 1
 #undo_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_undo.mat',  struct_as_record=False)
 
 # load maps from json
+# /home/malab/Desktop/Road_Construction/
+# /Users/sherrybao/Downloads/Research/Road_Construction/
 with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_training','r') as file: 
     train_num_map = json.load(file) 
 with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_map_training','r') as file: 
@@ -95,12 +96,12 @@ for blk, cond in enumerate(orders[order_ind - 1]):
 pg.quit()
 
 # saving mat
-sio.savemat('test_all.mat', {'trials':trials})   
+sio.savemat('test_all_'+ subject_num + '.mat', {'trials':trials})   
 # saving json
 trial_json = [0]*len(trials)
 for trl in range(len(trials)):
     trial_json[trl] = trials[trl].__dict__
-with open('test_all','w') as file: 
+with open('test_all_' + subject_num,'w') as file: 
     json.dump(trial_json,file)
 
 # =============================================================================
@@ -108,6 +109,8 @@ with open('test_all','w') as file:
 import csv
 
 members = [attr for attr in dir(trials[0]) if not callable(getattr(trials[0], attr)) and not attr.startswith("__")]
+remove_members = ['budget_dyn','check','check_end_ind','choice_dyn','choice_locdyn','mouse_distance']
+members = [ele for ele in members if ele not in remove_members] 
 if 'position' in members: members.remove('position')
 exp = ['blk','cond','trl','mapid','time','pos','click','undo_press','choice_his','choice_loc',
               'budget_his','n_city','num_est']
@@ -130,13 +133,13 @@ for member in members:
         dict_info[member] = attr
 #        infos.append(attr)
         
-with open('test_exp.csv', 'w' ) as f:
+with open('test_exp_' + subject_num + '.csv', 'w' ) as f:
     writer = csv.writer(f)
     writer.writerow(exp)
     all_values = [dict_exp[exp[i]] for i in range(len(exp))]
     writer.writerows(zip(*all_values))
 
-with open('test_info.csv', 'w' ) as f:
+with open('test_info_' + subject_num + '.csv', 'w' ) as f:
     writer = csv.writer(f)
     writer.writerow(info)
     all_values = [dict_info[info[i]] for i in range(len(info))]

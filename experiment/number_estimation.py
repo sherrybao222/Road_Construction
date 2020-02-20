@@ -151,8 +151,8 @@ class Draw:
 # =============================================================================
 def game_start(screen): 
     text_write('Number Estimation', 100, BLACK, 400, int(HEIGHT/3), screen)
-    text_write('Type your estimation', 70, BLACK, 400, int(HEIGHT/3)+70, screen)
-    text_write('Press SPACE to submit', 70, BLACK, 400, int(HEIGHT/3)+140, screen)
+    text_write('Type your estimation', 60, BLACK, 400, int(HEIGHT/3)+200, screen)
+    text_write('Press SPACE to submit', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
 
 def trial_start(screen):
     text_write('This is Number Estimation',50, BLACK, 50, 200, screen)

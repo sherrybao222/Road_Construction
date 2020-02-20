@@ -16,8 +16,8 @@ def ins_1(screen):
     text_write('You are invited to be part of a research study to learn about spatial planning.', 50, BLACK, 50, 400,screen)
     text_write('This study is conducted by Dr. Wei Ji Ma, in the Department of Psychology ', 50, BLACK, 50, 500,screen)
     text_write('and the Center for Neural Science in the Faculty of Arts & Sciences', 50, BLACK, 50, 600,screen)
-    text_write('at New York University.', 90, BLACK, 50, 700, screen)
-    text_write('Press SPACE to continue', 90, BLACK, 50, 900, screen)
+    text_write('at New York University.', 50, BLACK, 50, 700, screen)
+    text_write('Press SPACE to continue', 50, BLACK, 50, 900, screen)
 
 def ins_2(screen): 
     text_write('You need to complete 3 types of tasks in this study.',50, BLACK, 50, 300, screen)
