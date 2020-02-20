@@ -77,6 +77,44 @@ def training(screen):
                 if event.key == pg.K_ESCAPE:
                     pg.quit()   
 
+def incentive_instruction(screen):    
+    # instruction
+    # -------------------------------------------------------------------------    
+    ins = True
+    
+    screen.fill(GREY)
+    incentive_1(screen)
+    pg.display.flip()  
+
+    while ins:
+        events = pg.event.get()
+        for event in events:
+            
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_SPACE:
+                    ins = False 
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.quit()   
+
+    ins = True
+
+    screen.fill(GREY)
+    incentive_2(screen)
+    pg.display.flip()  
+    
+    while ins:
+        events = pg.event.get()
+        for event in events:
+            
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_SPACE:
+                    ins = False 
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.quit()   
+
+
 
 # main
 # =============================================================================

@@ -3,7 +3,7 @@ import scipy.io as sio
 from number_estimation import num_estimation
 from road_basic import road_basic
 from road_undo import road_undo
-from training import training
+from training import training, incentive_instruction
 import json
 
 # main
@@ -72,6 +72,9 @@ mode_1 = 'try'
 num_estimation(screen,train_num_map,2,0,1,mode_1)
 road_basic(screen,train_basic_map,2,0,1,mode_1)
 road_undo(screen,train_undo_map,2,0,1,mode_1)
+
+# incentive instruction
+incentive_instruction(screen)
 
 # game blocks
 mode_2 = 'game'
