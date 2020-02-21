@@ -261,12 +261,13 @@ class Draw:
 # ---------------------------------------------------------------------------------
     def number(self, scorebar, screen):
         left = scorebar.center_list[0][0] - 25
+        c_list = [(102,204,102),(116,195,102),(130,185,102),(144,176,102),(158,167,102),(172,158,102),(185,148,102),(199,139,102),(213,130,102),(227,121,102),(241,111,102),(255,102,102)]
         for i in range(scorebar.box):
             loc = scorebar.center_list[i]
             text = scorebar.incentive_score[i]
+            pg.draw.rect(screen, c_list[i], (left, loc[1] + scorebar.top - scorebar.uni_height, scorebar.width, scorebar.box_height), 0)
             text_write(str(text), int(scorebar.box_height - 15), BLACK, loc[0], loc[1]+scorebar.top , screen) # larger number, further to right
-            pg.draw.rect(screen, BLACK, (left, loc[1]+scorebar.top-scorebar.uni_height, 
-                                         scorebar.width, scorebar.box_height), 2)  # width for line thickness
+
     def arrow(self, scorebar,screen):
         # arrow parameter
         point = (scorebar.indicator_loc[0] - 30, scorebar.indicator_loc[1]+scorebar.top+10)
@@ -437,14 +438,14 @@ if __name__ == "__main__":
     pg.font.init()
       
     # display setup
-    screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
  
     screen.fill(GREY)
     
     # load maps
 #    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
     import json
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_24','r') as file: 
+    with open('/Users/fqx/Spring 2020/Ma Lab/GitHub/Road_Construction/map/basic_map_24','r') as file:
         map_content = json.load(file) 
 
     n_trials = 5
