@@ -253,19 +253,23 @@ class Draw:
         pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
 
     def instruction_submit(self,screen):
-        text_write("Press SPACE to SUBMIT", 30, BLACK, 100, 200, screen)
+        text_write("Press SPACE to SUBMIT", 60, BLACK, 100, 200, screen)
 
     def check_end(self,screen):
-        text_write("You are out of budget", 30, RED, 100, 400, screen)
+        text_write("You are out of budget", 60, RED, 100, 400, screen)
 
 # ---------------------------------------------------------------------------------
     def number(self, scorebar, screen):
         left = scorebar.center_list[0][0] - 25
-        c_list = [(102,204,102),(116,195,102),(130,185,102),(144,176,102),(158,167,102),(172,158,102),(185,148,102),(199,139,102),(213,130,102),(227,121,102),(241,111,102),(255,102,102)]
+        c_list = [(102,204,102),(116,195,102),(130,185,102),(144,176,102),
+                  (158,167,102),(172,158,102),(185,148,102),(199,139,102),
+                  (213,130,102),(227,121,102),(241,111,102),(255,102,102)]
         for i in range(scorebar.box):
             loc = scorebar.center_list[i]
             text = scorebar.incentive_score[i]
-            pg.draw.rect(screen, c_list[i], (left, loc[1] + scorebar.top - scorebar.uni_height, scorebar.width, scorebar.box_height), 0)
+            pg.draw.rect(screen, c_list[i],
+                         (left, loc[1] + scorebar.top - scorebar.uni_height,
+                          scorebar.width, scorebar.box_height), 0)
             text_write(str(text), int(scorebar.box_height - 15), BLACK, loc[0], loc[1]+scorebar.top , screen) # larger number, further to right
 
     def arrow(self, scorebar,screen):

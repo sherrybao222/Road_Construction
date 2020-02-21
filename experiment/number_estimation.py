@@ -134,9 +134,9 @@ class Draw:
             i = i + 1
         
     def num_est(self, mmap,screen):
-        text_write('How many cities can you connect? ', 30, BLACK, 100, 100,screen)
-        text_write("Type your answer here: ", 30, BLACK, 100, 200,screen)
-        text_write("Press SPACE to SUBMIT", 30, BLACK, 100, 300,screen)
+        text_write('How many cities can you connect? ', 60, BLACK, 100, 100,screen)
+        text_write("Type your answer here: ", 60, BLACK, 100, 200,screen)
+        text_write("Press SPACE to SUBMIT", 60, BLACK, 100, 300,screen)
         
     def budget(self, mmap, mouse,screen):  
         # current mouse position
