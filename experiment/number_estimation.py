@@ -187,7 +187,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
         # allow text-input on the screen
         screen.fill(GREY)
         num_input.update(events)
-        screen.blit(num_input.get_surface(), (400, 200))
+        screen.blit(num_input.get_surface(), (600, 200)) # change cursor location
         draw_map = Draw(trial,screen)
         pg.display.flip()  
         
@@ -308,7 +308,7 @@ if __name__ == "__main__":
     # load maps
 #    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
     import json
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_48','r') as file: 
+    with open('/Users/fqx/Spring 2020/Ma Lab/GitHub/Road_Construction/map/num_48','r') as file:
         map_content = json.load(file) 
 
     n_trials = 2
