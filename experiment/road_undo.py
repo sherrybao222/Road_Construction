@@ -276,6 +276,8 @@ class Draw:
             pg.draw.rect(screen, c_list[i],
                          (left, loc[1]+scorebar.top-scorebar.uni_height,
                           scorebar.width, scorebar.box_height), 0)
+            pg.draw.rect(screen, BLACK, (left, loc[1]+scorebar.top-scorebar.uni_height, 
+                                         scorebar.width, scorebar.box_height), 2)  # width for line thickness
             text_write(str(text), int(scorebar.box_height - 15), BLACK, loc[0], loc[1]+scorebar.top , screen) # larger number, further to right
         
     def arrow(self, scorebar,screen):
@@ -304,10 +306,13 @@ class Draw:
 
 # instruction
 # =============================================================================
-def game_start(screen): 
-    text_write('Road Constructions with Undo', 100, BLACK, 300, int(HEIGHT/3), screen)
-    text_write('Press Z to undo', 60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('Press SPACE to submit', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
+def game_start(screen,blk): 
+    text_write('This is Part '+ str(blk) + ' on Road Construction with Undo',100, BLACK, 400, int(HEIGHT/3), screen)
+    text_write('Remember you should connect as many cities as possible to achieve a higher score.',
+               60, BLACK, 400, int(HEIGHT/3)+200, screen)
+    text_write('And, you can press Z to undo your connections.', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
+    text_write('You will press SPACE to submit your final score', 60, BLACK, 400, int(HEIGHT/3)+400, screen)
+    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
     
 def trial_start(screen):
     text_write('This is Road Construction with Undo',50, BLACK, 50, 200, screen)
@@ -318,6 +323,12 @@ def trial_start(screen):
     text_write('and a record of your highest score achieved. ', 50, BLACK, 50, 700,screen)
     text_write('You will need to press Space to submit your final score. ', 50, BLACK, 50, 800,screen)
     text_write('Press SPACE to see examples', 50, BLACK, 50, 900, screen)
+
+def post_block(screen,blk):
+    text_write('Congratulation, you finished Part '+ str(blk),100, BLACK, 400, int(HEIGHT/3), screen)
+    text_write('You can take a short break now.',
+               60, BLACK, 400, int(HEIGHT/3)+200, screen)
+    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
 
 # helper function
 # =============================================================================
@@ -419,7 +430,7 @@ def road_undo(screen,map_content,n_trials,blk,n_blk,mode):
 
     if mode == 'game':
         screen.fill(GREY)
-        game_start(screen)
+        game_start(screen,blk)
         pg.display.flip()
     elif mode == 'try':
         screen.fill(GREY)
@@ -456,6 +467,27 @@ def road_undo(screen,map_content,n_trials,blk,n_blk,mode):
         
     # saving
 #    sio.savemat('test_saving_undo.mat', {'trials':trials})   
+
+    # end
+    # -------------------------------------------------------------------------    
+    screen.fill(GREY)
+    post_block(screen,blk)
+    pg.display.flip()
+
+    ins = True
+    while ins:
+        events = pg.event.get()
+        for event in events:
+       
+            
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_SPACE:
+                    ins = False 
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.display.quit()
+                    pg.quit()   
+
     return trials
 
 # main

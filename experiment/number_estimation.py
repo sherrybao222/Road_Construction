@@ -149,18 +149,26 @@ class Draw:
 
 # instruction
 # =============================================================================
-def game_start(screen): 
-    text_write('Number Estimation', 100, BLACK, 400, int(HEIGHT/3), screen)
-    text_write('Type your estimation', 60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('Press SPACE to submit', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
+def game_start(screen,blk): 
+    text_write('This is Part '+ str(blk) + ' on Number Estimation',100, BLACK, 400, int(HEIGHT/3), screen)
+    text_write('How many cities can you connect using the given budget by following the labeled order?',
+               60, BLACK, 400, int(HEIGHT/3)+200, screen)
+    text_write('Remember to type your answer in the textbox ', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
+    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
 
-#def trial_start(screen):
-    #text_write('This is Number Estimation',50, BLACK, 50, 200, screen)
-    #text_write('The green line is your budget line, and you can rotate it by using your mouse.', 50, BLACK, 50, 400,screen)
-    #text_write('You are asked to estimate the number of cities you can connect with the given budget. ', 50, BLACK, 50, 500,screen)
-    #text_write('Please remember that all cities must be connected in a labeled order. ', 50, BLACK, 50, 600,screen)
-    #text_write('You will type your response in a textbox, and press Space to continue. ', 50, BLACK, 50, 700, screen)
-    #text_write('Press SPACE to see examples', 50, BLACK, 50, 900, screen)
+def trial_start(screen):
+    text_write('This is Number Estimation',50, BLACK, 50, 200, screen)
+    text_write('The green line is your budget line, and you can rotate it by using your mouse.', 50, BLACK, 50, 400,screen)
+    text_write('You are asked to estimate the number of cities you can connect with the given budget. ', 50, BLACK, 50, 500,screen)
+    text_write('Please remember that all cities must be connected in a labeled order. ', 50, BLACK, 50, 600,screen)
+    text_write('You will type your response in a textbox, and press Space to continue. ', 50, BLACK, 50, 700, screen)
+    text_write('Press SPACE to see examples', 50, BLACK, 50, 900, screen)
+
+def post_block(screen,blk):
+    text_write('Congratulation, you finished Part '+ str(blk),100, BLACK, 400, int(HEIGHT/3), screen)
+    text_write('You can take a short break now.',
+               60, BLACK, 400, int(HEIGHT/3)+200, screen)
+    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
         
 # helper function
 # =============================================================================
@@ -243,7 +251,7 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk,mode):
     
     if mode == 'game':
         screen.fill(GREY)
-        game_start(screen)
+        game_start(screen,blk)
         pg.display.flip()
     elif mode == 'try':
         screen.fill(GREY)
@@ -281,7 +289,29 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk,mode):
             trials.append(trial)
         all_done = True
     # saving
-#    sio.savemat('test_saving.mat', {'trials':trials})    
+#    sio.savemat('test_saving.mat', {'trials':trials})  
+
+    # end
+    # -------------------------------------------------------------------------    
+    screen.fill(GREY)
+    post_block(screen,blk)
+    pg.display.flip()
+
+    ins = True
+    while ins:
+        events = pg.event.get()
+        for event in events:
+       
+            
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_SPACE:
+                    ins = False 
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.display.quit()
+                    pg.quit()   
+    
+    
     return trials
 
 # main
@@ -308,7 +338,8 @@ if __name__ == "__main__":
     # load maps
 #    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
     import json
-    with open('/Users/fqx/Spring 2020/Ma Lab/GitHub/Road_Construction/map/num_48','r') as file:
+#    with open('/Users/fqx/Spring 2020/Ma Lab/GitHub/Road_Construction/map/num_48','r') as file:
+    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_48','r') as file: 
         map_content = json.load(file) 
 
     n_trials = 2

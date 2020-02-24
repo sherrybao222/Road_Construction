@@ -3,7 +3,7 @@ import scipy.io as sio
 from number_estimation import num_estimation
 from road_basic import road_basic
 from road_undo import road_undo
-from training import training, incentive_instruction
+from training import training, incentive_instruction, end_instruction
 import json
 
 # main
@@ -92,6 +92,8 @@ for blk, cond in enumerate(orders[order_ind - 1]):
         n_3 = n_3 + 1
     
     start_trl = start_trl + n_trl[cond-1]
+
+end_instruction(screen)
 
 pg.quit()
 

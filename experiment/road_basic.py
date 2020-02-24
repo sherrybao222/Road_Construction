@@ -180,7 +180,7 @@ class ScoreBar:
         # only call once when initiated for this part
         # score bar parameters
         self.width = 100
-        self.height = 500
+        self.height = 480
         self.box = 12
         self.top = 200 # distance to screen top
 
@@ -263,15 +263,16 @@ class Draw:
         left = scorebar.center_list[0][0] - 25
         c_list = [(102,204,102),(116,195,102),(130,185,102),(144,176,102),
                   (158,167,102),(172,158,102),(185,148,102),(199,139,102),
-                  (213,130,102),(227,121,102),(241,111,102),(255,102,102)]
+                  (213,130,102),(227,121,102),(241,111,102),(255,102,102)] # color list
         for i in range(scorebar.box):
             loc = scorebar.center_list[i]
             text = scorebar.incentive_score[i]
             pg.draw.rect(screen, c_list[i],
                          (left, loc[1] + scorebar.top - scorebar.uni_height,
-                          scorebar.width, scorebar.box_height), 0)
-            text_write(str(text), int(scorebar.box_height - 15), BLACK, loc[0], loc[1]+scorebar.top , screen) # larger number, further to right
-
+                          scorebar.width, scorebar.box_height), 0) # if width == 0, (default) fill the rectangle
+            pg.draw.rect(screen, BLACK, (left, loc[1]+scorebar.top-scorebar.uni_height, 
+                                         scorebar.width, scorebar.box_height), 2)  # width for line thickness
+            text_write(str(text), int(scorebar.box_height - 10), BLACK, loc[0], loc[1]+scorebar.top , screen) # larger number, further to right
     def arrow(self, scorebar,screen):
         # arrow parameter
         point = (scorebar.indicator_loc[0] - 30, scorebar.indicator_loc[1]+scorebar.top+10)
@@ -287,9 +288,12 @@ class Draw:
 
 # instruction
 # =============================================================================
-def game_start(screen): 
-    text_write('Road Construction', 100, BLACK, 400, int(HEIGHT/3), screen)
-    text_write('Press SPACE to submit', 60, BLACK, 400, int(HEIGHT/3)+200, screen)
+def game_start(screen,blk): 
+    text_write('This is Part '+ str(blk) + ' on Road Construction',100, BLACK, 400, int(HEIGHT/3), screen)
+    text_write('Remember you should connect as many cities as possible to achieve a higher score.',
+               60, BLACK, 400, int(HEIGHT/3)+200, screen)
+    text_write('You will press SPACE to submit your final score', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
+    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
 
 def trial_start(screen):
     text_write('This is Road Construction',50, BLACK, 50, 200, screen)
@@ -298,6 +302,12 @@ def trial_start(screen):
     text_write('The score bar indicates your score in respect to the number of cities connected. ', 50, BLACK, 50, 600,screen)
     text_write('You will need to press Space to submit your final score.  ', 50, BLACK, 50, 700,screen)
     text_write('Press SPACE to examples.', 50, BLACK, 50, 900, screen)
+
+def post_block(screen,blk):
+    text_write('Congratulation, you finished Part '+ str(blk),100, BLACK, 400, int(HEIGHT/3), screen)
+    text_write('You can take a short break now.',
+               60, BLACK, 400, int(HEIGHT/3)+200, screen)
+    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
 
 # helper function
 # =============================================================================
@@ -389,7 +399,7 @@ def road_basic(screen,map_content,n_trials, blk, n_blk, mode):
     
     if mode == 'game':
         screen.fill(GREY)
-        game_start(screen)
+        game_start(screen,blk)
         pg.display.flip()
     elif mode == 'try':
         screen.fill(GREY)
@@ -422,8 +432,29 @@ def road_basic(screen,map_content,n_trials, blk, n_blk, mode):
             trials.append(trial)
         all_done = True
     # saving
-#    sio.savemat('test_saving_basic.mat', {'trials':trials}) 
+#    sio.savemat('test_saving_basic.mat', {'trials':trials})
+    # end
+    # -------------------------------------------------------------------------    
+    screen.fill(GREY)
+    post_block(screen,blk)
+    pg.display.flip()
+
+    ins = True
+    while ins:
+        events = pg.event.get()
+        for event in events:
+       
+            
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_SPACE:
+                    ins = False 
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.display.quit()
+                    pg.quit()   
+    
     return trials
+
 
 # main
 # =============================================================================
@@ -442,14 +473,15 @@ if __name__ == "__main__":
     pg.font.init()
       
     # display setup
-    screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((WIDTH, HEIGHT))#, flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
  
     screen.fill(GREY)
     
     # load maps
 #    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
     import json
-    with open('/Users/fqx/Spring 2020/Ma Lab/GitHub/Road_Construction/map/basic_map_24','r') as file:
+    #with open('/Users/fqx/Spring 2020/Ma Lab/GitHub/Road_Construction/map/basic_map_24','r') as file:
+    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_48_all4','r') as file: 
         map_content = json.load(file) 
 
     n_trials = 5

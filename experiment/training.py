@@ -34,34 +34,6 @@ def ins_end(screen):
     text_write('Do you have any questions? ',50, BLACK, 50, 300, screen)
     text_write('If not, press SPACE to start the experiment.', 50, BLACK, 50, 900, screen)
 
-def NE_pre_block(screen):
-    text_write('This is Part '+ str(block_number) + ' on Number Estimation',100, BLACK, 400, int(HEIGHT/3), screen)
-    text_write('How many cities can you connect using the given budget by following the labeled order?',
-               60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('Remember to type your answer in the textbox ', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
-    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
-
-def RC_pre_block(screen):
-    text_write('This is Part '+ str(block_number) + ' on Road Construction',100, BLACK, 400, int(HEIGHT/3), screen)
-    text_write('Remember you should connect as many cities as possible to achieve a higher score.',
-               60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('You will press SPACE to submit your final score', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
-    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
-
-def RCUndo_pre_block(screen):
-    text_write('This is Part '+ str(block_number) + ' on Road Construction with Undo',100, BLACK, 400, int(HEIGHT/3), screen)
-    text_write('Remember you should connect as many cities as possible to achieve a higher score.',
-               60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('And, you can press Z to undo your connections.', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
-    text_write('You will press SPACE to submit your final score', 60, BLACK, 400, int(HEIGHT/3)+400, screen)
-    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
-
-def post_block(screen):
-    text_write('Congratulation, you finished Part '+ str(block_number),100, BLACK, 400, int(HEIGHT/3), screen)
-    text_write('You can take a short break now.',
-               60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
-
 def exp_end(screen):
     text_write('Thank you for participating in this study.',50, BLACK, 50, 300, screen)
     text_write('The researcher will pay you in cash shortly.',50, BLACK, 50, 400, screen)
@@ -127,9 +99,29 @@ def incentive_instruction(screen):
     ins = True
 
     screen.fill(GREY)
-    incentive_2(screen)
+    ins_end(screen)
     pg.display.flip()  
     
+    while ins:
+        events = pg.event.get()
+        for event in events:
+            
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_SPACE:
+                    ins = False 
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.quit()   
+
+def end_instruction(screen):    
+    # instruction
+    # -------------------------------------------------------------------------    
+    ins = True
+    
+    screen.fill(GREY)
+    exp_end(screen)
+    pg.display.flip()  
+
     while ins:
         events = pg.event.get()
         for event in events:
