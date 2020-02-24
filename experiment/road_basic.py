@@ -435,7 +435,7 @@ def road_basic(screen,map_content,n_trials, blk, n_blk, mode):
 #    sio.savemat('test_saving_basic.mat', {'trials':trials})
     # end
     # -------------------------------------------------------------------------    
-    if mode == 'game':
+    if mode == 'game' and blk != 6:
         screen.fill(GREY)
         post_block(screen,blk)
         pg.display.flip()

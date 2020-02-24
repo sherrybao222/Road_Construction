@@ -293,7 +293,7 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk,mode):
 
     # end
     # -------------------------------------------------------------------------    
-    if mode == 'game':
+    if mode == 'game' and blk != 6:
         screen.fill(GREY)
         post_block(screen,blk)
         pg.display.flip()
@@ -332,7 +332,7 @@ if __name__ == "__main__":
     pg.font.init()
     
     # display setup
-    screen = pg.display.set_mode((WIDTH, HEIGHT), flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((WIDTH, HEIGHT))#, flags= pg.RESIZABLE)  #  pg.FULLSCREEN pg.RESIZABLE
     
     screen.fill(GREY)
     
@@ -340,10 +340,10 @@ if __name__ == "__main__":
 #    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
     import json
 #    with open('/Users/fqx/Spring 2020/Ma Lab/GitHub/Road_Construction/map/num_48','r') as file:
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_48','r') as file: 
+    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_training','r') as file: 
         map_content = json.load(file) 
 
-    n_trials = 2
+    n_trials = 6
     blk = 1 # set some number\
     n_blk = 1
     mode = 'game'

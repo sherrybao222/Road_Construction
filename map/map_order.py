@@ -17,7 +17,7 @@ class circle_map:
     def __init__(self, budget):
         # map parameters
         self.N = 11    # total city number, including start
-        self.radius = 10     # radius of city
+        self.radius = 5     # radius of city
         self.total = budget    # total budget
         self.budget_remain = budget    # remaining budget
 
@@ -91,7 +91,7 @@ def optimal(mmap):
     correct = 0
     path = 0
     ind = 0
-    while path < mmap.total:
+    while path < mmap.total and ind < 10:
         path = path + mmap.distance[optimal_index[ind]][optimal_index[ind+1]]
         if path <= mmap.total:
             correct = correct + 1
@@ -103,18 +103,23 @@ def optimal(mmap):
 # repulsive force field
 def field(pos, city_x,city_y,sigma):
     x,y = pos 
-    return sum(scipy.exp(-((city_x - x)**2+(city_y - y)**2)/(2*sigma**2))/(2*math.pi*sigma**2))
+    return sum(scipy.exp(-((city_x - x)**2+(city_y - y)**2)/(2*sigma**2))/(2*math.pi*(sigma**2)))
 
 def field_pos(mmap):
     position = []
-    for i in range(0,mmap.N):
-#        initial_guess = [1000, 750]
-#        cons = {'type': 'eq', 
-#            'fun': lambda pos: (pos[0] - mmap.x[i])**2 + (pos[1] - mmap.y[i])**2 - 20**2}
+
+    for i in range(0,mmap.N):        
+#        initial_guess = mmap.xy[i]
+        cons = (#{'type': 'ineq', 
+                #'fun': lambda pos: (pos[0] - mmap.x[i])**2 + (pos[1] - mmap.y[i])**2 - 14**2},
+                #{'type': 'ineq', 
+                #'fun': lambda pos: -(pos[0] - mmap.x[i])**2 - (pos[1] - mmap.y[i])**2 + 16**2},
+                {'type': 'eq', 
+                'fun': lambda pos: (pos[0] - mmap.x[i])**2 + (pos[1] - mmap.y[i])**2 - 15**2})
 #        result = optimize.minimize(field, initial_guess, 
-#                                   args=(mmap.x,mmap.y,50),constraints=cons)
-        bounds = [(mmap.x[i]-20, mmap.x[i]+20), (mmap.y[i]-20, mmap.y[i]+20)]
-        result = optimize.shgo(field, bounds, args=(mmap.x,mmap.y,20))
+#                                   args=(mmap.x,mmap.y,17),constraints=cons)
+        bounds = [(mmap.x[i]-16, mmap.x[i]+16), (mmap.y[i]-16, mmap.y[i]+16)]
+        result = optimize.shgo(field, bounds, args=(mmap.x,mmap.y,10),constraints=cons)
         position.append(result.x.tolist())
     return position
 
@@ -158,6 +163,7 @@ while True:
     name_list.append(name)
     pos_list.append(pos)
     i = i + 1
+    print(i)
     if len(map_list) == n_map:
         break
    
