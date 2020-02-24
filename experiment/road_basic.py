@@ -435,23 +435,24 @@ def road_basic(screen,map_content,n_trials, blk, n_blk, mode):
 #    sio.savemat('test_saving_basic.mat', {'trials':trials})
     # end
     # -------------------------------------------------------------------------    
-    screen.fill(GREY)
-    post_block(screen,blk)
-    pg.display.flip()
-
-    ins = True
-    while ins:
-        events = pg.event.get()
-        for event in events:
-       
-            
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
-                    ins = False 
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
-                    pg.display.quit()
-                    pg.quit()   
+    if mode == 'game':
+        screen.fill(GREY)
+        post_block(screen,blk)
+        pg.display.flip()
+    
+        ins = True
+        while ins:
+            events = pg.event.get()
+            for event in events:
+           
+                
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_SPACE:
+                        ins = False 
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE:
+                        pg.display.quit()
+                        pg.quit()   
     
     return trials
 

@@ -114,12 +114,14 @@ class TextInput:
 
                 elif len(self.input_string) < self.max_string_length or self.max_string_length == -1:
                     # If no special key is pressed, add unicode of key to input_string
-                    self.input_string = (
-                        self.input_string[:self.cursor_position]
-                        + event.unicode
-                        + self.input_string[self.cursor_position:]
-                    )
-                    self.cursor_position += len(event.unicode)  # Some are empty, e.g. K_UP
+                    if event.key in set([pl.K_0,pl.K_1,pl.K_2,pl.K_3,pl.K_4,pl.K_5,
+                                         pl.K_6,pl.K_7,pl.K_8,pl.K_9]): # only input number
+                        self.input_string = (
+                            self.input_string[:self.cursor_position]
+                            + event.unicode
+                            + self.input_string[self.cursor_position:]
+                        )
+                        self.cursor_position += len(event.unicode)  # Some are empty, e.g. K_UP
 
             elif event.type == pl.KEYUP:
                 # *** Because KEYUP doesn't include event.unicode, this dict is stored in such a weird way
