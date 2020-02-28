@@ -13,8 +13,8 @@ with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/experi
   d1 = json.load(f)
 with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/experiment/data_003/test_all_3') as f:
   d2 = json.load(f)
-# with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/experiment/data_004/test_all_4') as f:
-#   d3 = json.load(f)
+with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/test-room-experiment/data_009/test_all_9') as f:
+  d3 = json.load(f)
 
 # list for operations
 d1_rc = []
@@ -39,19 +39,23 @@ for i in range(144):
         d1_rc.append(d1[i]['n_city'][-1])
     if d2[i]['cond'][-1] == 2:
         d2_rc.append(d2[i]['n_city'][-1])
+    if d3[i]['cond'][-1] == 2:
+        d3_rc.append(d3[i]['n_city'][-1])
     if d1[i]['cond'][-1] == 3:
         d1_undo.append(d1[i]['n_city'][-1])
     if d2[i]['cond'][-1] == 3:
         d2_undo.append(d2[i]['n_city'][-1])
+    if d3[i]['cond'][-1] == 3:
+        d3_undo.append(d3[i]['n_city'][-1])
 
-rc_con = [d1_rc[i] + d2_rc[i] for i in range(len(d1_rc))]
-undo_con = [d1_undo[i] + d2_undo[i] for i in range(len(d1_undo))]
+rc_con = [d1_rc[i] + d2_rc[i] + d3_rc[i] for i in range(len(d1_rc))]
+undo_con = [d1_undo[i] + d2_undo[i] + d3_undo[i] for i in range(len(d1_undo))]
 
 print(rc_con)
 print(undo_con)
 
-rc_ave = [rc_con[i]/2 for i in range(len(rc_con))]
-undo_ave = [undo_con[i]/2 for i in range(len(undo_con))]
+rc_ave = [round(rc_con[i]/3, 2) for i in range(len(rc_con))]
+undo_ave = [round(undo_con[i]/3,2) for i in range(len(undo_con))]
 
 print(rc_ave)
 print(undo_ave)
