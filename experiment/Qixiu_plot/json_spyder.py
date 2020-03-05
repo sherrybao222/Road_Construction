@@ -10,11 +10,11 @@ import numpy as np
 
 #loading pilot data
 with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/experiment/data_002/test_all') as f:
-  d1 = json.load(f)
+  d1 = json.load(f).copy()
 with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/experiment/data_003/test_all_3') as f:
-  d2 = json.load(f)
+  d2 = json.load(f).copy()
 with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/test-room-experiment/data_009/test_all_9') as f:
-  d3 = json.load(f)
+  d3 = json.load(f).copy()
 
 # list for operations
 d1_rc = []
@@ -66,16 +66,47 @@ for i in range(24):
     mapid.append(d1[i]['mapid'][-1])
 print(mapid)
 
-plot1 = plt.plot(mapid, rc_ave[:24], label='RC')
-plot2 = plt.plot(mapid, undo_ave[:24],label='Undo')
-plt.legend(loc="upper left")
-plt.xlabel('map number')
-plt.ylabel('cities connected')
-plt.show()
+# line graph
 
-# mapid.hist(rc_ave, undo_ave, 24, density=True, histtype='bar', stacked=True)
-# mapid.set_title('stacked bar')
+# plot1 = plt.plot(mapid, rc_ave[:24], label='RC')
+# plot2 = plt.plot(mapid, undo_ave[:24],label='Undo')
+# plt.legend(loc="upper left")
+# plt.xlabel('map number')
+# plt.ylabel('cities connected')
 # plt.show()
+
+
+# bar graph
+
+# data to plot
+n_groups = len(mapid)
+means_rc = rc_ave[:24]
+means_undo = undo_ave[:24]
+
+# create plot
+fig, ax = plt.subplots()
+index = np.arange(n_groups)
+bar_width = 0.35
+opacity = 0.8
+
+rects1 = plt.bar(index, means_rc, bar_width,
+alpha=opacity,
+color='b',
+label='RC')
+
+rects2 = plt.bar(index + bar_width, means_undo, bar_width,
+alpha=opacity,
+color='g',
+label='Undo')
+
+plt.xlabel('Map Number')
+plt.ylabel('Cities connected')
+plt.title('Average cities connected across maps')
+plt.xticks(index + bar_width, (i for i in range(len(mapid))))
+plt.legend()
+
+plt.tight_layout()
+plt.show()
 
 
 # practice
