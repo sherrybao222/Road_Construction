@@ -66,6 +66,11 @@ for i in range(24):
     mapid.append(d1[i]['mapid'][-1])
 print(mapid)
 
+# zip = zip(undo_ave, mapid)
+# print(list(zip))
+sort = sorted(zip(undo_ave, mapid))
+print(sort)
+
 # line graph
 
 # plot1 = plt.plot(mapid, rc_ave[:24], label='RC')
@@ -79,14 +84,15 @@ print(mapid)
 # bar graph
 
 # data to plot
-n_groups = len(mapid)
-means_rc = rc_ave[:24]
-means_undo = undo_ave[:24]
+unzip = zip(*sort) # sort the map id based on maximum cities connected
+n_groups = (1, 19, 17, 12, 0, 5, 10, 15, 22, 4, 7, 8, 16, 20, 21, 9, 14, 2, 3, 6, 18, 23, 13, 11)
+means_rc = [rc_ave[i] for i in n_groups]
+means_undo = [undo_ave[int(i)] for i in n_groups]
 
 # create plot
 fig, ax = plt.subplots()
-index = np.arange(n_groups)
-bar_width = 0.35
+index = np.arange(len(mapid))
+bar_width = 0.45
 opacity = 0.8
 
 rects1 = plt.bar(index, means_rc, bar_width,
@@ -100,9 +106,10 @@ color='g',
 label='Undo')
 
 plt.xlabel('Map Number')
-plt.ylabel('Cities connected')
+plt.ylabel('Average cities connected')
 plt.title('Average cities connected across maps')
-plt.xticks(index + bar_width, (i for i in range(len(mapid))))
+plt.xticks(index + bar_width - 0.3, (i for i in n_groups))
+plt.tick_params(axis='x', which='major', labelsize=5)
 plt.legend()
 
 plt.tight_layout()
