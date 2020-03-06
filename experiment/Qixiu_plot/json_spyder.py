@@ -7,6 +7,7 @@ This is a temporary script file.
 import json
 import matplotlib.pyplot as plt
 import numpy as np
+import csv
 
 #loading pilot data
 with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/experiment/data_002/test_all') as f:
@@ -16,6 +17,7 @@ with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/experi
 with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/test-room-experiment/data_009/test_all_9') as f:
   d3 = json.load(f).copy()
 
+print(d1[0].keys())
 # list for operations
 d1_rc = []
 d2_rc = []
@@ -37,16 +39,20 @@ d3_undo = []
 # organize data
 data_all = [d1, d2, d3]
 rc = []
+rc_ind = []
 undo = []
 
 for data in data_all:
     for i in range(len(data)):
         if data[i]['cond'][-1] == 2:
             rc.append(data[i]['n_city'][-1])
+            rc_ind.append(i)
         if data[i]['cond'][-1] == 3:
             undo.append(data[i]['n_city'][-1])
 
 print(len(rc))
+print(rc_ind)
+print(len(rc_ind))
 
 # score list for RC & undo condition
 rc_con = [d1_rc[i] + d2_rc[i] + d3_rc[i] for i in range(len(d1_rc))]
@@ -63,18 +69,14 @@ plt.xlabel('Number of cities connected in RCU')
 plt.ylabel('Number of cities connected in RC')
 # plt.title('Number of cities connected')
 
-plt.show()
+# plt.show()
 
 # mapid list
 mapid = []
 for i in range(24):
     mapid.append(d1[i]['mapid'][-1])
-print(mapid)
+# print(mapid)
 
-# zip = zip(undo_ave, mapid)
-# print(list(zip))
-sort = sorted(zip(undo_ave, mapid))
-print(sort)
 
 # line graph
 
@@ -89,10 +91,9 @@ print(sort)
 # bar graph
 
 # data to plot
-unzip = zip(*sort) # sort the map id based on maximum cities connected
-n_groups = (1, 19, 17, 12, 0, 5, 10, 15, 22, 4, 7, 8, 16, 20, 21, 9, 14, 2, 3, 6, 18, 23, 13, 11)
-means_rc = [rc_ave[i] for i in n_groups]
-means_undo = [undo_ave[int(i)] for i in n_groups]
+# n_groups = (1, 19, 17, 12, 0, 5, 10, 15, 22, 4, 7, 8, 16, 20, 21, 9, 14, 2, 3, 6, 18, 23, 13, 11)
+# means_rc = [rc_ave[i] for i in n_groups]
+# means_undo = [undo_ave[int(i)] for i in n_groups]
 
 # create plot
 fig, ax = plt.subplots()
@@ -145,4 +146,3 @@ plt.tight_layout()
 #
 # mean1 = con1/144
 # mean2 = con2/144
-print(d1[0].keys())
