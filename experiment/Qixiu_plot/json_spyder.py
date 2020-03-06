@@ -33,32 +33,37 @@ d3_undo = []
 # d2_undo.clear()
 # d3_undo.clear()
 
-# score list for RC & undo condition
-for i in range(144):
-    if d1[i]['cond'][-1] == 2:
-        d1_rc.append(d1[i]['n_city'][-1])
-    if d2[i]['cond'][-1] == 2:
-        d2_rc.append(d2[i]['n_city'][-1])
-    if d3[i]['cond'][-1] == 2:
-        d3_rc.append(d3[i]['n_city'][-1])
-    if d1[i]['cond'][-1] == 3:
-        d1_undo.append(d1[i]['n_city'][-1])
-    if d2[i]['cond'][-1] == 3:
-        d2_undo.append(d2[i]['n_city'][-1])
-    if d3[i]['cond'][-1] == 3:
-        d3_undo.append(d3[i]['n_city'][-1])
 
+# organize data
+data_all = [d1, d2, d3]
+rc = []
+undo = []
+
+for data in data_all:
+    for i in range(len(data)):
+        if data[i]['cond'][-1] == 2:
+            rc.append(data[i]['n_city'][-1])
+        if data[i]['cond'][-1] == 3:
+            undo.append(data[i]['n_city'][-1])
+
+print(len(rc))
+
+# score list for RC & undo condition
 rc_con = [d1_rc[i] + d2_rc[i] + d3_rc[i] for i in range(len(d1_rc))]
 undo_con = [d1_undo[i] + d2_undo[i] + d3_undo[i] for i in range(len(d1_undo))]
-
-print(rc_con)
-print(undo_con)
-
+# print(rc_con)
+# print(undo_con)
 rc_ave = [round(rc_con[i]/3, 2) for i in range(len(rc_con))]
 undo_ave = [round(undo_con[i]/3,2) for i in range(len(undo_con))]
+# print(rc_ave)
+# print(undo_ave)
 
-print(rc_ave)
-print(undo_ave)
+plt.scatter(undo,rc, alpha=0.2)
+plt.xlabel('Number of cities connected in RCU')
+plt.ylabel('Number of cities connected in RC')
+# plt.title('Number of cities connected')
+
+plt.show()
 
 # mapid list
 mapid = []
@@ -113,7 +118,7 @@ plt.tick_params(axis='x', which='major', labelsize=5)
 plt.legend()
 
 plt.tight_layout()
-plt.show()
+# plt.show()
 
 
 # practice
