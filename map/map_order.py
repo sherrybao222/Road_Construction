@@ -57,7 +57,7 @@ def greedy(mmap):
     correct = 0
     path = 0
     ind = 0
-    while path < mmap.total:
+    while path < mmap.total and ind < 10:
         path = path + mmap.distance[index_greedy[ind]][index_greedy[ind+1]]
         if path <= mmap.total:
             correct = correct + 1
@@ -111,24 +111,24 @@ def field_pos(mmap):
     for i in range(0,mmap.N):        
 #        initial_guess = mmap.xy[i]
         cons = (#{'type': 'ineq', 
-                #'fun': lambda pos: (pos[0] - mmap.x[i])**2 + (pos[1] - mmap.y[i])**2 - 14**2},
+                #'fun': lambda pos: (pos[0] - mmap.x[i])**2 + (pos[1] - mmap.y[i])**2 - 15**2},
                 #{'type': 'ineq', 
-                #'fun': lambda pos: -(pos[0] - mmap.x[i])**2 - (pos[1] - mmap.y[i])**2 + 16**2},
+                #'fun': lambda pos: -(pos[0] - mmap.x[i])**2 - (pos[1] - mmap.y[i])**2 + 20**2},
                 {'type': 'eq', 
-                'fun': lambda pos: (pos[0] - mmap.x[i])**2 + (pos[1] - mmap.y[i])**2 - 15**2})
+                'fun': lambda pos: (pos[0] - mmap.x[i])**2 + (pos[1] - mmap.y[i])**2 - 17**2})
 #        result = optimize.minimize(field, initial_guess, 
-#                                   args=(mmap.x,mmap.y,17),constraints=cons)
-        bounds = [(mmap.x[i]-16, mmap.x[i]+16), (mmap.y[i]-16, mmap.y[i]+16)]
-        result = optimize.shgo(field, bounds, args=(mmap.x,mmap.y,10),constraints=cons)
+#                                   args=(mmap.x,mmap.y,50),constraints=cons)
+        bounds = [(mmap.x[i]-15, mmap.x[i]+15), (mmap.y[i]-15, mmap.y[i]+15)]
+        result = optimize.shgo(field, bounds, args=(mmap.x,mmap.y,50),constraints=cons,minimizer_kwargs={'method':'SLSQP'})
         position.append(result.x.tolist())
     return position
 
 
 # main
 # =============================================================================  
-n_map = 6 # number of maps needed
+n_map = 48 # number of maps needed
 map_ind = int(n_map/2)*[0]
-map_ind.extend(int(n_map/2)*[1])
+map_ind.extend(int(n_map/2)*[0])
 random.shuffle(map_ind)
 map_list = []
 order_list = []
@@ -175,10 +175,10 @@ while True:
 #    json.dump((map_list,order_list,correct_list,name_list,pos_list),file)
 #
 # saving
-sio.savemat('num_training.mat', {'map_list':map_list,'order_list':order_list,
+sio.savemat('num_training_test.mat', {'map_list':map_list,'order_list':order_list,
                                  'correct_list':correct_list,'name_list':name_list,'pos_list':pos_list})
 # saving json
-with open('num_training','w') as file: 
+with open('num_training_test','w') as file: 
     json.dump((map_list,order_list,correct_list,name_list,pos_list),file)
 
     # draw

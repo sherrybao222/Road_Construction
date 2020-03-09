@@ -340,10 +340,10 @@ if __name__ == "__main__":
 #    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
     import json
 #    with open('/Users/fqx/Spring 2020/Ma Lab/GitHub/Road_Construction/map/num_48','r') as file:
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_training','r') as file: 
+    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_48','r') as file: 
         map_content = json.load(file) 
 
-    n_trials = 6
+    n_trials = 48
     blk = 1 # set some number\
     n_blk = 1
     mode = 'game'
