@@ -3,8 +3,9 @@ import scipy.io as sio
 from number_estimation import num_estimation
 from road_basic import road_basic
 from road_undo import road_undo
-from training import training, incentive_instruction, end_instruction
+from training import training, incentive_instruction, end_instruction,payment
 import json
+
 
 # main
 # =============================================================================
@@ -31,18 +32,18 @@ n_3 = 1
 # /home/malab/Desktop/Road_Construction/
 # /Users/sherrybao/Downloads/Research/Road_Construction/
 # /Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/map/
-with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/map/num_training','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_training','r') as file: 
     train_num_map = json.load(file) 
-with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/map/basic_map/basic_map_training','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map/basic_map_training','r') as file: 
     train_basic_map = json.load(file) 
-with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/map/undo_map_training','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/undo_map_training','r') as file: 
     train_undo_map = json.load(file) 
 
-with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/map/num_48','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_48','r') as file: 
     num_map = json.load(file) 
-with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/map/basic_map_48_all4','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_48_all4','r') as file: 
     basic_map = json.load(file) 
-with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/map/undo_map_48_all4','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/undo_map_48_all4','r') as file: 
     undo_map = json.load(file) 
 
 # blocks
@@ -56,6 +57,7 @@ orders = [[1,2,3,3,2,1],
 # information input
 subject_num = input("Enter the subject number: ")
 order_ind = int(subject_num)%6
+my_order = orders[order_ind - 1]
 
 # setting up window, basic features 
 pg.init()
@@ -81,7 +83,7 @@ incentive_instruction(screen)
 # game blocks
 mode_2 = 'game'
 start_trl = 0
-for blk, cond in enumerate(orders[order_ind - 1]):   
+for blk, cond in enumerate(my_order):   
     if cond == 1:
         trials[start_trl:] = num_estimation(screen,num_map,n_trl[cond-1],blk+1,n_1,mode_2)
         n_1 = n_1 + 1
@@ -94,12 +96,18 @@ for blk, cond in enumerate(orders[order_ind - 1]):
     
     start_trl = start_trl + n_trl[cond-1]
 
-end_instruction(screen)
+# calculate payment
+ind_list_2,pay_list_2 = payment(my_order,2,trials,1) 
+ind_list_3,pay_list_3 = payment(my_order,3,trials,1)       
+  
+end_instruction(screen,ind_list_2,pay_list_2,ind_list_3,pay_list_3)
 
 pg.quit()
 
 # saving mat
-sio.savemat('test_all_'+ subject_num + '.mat', {'trials':trials})   
+sio.savemat('test_all_'+ subject_num + '.mat', {'trials':trials,'ind_list_2':ind_list_2,
+                                                'pay_list_2':pay_list_2,'ind_list_3':ind_list_3,
+                                                'pay_list_3':pay_list_3})   
 # saving json
 trial_json = [0]*len(trials)
 for trl in range(len(trials)):

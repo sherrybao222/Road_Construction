@@ -2,7 +2,7 @@ import json
 import numpy as np
 
 # import experiment data
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/experiment/data_002/test_all','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/data_copy/data_002/test_all','r') as file: 
     all_data = json.load(file)
 # import num_est map
 with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/num_48','r') as file: 

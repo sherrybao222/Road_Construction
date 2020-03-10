@@ -1,4 +1,5 @@
 import pygame as pg
+from random import randrange
 
 # helper function
 # =============================================================================
@@ -26,18 +27,37 @@ def ins_2(screen):
 
 def incentive_1(screen):
     text_write('You will receive $12 for your participation. ',50, BLACK, 50, 300, screen)
-    text_write('There will be up to $10 bonus added based on your performance.', 50, BLACK, 50, 400,screen)
-    text_write('We will randomly select 3 scores from your Road Construction with/without Undo scores as the bonus.', 50, BLACK, 50, 500,screen)
+    text_write('We will randomly select 4 scores from your Road Construction with/without Undo results (2 scores each) as the bonus.', 50, BLACK, 50, 500,screen)
     text_write('Press SPACE to continue', 50, BLACK, 50, 900, screen)
 
 def ins_end(screen):
     text_write('Do you have any questions? ',50, BLACK, 50, 300, screen)
     text_write('If not, press SPACE to start the experiment.', 50, BLACK, 50, 900, screen)
 
-def exp_end(screen):
+def exp_end(screen,ind_list_2,pay_list_2,ind_list_3,pay_list_3):
     text_write('Thank you for participating in this study.',50, BLACK, 50, 300, screen)
-    text_write('The researcher will pay you in cash shortly.',50, BLACK, 50, 400, screen)
-    text_write('You can now notify the researcher, and you will complete a short survey.',50, BLACK, 50, 500, screen)
+    text_write('The chosen trials for road construction are '+str(ind_list_2),50, BLACK, 50, 400, screen)
+    text_write('Your scores are '+str(pay_list_2),50, BLACK, 50, 500, screen)
+    text_write('The chosen trials for road construction with undo are '+str(ind_list_3),50, BLACK, 50, 600, screen)
+    text_write('Your scores are '+str(pay_list_3),50, BLACK, 50, 700, screen)
+    text_write('Your total payment is '+ str((sum(pay_list_2)+sum(pay_list_3))/10+12),50, BLACK, 50, 800, screen)
+    text_write('You can now notify the researcher, and you will complete a short survey.',50, BLACK, 50, 900, screen)
+
+def payment(my_order,cond,trials,n_trl):
+    ind_rc = [i for i, x in enumerate(my_order) if x == cond]
+    ind_map = list(range(n_trl*ind_rc[0],n_trl*(ind_rc[0]+1)))
+    ind_map.extend(list(range(n_trl*ind_rc[1],n_trl*(ind_rc[1]+1))))
+    ans_list = []
+    pay_list = []
+    ind_list = []
+    for ind in ind_map:
+        ans_list.append(int(trials[ind].n_city[-1]))
+    for i in range(0,2):
+        ind_list.append(randrange(len(ans_list)))
+        pay_list.append(ans_list.pop(ind_list[-1]))
+        i = i + 1
+    return ind_list,pay_list
+
     
 def training(screen):    
     # instruction
@@ -113,13 +133,13 @@ def incentive_instruction(screen):
                 if event.key == pg.K_ESCAPE:
                     pg.quit()   
 
-def end_instruction(screen):    
+def end_instruction(screen,ind_list_2,pay_list_2,ind_list_3,pay_list_3):    
     # instruction
     # -------------------------------------------------------------------------    
     ins = True
     
     screen.fill(GREY)
-    exp_end(screen)
+    exp_end(screen,ind_list_2,pay_list_2,ind_list_3,pay_list_3)
     pg.display.flip()  
 
     while ins:
