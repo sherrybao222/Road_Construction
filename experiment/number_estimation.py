@@ -136,7 +136,7 @@ class Draw:
     def num_est(self, mmap,screen):
         text_write('How many cities can you connect? ', 60, BLACK, 100, 100,screen)
         text_write("Type your answer here: ", 60, BLACK, 100, 200,screen)
-        text_write("Press SPACE to SUBMIT", 60, BLACK, 100, 300,screen)
+        text_write("Press RETURN to SUBMIT", 60, BLACK, 100, 300,screen)
         
     def budget(self, mmap, mouse,screen):  
         # current mouse position
@@ -154,21 +154,21 @@ def game_start(screen,blk):
     text_write('How many cities can you connect using the given budget by following the labeled order?',
                60, BLACK, 400, int(HEIGHT/3)+200, screen)
     text_write('Remember to type your answer in the textbox ', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
-    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
+    text_write('Press RETURN to continue', 60, BLACK, 400, 900, screen)
 
 def trial_start(screen):
-    text_write('This is Number Estimation',50, BLACK, 50, 200, screen)
-    text_write('The green line is your budget line, and you can rotate it by using your mouse.', 50, BLACK, 50, 400,screen)
-    text_write('You are asked to estimate the number of cities you can connect with the given budget. ', 50, BLACK, 50, 500,screen)
-    text_write('Please remember that all cities must be connected in a labeled order. ', 50, BLACK, 50, 600,screen)
-    text_write('You will type your response in a textbox, and press Space to continue. ', 50, BLACK, 50, 700, screen)
-    text_write('Press SPACE to see examples', 50, BLACK, 50, 900, screen)
+    text_write('In Number Estimation, you will see a map and a green line as your budget.',50, BLACK, 50, 200, screen)
+    text_write('You are asked to estimate the number of cities you could connect with the given budget.', 50, BLACK, 50, 400,screen)
+    text_write('Please remember that all cities must be connected in the labeled order.', 50, BLACK, 50, 500,screen)
+    text_write('You will type your response in a textbox.', 50, BLACK, 50, 600,screen)
+    text_write('You will need to press RETURN to submit your result.', 50, BLACK, 50, 700, screen)
+    text_write('Press RETURN to see examples.', 50, BLACK, 50, 900, screen)
 
 def post_block(screen,blk):
     text_write('Congratulation, you finished Part '+ str(blk),100, BLACK, 400, int(HEIGHT/3), screen)
     text_write('You can take a short break now.',
                60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
+    text_write('Press RETURN to continue', 60, BLACK, 400, 900, screen)
         
 # helper function
 # =============================================================================
@@ -221,7 +221,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                     pg.quit()
                 try: 
                     float(trial.num_est[-1])
-                    if event.key == pg.K_SPACE and not np.isnan(float(trial.num_est[-1])):
+                    if event.key == pg.K_RETURN and not np.isnan(float(trial.num_est[-1])):
                         trl_done = True
                 except: "Value error"
                 
@@ -268,7 +268,7 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk,mode):
        
             
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
+                if event.key == pg.K_RETURN:
                     ins = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
@@ -305,7 +305,7 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk,mode):
            
                 
                 if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_SPACE:
+                    if event.key == pg.K_RETURN:
                         ins = False 
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_ESCAPE:

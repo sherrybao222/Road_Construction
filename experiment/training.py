@@ -13,34 +13,36 @@ def text_write(text, size, color, x, y,screen):  # function that can display any
 # instruction
 # =============================================================================
 def ins_1(screen): 
-    text_write('This study takes approximately 40-50 minutes to complete.',50, BLACK, 50, 300, screen)
-    text_write('It consists of 6 parts, and each part takes about 6-8 minutes.', 50, BLACK, 50, 400,screen)
-    text_write('You can take a short break after each part.', 50, BLACK, 50, 500,screen)
-    text_write('The researcher will now guide you through some instructions. ', 50, BLACK, 50, 600,screen)
-    text_write('Press SPACE to continue', 50, BLACK, 50, 900, screen)
+    text_write('Welcome. This study takes approximately 40-60 minutes to complete.',50, BLACK, 50, 300, screen)
+    text_write('It consists of 2 experiments: Road Construction and Number Estimation', 50, BLACK, 50, 400,screen)
+    text_write('There are 4 parts for each experiment, and each part takes about 5-7 minutes.', 50, BLACK, 50, 500,screen)
+    text_write('You can take a short break after finishing the first experiment.', 50, BLACK, 50, 600,screen)
+    text_write('Press RETURN to continue', 50, BLACK, 50, 900, screen)
 
-def ins_2(screen): 
-    text_write('In each part you will be doing one of the following 3 tasks:',50, BLACK, 50, 300, screen)
-    text_write('Number Estimation, Road Construction, and Road Construction with Undo.', 50, BLACK, 50, 400,screen)
-    text_write('Now we are going to show you the instructions for these 3 tasks. ', 50, BLACK, 50, 500,screen)
-    text_write('Press SPACE to continue', 50, BLACK, 50, 900, screen)
 
 def incentive_1(screen):
     text_write('You will receive $12 for your participation. ',50, BLACK, 50, 300, screen)
-    text_write('We will randomly select 4 scores from your Road Construction with/without Undo results (2 scores each) as the bonus.', 50, BLACK, 50, 500,screen)
-    text_write('Press SPACE to continue', 50, BLACK, 50, 900, screen)
+    text_write('There will be up to a $5 bonus added based on your performance in Road Construction.', 50, BLACK, 50, 400,screen)
+    text_write('We will randomly select 2 results from Road Construction and Road Construction with Undo to calculate your bonus.', 50, BLACK, 50, 500, screen)
+    text_write('In order to maximize your bonus, it’s important to try your best in each trial.', 50, BLACK, 50, 600, screen)
+    text_write('Press RETURN to continue', 50, BLACK, 50, 700, screen)
 
-def ins_end(screen):
-    text_write('Do you have any questions? ',50, BLACK, 50, 300, screen)
-    text_write('If not, press SPACE to start the experiment.', 50, BLACK, 50, 900, screen)
+def ins_2(screen): 
+    text_write('Once you finish Road Construction, you will continue to read the instruction for Experiment Two: Number Estimation.',50, BLACK, 50, 300, screen)
+    text_write('Feel free to reach out to the researcher at any point during the experiment if you have questions.', 50, BLACK, 50, 400,screen)
+    text_write('If not, press RETURN to start Road Construction.', 50, BLACK, 50, 900, screen)
+
+#def ins_end(screen):
+#    text_write('Do you have any questions? ',50, BLACK, 50, 300, screen)
+#    text_write('If not, press RETURN to start the experiment.', 50, BLACK, 50, 900, screen)
 
 def exp_end(screen,ind_list_2,pay_list_2,ind_list_3,pay_list_3):
     text_write('Thank you for participating in this study.',50, BLACK, 50, 300, screen)
     text_write('The chosen trials for road construction are '+str(ind_list_2),50, BLACK, 50, 400, screen)
-    text_write('Your scores are '+str(pay_list_2),50, BLACK, 50, 500, screen)
+    text_write('Your scores are '+str([ x**2 for x in pay_list_2]),50, BLACK, 50, 500, screen)
     text_write('The chosen trials for road construction with undo are '+str(ind_list_3),50, BLACK, 50, 600, screen)
-    text_write('Your scores are '+str(pay_list_3),50, BLACK, 50, 700, screen)
-    text_write('Your total payment is '+ str((sum(pay_list_2)+sum(pay_list_3))/10+12),50, BLACK, 50, 800, screen)
+    text_write('Your scores are '+str([ x**2 for x in pay_list_3]),50, BLACK, 50, 700, screen)
+    text_write('Your total payment is '+ str((sum([ x**2 for x in pay_list_2])+sum([ x**2 for x in pay_list_3]))/100+12),50, BLACK, 50, 800, screen)
     text_write('You can now notify the researcher, and you will complete a short survey.',50, BLACK, 50, 900, screen)
 
 def payment(my_order,cond,trials,n_trl):
@@ -73,7 +75,30 @@ def training(screen):
         for event in events:
             
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
+                if event.key == pg.K_RETURN:
+                    ins = False 
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.quit()   
+
+    ins = True
+
+
+def incentive_instruction(screen):    
+    # instruction
+    # -------------------------------------------------------------------------    
+    ins = True
+    
+    screen.fill(GREY)
+    incentive_1(screen)
+    pg.display.flip()  
+
+    while ins:
+        events = pg.event.get()
+        for event in events:
+            
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
                     ins = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
@@ -90,44 +115,7 @@ def training(screen):
         for event in events:
             
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
-                    ins = False 
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
-                    pg.quit()   
-
-def incentive_instruction(screen):    
-    # instruction
-    # -------------------------------------------------------------------------    
-    ins = True
-    
-    screen.fill(GREY)
-    incentive_1(screen)
-    pg.display.flip()  
-
-    while ins:
-        events = pg.event.get()
-        for event in events:
-            
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
-                    ins = False 
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
-                    pg.quit()   
-
-    ins = True
-
-    screen.fill(GREY)
-    ins_end(screen)
-    pg.display.flip()  
-    
-    while ins:
-        events = pg.event.get()
-        for event in events:
-            
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
+                if event.key == pg.K_RETURN:
                     ins = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
@@ -147,7 +135,7 @@ def end_instruction(screen,ind_list_2,pay_list_2,ind_list_3,pay_list_3):
         for event in events:
             
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
+                if event.key == pg.K_RETURN:
                     ins = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:

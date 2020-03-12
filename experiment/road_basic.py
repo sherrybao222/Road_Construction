@@ -253,7 +253,7 @@ class Draw:
         pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
 
     def instruction_submit(self,screen):
-        text_write("Press SPACE to SUBMIT", 60, BLACK, 100, 200, screen)
+        text_write("Press RETURN to SUBMIT", 60, BLACK, 100, 200, screen)
 
     def check_end(self,screen):
         text_write("You are out of budget", 60, RED, 100, 400, screen)
@@ -292,22 +292,21 @@ def game_start(screen,blk):
     text_write('This is Part '+ str(blk) + ' on Road Construction',100, BLACK, 400, int(HEIGHT/3), screen)
     text_write('Remember you should connect as many cities as possible to achieve a higher score.',
                60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('You will press SPACE to submit your final score', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
-    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
+    text_write('You will press RETURN to submit your final score', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
+    text_write('Press RETURN to continue', 60, BLACK, 400, 900, screen)
 
 def trial_start(screen):
-    text_write('This is Road Construction',50, BLACK, 50, 200, screen)
-    text_write('The green line is your budget line, and you can rotate it by using your mouse.', 50, BLACK, 50, 400,screen)
-    text_write('You are asked to connect as many cities as possible with the given budget.', 50, BLACK, 50, 500,screen)
-    text_write('The score bar indicates your score in respect to the number of cities connected. ', 50, BLACK, 50, 600,screen)
-    text_write('You will need to press Space to submit your final score.  ', 50, BLACK, 50, 700,screen)
-    text_write('Press SPACE to examples.', 50, BLACK, 50, 900, screen)
+    text_write('In Road Construction, you will see a map and a green line as your budget.',50, BLACK, 50, 200, screen)
+    text_write('Your goal is to connect as many cities as possible with the given budget.', 50, BLACK, 50, 400,screen)
+    text_write('The score bar on the right will show cents you have earned in respect to the number of cities connected.', 50, BLACK, 50, 500,screen)
+    text_write('You will need to press RETURN to submit your result. ', 50, BLACK, 50, 600,screen)
+    text_write('Press RETURN to see examples.', 50, BLACK, 50, 900, screen)
 
 def post_block(screen,blk):
     text_write('Congratulation, you finished Part '+ str(blk),100, BLACK, 400, int(HEIGHT/3), screen)
     text_write('You can take a short break now.',
                60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('Press SPACE to continue', 60, BLACK, 400, 900, screen)
+    text_write('Press RETURN to continue', 60, BLACK, 400, 900, screen)
 
 # helper function
 # =============================================================================
@@ -369,7 +368,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                     all_done = True   # very important, otherwise stuck in full screen
                     pg.display.quit()
                     pg.quit()
-                if event.key == pg.K_SPACE and trial.n_city[-1] != 0:
+                if event.key == pg.K_RETURN and trial.n_city[-1] != 0:
 #                    pg.event.set_blocked(pg.MOUSEMOTION)
                     trl_done = True
                     break
@@ -414,7 +413,7 @@ def road_basic(screen,map_content,n_trials, blk, n_blk, mode):
         for event in events:
                    
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
+                if event.key == pg.K_RETURN:
                     ins = False 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
@@ -447,7 +446,7 @@ def road_basic(screen,map_content,n_trials, blk, n_blk, mode):
            
                 
                 if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_SPACE:
+                    if event.key == pg.K_RETURN:
                         ins = False 
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_ESCAPE:
