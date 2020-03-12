@@ -223,6 +223,7 @@ class Draw:
         self.cities(mmap,screen) # draw city dots
         self.number(scorebar, screen)
         self.arrow(scorebar, screen)
+        self.title(screen)
         
         if len(mmap.choice_dyn) >= 2: # if people have made choice, need to redraw the chosen path every time
             self.road(mmap,screen)
@@ -284,6 +285,11 @@ class Draw:
         v7 = point[0] - 20, point[1] - 20
         self.vertices = [point, v2, v3, v4, v5, v6, v7]
         pg.draw.polygon(screen, BLACK, self.vertices)
+
+    def title(self, screen):
+        x = self.width / 2 + 1500
+        y = self.top + 50
+        text_write("Bonus in cents", 50, BLACK, x, y, screen)
 
 
 # instruction
