@@ -206,7 +206,7 @@ class ScoreBar:
         self.score = list(range(0,self.box))
         self.incentive_score = []
         for i in self.score:
-            i = i ** 2
+            i = (i ** 2)*0.01
             self.incentive_score.append(i)
 
     def indicator(self, mmap): # call this function to updates arrow location
