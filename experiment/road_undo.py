@@ -314,19 +314,19 @@ class Draw:
 # =============================================================================
 def game_start(screen,blk): 
     text_write('This is Part '+ str(blk) + ' on Road Construction with Undo',100, BLACK, 400, int(HEIGHT/3), screen)
-    text_write('Remember you should connect as many cities as possible to achieve a higher score.',
+    text_write('Your goal is to connect as many cities as possible with the given budget.',
                60, BLACK, 400, int(HEIGHT/3)+200, screen)
     text_write('And, you can press Z to undo your connections.', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
-    text_write('You will press RETURN to submit your final score', 60, BLACK, 400, int(HEIGHT/3)+400, screen)
     text_write('Press RETURN to continue', 60, BLACK, 400, 900, screen)
     
 def trial_start(screen):
-    text_write('In Road Construction with Undo, you will see a map and a green line as your budget.',50, BLACK, 50, 200, screen)
-    text_write('Your goal is to connect as many cities as possible with the given budget.', 50, BLACK, 50, 300,screen)
-    text_write('In addition, you can press Z to undo your connections.', 50, BLACK, 50, 400,screen)
-    text_write('The score bar on the right will show cents you have earned in respect to the number of cities connected, and a record of your highest score achieved.', 50, BLACK, 50, 500,screen)
-    text_write('You will need to press RETURN to submit your result.', 50, BLACK, 50, 600,screen)
-    text_write('Press RETURN to see examples ', 50, BLACK, 50, 900, screen)
+    text_write('Now you will read the instruction for Road Construction with Undo.', 50, BLACK, 50, 200, screen)
+    text_write('In Road Construction with Undo, you will see a map and a green line as your budget.', 50, BLACK, 50, 300, screen)
+    text_write('Your goal is to connect as many cities as possible with the given budget.', 50, BLACK, 50, 400, screen)
+    text_write('In addition, you can press Z to undo your connections.', 50, BLACK, 50, 500, screen)
+    text_write('The score bar on the right will show cents you have earned in respect to the number of cities connected.', 50, BLACK, 50, 600, screen)
+    text_write('and a record of your highest score achieved.', 50, BLACK, 50, 700, screen)
+    text_write('Press RETURN to see examples.', 50, BLACK, 50, 900, screen)
 
 def post_block(screen,blk):
     text_write('Congratulation, you finished Part '+ str(blk),100, BLACK, 400, int(HEIGHT/3), screen)

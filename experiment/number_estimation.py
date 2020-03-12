@@ -134,7 +134,7 @@ class Draw:
             i = i + 1
         
     def num_est(self, mmap,screen):
-        text_write('How many cities can you connect? ', 60, BLACK, 100, 100,screen)
+        text_write('How many cities could you connect? ', 60, BLACK, 100, 100,screen)
         text_write("Type your answer here: ", 60, BLACK, 100, 200,screen)
         text_write("Press RETURN to SUBMIT", 60, BLACK, 100, 300,screen)
         
@@ -151,17 +151,17 @@ class Draw:
 # =============================================================================
 def game_start(screen,blk): 
     text_write('This is Part '+ str(blk) + ' on Number Estimation',100, BLACK, 400, int(HEIGHT/3), screen)
-    text_write('How many cities can you connect using the given budget by following the labeled order?',
+    text_write('Estimate the number of cities you could connect with the given budget',
                60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('Remember to type your answer in the textbox ', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
+    text_write('All cities must be connected in the labeled order', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
     text_write('Press RETURN to continue', 60, BLACK, 400, 900, screen)
 
 def trial_start(screen):
-    text_write('In Number Estimation, you will see a map and a green line as your budget.',50, BLACK, 50, 200, screen)
-    text_write('You are asked to estimate the number of cities you could connect with the given budget.', 50, BLACK, 50, 400,screen)
-    text_write('Please remember that all cities must be connected in the labeled order.', 50, BLACK, 50, 500,screen)
-    text_write('You will type your response in a textbox.', 50, BLACK, 50, 600,screen)
-    text_write('You will need to press RETURN to submit your result.', 50, BLACK, 50, 700, screen)
+    text_write('Now you will read the instruction for Number Estimation.', 50, BLACK, 50, 200, screen)
+    text_write('In Number Estimation, you will see a map and a green line as your budget.', 50, BLACK, 50, 300, screen)
+    text_write('You are asked to estimate the number of cities you could connect with the given budget.', 50, BLACK, 50, 400, screen)
+    text_write('Please remember that all cities must be connected in the labeled order.', 50, BLACK, 50, 500, screen)
+    text_write('You will type your response in a textbox.', 50, BLACK, 50, 600, screen)
     text_write('Press RETURN to see examples.', 50, BLACK, 50, 900, screen)
 
 def post_block(screen,blk):
