@@ -45,7 +45,7 @@ class ScoreBar:
         self.score = list(range(1,self.box+1))
         self.incentive_score = []
         for i in self.score:
-            i = i ** 2
+            i = (i ** 2)*0.01
             self.incentive_score.append(i)
 
     def indicator(self): # call this function to updates arrow location
@@ -64,6 +64,7 @@ class Draw:
         # draw/label incentive number on the screen
         self.number(scorebar,screen)
         self.arrow(scorebar,screen)
+        self.title(screen)
 
     def number(self, scorebar, screen):
         left = scorebar.center_list[0][0] - 25
@@ -84,6 +85,11 @@ class Draw:
         v7 = point[0] - 20, point[1] - 20
         self.vertices = [point, v2, v3, v4, v5, v6, v7]
         self.arrow = pg.draw.polygon(screen, BLACK, self.vertices)
+
+    def title(self, screen):
+        x = self.width / 2 + 1500
+        y = self.top + 50
+        text_write("Bonus in cents", 50, BLACK, x, y, screen)
 
 
 WHITE = (255, 255, 255)
