@@ -150,11 +150,11 @@ class Draw:
 # instruction
 # =============================================================================
 def game_start(screen,blk): 
-    text_write('This is Part '+ str(blk) + ' on Number Estimation',100, BLACK, 400, int(HEIGHT/3), screen)
+    text_write('This is Part '+ str(blk) + ' on Number Estimation',80, BLACK, 400, int(HEIGHT/3), screen)
     text_write('Estimate the number of cities you could connect with the given budget',
-               60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('All cities must be connected in the labeled order', 60, BLACK, 400, int(HEIGHT/3)+300, screen)
-    text_write('Press RETURN to continue', 60, BLACK, 400, 900, screen)
+               50, BLACK, 400, int(HEIGHT/3)+200, screen)
+    text_write('All cities must be connected in the labeled order', 50, BLACK, 400, int(HEIGHT/3)+300, screen)
+    text_write('Press RETURN to continue', 50, BLACK, 400, 900, screen)
 
 def trial_start(screen):
     text_write('Now you will read the instruction for Number Estimation.', 50, BLACK, 50, 200, screen)

@@ -295,10 +295,10 @@ class Draw:
 # instruction
 # =============================================================================
 def game_start(screen,blk): 
-    text_write('This is Part '+ str(blk) + ' on Road Construction',100, BLACK, 400, int(HEIGHT/3), screen)
+    text_write('This is Part '+ str(blk) + ' on Road Construction',80, BLACK, 400, int(HEIGHT/3), screen)
     text_write('Your goal is to connect as many cities as possible with the given budget',
-               60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('Press RETURN to continue', 60, BLACK, 400, 900, screen)
+               50, BLACK, 400, int(HEIGHT/3)+200, screen)
+    text_write('Press RETURN to continue', 50, BLACK, 400, 900, screen)
 
 def trial_start(screen):
     text_write('Now you will read the instruction for Road Construction.', 50, BLACK, 50, 200, screen)
