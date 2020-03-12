@@ -307,7 +307,7 @@ class Draw:
 
     def title(self, scorebar, screen):
         x = scorebar.width / 2 + 1500
-        y = self.top + 50
+        y = scorebar.top + 50
         text_write("Bonus in cents", 50, BLACK, x, y, screen)
 
 # instruction
