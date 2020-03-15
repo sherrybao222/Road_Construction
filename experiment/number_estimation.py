@@ -123,9 +123,9 @@ class Draw:
     def cities(self,mmap,screen): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
 #            self.city = pg.draw.circle(screen, BLACK, city, mmap.radius)  
-            self.city = draw_circle(city,mmap.radius,BLACK)
+            self.city = draw_circle(screen,city,mmap.radius,BLACK)
 #        self.start = pg.draw.circle(screen, RED, mmap.city_start, mmap.radius)
-        self.start = draw_circle(mmap.city_start,mmap.radius,RED)
+        self.start = draw_circle(screen,mmap.city_start,mmap.radius,RED)
 
     def city_order(self,mmap,screen):
         i = 1
@@ -148,7 +148,7 @@ class Draw:
         radians = math.atan2(cy, cx)
         budget_pos = [int(mmap.city_start[0] + mmap.total * math.cos(radians)),
                       int(mmap.city_start[1] + mmap.total * math.sin(radians))]
-        self.budget_line = draw_line(mmap.city_start, budget_pos, GREEN)
+        self.budget_line = draw_line(screen,mmap.city_start, budget_pos, GREEN)
         
 # instruction
 # =============================================================================
@@ -157,9 +157,9 @@ def game_start(screen,blk):
     text_write('Estimate the number of cities you could connect with the given budget',
                50, BLACK, 400, int(HEIGHT/3)+200, screen)
     text_write('All cities must be connected in the labeled order', 50, BLACK, 400, int(HEIGHT/3)+300, screen)
-    text_write('Press RETURN to continue', 50, BLACK, 400, 900, screen)
+    text_write('Press RETURN to continue.', 50, BLACK, 400, 900, screen)
 
-def trial_start(screen):
+def trial_start_1(screen):
     text_write('Now you will read the instruction for Number Estimation.', 50, BLACK, 50, 200, screen)
     text_write('In Number Estimation, you will see a map and a green line as your budget.', 50, BLACK, 50, 300, screen)
     text_write('You are asked to estimate the number of cities you could connect with the given budget.', 50, BLACK, 50, 400, screen)
@@ -167,11 +167,16 @@ def trial_start(screen):
     text_write('You will type your response in a textbox.', 50, BLACK, 50, 600, screen)
     text_write('Press RETURN to see examples.', 50, BLACK, 50, 900, screen)
 
+def trial_start_2(screen):
+    text_write('You have finished the Road Construction with and without Undo.', 50, BLACK, 50, 200, screen)
+    text_write('Please call the instructor to guide you through the instruction for Number Estimation.', 50, BLACK, 50, 300, screen)
+
+
 def post_block(screen,blk):
     text_write('Congratulation, you finished Part '+ str(blk),100, BLACK, 400, int(HEIGHT/3), screen)
     text_write('You can take a short break now.',
                60, BLACK, 400, int(HEIGHT/3)+200, screen)
-    text_write('Press RETURN to continue', 60, BLACK, 400, 900, screen)
+    text_write('Press RETURN to continue.', 60, BLACK, 400, 900, screen)
         
 # helper function
 # =============================================================================
@@ -182,7 +187,7 @@ def text_write(text, size, color, x, y,screen):  # function that can display any
     text_rectangle.center = x, y
     screen.blit(text_surface, text_rectangle.center)
 
-def draw_line(X0, X1, color):
+def draw_line(screen,X0, X1, color):
     mylist = [x + y for x, y in zip(X0, X1)]
     center_L1 = [x/2 for x in mylist]
     
@@ -202,7 +207,7 @@ def draw_line(X0, X1, color):
     pygame.gfxdraw.aapolygon(screen, (UL, UR, BR, BL), color)
     pygame.gfxdraw.filled_polygon(screen, (UL, UR, BR, BL), color)
 
-def draw_circle(X,r,color):
+def draw_circle(screen,X,r,color):
     pygame.gfxdraw.aacircle(screen, X[0], X[1], r, color)
     pygame.gfxdraw.filled_circle(screen,X[0], X[1], r, color)
 
@@ -282,12 +287,31 @@ def num_estimation(screen,map_content,n_trials,blk,n_blk,mode):
         pg.display.flip()
     elif mode == 'try':
         screen.fill(GREY)
-        trial_start(screen)
+        trial_start_1(screen)
         pg.display.flip()
 
     
     # instruction
     # -------------------------------------------------------------------------    
+    ins = True
+    while ins:
+        events = pg.event.get()
+        for event in events:
+       
+            
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    ins = False 
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.display.quit()
+                    pg.quit()   
+
+    if mode == 'try':
+        screen.fill(GREY)
+        trial_start_2(screen)
+        pg.display.flip()
+
     ins = True
     while ins:
         events = pg.event.get()

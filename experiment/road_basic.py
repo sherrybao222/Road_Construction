@@ -236,16 +236,16 @@ class Draw:
 
     def road(self,mmap,screen): # if people have made choice, need to redraw the chosen path every time
         for i in range(0,len(mmap.choice_locdyn)-1):
-            draw_line(mmap.choice_locdyn[i], mmap.choice_locdyn[i+1], BLACK)
+            draw_line(screen,mmap.choice_locdyn[i], mmap.choice_locdyn[i+1], BLACK)
             i = i + 1
 #        pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 4)
 
     def cities(self,mmap,screen): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
 #            self.city = pg.draw.circle(screen, BLACK, city, mmap.radius)  
-            self.city = draw_circle(city,mmap.radius,BLACK)
+            self.city = draw_circle(screen,city,mmap.radius,BLACK)
 #        self.start = pg.draw.circle(screen, RED, mmap.city_start, mmap.radius)
-        self.start = draw_circle(mmap.city_start,mmap.radius,RED)
+        self.start = draw_circle(screen,mmap.city_start,mmap.radius,RED)
     
     def budget(self, mmap, mouse,screen):  
         # current mouse position
@@ -255,11 +255,11 @@ class Draw:
         budget_pos = [int(mmap.choice_locdyn[-1][0] + mmap.budget_dyn[-1] * math.cos(radians)),
                       int(mmap.choice_locdyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians))]
 #        self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 4)
-        self.budget_line = draw_line(mmap.choice_locdyn[-1], budget_pos, GREEN)
+        self.budget_line = draw_line(screen,mmap.choice_locdyn[-1], budget_pos, GREEN)
         
     def auto_snap(self, mmap,screen):
 #        pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
-        draw_line(mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], BLACK)
+        draw_line(screen,mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], BLACK)
 
     def instruction_submit(self,screen):
         text_write("Press RETURN to SUBMIT", 60, BLACK, 100, 200, screen)
@@ -295,8 +295,8 @@ class Draw:
         pg.draw.polygon(screen, BLACK, self.vertices)
 
     def title(self, scorebar,screen):
-        x = scorebar.indicator_loc[0]-20
-        y = scorebar.indicator_loc[1]+scorebar.top-60
+        x = scorebar.center_list[0][0]-20
+        y = scorebar.center_list[0][1]+scorebar.top-60
         text_write("Bonus in dollars", 50, BLACK, x, y, screen)
 
 
@@ -330,7 +330,7 @@ def text_write(text, size, color, x, y,screen):  # function that can display any
     text_rectangle.center = x, y
     screen.blit(text_surface, text_rectangle.center)
 
-def draw_line(X0, X1, color):
+def draw_line(screen,X0, X1, color):
     mylist = [x + y for x, y in zip(X0, X1)]
     center_L1 = [x/2 for x in mylist]
     
@@ -350,7 +350,7 @@ def draw_line(X0, X1, color):
     pygame.gfxdraw.aapolygon(screen, (UL, UR, BR, BL), color)
     pygame.gfxdraw.filled_polygon(screen, (UL, UR, BR, BL), color)
 
-def draw_circle(X,r,color):
+def draw_circle(screen,X,r,color):
     pygame.gfxdraw.aacircle(screen, X[0], X[1], r, color)
     pygame.gfxdraw.filled_circle(screen,X[0], X[1], r, color)
     

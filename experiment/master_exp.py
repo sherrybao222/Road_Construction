@@ -62,7 +62,7 @@ pg.font.init()
 # display setup
 WIDTH = 1900
 HEIGHT = 1000
-screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
+screen = pg.display.set_mode((WIDTH, HEIGHT))#, flags=pg.FULLSCREEN)  #  pg.FULLSCREEN pg.RESIZABLE
 GREY = (222, 222, 222)
 
 # -----------------------------------------------------------------------------

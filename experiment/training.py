@@ -15,23 +15,23 @@ def text_write(text, size, color, x, y,screen):  # function that can display any
 def ins_1(screen): 
     text_write('Welcome. This study takes approximately 40-60 minutes to complete.',50, BLACK, 50, 200, screen)
     text_write('It consists of 3 tasks: Road Construction, Road Construction with Undo, and Number Estimation.', 50, BLACK, 50, 300,screen)
-    text_write('They are divided into 6 parts, and each part takes about 5-7 minutes.', 50, BLACK, 50, 400,screen)
+    text_write('Each task is divided into 2 parts, and each part takes about 5-7 minutes.', 50, BLACK, 50, 400,screen)
     text_write('You can take a short break after finishing each part.', 50, BLACK, 50, 500,screen)
-    text_write('Press RETURN to continue', 50, BLACK, 50, 900, screen)
+    text_write('Press RETURN to continue.', 50, BLACK, 50, 900, screen)
 
 
 def incentive_1(screen):
     text_write('In this study, you will receive $12 for your participation. ',50, BLACK, 50, 200, screen)
-    text_write('There will be up to a $5 bonus added based on your performance in Road Construction.', 50, BLACK, 50, 300,screen)
+    text_write('There will be up to a $5 bonus added based on your performance in Road Construction with and without Undo.', 50, BLACK, 50, 300,screen)
     text_write('We will randomly select 2 results from Road Construction', 50, BLACK, 50, 400, screen)
-    text_write('and Road Construction with Undo to calculate your bonus.', 50, BLACK, 50, 500, screen)
+    text_write('and 2 results from Road Construction with Undo to calculate your bonus.', 50, BLACK, 50, 500, screen)
     text_write('In order to maximize your bonus, it’s important to try your best in each trial.', 50, BLACK, 50, 600, screen)
-    text_write('Press RETURN to continue', 50, BLACK, 50, 900, screen)
+    text_write('Press RETURN to continue.', 50, BLACK, 50, 900, screen)
 
 def ins_2(screen): 
-    text_write('Once you finish Road Construction, you will continue to read the instruction for Number Estimation.',50, BLACK, 50, 200, screen)
-    text_write('Feel free to reach out to the researcher at any point during the experiment if you have questions.', 50, BLACK, 50, 300,screen)
-    text_write('If not, press RETURN to start.', 50, BLACK, 50, 900, screen)
+    text_write('Once you finish Road Construction with and without Undo, you will read the instruction for Number Estimation.',50, BLACK, 50, 200, screen)
+    text_write('You will now read the instruction for Road Construction with and without Undo.', 50, BLACK, 50, 300,screen)
+    text_write('Press RETURN to start.', 50, BLACK, 50, 900, screen)
 
 #def ins_end(screen):
 #    text_write('Do you have any questions? ',50, BLACK, 50, 300, screen)
