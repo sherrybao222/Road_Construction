@@ -256,6 +256,7 @@ class Draw:
                       int(mmap.choice_locdyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians))]
 #        self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 4)
         self.budget_line = draw_line(mmap.choice_locdyn[-1], budget_pos, GREEN)
+        
     def auto_snap(self, mmap,screen):
 #        pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
         draw_line(mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], BLACK)
