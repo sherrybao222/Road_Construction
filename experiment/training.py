@@ -39,12 +39,18 @@ def ins_2(screen):
 
 def exp_end(screen,ind_list_2,pay_list_2,ind_list_3,pay_list_3):
     text_write('Thank you for participating in this study.',50, BLACK, 50, 200, screen)
-    text_write('The chosen trials for road construction are '+str(ind_list_2),50, BLACK, 50, 300, screen)
-    text_write('Your scores are '+str([ x**2 for x in pay_list_2]),50, BLACK, 50, 400, screen)
-    text_write('The chosen trials for road construction with undo are '+str(ind_list_3),50, BLACK, 50, 500, screen)
-    text_write('Your scores are '+str([ x**2 for x in pay_list_3]),50, BLACK, 50, 600, screen)
-    text_write('Your total payment is '+ str((sum([ x**2 for x in pay_list_2])+sum([ x**2 for x in pay_list_3]))/100+12),50, BLACK, 50, 700, screen)
-    print('Your total payment is '+ str((sum([ x**2 for x in pay_list_2])+sum([ x**2 for x in pay_list_3]))/100+12))
+    text_write('The chosen trials for road construction are '+str(ind_list_2),
+               50, BLACK, 50, 300, screen)
+    text_write('Your scores are '+str([ x**2 for x in pay_list_2]),50, BLACK, 
+               50, 400, screen)
+    text_write('The chosen trials for road construction with undo are '
+               +str(ind_list_3),50, BLACK, 50, 500, screen)
+    text_write('Your scores are '+str([ x**2 for x in pay_list_3]),50, BLACK, 
+               50, 600, screen)
+    text_write('Your total payment is '+ 
+               str(round((sum([ x**2 for x in pay_list_2])+sum([ x**2 for x in pay_list_3]))/100,2)+12),50, BLACK, 50, 700, screen)
+    print('Your total payment is '+ 
+          str(round((sum([ x**2 for x in pay_list_2])+sum([ x**2 for x in pay_list_3]))/100,2)+12))
     text_write('You can now notify the researcher, and you will complete a short survey.',50, BLACK, 50, 900, screen)
 
 def payment(my_order,cond,trials,n_trl):
