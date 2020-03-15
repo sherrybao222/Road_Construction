@@ -1,4 +1,5 @@
 import pygame as pg
+import pygame.gfxdraw
 import random
 import math
 from scipy.spatial import distance_matrix
@@ -234,24 +235,30 @@ class Draw:
         
 
     def road(self,mmap,screen): # if people have made choice, need to redraw the chosen path every time
-        pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 4)
+        for i in range(0,len(mmap.choice_locdyn)-1):
+            draw_line(mmap.choice_locdyn[i], mmap.choice_locdyn[i+1], BLACK)
+            i = i + 1
+#        pg.draw.lines(screen, BLACK, False, mmap.choice_locdyn, 4)
 
     def cities(self,mmap,screen): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
-            self.city = pg.draw.circle(screen, BLACK, city, mmap.radius)     
-        self.start = pg.draw.circle(screen, RED, mmap.city_start, mmap.radius)
-        
+#            self.city = pg.draw.circle(screen, BLACK, city, mmap.radius)  
+            self.city = draw_circle(city,mmap.radius,BLACK)
+#        self.start = pg.draw.circle(screen, RED, mmap.city_start, mmap.radius)
+        self.start = draw_circle(mmap.city_start,mmap.radius,RED)
+    
     def budget(self, mmap, mouse,screen):  
         # current mouse position
         cx, cy = mouse[0] - mmap.choice_locdyn[-1][0], mouse[1] - mmap.choice_locdyn[-1][1]
         # give budget line follow mouse in the correct direction
         radians = math.atan2(cy, cx)
-        budget_pos = (int(mmap.choice_locdyn[-1][0] + mmap.budget_dyn[-1] * math.cos(radians)),
-                      int(mmap.choice_locdyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians)))
-        self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 4)
-
+        budget_pos = [int(mmap.choice_locdyn[-1][0] + mmap.budget_dyn[-1] * math.cos(radians)),
+                      int(mmap.choice_locdyn[-1][1] + mmap.budget_dyn[-1] * math.sin(radians))]
+#        self.budget_line = pg.draw.line(screen, GREEN, mmap.choice_locdyn[-1], budget_pos, 4)
+        self.budget_line = draw_line(mmap.choice_locdyn[-1], budget_pos, GREEN)
     def auto_snap(self, mmap,screen):
-        pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
+#        pg.draw.line(screen, BLACK, mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], 3)
+        draw_line(mmap.choice_locdyn[-2], mmap.choice_locdyn[-1], BLACK)
 
     def instruction_submit(self,screen):
         text_write("Press RETURN to SUBMIT", 60, BLACK, 100, 200, screen)
@@ -322,6 +329,30 @@ def text_write(text, size, color, x, y,screen):  # function that can display any
     text_rectangle.center = x, y
     screen.blit(text_surface, text_rectangle.center)
 
+def draw_line(X0, X1, color):
+    mylist = [x + y for x, y in zip(X0, X1)]
+    center_L1 = [x/2 for x in mylist]
+    
+    length = math.sqrt(((X0[0]-X1[0])**2)+((X0[1]-X1[1])**2)) # Line size
+    thickness = 4
+    angle = math.atan2(X0[1] - X1[1], X0[0] - X1[0])
+    
+    UL = (center_L1[0] + (length / 2.) * math.cos(angle) - (thickness / 2.) * math.sin(angle),
+      center_L1[1] + (thickness / 2.) * math.cos(angle) + (length / 2.) * math.sin(angle))
+    UR = (center_L1[0] - (length / 2.) * math.cos(angle) - (thickness / 2.) * math.sin(angle),
+          center_L1[1] + (thickness / 2.) * math.cos(angle) - (length / 2.) * math.sin(angle))
+    BL = (center_L1[0] + (length / 2.) * math.cos(angle) + (thickness / 2.) * math.sin(angle),
+          center_L1[1] - (thickness / 2.) * math.cos(angle) + (length / 2.) * math.sin(angle))
+    BR = (center_L1[0] - (length / 2.) * math.cos(angle) + (thickness / 2.) * math.sin(angle),
+          center_L1[1] - (thickness / 2.) * math.cos(angle) - (length / 2.) * math.sin(angle))
+    
+    pygame.gfxdraw.aapolygon(screen, (UL, UR, BR, BL), color)
+    pygame.gfxdraw.filled_polygon(screen, (UL, UR, BR, BL), color)
+
+def draw_circle(X,r,color):
+    pygame.gfxdraw.aacircle(screen, X[0], X[1], r, color)
+    pygame.gfxdraw.filled_circle(screen,X[0], X[1], r, color)
+    
 # single trial
 # =============================================================================
 def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
