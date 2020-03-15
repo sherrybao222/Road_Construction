@@ -314,9 +314,9 @@ class Draw:
         pg.draw.polygon(screen, WHITE, self.vertices)
 
     def title(self, scorebar, screen):
-        x = scorebar.width / 2 + 1500
-        y = scorebar.top + 50
-        text_write("Bonus in cents", 50, BLACK, x, y, screen)
+        x = scorebar.indicator_loc[0]-20
+        y = scorebar.indicator_loc[1]+scorebar.top-60
+        text_write("Bonus in dollars", 50, BLACK, x, y, screen)
 
 # instruction
 # =============================================================================
