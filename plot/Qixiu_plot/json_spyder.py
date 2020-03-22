@@ -10,14 +10,14 @@ import numpy as np
 import csv
 
 #loading pilot data
-with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/experiment/data_002/test_all') as f:
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/data_copy/data_pilot/sub_1/test_all_1') as f:
   d1 = json.load(f).copy()
-with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/experiment/data_003/test_all_3') as f:
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/data_copy/data_pilot/sub_2/test_all_2') as f:
   d2 = json.load(f).copy()
-with open('/Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/test-room-experiment/data_009/test_all_9') as f:
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/data_copy/data_pilot/sub_4/test_all_4') as f:
   d3 = json.load(f).copy()
 
-print(d1[0].keys())
+print(d1[0][0].keys())
 # list for operations
 d1_rc = []
 d2_rc = []
@@ -37,7 +37,7 @@ d3_undo = []
 
 
 # organize data
-data_all = [d1, d2, d3]
+data_all = [d1[0], d2[0], d3[0]]
 rc = []
 rc_ind = []
 undo = []
