@@ -10,14 +10,14 @@ data_all = []
 
 # import experiment data
 for num in [1,2,4]:
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/data_copy/data_pilot/sub_'+str(num)+'/test_all_'+str(num),'r') as file: 
+    with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/data_copy/data_pilot/sub_'+str(num)+'/test_all_'+str(num),'r') as file: 
         all_data = json.load(file)
         data_all.append(all_data)
         
 # import map
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/pilot_031220/map/num_48','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/pilot_031220/map/num_48','r') as file: 
     num_map = json.load(file) 
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_48_all4','r') as file: 
+with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/map/active_map/basic_map_48_all4','r') as file: 
     rc_map = json.load(file) 
 
 # map index
@@ -207,6 +207,28 @@ plt.ylabel('trial duration (s)')
 
 fig.savefig('t_rc.png',dpi=600)
 plt.close(fig)
+
+# ---------------------------------------------------
+ind = [0.5]
+err = stdev(pc_undo)/math.sqrt(len(pc_undo))
+fig, ax = plt.subplots()
+ax.bar(ind,mean(pc_undo),width = 0.1,
+       color = '#eed06f',edgecolor='k')
+plotline1, caplines1, barlinecols1 = ax.errorbar(ind, mean(pc_undo), yerr=err, lolims=True, capsize = 0, ls='None', color='k')
+caplines1[0].set_marker('_')
+caplines1[0].set_markersize(7)
+ax.set_ylim((0,1))
+ax.set_xticks([0.3,0.5,0.7])
+ax.set_xticklabels(['','w/ undo',''])
+ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
+ax.set_facecolor('white')
+ax.spines['bottom'].set_color('k')
+ax.spines['left'].set_color('k')
+ax.tick_params(axis='y', colors='k')
+plt.ylabel('undo percentage')
+
+#fig.savefig('pc_undo.png',dpi=600)
+#plt.close(fig)
 
 # ----------------------------------------------------
 ind = [0.5,0.8,1.1]
