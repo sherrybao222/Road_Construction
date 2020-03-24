@@ -4,6 +4,10 @@ map/basic_map/basic_tree_500
 map/basic_map/basic_tree_1000
 map/basic_map/basic_tree_1500
 path_length/
+data/
+data_copy/
+map/active_map/
+map/basic_map_pool/
 experiment/__pycache__/
 map/__pycache__/
 data/data_old/data_001_12trials/Icon
@@ -36,7 +40,7 @@ data_copy/data_pilot/sub_2/Icon
 data_copy/data_pilot/sub_4/Icon
 data_copy/Icon
 demo/Icon
-pilot_031220/Icon
+pilot_031220/
 pilot_031220/map/Icon
 
 plot/Icon
