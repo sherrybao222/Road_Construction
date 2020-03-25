@@ -74,8 +74,8 @@ for data in data_all:
                 undo_click.append(0)
             undo_ind.append(i)
 
-bool_numest = map(eq, num, num_list)
-int_numest = list(np.array(list(bool_numest)).astype(float))
+bool_numest = map(eq, num, num_list) 
+int_numest = list(np.array(list(bool_numest)).astype(float))# indicator num_est is correct
 
 mx_num = [0]*3
 sorted_mx = [0]*3
@@ -291,11 +291,41 @@ plt.close(fig)
 
 # =============================================================================
 # statistical tests
+# Wilcoxon Signed-Rank Test
 from scipy.stats import wilcoxon
 stat, p = wilcoxon(rc, undo)
 print('stat=%.3f, p=%.10f' % (stat, p))
 if p > 0.05:
 	print('Probably the same distribution')
 else:
-	print('Probably different distributions')    
+	print('Probably different distributions')  
+#----------------------------------------------------------------
+# Kruskal-Wallis H Test
+mx_num_all = np.column_stack((num_ind, budget_list, num, num_list,int_numest)) 
+temp = mx_num_all.view(np.ndarray)
+sorted_mx_all = temp[np.lexsort((temp[:, 1], ))] # sort by budget
+
+from scipy.stats import kruskal
+stat, p = kruskal(sorted_mx_all, sorted_mx_all, sorted_mx_all)
+print('stat=%.3f, p=%.3f' % (stat, p))
+if p > 0.05:
+	print('Probably the same distribution')
+else:
+	print('Probably different distributions')
+# Student's t-test
+from scipy.stats import ttest_ind
+stat, p = ttest_ind(t_rc, t_undo)
+print('stat=%.3f, p=%.6f' % (stat, p))
+if p > 0.05:
+	print('Probably the same distribution')
+else:
+	print('Probably different distributions')
+# Student's t-test
+from scipy.stats import ttest_ind
+stat, p = ttest_ind(f_t_rc, f_t_undo)
+print('stat=%.3f, p=%.6f' % (stat, p))
+if p > 0.05:
+	print('Probably the same distribution')
+else:
+	print('Probably different distributions')
 # =============================================================================
