@@ -4,7 +4,7 @@ import random
 import math
 from scipy.spatial import distance_matrix
 import numpy as np
-import scipy.io as sio
+#import scipy.io as sio
 
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
@@ -551,7 +551,7 @@ if __name__ == "__main__":
     
     # load maps
     import json
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/undo_map_24','r') as file: 
+    with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/map/active_map/undo_map_48_all4','r') as file: 
         map_content = json.load(file) 
 
     n_trials = 5

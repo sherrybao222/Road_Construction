@@ -4,7 +4,7 @@ import random
 import math
 from scipy.spatial import distance_matrix
 import numpy as np
-import scipy.io as sio
+#import scipy.io as sio
 
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
@@ -510,7 +510,7 @@ if __name__ == "__main__":
     pg.font.init()
       
     # display setup
-    screen = pg.display.set_mode((WIDTH, HEIGHT))#, flags=pg.RESIZABLE)  # pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
  
     screen.fill(GREY)
     
@@ -518,8 +518,8 @@ if __name__ == "__main__":
 #    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
     import json
     #with open('/Users/fqx/Spring 2020/Ma Lab/GitHub/Road_Construction/map/basic_map_24','r') as file:
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_48_all4','r') as file: 
-        map_content = json.load(file) 
+    with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/map/active_map/basic_map_48_all4','r') as file: 
+        map_content = json.load(file)[0] 
 
     n_trials = 5
     blk = 2 # set some number

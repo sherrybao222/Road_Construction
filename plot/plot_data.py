@@ -300,18 +300,6 @@ if p > 0.05:
 else:
 	print('Probably different distributions')  
 #----------------------------------------------------------------
-# Kruskal-Wallis H Test
-mx_num_all = np.column_stack((num_ind, budget_list, num, num_list,int_numest)) 
-temp = mx_num_all.view(np.ndarray)
-sorted_mx_all = temp[np.lexsort((temp[:, 1], ))] # sort by budget
-
-from scipy.stats import kruskal
-stat, p = kruskal(sorted_mx_all, sorted_mx_all, sorted_mx_all)
-print('stat=%.3f, p=%.3f' % (stat, p))
-if p > 0.05:
-	print('Probably the same distribution')
-else:
-	print('Probably different distributions')
 # Student's t-test
 from scipy.stats import ttest_ind
 stat, p = ttest_ind(t_rc, t_undo)
