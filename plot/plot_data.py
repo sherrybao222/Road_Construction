@@ -114,7 +114,7 @@ for ind,val in enumerate(rc):
 diff = []
 zip_obj = zip(rc,rc_list)
 for x,y in zip_obj:
-    diff.append(y-x)
+    diff.append(x-y)
     
 # =============================================================================
 # plot
@@ -136,8 +136,8 @@ for i in range(0,3):
     
     plt.xticks(np.arange(x0,x1, 1.0))
     plt.yticks(np.arange(y0,y1, 1.0))
-    plt.xlabel("correct answer in number estimation")
-    plt.ylabel("reported answer in number estimation")
+    plt.xlabel("Number estimation (correct)")
+    plt.ylabel("Number estimation (reported)")
     #ax.set_aspect('equal')
     fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_est_'+ str(subs[i]) + '.png',dpi=600)
     plt.close(fig)
@@ -145,49 +145,56 @@ for i in range(0,3):
 #-----------------------------------------------------------------------------
 
 # =============================================================================
+fig, axs = plt.subplots(1, 3, sharey=True)
+
 for i in range(0,3):
-    fig, ax = plt.subplots()
     u, c = np.unique(np.c_[rc_list[48*i:48*(i+1)],rc[48*i:48*(i+1)]], return_counts=True, axis=0)
-    ax.scatter(rc_list[48*i:48*(i+1)],rc[48*i:48*(i+1)],s =c**2,c= '#727bda')
+    axs[i].scatter(rc_list[48*i:48*(i+1)],rc[48*i:48*(i+1)],s =c**2,c= '#727bda')
     #ax = sns.heatmap(num_mx,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
     
-    ax.set_xlim((4,12))
-    ax.set_ylim((4,12))
-    x0,x1 = ax.get_xlim()
-    y0,y1 = ax.get_ylim()
-    ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+    axs[i].set_xlim((4,12))
+    axs[i].set_ylim((4,12))
+    x0,x1 = axs[i].get_xlim()
+    y0,y1 = axs[i].get_ylim()
+    axs[i].set_aspect(abs(x1-x0)/abs(y1-y0))
     
-    ax.plot(ax.get_xlim(), ax.get_ylim(), ls="--", c=".3") # diagnal
-    ax.grid(b=True, which='major', color='k', linestyle='--',alpha=0.2)
-    ax.set_facecolor('white')
+    axs[i].plot(axs[i].get_xlim(), axs[i].get_ylim(), ls="--", c=".3") # diagnal
+    axs[i].grid(b=True, which='major', color='k', linestyle='--',alpha=0.2)
+    axs[i].set_facecolor('white')
     
-    plt.xticks(np.arange(x0,x1, 1.0))
-    plt.yticks(np.arange(y0,y1, 1.0))
-    plt.xlabel("maximal number of connectable cities")
-    plt.ylabel("connected number of cities in trials w/o undo")
-    #ax.set_aspect('equal')
-    fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_'+ str(subs[i]) + '.png',dpi=600)
-    plt.close(fig)
+    axs[i].set_xticks(np.arange(x0,x1, 1.0))
+    axs[i].set_yticks(np.arange(y0,y1, 1.0))
+    axs[i].title.set_text('S'+str(i+1))
+
+axs[1].set_xlabel("Number connected (maximum)")
+axs[0].set_ylabel("Number connected (actual) w/o undo")
+#ax.set_aspect('equal')
+fig.set_figwidth(12)
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_all.png',dpi=600)
+plt.close(fig)
 
 #-----------------------------------------------------------------------------
-    fig, ax = plt.subplots()
-    u, c = np.unique(diff[48*i:48*(i+1)], return_counts=True, axis=0)
-    plt.hist(diff[48*i:48*(i+1)], range(len(u)+1), facecolor='#727bda', density=1,align = 'left',edgecolor='k')
+fig, axs = plt.subplots(1, 3, sharey=True)
 
-    ax.set_ylim((0,1))
-    ax.set_xlim((-1,4))
+for i in range(0,3):
+    axs[i].hist(diff[48*i:48*(i+1)], range(-4,2), facecolor='#727bda', density=1,
+                 align = 'left',edgecolor='k')
 
-    ax.set_xticks(range(len(u)))
-    plt.yticks(np.arange(0,1, 0.1))
+    axs[i].set_ylim((0,1))
+    axs[i].set_xlim((-4,1))
 
-    ax.set_facecolor('white')
-    ax.spines['bottom'].set_color('k')
-    ax.spines['left'].set_color('k')
-    ax.tick_params(axis='y', colors='k')
-    plt.xlabel('(number_max - connected number of cities in trials w/o undo)')
-    plt.ylabel('frequency')
-    fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_hist_'+ str(subs[i]) + '.png',dpi=600)
-    plt.close(fig)
+    axs[i].set_xticks(range(-4,2))
+    axs[i].set_yticks(np.arange(0,1, 0.1))
+
+    axs[i].set_facecolor('white')
+    axs[i].spines['bottom'].set_color('k')
+    axs[i].spines['left'].set_color('k')
+    axs[i].tick_params(axis='y', colors='k')
+    axs[i].title.set_text('S'+str(i+1))
+axs[1].set_xlabel('Number connected (actual - maximum) w/o undo')
+axs[0].set_ylabel('Frequency')
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_hist_all.png',dpi=600)
+plt.close(fig)
 
 # ---------------------------------------------------
 ind = [0.5,0.8]
@@ -213,27 +220,29 @@ fig.savefig('av_rc.png',dpi=600)
 plt.close(fig)
 
 # ---------------------------------------------------
-ind = [0.5,0.8]
-err_rc = stdev(mean_t_rc)/math.sqrt(len(mean_rc))
-err_undo = stdev(mean_t_undo)/math.sqrt(len(mean_undo))
+#err_rc = stdev(mean_t_rc)/math.sqrt(len(mean_rc))
+#err_undo = stdev(mean_t_undo)/math.sqrt(len(mean_undo))
 fig, ax = plt.subplots()
-ax.bar(ind,[mean(mean_t_rc),mean(mean_t_undo)],width = 0.1,
-       color = '#eed06f',edgecolor='k')
-plotline1, caplines1, barlinecols1 = ax.errorbar(ind, [mean(mean_t_rc),mean(mean_t_undo)], yerr=[err_rc,err_undo], lolims=True, capsize = 0, ls='None', color='k')
-caplines1[0].set_marker('_')
-caplines1[0].set_markersize(7)
+#ax.bar(ind,[mean(mean_t_rc),mean(mean_t_undo)],width = 0.1,
+#       color = '#eed06f',edgecolor='k')
+ax.boxplot([mean_t_rc, mean_t_undo],widths = 0.6)  
+ax.plot([1,2],[mean_t_rc, mean_t_undo], 'o')     
+#plotline1, caplines1, barlinecols1 = ax.errorbar(ind, [mean(mean_t_rc),mean(mean_t_undo)], yerr=[err_rc,err_undo], lolims=True, capsize = 0, ls='None', color='k')
+#caplines1[0].set_marker('_')
+#caplines1[0].set_markersize(7)
 ax.set_ylim((10,45))
-ax.set_xticks([0.3,0.5,0.8,1])
-ax.set_xticklabels(['','w/o undo','w/ undo',' '])
-ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
+
+ax.set_xticklabels(['w/o undo','w/ undo'])
+#ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
 ax.set_facecolor('white')
 ax.spines['bottom'].set_color('k')
 ax.spines['left'].set_color('k')
 ax.tick_params(axis='y', colors='k')
 plt.ylabel('trial duration (s)')
 
-fig.savefig('t_rc.png',dpi=600)
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc.png',dpi=600)
 plt.close(fig)
+
 
 # ---------------------------------------------------
 ind = [0.5,0.8]
