@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 import math
 
 data_all = []
-
+subs = [1,2,4]
 # import experiment data
-for num in [1,2,4]:
+for num in subs:
     with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/data_copy/data_pilot/sub_'+str(num)+'/test_all_'+str(num),'r') as file: 
         all_data = json.load(file)
         data_all.append(all_data)
@@ -111,69 +111,83 @@ rc_mx = np.zeros((12,12))
 for ind,val in enumerate(rc):
         rc_mx[val,rc_list[ind]] = rc_mx[val,rc_list[ind]]+1/len(rc)
 
+diff = []
+zip_obj = zip(rc,rc_list)
+for x,y in zip_obj:
+    diff.append(y-x)
+    
 # =============================================================================
 # plot
-fig, ax = plt.subplots()
-#ax.scatter(x,y,alpha=0.2)
-ax = sns.heatmap(num_mx,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
+for i in range(0,3):
+    fig, ax = plt.subplots()
+    u, c = np.unique(np.c_[num_list[48*i:48*(i+1)],num[48*i:48*(i+1)]], return_counts=True, axis=0)
+    ax.scatter(num_list[48*i:48*(i+1)],num[48*i:48*(i+1)],s =c**2,c= '#0776d8')
+    #ax = sns.heatmap(num_mx,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
+    
+    ax.set_xlim((0,11))
+    ax.set_ylim((0,11))
+    x0,x1 = ax.get_xlim()
+    y0,y1 = ax.get_ylim()
+    ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+    
+    ax.plot(ax.get_xlim(), ax.get_ylim(), ls="--", c=".3") # diagnal
+    ax.grid(b=True, which='major', color='k', linestyle='--',alpha=0.2)
+    ax.set_facecolor('white')
+    
+    plt.xticks(np.arange(x0,x1, 1.0))
+    plt.yticks(np.arange(y0,y1, 1.0))
+    plt.xlabel("correct answer in number estimation")
+    plt.ylabel("reported answer in number estimation")
+    #ax.set_aspect('equal')
+    fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_est_'+ str(subs[i]) + '.png',dpi=600)
+    plt.close(fig)
 
-ax.set_xlim((0,11))
-ax.set_ylim((0,11))
-x0,x1 = ax.get_xlim()
-y0,y1 = ax.get_ylim()
-ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+#-----------------------------------------------------------------------------
 
-ax.plot(ax.get_xlim(), ax.get_ylim(), ls="--", c=".3") # diagnal
-#ax.grid(b=True, which='major', color='k', linestyle='--')
+# =============================================================================
+for i in range(0,3):
+    fig, ax = plt.subplots()
+    u, c = np.unique(np.c_[rc_list[48*i:48*(i+1)],rc[48*i:48*(i+1)]], return_counts=True, axis=0)
+    ax.scatter(rc_list[48*i:48*(i+1)],rc[48*i:48*(i+1)],s =c**2,c= '#727bda')
+    #ax = sns.heatmap(num_mx,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
+    
+    ax.set_xlim((4,12))
+    ax.set_ylim((4,12))
+    x0,x1 = ax.get_xlim()
+    y0,y1 = ax.get_ylim()
+    ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+    
+    ax.plot(ax.get_xlim(), ax.get_ylim(), ls="--", c=".3") # diagnal
+    ax.grid(b=True, which='major', color='k', linestyle='--',alpha=0.2)
+    ax.set_facecolor('white')
+    
+    plt.xticks(np.arange(x0,x1, 1.0))
+    plt.yticks(np.arange(y0,y1, 1.0))
+    plt.xlabel("maximal number of connectable cities")
+    plt.ylabel("connected number of cities in trials w/o undo")
+    #ax.set_aspect('equal')
+    fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_'+ str(subs[i]) + '.png',dpi=600)
+    plt.close(fig)
 
-#plt.xticks(np.arange(x0,x1, 1.0))
-#plt.yticks(np.arange(y0,y1, 1.0))
-plt.xlabel("correct answer in number estimation")
-plt.ylabel("reported answer in number estimation")
-#ax.set_aspect('equal')
-fig.savefig('num_est.png',dpi=600)
-plt.close(fig)
+#-----------------------------------------------------------------------------
+    fig, ax = plt.subplots()
+    u, c = np.unique(diff[48*i:48*(i+1)], return_counts=True, axis=0)
+    plt.hist(diff[48*i:48*(i+1)], range(len(u)+1), facecolor='#727bda', density=1,align = 'left',edgecolor='k')
 
-# ---------------------------------------------------
-fig, ax = plt.subplots()
-#ax.scatter(x,y,alpha=0.2)
-ax = sns.heatmap(rc_mx,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
+    ax.set_ylim((0,1))
+    ax.set_xlim((-1,4))
 
-ax.set_xlim((4,12))
-ax.set_ylim((4,12))
-x0,x1 = ax.get_xlim()
-y0,y1 = ax.get_ylim()
-ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+    ax.set_xticks(range(len(u)))
+    plt.yticks(np.arange(0,1, 0.1))
 
-ax.plot(ax.get_xlim(), ax.get_ylim(), ls="--", c=".3") # diagnal
-
-#plt.xticks(np.arange(x0,x1, 1.0))
-#plt.yticks(np.arange(y0,y1, 1.0))
-plt.xlabel("optimal answer in road construction w/o undo")
-plt.ylabel("reported answer in road construction w/o undo")
-ax.grid(b=True, which='both', color='b', linestyle='--')
-
-#ax.set_aspect('equal')
-fig.savefig('rc.png',dpi=600)
-plt.close(fig)
-
-# ---------------------------------------------------
-fig, ax = plt.subplots()
-ax = sns.heatmap(rc_undo,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
-
-ax.set_xlim((4,12))
-ax.set_ylim((4,12))
-x0,x1 = ax.get_xlim()
-y0,y1 = ax.get_ylim()
-ax.set_aspect(abs(x1-x0)/abs(y1-y0))
-
-ax.plot(ax.get_xlim(), ax.get_ylim(), ls="--", c=".3") # diagnal
-
-plt.xlabel("reported answer in road construction w/ undo")
-plt.ylabel("reported answer in road construction w/o undo")
-#ax.set_aspect('equal')
-fig.savefig('rc_undo.png',dpi=600)
-plt.close(fig)
+    ax.set_facecolor('white')
+    ax.spines['bottom'].set_color('k')
+    ax.spines['left'].set_color('k')
+    ax.tick_params(axis='y', colors='k')
+    plt.xlabel('(number_max - connected number of cities in trials w/o undo)')
+    plt.ylabel('frequency')
+    fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_hist_'+ str(subs[i]) + '.png',dpi=600)
+    plt.close(fig)
 
 # ---------------------------------------------------
 ind = [0.5,0.8]
