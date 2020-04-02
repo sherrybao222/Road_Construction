@@ -30,6 +30,7 @@ undo_ind = []
 num = []
 rc = []
 undo = []
+n_undo = [] #number of undo
 # correct answer
 num_list = num_map[2]*3
 rc_list = rc_map[2]*3
@@ -70,6 +71,7 @@ for data in data_all:
             ind_choice = next(x for x, val in enumerate(data[0][i]['choice_his']) 
                                   if val != 0)
             f_t_undo.append(data[0][i]['time'][ind_choice]-data[0][i]['time'][0])
+            n_undo.append(sum(data[0][i]['undo_press']))
             if 1 in set(data[0][i]['undo_press']):
                 undo_click.append(1)
             else:
@@ -246,23 +248,22 @@ plt.close(fig)
 fig, axs = plt.subplots(1, 3, sharey=True)
 
 for i in range(0,3):
-    axs[i].hist(diff_n[48*i:48*(i+1)], range(-4,4), facecolor='#727bda', density=1,
-                 align = 'left',edgecolor='k')
+    axs[i].boxplot(n_undo[48*i:48*(i+1)],widths = 0.6)  
+    axs[i].plot([1]*48,n_undo[48*i:48*(i+1)], 'o',
+       markerfacecolor = '#727bda',markeredgecolor = 'none',alpha = 0.2)     
 
-    axs[i].set_ylim((0,1))
-    axs[i].set_xlim((-5,3))
+    axs[i].set_ylim((-4,40))
+    axs[i].set_xlim((0,2))
 
-    axs[i].set_xticks(range(-4,3))
-    axs[i].set_yticks(np.arange(0,1, 0.1))
+    axs[i].set_xticklabels([])
 
     axs[i].set_facecolor('white')
     axs[i].spines['bottom'].set_color('k')
     axs[i].spines['left'].set_color('k')
-    axs[i].tick_params(axis='y', colors='k')
     axs[i].title.set_text('S'+str(i+1))
-axs[1].set_xlabel('Number estimation (reported - correct)')
-axs[0].set_ylabel('Frequency')
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_hist_all.png',dpi=600)
+axs[0].set_ylabel('Number of undos per trial')
+plt.show()
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_hist_all.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
