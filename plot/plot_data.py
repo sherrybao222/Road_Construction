@@ -6,7 +6,7 @@ import seaborn as sns; sns.set()
 import matplotlib.pyplot as plt
 import math
 import matplotlib.lines as mlines
-
+from numpy import matrix
 
 data_all = []
 subs = [1,2,4]
@@ -117,11 +117,26 @@ diff = []
 zip_obj = zip(rc,rc_list)
 for x,y in zip_obj:
     diff.append(x-y)
-
+    
+diff_undo = []
+zip_obj = zip(undo,rc_list)
+for x,y in zip_obj:
+    diff_undo.append(x-y)
+    
 diff_n = []
 zip_obj = zip(num,num_list)
 for x,y in zip_obj:
     diff_n.append(x-y)
+    
+rm_t = []
+zip_obj = zip(t_rc,f_t_rc)
+for x,y in zip_obj:
+    rm_t.append(x-y)
+
+rm_t_undo = []
+zip_obj = zip(t_undo,f_t_undo)
+for x,y in zip_obj:
+    rm_t_undo.append(x-y)
 
 # =============================================================================
 # per subject    
@@ -198,15 +213,17 @@ plt.close(fig)
 
 # =============================================================================
 fig, axs = plt.subplots(1, 3, sharey=True)
-
 for i in range(0,3):
-    axs[i].hist(diff[48*i:48*(i+1)], range(-4,2), facecolor='#727bda', density=1,
+    temp = [diff[48*i:48*(i+1)],diff_undo[48*i:48*(i+1)]]
+    temp = np.array(temp)
+    new = temp.transpose()
+    axs[i].hist(new, range(-4,2), color=['#0776d8','#e13f42'], density=1,
                  align = 'left',edgecolor='k')
 
     axs[i].set_ylim((0,1))
     axs[i].set_xlim((-4,1))
 
-    axs[i].set_xticks(range(-4,2))
+    axs[i].set_xticks(range(-3,2))
     axs[i].set_yticks(np.arange(0,1, 0.1))
 
     axs[i].set_facecolor('white')
@@ -214,9 +231,15 @@ for i in range(0,3):
     axs[i].spines['left'].set_color('k')
     axs[i].tick_params(axis='y', colors='k')
     axs[i].title.set_text('S'+str(i+1))
-axs[1].set_xlabel('Number connected (actual - maximum) w/o undo')
+axs[1].set_xlabel('Number connected (actual - maximum)')
 axs[0].set_ylabel('Frequency')
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_hist_all.png',dpi=600)
+
+import matplotlib.patches as mpatches
+rc_led = mpatches.Patch(color='#0776d8', label='w/o undo')
+undo_led = mpatches.Patch(color='#e13f42', label='w/ undo')
+plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
+plt.show()
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_undo_hist_all.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
@@ -288,6 +311,29 @@ axs[0].set_ylabel('Trial duration (s)')
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc_hist_all.png',dpi=600)
 plt.close(fig)
 
+# =============================================================================
+fig, axs = plt.subplots(1, 3, sharey=True)
+
+for i in range(0,3):
+    axs[i].boxplot([rm_t[48*i:48*(i+1)], rm_t_undo[48*i:48*(i+1)]],widths = 0.6)  
+    axs[i].plot([1,2],[rm_t[48*i:48*(i+1)], rm_t_undo[48*i:48*(i+1)]], 'o',
+       markerfacecolor = '#727bda',markeredgecolor = 'none',alpha = 0.2)     
+    #plotline1, caplines1, barlinecols1 = ax.errorbar(ind, [mean(mean_t_rc),mean(mean_t_undo)], yerr=[err_rc,err_undo], lolims=True, capsize = 0, ls='None', color='k')
+    #caplines1[0].set_marker('_')
+    #caplines1[0].set_markersize(7)
+    axs[i].set_ylim((0,110))
+    
+    axs[i].set_xticklabels(['w/o undo','w/ undo'])
+    #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
+    axs[i].set_facecolor('white')
+    axs[i].spines['bottom'].set_color('k')
+    axs[i].spines['left'].set_color('k')
+    axs[i].tick_params(axis='y', colors='k')
+    axs[i].title.set_text('S'+str(i+1))
+axs[0].set_ylabel('Trial duration excluding first-move rt(s)')
+plt.show()
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rm_t_rc_hist_all.png',dpi=600)
+plt.close(fig)
 
 # =============================================================================
 # all subjects
