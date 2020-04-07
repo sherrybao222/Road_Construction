@@ -413,21 +413,38 @@ plt.close(fig)
 # =============================================================================
 fig, axs = plt.subplots(1, 3, sharey=True)
 
-labels = ['first choice', 'other choice', 'submit','undo']
+labels = ['first choice', 'later choices', 'submit','undo']
 x = np.arange(len(labels))  # the label locations
 width = 0.4  # the width of the bars
 
 for i in range(0,3):
     axs[i].bar(x - width/2,[mean(f_t_rc[48*i:48*(i+1)]),median([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x]), 
-       mean(t_s_rc[48*i:48*(i+1)]),0],width, color='#0776d8',edgecolor = 'k')  
-    plotline1, caplines1, barlinecols1 = ax.errorbar(ind, [mean(mean_t_rc),mean(mean_t_undo)], yerr=[err_rc,err_undo], lolims=True, capsize = 0, ls='None', color='k')
+       mean(t_s_rc[48*i:48*(i+1)]),0],width, color='#0776d8',edgecolor = 'k') 
+    err_f_1 = np.quantile(f_t_rc[48*i:48*(i+1)],q = 0.25)
+    err_f_2 = np.quantile(f_t_rc[48*i:48*(i+1)],q = 0.75)
+    err_s_1 = np.quantile(t_s_rc[48*i:48*(i+1)],q = 0.25)
+    err_s_2 = np.quantile(t_s_rc[48*i:48*(i+1)],q = 0.75)
+    err_rc_1 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.25)
+    err_rc_2 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.75)
+
+    axs[i].errorbar(x - width/2, [mean(f_t_rc[48*i:48*(i+1)]),median([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x]), 
+       mean(t_s_rc[48*i:48*(i+1)]),0], yerr=[[err_f_1,err_rc_1,err_s_1,0],[err_f_2,err_rc_2,err_s_2,0]], capsize = 3, ls='None', color='k')
 
     axs[i].bar(x + width/2,[mean(f_t_undo[48*i:48*(i+1)]),median([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x]), 
        mean(t_s_undo[48*i:48*(i+1)]),median([y for x in t_everyundo[48*i:48*(i+1)] for y in x])],width,color ='#e13f42',edgecolor = 'k')  
+    err_fu_1 = np.quantile(f_t_undo[48*i:48*(i+1)],q = 0.25)
+    err_fu_2 = np.quantile(f_t_undo[48*i:48*(i+1)],q = 0.75)
+    err_su_1 = np.quantile(t_s_undo[48*i:48*(i+1)],q = 0.25)
+    err_su_2 = np.quantile(t_s_undo[48*i:48*(i+1)],q = 0.75)
+    err_rcu_1 = np.quantile([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x],q = 0.25)
+    err_rcu_2 = np.quantile([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x],q = 0.75)
+    err_u_1 = np.quantile([y for x in t_everyundo[48*i:48*(i+1)] for y in x],q = 0.25)
+    err_u_2 = np.quantile([y for x in t_everyundo[48*i:48*(i+1)] for y in x],q = 0.75)
+
+    axs[i].errorbar(x + width/2, [mean(f_t_undo[48*i:48*(i+1)]),median([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x]), 
+       mean(t_s_undo[48*i:48*(i+1)]),median([y for x in t_everyundo[48*i:48*(i+1)] for y in x])], yerr=[[err_fu_1,err_rcu_1,err_su_1,err_u_1],[err_fu_2,err_rcu_2,err_su_2,err_u_2]], capsize = 3, ls='None', color='k')
     
-    #caplines1[0].set_marker('_')
-    #caplines1[0].set_markersize(7)
-    axs[i].set_ylim((0,26))
+    axs[i].set_ylim((0,60))
     axs[i].set_xticks(x - width/2)
     axs[i].set_xticklabels(labels)
     #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
@@ -440,8 +457,8 @@ for i in range(0,3):
 axs[0].set_ylabel('Response time(s)')
 
 import matplotlib.patches as mpatches
-rc_led = mpatches.Patch(color='#0776d8', label='w/o undo')
-undo_led = mpatches.Patch(color='#e13f42', label='w/ undo')
+rc_led = mpatches.Patch(color='#0776d8', label='without undo')
+undo_led = mpatches.Patch(color='#e13f42', label='with undo')
 plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
 
 fig.set_figwidth(10)
@@ -450,6 +467,50 @@ fig.set_figheight(8)
 plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t.png',dpi=600)
 plt.close(fig)
+# =============================================================================
+#fig, axs = plt.subplots(1, 3, sharey=True)
+#
+#labels = ['first choice', 'other choice', 'submit','undo']
+#x = np.arange(len(labels))  # the label locations
+#width = 0.4  # the width of the bars
+#
+#for i in range(0,3):
+#    axs[i].boxplot([mean(f_t_rc[48*i:48*(i+1)]),median([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x]), 
+#       mean(t_s_rc[48*i:48*(i+1)]),0])#,width, color='#0776d8',edgecolor = 'k'
+##    err_rc_1 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.25)
+##    err_rc_2 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.75)
+#
+##    plotline1, caplines1, barlinecols1 = axs[i].errorbar(ind, [mean(f_t_rc[48*i:48*(i+1)]),median([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x]), 
+##       mean(t_s_rc[48*i:48*(i+1)]),0], yerr=[0,err_rc_1,0], lolims=True, capsize = 0, ls='None', color='k')
+#
+#    axs[i].boxplot([mean(f_t_undo[48*i:48*(i+1)]),median([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x]), 
+#       mean(t_s_undo[48*i:48*(i+1)]),median([y for x in t_everyundo[48*i:48*(i+1)] for y in x])])  #,width,color ='#e13f42',edgecolor = 'k'
+#    
+#    #caplines1[0].set_marker('_')
+#    #caplines1[0].set_markersize(7)
+#    axs[i].set_ylim((0,26))
+#    axs[i].set_xticks(x - width/2)
+#    axs[i].set_xticklabels(labels)
+#    #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
+#    axs[i].set_facecolor('white')
+#    axs[i].spines['bottom'].set_color('k')
+#    axs[i].spines['left'].set_color('k')
+#    axs[i].tick_params(axis='y', colors='k', direction='in',left = True)   
+#    axs[i].tick_params(axis='x', colors='k',labelrotation = 70)
+#    axs[i].title.set_text('S'+str(i+1))
+#axs[0].set_ylabel('Response time(s)')
+#
+#import matplotlib.patches as mpatches
+#rc_led = mpatches.Patch(color='#0776d8', label='w/o undo')
+#undo_led = mpatches.Patch(color='#e13f42', label='w/ undo')
+#plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
+#
+#fig.set_figwidth(10)
+#fig.set_figheight(8)
+#
+#plt.show()
+#fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t_box.png',dpi=600)
+#plt.close(fig)
 
 # =============================================================================
 # all subjects
