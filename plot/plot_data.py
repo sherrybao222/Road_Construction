@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from statistics import mean,stdev
+from statistics import mean,stdev,median
 from operator import eq
 import seaborn as sns; sns.set()
 import matplotlib.pyplot as plt
@@ -41,6 +41,19 @@ t_undo = []
 f_t_rc = []
 f_t_undo = []
 undo_click = []
+
+rc_t_all = [] #choice index
+rcu_t_all = [] # choice and undo index
+u_t_all = [] # undo index
+rc_u_t_all = []
+
+t_everyact_rc = [] # time for choice (exclude first choice) in basic
+t_everyact_undo = [] # time for every action (except submit) in basic
+t_everyundo = []
+t_everyc_undo = []
+
+t_s_rc = [] # time to submit
+t_s_undo = []
 # statistics list
 mean_rc = []
 mean_undo = []
@@ -50,6 +63,7 @@ mean_t_rc = []
 mean_t_undo = []# Average time spent in RC VS RCU across maps
 mean_f_t_rc = []
 mean_f_t_undo = []# Average time spent in RC VS RCU across maps
+
 
 
 for data in data_all:
@@ -64,6 +78,15 @@ for data in data_all:
             ind_choice = next(x for x, val in enumerate(data[0][i]['choice_his']) 
                                   if val != 0)
             f_t_rc.append(data[0][i]['time'][ind_choice]-data[0][i]['time'][0])
+            
+            v = np.array(data[0][i]['choice_his'])
+            temp = np.where(v[:-1] != v[1:])[0]
+            rc_t_all.append(list(map(lambda x : x + 1, temp)))
+            
+            temp = [data[0][i]['time'][rc_t_all[-1][p+1]]-data[0][i]['time'][rc_t_all[-1][p]] for p,x in enumerate(rc_t_all[-1]) if p<len(rc_t_all[-1])-1]
+            t_everyact_rc.append(temp)
+            
+            t_s_rc.append(data[0][i]['time'][-1]-data[0][i]['time'][rc_t_all[-1][-1]])
             rc_ind.append(i)
         if data[0][i]['cond'][-1] == 3:
             undo.append(data[0][i]['n_city'][-1])
@@ -71,7 +94,28 @@ for data in data_all:
             ind_choice = next(x for x, val in enumerate(data[0][i]['choice_his']) 
                                   if val != 0)
             f_t_undo.append(data[0][i]['time'][ind_choice]-data[0][i]['time'][0])
+            
+            v = np.array(data[0][i]['choice_his'])
+            temp = np.where(v[:-1] != v[1:])[0]
+            rc_t_all.append(list(map(lambda x : x + 1, temp)))
+
+            v = np.array(data[0][i]['choice_his'])
+            temp = np.where(v[:-1] != v[1:])[0]
+            rcu_t_all.append(list(map(lambda x : x + 1, temp)))
+            
+            temp = [data[0][i]['time'][rcu_t_all[-1][p+1]]-data[0][i]['time'][rcu_t_all[-1][p]] for p,x in enumerate(rcu_t_all[-1]) if p<len(rcu_t_all[-1])-1]
+            t_everyact_undo.append(temp)
+
+            u_t_all.append([i for i,x in enumerate(data[0][i]['undo_press']) 
+                                        if x == 1])
+            
+            np_rcu_t_all = np.array(rcu_t_all[-1])
+            t_everyundo.append([t_everyact_undo[-1][np.where(np_rcu_t_all == x)[0][0]-1]for x in u_t_all[-1]])
+            rc_u_t_all.append([e for e in rcu_t_all[-1] if e not in u_t_all[-1]])
+            t_everyc_undo.append([e for e in t_everyact_undo[-1] if e not in t_everyundo[-1]])
+
             n_undo.append(sum(data[0][i]['undo_press']))
+            t_s_undo.append(data[0][i]['time'][-1]-data[0][i]['time'][rcu_t_all[-1][-1]])
             if 1 in set(data[0][i]['undo_press']):
                 undo_click.append(1)
             else:
@@ -172,50 +216,76 @@ fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/p
 plt.close(fig)
 
 # =============================================================================
-fig, axs = plt.subplots(1, 3, sharey=True)
+fig, axs = plt.subplots(2, 3, sharey=True)
+for j in range(0,2):
+    for i in range(0,3):
+        u, c = np.unique(np.c_[rc_list[48*i:48*(i+1)],rc[48*i:48*(i+1)]], return_counts=True, axis=0)
+        u1, c1 = np.unique(np.c_[rc_list[48*i:48*(i+1)],undo[48*i:48*(i+1)]], return_counts=True, axis=0)
+        if j == 0:
+            axs[j,i].scatter(u[:,0],u[:,1],s =c*15,facecolors='none',
+                           edgecolors = '#727bda')
+        else:
+            axs[j,i].scatter(u1[:,0],u1[:,1],s =c*15,facecolors='none',
+                           edgecolors = '#e13f42')
+        #ax = sns.heatmap(num_mx,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
+        
+        axs[j,i].set_xlim((4,12))
+        axs[j,i].set_ylim((4,12))
+        x0,x1 = axs[j,i].get_xlim()
+        y0,y1 = axs[j,i].get_ylim()
+        axs[j,i].set_aspect(abs(x1-x0)/abs(y1-y0))
+        
+        axs[j,i].plot(axs[j,i].get_xlim(), axs[j,i].get_ylim(), ls="--", c=".3") # diagnal
+        axs[j,i].grid(b=True, which='major', color='k', linestyle='--',alpha=0.2)
+        axs[j,i].set_facecolor('white')
+        
+        axs[j,i].set_xticks(np.arange(x0,x1, 1.0))
+        axs[j,i].set_yticks(np.arange(y0,y1, 1.0))
+        axs[0,i].title.set_text('S'+str(i+1))
 
-for i in range(0,3):
-    u, c = np.unique(np.c_[rc_list[48*i:48*(i+1)],rc[48*i:48*(i+1)]], return_counts=True, axis=0)
-    u1, c1 = np.unique(np.c_[rc_list[48*i:48*(i+1)],undo[48*i:48*(i+1)]], return_counts=True, axis=0)
-    axs[i].scatter(u[:,0],u[:,1],s =(c*1.5)**2,facecolors='none',
-                   edgecolors = '#727bda')
-    axs[i].scatter(u1[:,0],u1[:,1],s =(c1*1.5)**2,facecolors='none',
-                   edgecolors = '#e13f42')
-    #ax = sns.heatmap(num_mx,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
-    
-    axs[i].set_xlim((4,12))
-    axs[i].set_ylim((4,12))
-    x0,x1 = axs[i].get_xlim()
-    y0,y1 = axs[i].get_ylim()
-    axs[i].set_aspect(abs(x1-x0)/abs(y1-y0))
-    
-    axs[i].plot(axs[i].get_xlim(), axs[i].get_ylim(), ls="--", c=".3") # diagnal
-    axs[i].grid(b=True, which='major', color='k', linestyle='--',alpha=0.2)
-    axs[i].set_facecolor('white')
-    
-    axs[i].set_xticks(np.arange(x0,x1, 1.0))
-    axs[i].set_yticks(np.arange(y0,y1, 1.0))
-    axs[i].title.set_text('S'+str(i+1))
+        axs[1,i].set_xlabel("Number connected (maximum)")
+        axs[j,0].set_ylabel("Number connected (actual)")
 
-axs[1].set_xlabel("Number connected (maximum)")
-axs[0].set_ylabel("Number connected (actual)")
+title_1 = mlines.Line2D([], [], color='white', label='without undo')
+title_2 = mlines.Line2D([], [], color='white', label='with undo')
+rc_led_1 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#727bda',
+                          markersize=math.sqrt(1*15), label='1')
+rc_led_2 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#727bda',
+                          markersize=math.sqrt(5*15), label='5')
+rc_led_3 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#727bda',
+                          markersize=math.sqrt(10*15), label='10')
+rc_led_4 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#727bda',
+                          markersize=math.sqrt(15*15), label='15')
+undo_led_1 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#e13f42',
+                          markersize=math.sqrt(1*15), label='1')
+undo_led_2 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#e13f42',
+                          markersize=math.sqrt(5*15), label='5')
+undo_led_3 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#e13f42',
+                          markersize=math.sqrt(10*15), label='10')
+undo_led_4 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#e13f42',
+                          markersize=math.sqrt(15*15), label='15')
 
-rc_led = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#727bda',
-                          markersize=15, label='w/o undo')
-undo_led = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#e13f42',
-                          markersize=15, label='w/ undo')
+lgd = axs[0,2].legend(bbox_to_anchor=(2.04, 0.1),prop={'size': 12},title="Number of trials",handletextpad=0.01,handlelength=3,
+           handles=[title_1,rc_led_1,rc_led_2,rc_led_3,rc_led_4,
+                    title_2,undo_led_1,undo_led_2,undo_led_3,undo_led_4],facecolor = 'white',ncol=2)
 
-
-plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
-
+for vpack in lgd._legend_handle_box.get_children():
+        vpack.get_children()[0].get_children()[0].set_width(0)
+       
 #ax.set_aspect('equal')
 fig.set_figwidth(12)
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_all.png',dpi=600)
+fig.set_figheight(9)
+
+plt.show()
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_all.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
 plt.close(fig)
 
 # =============================================================================
 fig, axs = plt.subplots(1, 3, sharey=True)
 for i in range(0,3):
+    mean1 = mean(diff[48*i:48*(i+1)])
+    mean2 = mean(diff_undo[48*i:48*(i+1)])
+
     temp = [diff[48*i:48*(i+1)],diff_undo[48*i:48*(i+1)]]
     temp = np.array(temp)
     new = temp.transpose()
@@ -224,17 +294,20 @@ for i in range(0,3):
 
     axs[i].set_ylim((0,1))
     axs[i].set_xlim((-4,1))
+    axs[i].set_xticks(range(-3,1))
+    axs[i].set_yticks(np.arange(0,1.1, 0.1))
+    axs[i].set_yticklabels([0,'',0.2,'',0.4,'',0.6,'',0.8,'',1.0])
 
-    axs[i].set_xticks(range(-3,2))
-    axs[i].set_yticks(np.arange(0,1, 0.1))
 
     axs[i].set_facecolor('white')
     axs[i].spines['bottom'].set_color('k')
     axs[i].spines['left'].set_color('k')
-    axs[i].tick_params(axis='y', colors='k')
+    axs[i].tick_params(axis='y', colors='k',direction='in',left = True)
     axs[i].title.set_text('S'+str(i+1))
+    axs[i].text(-3.5, 0.7, 'w/o undo mean:'+ '{:.2f}'.format(mean1),fontsize=6)
+    axs[i].text(-3.5, 0.6, 'w/ undo mean:'+'{:.2f}'.format(mean2),fontsize=6)
 axs[1].set_xlabel('Number connected (actual - maximum)')
-axs[0].set_ylabel('Frequency')
+axs[0].set_ylabel('Proportion of trials')
 
 import matplotlib.patches as mpatches
 rc_led = mpatches.Patch(color='#0776d8', label='w/o undo')
@@ -261,6 +334,7 @@ for i in range(0,3):
     axs[i].spines['bottom'].set_color('k')
     axs[i].spines['left'].set_color('k')
     axs[i].title.set_text('S'+str(i+1))
+axs[1].set_xlabel('Number of undos per trial')
 axs[0].set_ylabel('Number of undos per trial')
 plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_hist_all.png',dpi=600)
@@ -334,6 +408,47 @@ for i in range(0,3):
 axs[0].set_ylabel('Trial duration excluding first-move rt(s)')
 plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rm_t_rc_hist_all.png',dpi=600)
+plt.close(fig)
+
+# =============================================================================
+fig, axs = plt.subplots(1, 3, sharey=True)
+
+labels = ['first choice', 'other choice', 'submit','undo']
+x = np.arange(len(labels))  # the label locations
+width = 0.4  # the width of the bars
+
+for i in range(0,3):
+    axs[i].bar(x - width/2,[mean(f_t_rc[48*i:48*(i+1)]),median([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x]), 
+       mean(t_s_rc[48*i:48*(i+1)]),0],width, color='#0776d8',edgecolor = 'k')  
+    plotline1, caplines1, barlinecols1 = ax.errorbar(ind, [mean(mean_t_rc),mean(mean_t_undo)], yerr=[err_rc,err_undo], lolims=True, capsize = 0, ls='None', color='k')
+
+    axs[i].bar(x + width/2,[mean(f_t_undo[48*i:48*(i+1)]),median([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x]), 
+       mean(t_s_undo[48*i:48*(i+1)]),median([y for x in t_everyundo[48*i:48*(i+1)] for y in x])],width,color ='#e13f42',edgecolor = 'k')  
+    
+    #caplines1[0].set_marker('_')
+    #caplines1[0].set_markersize(7)
+    axs[i].set_ylim((0,26))
+    axs[i].set_xticks(x - width/2)
+    axs[i].set_xticklabels(labels)
+    #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
+    axs[i].set_facecolor('white')
+    axs[i].spines['bottom'].set_color('k')
+    axs[i].spines['left'].set_color('k')
+    axs[i].tick_params(axis='y', colors='k', direction='in',left = True)   
+    axs[i].tick_params(axis='x', colors='k',labelrotation = 70)
+    axs[i].title.set_text('S'+str(i+1))
+axs[0].set_ylabel('Response time(s)')
+
+import matplotlib.patches as mpatches
+rc_led = mpatches.Patch(color='#0776d8', label='w/o undo')
+undo_led = mpatches.Patch(color='#e13f42', label='w/ undo')
+plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
+
+fig.set_figwidth(10)
+fig.set_figheight(8)
+
+plt.show()
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
