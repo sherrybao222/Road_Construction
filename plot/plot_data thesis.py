@@ -12,7 +12,7 @@ data_all = []
 subs = [1,2,4]
 # import experiment data
 for num in subs:
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/data_copy/data_pilot/sub_'+str(num)+'/test_all_'+str(num),'r') as file: 
+    with open('/Users/fqx/Dropbox/Spring 2020/Honors/pilot data/sub_'+str(num)+'/test_all_'+str(num),'r') as file:
         all_data = json.load(file)
         data_all.append(all_data)
         
