@@ -187,6 +187,7 @@ for x,y in zip_obj:
 # =============================================================================
 # per subject    
 # =============================================================================
+# number est scatter all - final
 fig, axs = plt.subplots(1, 3, sharey=True)
 for i in range(0,3):
     u, c = np.unique(np.c_[num_list[48*i:48*(i+1)],num[48*i:48*(i+1)]], return_counts=True, axis=0)
@@ -216,6 +217,7 @@ fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/p
 plt.close(fig)
 
 # =============================================================================
+# rc scatter all - final
 fig, axs = plt.subplots(2, 3, sharey=True)
 for j in range(0,2):
     for i in range(0,3):
@@ -339,6 +341,30 @@ axs[0].set_ylabel('Number of undos per trial')
 plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_hist_all.png',dpi=600)
 plt.close(fig)
+# =============================================================================
+fig, axs = plt.subplots(1, 3, sharey=True)
+for i in range(0,3):
+    u, c = np.unique(np.c_[n_undo[48*i:48*(i+1)],rc_list[48*i:48*(i+1)]], return_counts=True, axis=0)
+    axs[i].plot(rc_list[48*i:48*(i+1)],n_undo[48*i:48*(i+1)], 'o',
+       markerfacecolor = '#727bda',markeredgecolor = 'none',alpha = 0.2)     
+
+    axs[i].set_ylim((-4,40))
+    axs[i].set_xlim((4,12))
+
+    
+    axs[i].set_xticks(range(6,12))
+
+    axs[i].set_facecolor('white')
+    axs[i].spines['bottom'].set_color('k')
+    axs[i].spines['left'].set_color('k')
+    axs[i].title.set_text('S'+str(i+1))
+axs[1].set_xlabel('Number connected (maximum)')
+axs[0].set_ylabel('Number of undos per trial')
+
+plt.show()
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_max.png',dpi=600)
+plt.close(fig)
+
 
 # =============================================================================
 fig, axs = plt.subplots(1, 3, sharey=True)
@@ -413,59 +439,73 @@ plt.close(fig)
 # =============================================================================
 fig, axs = plt.subplots(1, 3, sharey=True)
 
-labels = ['first choice', 'later choices', 'submit','undo']
-x = np.arange(len(labels))  # the label locations
-width = 0.4  # the width of the bars
-
 for i in range(0,3):
-    axs[i].bar(x - width/2,[mean(f_t_rc[48*i:48*(i+1)]),median([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x]), 
-       mean(t_s_rc[48*i:48*(i+1)]),0],width, color='#0776d8',edgecolor = 'k') 
-    err_f_1 = np.quantile(f_t_rc[48*i:48*(i+1)],q = 0.25)
-    err_f_2 = np.quantile(f_t_rc[48*i:48*(i+1)],q = 0.75)
-    err_s_1 = np.quantile(t_s_rc[48*i:48*(i+1)],q = 0.25)
-    err_s_2 = np.quantile(t_s_rc[48*i:48*(i+1)],q = 0.75)
-    err_rc_1 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.25)
-    err_rc_2 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.75)
+#    err_f_1 = np.quantile(f_t_rc[48*i:48*(i+1)],q = 0.25)
+#    err_f_2 = np.quantile(f_t_rc[48*i:48*(i+1)],q = 0.75)
+#    err_s_1 = np.quantile(t_s_rc[48*i:48*(i+1)],q = 0.25)
+#    err_s_2 = np.quantile(t_s_rc[48*i:48*(i+1)],q = 0.75)
+#    err_rc_1 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.25)
+#    err_rc_2 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.75)
 
-    axs[i].errorbar(x - width/2, [mean(f_t_rc[48*i:48*(i+1)]),median([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x]), 
-       mean(t_s_rc[48*i:48*(i+1)]),0], yerr=[[err_f_1,err_rc_1,err_s_1,0],[err_f_2,err_rc_2,err_s_2,0]], capsize = 3, ls='None', color='k')
+#    axs[i].errorbar(x - width/2, [mean(f_t_rc[48*i:48*(i+1)]),median([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x]), 
+#       mean(t_s_rc[48*i:48*(i+1)]),0], yerr=[[err_f_1,err_rc_1,err_s_1,0],[err_f_2,err_rc_2,err_s_2,0]], capsize = 3, ls='None', color='k')
+    undobox = []
+    for x in t_everyundo[48*i:48*(i+1)]:
+        try: 
+            undobox.append(median(x))
+        except:  pass
 
-    axs[i].bar(x + width/2,[mean(f_t_undo[48*i:48*(i+1)]),median([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x]), 
-       mean(t_s_undo[48*i:48*(i+1)]),median([y for x in t_everyundo[48*i:48*(i+1)] for y in x])],width,color ='#e13f42',edgecolor = 'k')  
-    err_fu_1 = np.quantile(f_t_undo[48*i:48*(i+1)],q = 0.25)
-    err_fu_2 = np.quantile(f_t_undo[48*i:48*(i+1)],q = 0.75)
-    err_su_1 = np.quantile(t_s_undo[48*i:48*(i+1)],q = 0.25)
-    err_su_2 = np.quantile(t_s_undo[48*i:48*(i+1)],q = 0.75)
-    err_rcu_1 = np.quantile([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x],q = 0.25)
-    err_rcu_2 = np.quantile([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x],q = 0.75)
-    err_u_1 = np.quantile([y for x in t_everyundo[48*i:48*(i+1)] for y in x],q = 0.25)
-    err_u_2 = np.quantile([y for x in t_everyundo[48*i:48*(i+1)] for y in x],q = 0.75)
 
-    axs[i].errorbar(x + width/2, [mean(f_t_undo[48*i:48*(i+1)]),median([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x]), 
-       mean(t_s_undo[48*i:48*(i+1)]),median([y for x in t_everyundo[48*i:48*(i+1)] for y in x])], yerr=[[err_fu_1,err_rcu_1,err_su_1,err_u_1],[err_fu_2,err_rcu_2,err_su_2,err_u_2]], capsize = 3, ls='None', color='k')
+    axs[i].plot([1,2],[f_t_rc[48*i:48*(i+1)], f_t_undo[48*i:48*(i+1)]],c = '#cccccc',linewidth=0.3) 
+    axs[i].plot([2.5,3.5],[[median(x) for x in t_everyact_rc[48*i:48*(i+1)]], [median(x) for x in t_everyc_undo[48*i:48*(i+1)]]],c = '#cccccc',linewidth=0.3) 
+    axs[i].plot([4,5],[t_s_rc[48*i:48*(i+1)],t_s_undo[48*i:48*(i+1)]],c = '#cccccc',linewidth=0.3) 
+
+       
+    axs[i].boxplot([f_t_rc[48*i:48*(i+1)],f_t_undo[48*i:48*(i+1)],
+       [median(x) for x in t_everyact_rc[48*i:48*(i+1)]],
+       [median(x) for x in t_everyc_undo[48*i:48*(i+1)]],
+       t_s_rc[48*i:48*(i+1)],t_s_undo[48*i:48*(i+1)],
+       undobox],positions =[1,2,2.5,3.5,4,5,5.5],widths = 0.3,showfliers=False,
+       medianprops = dict(color = 'k')) #, color='#0776d8',edgecolor = 'k'
+            
+    #    err_fu_1 = np.quantile(f_t_undo[48*i:48*(i+1)],q = 0.25)
+#    err_fu_2 = np.quantile(f_t_undo[48*i:48*(i+1)],q = 0.75)
+#    err_su_1 = np.quantile(t_s_undo[48*i:48*(i+1)],q = 0.25)
+#    err_su_2 = np.quantile(t_s_undo[48*i:48*(i+1)],q = 0.75)
+#    err_rcu_1 = np.quantile([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x],q = 0.25)
+#    err_rcu_2 = np.quantile([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x],q = 0.75)
+#    err_u_1 = np.quantile([y for x in t_everyundo[48*i:48*(i+1)] for y in x],q = 0.25)
+#    err_u_2 = np.quantile([y for x in t_everyundo[48*i:48*(i+1)] for y in x],q = 0.75)
+#
+#    axs[i].errorbar(x + width/2, [mean(f_t_undo[48*i:48*(i+1)]),median([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x]), 
+#       mean(t_s_undo[48*i:48*(i+1)]),median([y for x in t_everyundo[48*i:48*(i+1)] for y in x])], yerr=[[err_fu_1,err_rcu_1,err_su_1,err_u_1],[err_fu_2,err_rcu_2,err_su_2,err_u_2]], capsize = 3, ls='None', color='k')
     
-    axs[i].set_ylim((0,60))
-    axs[i].set_xticks(x - width/2)
-    axs[i].set_xticklabels(labels)
+#    axs[i].set_ylim((0,60))
+    axs[i].set_xticks([1,2,2.5,3.5,4,5,5.5])
+#    axs[i].set_xticklabels(labels)
     #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
+    axs[i].set_xticklabels(labels = ['first choice without undo','first choice with undo', 
+       'later choices without undo', 'later choices with undo',
+       'submit without undo','submit with undo','undo'])
+
     axs[i].set_facecolor('white')
     axs[i].spines['bottom'].set_color('k')
     axs[i].spines['left'].set_color('k')
     axs[i].tick_params(axis='y', colors='k', direction='in',left = True)   
-    axs[i].tick_params(axis='x', colors='k',labelrotation = 70)
+    axs[i].tick_params(axis='x', colors='k',labelrotation = 45)
     axs[i].title.set_text('S'+str(i+1))
 axs[0].set_ylabel('Response time(s)')
 
-import matplotlib.patches as mpatches
-rc_led = mpatches.Patch(color='#0776d8', label='without undo')
-undo_led = mpatches.Patch(color='#e13f42', label='with undo')
-plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
+#import matplotlib.patches as mpatches
+#rc_led = mpatches.Patch(color='#0776d8', label='without undo')
+#undo_led = mpatches.Patch(color='#e13f42', label='with undo')
+#plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
 
-fig.set_figwidth(10)
-fig.set_figheight(8)
+fig.set_figwidth(20)
+fig.set_figheight(12)
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t.png',dpi=600)
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t.png',dpi=600,bbox_inches='tight')
 plt.close(fig)
 # =============================================================================
 #fig, axs = plt.subplots(1, 3, sharey=True)
