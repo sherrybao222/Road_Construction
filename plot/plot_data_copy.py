@@ -224,29 +224,47 @@ for x,y in zip_obj:
 # statistical tests
 # Wilcoxon Signed-Rank Test
 from scipy.stats import wilcoxon
-stat, p = wilcoxon(rc, undo)
-print('stat=%.3f, p=%.10f' % (stat, p))
-if p > 0.05:
-	print('Probably the same distribution')
-else:
-	print('Probably different distributions')
+print("length rc: "+ str(len(rc)))
+
+stat1, p1 = wilcoxon(rc[0:48], undo[0:48])
+m1rc = median(rc[0:48])
+m1undo = median(rc[0:48])
+print('stat1=%.3f, p1=%.10f' % (stat1, p1))
+print('median rc=%.3f, median undo=%.3f' % (m1rc, m1undo))
+
+stat2, p2 = wilcoxon(rc[48:126], undo[48:126])
+m2rc = median(rc[48:126])
+m2undo = median(rc[48:126])
+print('stat2=%.3f, p2=%.10f' % (stat2, p2))
+print('median rc=%.3f, median undo=%.3f' % (m2rc, m2undo))
+
+stat3, p3 = wilcoxon(rc[126:144], undo[126:144])
+m3rc = median(rc[126:144])
+m3undo = median(rc[126:144])
+print('stat3=%.3f, p3=%.10f' % (stat3, p3))
+print('median rc=%.3f, median undo=%.3f' % (m3rc, m3undo))
+
+# if p1 > 0.05:
+# 	print('Probably the same distribution')
+# else:
+# 	print('Probably different distributions')
 #----------------------------------------------------------------
 # Student's t-test
-from scipy.stats import ttest_ind
-stat, p = ttest_ind(t_rc, t_undo)
-print('stat=%.3f, p=%.6f' % (stat, p))
-if p > 0.05:
-	print('Probably the same distribution')
-else:
-	print('Probably different distributions')
-# Student's t-test
-from scipy.stats import ttest_ind
-stat, p = ttest_ind(f_t_rc, f_t_undo)
-print('stat=%.3f, p=%.6f' % (stat, p))
-if p > 0.05:
-	print('Probably the same distribution')
-else:
-	print('Probably different distributions')
+# from scipy.stats import ttest_ind
+# stat, p = ttest_ind(t_rc, t_undo)
+# print('stat=%.3f, p=%.6f' % (stat, p))
+# if p > 0.05:
+# 	print('Probably the same distribution')
+# else:
+# 	print('Probably different distributions')
+# # Student's t-test
+# from scipy.stats import ttest_ind
+# stat, p = ttest_ind(f_t_rc, f_t_undo)
+# print('stat=%.3f, p=%.6f' % (stat, p))
+# if p > 0.05:
+# 	print('Probably the same distribution')
+# else:
+# 	print('Probably different distributions')
 # =============================================================================
 
 
