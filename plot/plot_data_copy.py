@@ -14,14 +14,14 @@ subs = [1,2,4] # subject index
 
 # import experiment data
 for num in subs:
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/data_copy/data_pilot/sub_'+str(num)+'/test_all_'+str(num),'r') as file: 
+    with open('/Users/fqx/Dropbox/Spring 2020/Honors/pilot data/test_all_'+str(num),'r') as file:
         all_data = json.load(file)
         data_all.append(all_data)
         
 # import map
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/pilot_031220/map/num_48','r') as file: 
+with open('/Users/fqx/Dropbox/Spring 2020/Honors/pilot data/num_48','r') as file:
     num_map = json.load(file) 
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/map/active_map/basic_map_48_all4','r') as file: 
+with open('/Users/fqx/Dropbox/Spring 2020/Honors/pilot data/basic_map_48_all4','r') as file:
     rc_map = json.load(file) 
 
 # map index
@@ -207,17 +207,49 @@ for x,y in zip_obj:
 # organize some data into dataframe  
 # intialise data of lists.
 
-sub = [x for s in subs for x in [s]*48] 
-data = {'sub':sub, 'num_ind':num_ind, 'rc_ind':rc_ind, 'undo_ind':undo_ind,
-        'num_list':num_list,  'budget_list':budget_list, 'rc_list':rc_list,
-        'undo_click':undo_click, 'n_undo':n_undo, 'diff_n':diff_n, 'diff':diff,
-        'diff_undo':diff_undo, 't_rc':t_rc, 't_undo':t_undo, 'f_t_rc':f_t_rc,
-        't_everyact_rc':t_everyact_rc,'t_everyundo':t_everyundo, 't_everyc_undo':t_everyc_undo,
-        't_s_rc':t_s_rc, 't_s_undo':t_s_undo} 
-  
-# Create DataFrame 
-df = pd.DataFrame(data) 
-df.to_csv('filtered.csv', index=True)
+# sub = [x for s in subs for x in [s]*48]
+# data = {'sub':sub, 'num_ind':num_ind, 'rc_ind':rc_ind, 'undo_ind':undo_ind,
+#         'num_list':num_list,  'budget_list':budget_list, 'rc_list':rc_list,
+#         'undo_click':undo_click, 'n_undo':n_undo, 'diff_n':diff_n, 'diff':diff,
+#         'diff_undo':diff_undo, 't_rc':t_rc, 't_undo':t_undo, 'f_t_rc':f_t_rc,
+#         't_everyact_rc':t_everyact_rc,'t_everyundo':t_everyundo, 't_everyc_undo':t_everyc_undo,
+#         't_s_rc':t_s_rc, 't_s_undo':t_s_undo}
+#
+# # Create DataFrame
+# df = pd.DataFrame(data)
+# df.to_csv('filtered.csv', index=True)
+
+
+# =============================================================================
+# statistical tests
+# Wilcoxon Signed-Rank Test
+from scipy.stats import wilcoxon
+stat, p = wilcoxon(rc, undo)
+print('stat=%.3f, p=%.10f' % (stat, p))
+if p > 0.05:
+	print('Probably the same distribution')
+else:
+	print('Probably different distributions')
+#----------------------------------------------------------------
+# Student's t-test
+from scipy.stats import ttest_ind
+stat, p = ttest_ind(t_rc, t_undo)
+print('stat=%.3f, p=%.6f' % (stat, p))
+if p > 0.05:
+	print('Probably the same distribution')
+else:
+	print('Probably different distributions')
+# Student's t-test
+from scipy.stats import ttest_ind
+stat, p = ttest_ind(f_t_rc, f_t_undo)
+print('stat=%.3f, p=%.6f' % (stat, p))
+if p > 0.05:
+	print('Probably the same distribution')
+else:
+	print('Probably different distributions')
+# =============================================================================
+
+
 # =============================================================================
 # plotting per subject    
 # =============================================================================
@@ -247,7 +279,7 @@ axs[0].set_ylabel("Number estimation (reported)")
 fig.set_figwidth(12)
 
 #ax.set_aspect('equal')
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_est_scatter_all.png',dpi=600)
+# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_est_scatter_all.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
@@ -312,8 +344,8 @@ for vpack in lgd._legend_handle_box.get_children():
 fig.set_figwidth(12)
 fig.set_figheight(9)
 
-plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_all.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
+# plt.show()
+# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_all.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
 plt.close(fig)
 
 # =============================================================================
@@ -349,8 +381,8 @@ import matplotlib.patches as mpatches
 rc_led = mpatches.Patch(color='#0776d8', label='w/o undo')
 undo_led = mpatches.Patch(color='#e13f42', label='w/ undo')
 plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
-plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_undo_hist_all.png',dpi=600)
+# plt.show()
+# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_undo_hist_all.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
@@ -372,8 +404,8 @@ for i in range(0,3):
     axs[i].title.set_text('S'+str(i+1))
 axs[1].set_xlabel('Number of undos per trial')
 axs[0].set_ylabel('Number of undos per trial')
-plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_hist_all.png',dpi=600)
+# plt.show()
+# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_hist_all.png',dpi=600)
 plt.close(fig)
 # =============================================================================
 fig, axs = plt.subplots(1, 3, sharey=True)
@@ -395,8 +427,8 @@ for i in range(0,3):
 axs[1].set_xlabel('Number connected (maximum)')
 axs[0].set_ylabel('Number of undos per trial')
 
-plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_max.png',dpi=600)
+# plt.show()
+# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_max.png',dpi=600)
 plt.close(fig)
 
 
@@ -420,7 +452,7 @@ for i in range(0,3):
     axs[i].tick_params(axis='y', colors='k')
     axs[i].title.set_text('S'+str(i+1))
 axs[0].set_ylabel('First-move response time (s)')
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/f_t_rc_hist_all.png',dpi=600)
+# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/f_t_rc_hist_all.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
@@ -443,7 +475,7 @@ for i in range(0,3):
     axs[i].tick_params(axis='y', colors='k')
     axs[i].title.set_text('S'+str(i+1))
 axs[0].set_ylabel('Trial duration (s)')
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc_hist_all.png',dpi=600)
+# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc_hist_all.png',dpi=600)
 plt.close(fig)
 
 ## =============================================================================
@@ -545,8 +577,8 @@ axs[0].set_ylabel('Response time(s)')
 fig.set_figwidth(26)
 fig.set_figheight(12)
 
-plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t.png',dpi=600,bbox_inches='tight')
+# plt.show()
+# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t.png',dpi=600,bbox_inches='tight')
 plt.close(fig)
 # =============================================================================
 #fig, axs = plt.subplots(1, 3, sharey=True)
@@ -615,7 +647,7 @@ ax.spines['left'].set_color('k')
 ax.tick_params(axis='y', colors='k')
 plt.ylabel('connected number of cities')
 
-fig.savefig('av_rc.png',dpi=600)
+# fig.savefig('av_rc.png',dpi=600)
 plt.close(fig)
 
 # ---------------------------------------------------
@@ -639,7 +671,7 @@ ax.spines['left'].set_color('k')
 ax.tick_params(axis='y', colors='k')
 plt.ylabel('trial duration (s)')
 
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc.png',dpi=600)
+# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc.png',dpi=600)
 plt.close(fig)
 
 
@@ -663,7 +695,7 @@ ax.spines['left'].set_color('k')
 ax.tick_params(axis='y', colors='k')
 plt.ylabel('time spent until first move (s)')
 
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/f_t_rc.png',dpi=600)
+# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/f_t_rc.png',dpi=600)
 plt.close(fig)
 
 # ---------------------------------------------------
@@ -685,7 +717,7 @@ ax.spines['left'].set_color('k')
 ax.tick_params(axis='y', colors='k')
 plt.ylabel('undo percentage')
 
-fig.savefig('pc_undo.png',dpi=600)
+# fig.savefig('pc_undo.png',dpi=600)
 plt.close(fig)
 
 # ----------------------------------------------------
@@ -708,34 +740,34 @@ ax.tick_params(axis='y', colors='k')
 plt.ylabel('accuracy in number estimation')
 plt.xlabel('budget length')
 
-fig.savefig('av_num.png',dpi=600)
+# fig.savefig('av_num.png',dpi=600)
 plt.close(fig)
 
-# =============================================================================
-# statistical tests
-# Wilcoxon Signed-Rank Test
-from scipy.stats import wilcoxon
-stat, p = wilcoxon(rc, undo)
-print('stat=%.3f, p=%.10f' % (stat, p))
-if p > 0.05:
-	print('Probably the same distribution')
-else:
-	print('Probably different distributions')  
-#----------------------------------------------------------------
-# Student's t-test
-from scipy.stats import ttest_ind
-stat, p = ttest_ind(t_rc, t_undo)
-print('stat=%.3f, p=%.6f' % (stat, p))
-if p > 0.05:
-	print('Probably the same distribution')
-else:
-	print('Probably different distributions')
-# Student's t-test
-from scipy.stats import ttest_ind
-stat, p = ttest_ind(f_t_rc, f_t_undo)
-print('stat=%.3f, p=%.6f' % (stat, p))
-if p > 0.05:
-	print('Probably the same distribution')
-else:
-	print('Probably different distributions')
-# =============================================================================
+# # =============================================================================
+# # statistical tests
+# # Wilcoxon Signed-Rank Test
+# from scipy.stats import wilcoxon
+# stat, p = wilcoxon(rc, undo)
+# print('stat=%.3f, p=%.10f' % (stat, p))
+# if p > 0.05:
+# 	print('Probably the same distribution')
+# else:
+# 	print('Probably different distributions')
+# #----------------------------------------------------------------
+# # Student's t-test
+# from scipy.stats import ttest_ind
+# stat, p = ttest_ind(t_rc, t_undo)
+# print('stat=%.3f, p=%.6f' % (stat, p))
+# if p > 0.05:
+# 	print('Probably the same distribution')
+# else:
+# 	print('Probably different distributions')
+# # Student's t-test
+# from scipy.stats import ttest_ind
+# stat, p = ttest_ind(f_t_rc, f_t_undo)
+# print('stat=%.3f, p=%.6f' % (stat, p))
+# if p > 0.05:
+# 	print('Probably the same distribution')
+# else:
+# 	print('Probably different distributions')
+# # =============================================================================
