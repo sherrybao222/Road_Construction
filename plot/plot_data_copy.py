@@ -207,47 +207,55 @@ for x,y in zip_obj:
 # organize some data into dataframe  
 # intialise data of lists.
 
-# sub = [x for s in subs for x in [s]*48]
-# data = {'sub':sub, 'num_ind':num_ind, 'rc_ind':rc_ind, 'undo_ind':undo_ind,
-#         'num_list':num_list,  'budget_list':budget_list, 'rc_list':rc_list,
-#         'undo_click':undo_click, 'n_undo':n_undo, 'diff_n':diff_n, 'diff':diff,
-#         'diff_undo':diff_undo, 't_rc':t_rc, 't_undo':t_undo, 'f_t_rc':f_t_rc,
-#         't_everyact_rc':t_everyact_rc,'t_everyundo':t_everyundo, 't_everyc_undo':t_everyc_undo,
-#         't_s_rc':t_s_rc, 't_s_undo':t_s_undo}
-#
-# # Create DataFrame
-# df = pd.DataFrame(data)
-# df.to_csv('filtered.csv', index=True)
+sub = [x for s in subs for x in [s]*48]
+data = {'sub':sub, 'num_ind':num_ind, 'rc_ind':rc_ind, 'undo_ind':undo_ind,
+        'num_list':num_list,  'budget_list':budget_list, 'rc_list':rc_list,
+        'undo_click':undo_click, 'n_undo':n_undo, 'diff_n':diff_n, 'diff':diff,
+        'diff_undo':diff_undo, 't_rc':t_rc, 't_undo':t_undo, 'f_t_rc':f_t_rc, 'f_t_undo':f_t_undo,
+        't_everyact_rc':t_everyact_rc,'t_everyundo':t_everyundo, 't_everyc_undo':t_everyc_undo,
+        't_s_rc':t_s_rc, 't_s_undo':t_s_undo}
+
+# Create DataFrame
+df = pd.DataFrame(data)
+df.to_csv('filtered2.csv', index=True)
 
 
 # =============================================================================
 # statistical tests
-# Wilcoxon Signed-Rank Test
 from scipy.stats import wilcoxon
-print("length rc: "+ str(len(rc)))
-
-stat1, p1 = wilcoxon(rc[0:48], undo[0:48])
-m1rc = median(rc[0:48])
-m1undo = median(rc[0:48])
-print('stat1=%.3f, p1=%.10f' % (stat1, p1))
-print('median rc=%.3f, median undo=%.3f' % (m1rc, m1undo))
-
-stat2, p2 = wilcoxon(rc[48:126], undo[48:126])
-m2rc = median(rc[48:126])
-m2undo = median(rc[48:126])
-print('stat2=%.3f, p2=%.10f' % (stat2, p2))
-print('median rc=%.3f, median undo=%.3f' % (m2rc, m2undo))
-
-stat3, p3 = wilcoxon(rc[126:144], undo[126:144])
-m3rc = median(rc[126:144])
-m3undo = median(rc[126:144])
-print('stat3=%.3f, p3=%.10f' % (stat3, p3))
-print('median rc=%.3f, median undo=%.3f' % (m3rc, m3undo))
+# print("length rc: "+ str(len(rc)))
+#
+# stat1, p1 = wilcoxon(rc[0:48], undo[0:48])
+# m1rc = median(rc[0:48])
+# m1undo = median(rc[0:48])
+# print('stat1=%.3f, p1=%.10f' % (stat1, p1))
+# print('median rc=%.3f, median undo=%.3f' % (m1rc, m1undo))
+#
+# stat2, p2 = wilcoxon(rc[48:126], undo[48:126])
+# m2rc = median(rc[48:126])
+# m2undo = median(rc[48:126])
+# print('stat2=%.3f, p2=%.10f' % (stat2, p2))
+# print('median rc=%.3f, median undo=%.3f' % (m2rc, m2undo))
+#
+# stat3, p3 = wilcoxon(rc[126:144], undo[126:144])
+# m3rc = median(rc[126:144])
+# m3undo = median(rc[126:144])
+# print('stat3=%.3f, p3=%.10f' % (stat3, p3))
+# print('median rc=%.3f, median undo=%.3f' % (m3rc, m3undo))
 
 # if p1 > 0.05:
 # 	print('Probably the same distribution')
 # else:
 # 	print('Probably different distributions')
+
+#----------------------------------------------------------------
+#  Wilcoxon Signed-Rank Test for first move
+stat, p = wilcoxon(f_t_rc, f_t_undo)
+mrc = median(f_t_rc)
+mundo = median(f_t_undo)
+print('stat=%.3f, p=%.10f, median rc= %.3f, median undo=%.3f' % (stat, p,mrc,mundo))
+
+
 #----------------------------------------------------------------
 # Student's t-test
 # from scipy.stats import ttest_ind
