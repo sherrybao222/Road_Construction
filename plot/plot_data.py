@@ -317,6 +317,7 @@ fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/p
 plt.close(fig)
 
 # =============================================================================
+# rc_undo_hist 
 fig, axs = plt.subplots(1, 3, sharey=True)
 for i in range(0,3):
     mean1 = mean(diff[48*i:48*(i+1)])
@@ -340,14 +341,14 @@ for i in range(0,3):
     axs[i].spines['left'].set_color('k')
     axs[i].tick_params(axis='y', colors='k',direction='in',left = True)
     axs[i].title.set_text('S'+str(i+1))
-    axs[i].text(-3.5, 0.7, 'w/o undo mean:'+ '{:.2f}'.format(mean1),fontsize=6)
-    axs[i].text(-3.5, 0.6, 'w/ undo mean:'+'{:.2f}'.format(mean2),fontsize=6)
+    axs[i].text(-3.5, 0.7, 'without undo mean:'+ '{:.2f}'.format(mean1),fontsize=6)
+    axs[i].text(-3.5, 0.6, 'with undo mean:'+'{:.2f}'.format(mean2),fontsize=6)
 axs[1].set_xlabel('Number connected (actual - maximum)')
 axs[0].set_ylabel('Proportion of trials')
 
 import matplotlib.patches as mpatches
-rc_led = mpatches.Patch(color='#0776d8', label='w/o undo')
-undo_led = mpatches.Patch(color='#e13f42', label='w/ undo')
+rc_led = mpatches.Patch(color='#0776d8', label='without undo')
+undo_led = mpatches.Patch(color='#e13f42', label='with undo')
 plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
 plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_undo_hist_all.png',dpi=600)
