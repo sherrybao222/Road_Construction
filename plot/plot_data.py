@@ -6,7 +6,7 @@ import seaborn as sns; sns.set()
 import matplotlib.pyplot as plt
 import math
 import matplotlib.lines as mlines
-from statannot import add_stat_annotation
+from scipy.stats import wilcoxon
 import pandas as pd 
 
 data_all = [] # prepare for all data
@@ -57,9 +57,11 @@ rc_u_t_all = [] # choice index in undo trl
 
 # time of a single move
 t_everyact_rc = [] # time for choice (exclude first choice) in basic
+m_t_everyact_rc = []
 t_everyact_undo = [] # time for every action (except first choice and submit) in undo
 t_everyundo = [] # time for undo
 t_everyc_undo = [] # time for every choice (exclude first choice) in undo
+m_t_everyc_undo = []
 
 t_s_rc = [] # time to submit in basic
 t_s_undo = [] # time to submit in undo
@@ -101,6 +103,7 @@ for data in data_all:
             
             temp = [data[0][i]['time'][rc_t_all[-1][p+1]]-data[0][i]['time'][rc_t_all[-1][p]] for p,x in enumerate(rc_t_all[-1]) if p<len(rc_t_all[-1])-1]
             t_everyact_rc.append(temp)
+            m_t_everyact_rc.append(median(t_everyact_rc[-1]))
             
             t_s_rc.append(data[0][i]['time'][-1]-data[0][i]['time'][rc_t_all[-1][-1]])           
             
@@ -129,9 +132,12 @@ for data in data_all:
                                         if x == 1])
             
             np_rcu_t_all = np.array(rcu_t_all[-1])# change to numpy array for next opertation
-            t_everyundo.append([t_everyact_undo[-1][np.where(np_rcu_t_all == x)[0][0]-1]for x in u_t_all[-1]])
+            
+            t_everyundo.append([t_everyact_undo[-1][np.where(np_rcu_t_all == x)[0][0]-1]for x in u_t_all[-1]])            
             rc_u_t_all.append([e for e in rcu_t_all[-1] if e not in u_t_all[-1]])
+            
             t_everyc_undo.append([e for e in t_everyact_undo[-1] if e not in t_everyundo[-1]])
+            m_t_everyc_undo.append(median(t_everyc_undo[-1]))
 
             t_s_undo.append(data[0][i]['time'][-1]-data[0][i]['time'][rcu_t_all[-1][-1]])
 
@@ -210,10 +216,14 @@ for x,y in zip_obj:
 sub = [x for s in subs for x in [s]*48] 
 data = {'sub':sub, 'num_ind':num_ind, 'rc_ind':rc_ind, 'undo_ind':undo_ind,
         'num_list':num_list,  'budget_list':budget_list, 'rc_list':rc_list,
-        'undo_click':undo_click, 'n_undo':n_undo, 'diff_n':diff_n, 'diff':diff,
-        'diff_undo':diff_undo, 't_rc':t_rc, 't_undo':t_undo, 'f_t_rc':f_t_rc,
-        't_everyact_rc':t_everyact_rc,'t_everyundo':t_everyundo, 't_everyc_undo':t_everyc_undo,
-        't_s_rc':t_s_rc, 't_s_undo':t_s_undo} 
+        'undo_click':undo_click, 'n_undo':n_undo, 
+        'diff_n':diff_n, 'diff':diff,'diff_undo':diff_undo, 
+        't_rc':t_rc, 't_undo':t_undo, 
+        'f_t_rc':f_t_rc,'f_t_undo':f_t_undo,
+        't_everyact_rc':t_everyact_rc,'m_t_everyact_rc':m_t_everyact_rc,
+        't_everyc_undo':t_everyc_undo,'m_t_everyc_undo':m_t_everyc_undo,
+        't_s_rc':t_s_rc, 't_s_undo':t_s_undo,
+        't_everyundo':t_everyundo} 
   
 # Create DataFrame 
 df = pd.DataFrame(data) 
@@ -488,60 +498,65 @@ plt.close(fig)
 #plt.close(fig)
 #
 # =============================================================================
+# action time
 fig, axs = plt.subplots(1, 3, sharey=True)
 
 for i in range(0,3):
-#    err_f_1 = np.quantile(f_t_rc[48*i:48*(i+1)],q = 0.25)
-#    err_f_2 = np.quantile(f_t_rc[48*i:48*(i+1)],q = 0.75)
-#    err_s_1 = np.quantile(t_s_rc[48*i:48*(i+1)],q = 0.25)
-#    err_s_2 = np.quantile(t_s_rc[48*i:48*(i+1)],q = 0.75)
-#    err_rc_1 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.25)
-#    err_rc_2 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.75)
+    df_part = df.loc[df['sub'] == subs[i],['f_t_rc','f_t_undo',
+                     'm_t_everyact_rc','m_t_everyc_undo',
+                     't_s_rc','t_s_undo']]
 
-#    axs[i].errorbar(x - width/2, [mean(f_t_rc[48*i:48*(i+1)]),median([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x]), 
-#       mean(t_s_rc[48*i:48*(i+1)]),0], yerr=[[err_f_1,err_rc_1,err_s_1,0],[err_f_2,err_rc_2,err_s_2,0]], capsize = 3, ls='None', color='k')
     undobox = []
     for x in t_everyundo[48*i:48*(i+1)]:
         try: 
             undobox.append(median(x))
         except:  pass
 
-
     axs[i].plot([1,2],[f_t_rc[48*i:48*(i+1)], f_t_undo[48*i:48*(i+1)]],c = '#6a6763',linewidth=0.3) 
     axs[i].plot([2.5,3.5],[[median(x) for x in t_everyact_rc[48*i:48*(i+1)]], [median(x) for x in t_everyc_undo[48*i:48*(i+1)]]],c = '#6a6763',linewidth=0.3) 
     axs[i].plot([4,5],[t_s_rc[48*i:48*(i+1)],t_s_undo[48*i:48*(i+1)]],c = '#6a6763',linewidth=0.3) 
 
        
-    axs[i].boxplot([f_t_rc[48*i:48*(i+1)],f_t_undo[48*i:48*(i+1)],
+    bx = axs[i].boxplot([f_t_rc[48*i:48*(i+1)],f_t_undo[48*i:48*(i+1)],
        [median(x) for x in t_everyact_rc[48*i:48*(i+1)]],
        [median(x) for x in t_everyc_undo[48*i:48*(i+1)]],
        t_s_rc[48*i:48*(i+1)],t_s_undo[48*i:48*(i+1)],
-       undobox],positions =[1,2,2.5,3.5,4,5,5.5],widths = 0.3,showfliers=False,
-       medianprops = dict(color = 'k')) #, color='#0776d8',edgecolor = 'k'
+       undobox],positions =[1,2,2.5,3.5,4,5,5.5],widths = 0.3,showfliers=False,whis = 1.5,
+       medianprops = dict(color = 'k')) 
     
-    test_results = add_stat_annotation(axs[i], data=[f_t_rc[48*i:48*(i+1)],f_t_undo[48*i:48*(i+1)],
-       [median(x) for x in t_everyact_rc[48*i:48*(i+1)]],
-       [median(x) for x in t_everyc_undo[48*i:48*(i+1)]],
-       t_s_rc[48*i:48*(i+1)],t_s_undo[48*i:48*(i+1)]],
-       box_pairs=(f_t_rc[48*i:48*(i+1)],f_t_undo[48*i:48*(i+1)]),
-                                   test='Wilcoxon', text_format='star',
-                                   loc='outside')       
-    #    err_fu_1 = np.quantile(f_t_undo[48*i:48*(i+1)],q = 0.25)
-#    err_fu_2 = np.quantile(f_t_undo[48*i:48*(i+1)],q = 0.75)
-#    err_su_1 = np.quantile(t_s_undo[48*i:48*(i+1)],q = 0.25)
-#    err_su_2 = np.quantile(t_s_undo[48*i:48*(i+1)],q = 0.75)
-#    err_rcu_1 = np.quantile([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x],q = 0.25)
-#    err_rcu_2 = np.quantile([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x],q = 0.75)
-#    err_u_1 = np.quantile([y for x in t_everyundo[48*i:48*(i+1)] for y in x],q = 0.25)
-#    err_u_2 = np.quantile([y for x in t_everyundo[48*i:48*(i+1)] for y in x],q = 0.75)
-#
-#    axs[i].errorbar(x + width/2, [mean(f_t_undo[48*i:48*(i+1)]),median([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x]), 
-#       mean(t_s_undo[48*i:48*(i+1)]),median([y for x in t_everyundo[48*i:48*(i+1)] for y in x])], yerr=[[err_fu_1,err_rcu_1,err_su_1,err_u_1],[err_fu_2,err_rcu_2,err_su_2,err_u_2]], capsize = 3, ls='None', color='k')
     
-#    axs[i].set_ylim((0,60))
+    # statistical annotation
+    stat1, p1 = wilcoxon(df_part['f_t_rc'], df_part['f_t_undo'])
+    x1, x2 = 1,2  
+    if bx['caps'][1]._y[0] > bx['caps'][3]._y[0]:
+        y1, h1, col = bx['caps'][1]._y[0] + 2, 2, 'k'
+    else:
+        y1, h1, col = bx['caps'][3]._y[0] + 2, 2, 'k'
+    
+    axs[i].plot([x1, x1, x2, x2], [y1, y1+h1, y1+h1, y1], lw=1.5, c=col)
+    axs[i].text((x1+x2)*.5, y1+h1, 'p = '+ '{:.10f}'.format(p1), ha='center', va='bottom', color=col)
+    del y1,h1
+
+    #--------------------------------------
+    stat2, p2 = wilcoxon(df_part['m_t_everyact_rc'], df_part['m_t_everyc_undo'])
+
+    x1, x2 = 2.5,3.5  
+    y2, h2, col = bx['caps'][5]._y[0] + 2, 2, 'k'
+    axs[i].plot([x1, x1, x2, x2], [y2, y2+h2, y2+h2, y2], lw=1.5, c=col)
+    axs[i].text((x1+x2)*.5, y2+h2, 'p = '+ '{:.5f}'.format(p2), ha='center', va='bottom', color=col)
+    del y2,h2
+
+    #--------------------------------------
+    stat3, p3 = wilcoxon(df_part['t_s_rc'], df_part['t_s_undo'])
+
+    x1, x2 = 4,5  
+    y, h, col = bx['caps'][11]._y[0] + 2, 2, 'k'
+    axs[i].plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+    axs[i].text((x1+x2)*.5, y+h, 'p = '+ '{:.5f}'.format(p3), ha='center', va='bottom', color=col)
+    del y,h
+    #--------------------------------------
+
     axs[i].set_xticks([1.5,3,4.5,5.5])
-#    axs[i].secondary_xaxis(location = 'bottom', xticks = [1,2,2.5,3.5,4,5],
-#       xticklabels = ['without undo', 'with undo', 'without undo', 'with undo','without undo', 'with undo'])
 #    axs[i].set_xticklabels(labels)
     #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
     axs[i].set_xticklabels(labels = ['first choice\nwithout undo with undo','later choices\nwithout undo with undo', 'submit\nwithout undo with undo','undo'])
@@ -553,11 +568,6 @@ for i in range(0,3):
     axs[i].tick_params(axis='x', colors='k')
     axs[i].title.set_text('S'+str(i+1))
 axs[0].set_ylabel('Response time(s)')
-
-#import matplotlib.patches as mpatches
-#rc_led = mpatches.Patch(color='#0776d8', label='without undo')
-#undo_led = mpatches.Patch(color='#e13f42', label='with undo')
-#plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
 
 fig.set_figwidth(26)
 fig.set_figheight(12)
