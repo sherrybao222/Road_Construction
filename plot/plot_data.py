@@ -279,7 +279,7 @@ for j in range(0,2):
         axs[j,i].set_yticks(np.arange(y0,y1, 1.0))
         axs[0,i].title.set_text('S'+str(i+1))
 
-        axs[1,i].set_xlabel("Number connected (maximum)")
+        axs[1,i].set_xlabel("Number connectable (maximal)")
         axs[j,0].set_ylabel("Number connected (actual)")
 
 title_1 = mlines.Line2D([], [], color='white', label='without undo')
@@ -317,7 +317,7 @@ fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/p
 plt.close(fig)
 
 # =============================================================================
-# rc_undo_hist 
+# rc_undo_hist - final
 fig, axs = plt.subplots(1, 3, sharey=True)
 for i in range(0,3):
     mean1 = mean(diff[48*i:48*(i+1)])
@@ -343,18 +343,22 @@ for i in range(0,3):
     axs[i].title.set_text('S'+str(i+1))
     axs[i].text(-3.5, 0.7, 'without undo mean:'+ '{:.2f}'.format(mean1),fontsize=6)
     axs[i].text(-3.5, 0.6, 'with undo mean:'+'{:.2f}'.format(mean2),fontsize=6)
-axs[1].set_xlabel('Number connected (actual - maximum)')
+axs[1].set_xlabel('Number (actual connected - maximum connectable)')
 axs[0].set_ylabel('Proportion of trials')
 
 import matplotlib.patches as mpatches
 rc_led = mpatches.Patch(color='#0776d8', label='without undo')
 undo_led = mpatches.Patch(color='#e13f42', label='with undo')
-plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
+lgd = plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
+
+fig.set_figwidth(10)
+
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_undo_hist_all.png',dpi=600)
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_undo_hist_all.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
 plt.close(fig)
 
 # =============================================================================
+# number undos boxplot - final
 fig, axs = plt.subplots(1, 3, sharey=True)
 
 for i in range(0,3):
@@ -377,13 +381,22 @@ plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_hist_all.png',dpi=600)
 plt.close(fig)
 # =============================================================================
+# n_undo - n_max - final
 fig, axs = plt.subplots(1, 3, sharey=True)
 for i in range(0,3):
-    u, c = np.unique(np.c_[n_undo[48*i:48*(i+1)],rc_list[48*i:48*(i+1)]], return_counts=True, axis=0)
-    axs[i].plot(rc_list[48*i:48*(i+1)],n_undo[48*i:48*(i+1)], 'o',
-       markerfacecolor = '#727bda',markeredgecolor = 'none',alpha = 0.2)     
+    n_undo_mx = []
+    for j in list(set(rc_list[48*i:48*(i+1)])):
+        n_undo_mx.append(df.loc[(df['sub'] == subs[i]) & (df['rc_list'] == j),'n_undo'])
+    
+    err_1 = [np.quantile(x,q=0.25) for x in n_undo_mx]
+    err_2 = [np.quantile(x,q=0.75) for x in n_undo_mx]
 
-    axs[i].set_ylim((-4,40))
+    axs[i].plot(list(set(rc_list[48*i:48*(i+1)])),[np.median(x) for x in n_undo_mx],marker = 'o',
+       markerfacecolor = '#727bda',markeredgecolor = 'none')     
+    axs[i].errorbar(list(set(rc_list[48*i:48*(i+1)])), [np.median(x) for x in n_undo_mx], 
+       yerr=[err_1,err_2], capsize = 3, ls='None', color='k')
+
+    axs[i].set_ylim((-4,50))
     axs[i].set_xlim((4,12))
 
     
@@ -393,7 +406,7 @@ for i in range(0,3):
     axs[i].spines['bottom'].set_color('k')
     axs[i].spines['left'].set_color('k')
     axs[i].title.set_text('S'+str(i+1))
-axs[1].set_xlabel('Number connected (maximum)')
+axs[1].set_xlabel('Maximum connectable number')
 axs[0].set_ylabel('Number of undos per trial')
 
 plt.show()
@@ -401,30 +414,32 @@ fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/p
 plt.close(fig)
 
 
-# =============================================================================
-fig, axs = plt.subplots(1, 3, sharey=True)
+## =============================================================================
+#fig, axs = plt.subplots(1, 3, sharey=True)
+#
+#for i in range(0,3):
+#    axs[i].boxplot([f_t_rc[48*i:48*(i+1)], f_t_undo[48*i:48*(i+1)]],widths = 0.6)  
+#    axs[i].plot([1,2],[f_t_rc[48*i:48*(i+1)], f_t_undo[48*i:48*(i+1)]], 'o',
+#       markerfacecolor = '#727bda',markeredgecolor = 'none',alpha = 0.2)     
+#    #plotline1, caplines1, barlinecols1 = ax.errorbar(ind, [mean(mean_t_rc),mean(mean_t_undo)], yerr=[err_rc,err_undo], lolims=True, capsize = 0, ls='None', color='k')
+#    #caplines1[0].set_marker('_')
+#    #caplines1[0].set_markersize(7)
+#    axs[i].set_ylim((0,80))
+#    
+#    axs[i].set_xticklabels(['w/o undo','w/ undo'])
+#    #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
+#    axs[i].set_facecolor('white')
+#    axs[i].spines['bottom'].set_color('k')
+#    axs[i].spines['left'].set_color('k')
+#    axs[i].tick_params(axis='y', colors='k')
+#    axs[i].title.set_text('S'+str(i+1))
+#axs[0].set_ylabel('First-move response time (s)')
+#plt.show()
+#fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/f_t_rc_hist_all.png',dpi=600)
+#plt.close(fig)
 
-for i in range(0,3):
-    axs[i].boxplot([f_t_rc[48*i:48*(i+1)], f_t_undo[48*i:48*(i+1)]],widths = 0.6)  
-    axs[i].plot([1,2],[f_t_rc[48*i:48*(i+1)], f_t_undo[48*i:48*(i+1)]], 'o',
-       markerfacecolor = '#727bda',markeredgecolor = 'none',alpha = 0.2)     
-    #plotline1, caplines1, barlinecols1 = ax.errorbar(ind, [mean(mean_t_rc),mean(mean_t_undo)], yerr=[err_rc,err_undo], lolims=True, capsize = 0, ls='None', color='k')
-    #caplines1[0].set_marker('_')
-    #caplines1[0].set_markersize(7)
-    axs[i].set_ylim((0,80))
-    
-    axs[i].set_xticklabels(['w/o undo','w/ undo'])
-    #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
-    axs[i].set_facecolor('white')
-    axs[i].spines['bottom'].set_color('k')
-    axs[i].spines['left'].set_color('k')
-    axs[i].tick_params(axis='y', colors='k')
-    axs[i].title.set_text('S'+str(i+1))
-axs[0].set_ylabel('First-move response time (s)')
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/f_t_rc_hist_all.png',dpi=600)
-plt.close(fig)
-
 # =============================================================================
+# whole time boxplot - final
 fig, axs = plt.subplots(1, 3, sharey=True)
 
 for i in range(0,3):
@@ -444,6 +459,7 @@ for i in range(0,3):
     axs[i].tick_params(axis='y', colors='k')
     axs[i].title.set_text('S'+str(i+1))
 axs[0].set_ylabel('Trial duration (s)')
+plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc_hist_all.png',dpi=600)
 plt.close(fig)
 
@@ -549,50 +565,6 @@ fig.set_figheight(12)
 plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t.png',dpi=600,bbox_inches='tight')
 plt.close(fig)
-# =============================================================================
-#fig, axs = plt.subplots(1, 3, sharey=True)
-#
-#labels = ['first choice', 'other choice', 'submit','undo']
-#x = np.arange(len(labels))  # the label locations
-#width = 0.4  # the width of the bars
-#
-#for i in range(0,3):
-#    axs[i].boxplot([mean(f_t_rc[48*i:48*(i+1)]),median([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x]), 
-#       mean(t_s_rc[48*i:48*(i+1)]),0])#,width, color='#0776d8',edgecolor = 'k'
-##    err_rc_1 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.25)
-##    err_rc_2 = np.quantile([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x],q = 0.75)
-#
-##    plotline1, caplines1, barlinecols1 = axs[i].errorbar(ind, [mean(f_t_rc[48*i:48*(i+1)]),median([y for x in t_everyact_rc[48*i:48*(i+1)] for y in x]), 
-##       mean(t_s_rc[48*i:48*(i+1)]),0], yerr=[0,err_rc_1,0], lolims=True, capsize = 0, ls='None', color='k')
-#
-#    axs[i].boxplot([mean(f_t_undo[48*i:48*(i+1)]),median([y for x in t_everyc_undo[48*i:48*(i+1)] for y in x]), 
-#       mean(t_s_undo[48*i:48*(i+1)]),median([y for x in t_everyundo[48*i:48*(i+1)] for y in x])])  #,width,color ='#e13f42',edgecolor = 'k'
-#    
-#    #caplines1[0].set_marker('_')
-#    #caplines1[0].set_markersize(7)
-#    axs[i].set_ylim((0,26))
-#    axs[i].set_xticks(x - width/2)
-#    axs[i].set_xticklabels(labels)
-#    #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
-#    axs[i].set_facecolor('white')
-#    axs[i].spines['bottom'].set_color('k')
-#    axs[i].spines['left'].set_color('k')
-#    axs[i].tick_params(axis='y', colors='k', direction='in',left = True)   
-#    axs[i].tick_params(axis='x', colors='k',labelrotation = 70)
-#    axs[i].title.set_text('S'+str(i+1))
-#axs[0].set_ylabel('Response time(s)')
-#
-#import matplotlib.patches as mpatches
-#rc_led = mpatches.Patch(color='#0776d8', label='w/o undo')
-#undo_led = mpatches.Patch(color='#e13f42', label='w/ undo')
-#plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
-#
-#fig.set_figwidth(10)
-#fig.set_figheight(8)
-#
-#plt.show()
-#fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t_box.png',dpi=600)
-#plt.close(fig)
 
 # =============================================================================
 # all subjects
