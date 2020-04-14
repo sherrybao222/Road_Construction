@@ -223,23 +223,23 @@ df.to_csv('filtered2.csv', index=True)
 # =============================================================================
 # statistical tests
 from scipy.stats import wilcoxon
-# print("length rc: "+ str(len(rc)))
-#
-# stat1, p1 = wilcoxon(rc[0:48], undo[0:48])
-# m1rc = median(rc[0:48])
-# m1undo = median(rc[0:48])
+print("length rc: "+ str(len(diff)))
+
+# stat1, p1 = wilcoxon(diff[0:48], diff_undo[0:48])
+# m1rc = median(diff[0:48])
+# m1undo = median(diff_undo[0:48])
 # print('stat1=%.3f, p1=%.10f' % (stat1, p1))
 # print('median rc=%.3f, median undo=%.3f' % (m1rc, m1undo))
 #
-# stat2, p2 = wilcoxon(rc[48:126], undo[48:126])
-# m2rc = median(rc[48:126])
-# m2undo = median(rc[48:126])
+# stat2, p2 = wilcoxon(diff[48:126], diff_undo[48:126])
+# m2rc = median(diff[48:126])
+# m2undo = median(diff_undo[48:126])
 # print('stat2=%.3f, p2=%.10f' % (stat2, p2))
 # print('median rc=%.3f, median undo=%.3f' % (m2rc, m2undo))
 #
-# stat3, p3 = wilcoxon(rc[126:144], undo[126:144])
-# m3rc = median(rc[126:144])
-# m3undo = median(rc[126:144])
+# stat3, p3 = wilcoxon(diff[126:144], diff_undo[126:144])
+# m3rc = median(diff[126:144])
+# m3undo = median(diff_undo[126:144])
 # print('stat3=%.3f, p3=%.10f' % (stat3, p3))
 # print('median rc=%.3f, median undo=%.3f' % (m3rc, m3undo))
 
@@ -398,8 +398,8 @@ for i in range(0,3):
     axs[i].spines['left'].set_color('k')
     axs[i].tick_params(axis='y', colors='k',direction='in',left = True)
     axs[i].title.set_text('S'+str(i+1))
-    axs[i].text(-3.5, 0.7, 'w/o undo mean:'+ '{:.2f}'.format(mean1),fontsize=6)
-    axs[i].text(-3.5, 0.6, 'w/ undo mean:'+'{:.2f}'.format(mean2),fontsize=6)
+    # axs[i].text(-3.5, 0.7, 'w/o undo mean:'+ '{:.2f}'.format(mean1),fontsize=6)
+    # axs[i].text(-3.5, 0.6, 'w/ undo mean:'+'{:.2f}'.format(mean2),fontsize=6)
 axs[1].set_xlabel('Number connected (actual - maximum)')
 axs[0].set_ylabel('Proportion of trials')
 
@@ -408,7 +408,7 @@ rc_led = mpatches.Patch(color='#0776d8', label='w/o undo')
 undo_led = mpatches.Patch(color='#e13f42', label='w/ undo')
 plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
 # plt.show()
-# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_undo_hist_all.png',dpi=600)
+# fig.savefig('/Users/fqx/Dropbox/Spring 2020/Honors/Fig & Note/rc_undo_hist_all.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
