@@ -71,7 +71,7 @@ t_s_undo = [] # time to submit in undo
 mean_rc = [] # mean of number of connect city in rc
 mean_undo = [] # mean of number of connect city in undo trl
 ac_num = [] # accuracy for num_est
-budget_numest = [] # accuracy for num_est for every budget
+budget_numest = [0]*3 # accuracy/mbe/mae for num_est for every budget
 pc_undo = [] # Percentage of using undos among all undo trials
 mean_t_rc = [] # mean of whole trial time for rc trl
 mean_t_undo = [] # mean of whole trial time for undo trl
@@ -153,10 +153,6 @@ for data in data_all:
 bool_numest = map(eq, num, num_list) # correct or not in num_est 
 int_numest = list(np.array(list(bool_numest)).astype(float))# indicator num_est is correct
 
-# initialize
-mx_num = [0]*3 # number est summary matrix 
-sorted_mx = [0]*3 # number est summary matrix (sorted by budget)
-
 for i in range(0,3):
     mean_rc.append(mean(rc[48*i:48*(i+1)]))
     mean_undo.append(mean(undo[48*i:48*(i+1)]))
@@ -169,15 +165,6 @@ for i in range(0,3):
     pc_undo.append(mean(undo_click[48*i:48*(i+1)]))
     ac_num.append(mean(int_numest[48*i:48*(i+1)]))
 
-    mx_num[i] = np.column_stack((num_ind[48*i:48*(i+1)], budget_list[48*i:48*(i+1)], num[48*i:48*(i+1)], num_list[48*i:48*(i+1)],int_numest[48*i:48*(i+1)])) 
-    temp = mx_num[i].view(np.ndarray)
-    sorted_mx[i] = temp[np.lexsort((temp[:, 1], ))] # sort by budget
-
-for i in range(0,3):
-    sub = []
-    for j in range(0,3):
-        sub.append(mean(sorted_mx[i][16*j:16*(j+1),4]))
-    budget_numest.append(sub)
 
 # calculated for heatmap, ignore for now    
 rc_undo = np.zeros((12,12))
@@ -196,19 +183,32 @@ for x,y in zip_obj:
     diff_undo.append(x-y)
     
 diff_n = [] # number estimation (reported - correct) 
+diff_a_n = [] # number estimation abosolute error
 zip_obj = zip(num,num_list)
 for x,y in zip_obj:
     diff_n.append(x-y)
+    diff_a_n.append(abs(x-y))
     
-#rm_t = []
-#zip_obj = zip(t_rc,f_t_rc)
-#for x,y in zip_obj:
-#    rm_t.append(x-y)
-#
-#rm_t_undo = []
-#zip_obj = zip(t_undo,f_t_undo)
-#for x,y in zip_obj:
-#    rm_t_undo.append(x-y)
+# initialize
+mx_num = [0]*3 # number est summary matrix 
+sorted_mx = [0]*3 # number est summary matrix (sorted by budget)
+  
+for i in range(0,3):
+    mx_num[i] = np.column_stack((num_ind[48*i:48*(i+1)], budget_list[48*i:48*(i+1)], 
+          num[48*i:48*(i+1)], num_list[48*i:48*(i+1)],int_numest[48*i:48*(i+1)],
+          diff_n[48*i:48*(i+1)], diff_a_n[48*i:48*(i+1)]))
+    temp = mx_num[i].view(np.ndarray)
+    sorted_mx[i] = temp[np.lexsort((temp[:, 1], ))] # sort by budget
+    
+for i in range(0,3):
+    sub = []
+    sub1 = []
+    sub2 = []
+    for j in range(0,3):
+        sub.append(mean(sorted_mx[i][16*j:16*(j+1),4]))
+        sub1.append(mean(sorted_mx[i][16*j:16*(j+1),5]))
+        sub2.append(mean(sorted_mx[i][16*j:16*(j+1),6]))
+    budget_numest[i] = [sub,sub1,sub2]
 
 # organize some data into dataframe  
 # intialise data of lists.
@@ -260,6 +260,76 @@ fig.set_figwidth(12)
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_est_scatter_all.png',dpi=600)
 plt.close(fig)
 
+# ----------------------------------------------------
+fig, axs = plt.subplots(1, 3, sharey=True)
+for i in range(0,3):
+
+    ind = [0.5,0.8,1.1]
+    axs[i].bar(ind,budget_numest[i][2],width = 0.1,
+           color = '#99cccc',edgecolor='k')
+    axs[i].set_ylim((0,3))
+    axs[i].set_xticks([0.3,0.5,0.8,1.1,1.3])
+    axs[i].set_xticklabels(['',200,350,500,''])
+    axs[i].set_facecolor('white')
+    axs[i].spines['bottom'].set_color('k')
+    axs[i].spines['left'].set_color('k')
+    axs[i].tick_params(axis='y', colors='k')
+    axs[i].title.set_text('S'+str(i+1))
+    
+axs[0].set_ylabel('Mean absolute error in number estimation')
+axs[1].set_xlabel('Budget length')
+
+plt.show()
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_mae.png',dpi=600)
+plt.close(fig)
+
+# ----------------------------------------------------
+fig, axs = plt.subplots(1, 3, sharey=True)
+for i in range(0,3):
+
+    ind = [0.5,0.8,1.1]
+    axs[i].bar(ind,budget_numest[i][1],width = 0.1,
+           color = '#99cccc',edgecolor='k')
+    axs[i].set_ylim((-3,1))
+    axs[i].set_xticks([0.3,0.5,0.8,1.1,1.3])
+    axs[i].set_xticklabels(['',200,350,500,''])
+    axs[i].set_facecolor('white')
+    axs[i].spines['bottom'].set_color('k')
+#    axs[i].spines['bottom'].set_position('zero')
+    axs[i].spines['left'].set_color('k')
+    axs[i].tick_params(axis='y', colors='k')
+    axs[i].title.set_text('S'+str(i+1))
+    
+axs[0].set_ylabel('Mean bias error in number estimation')
+axs[1].set_xlabel('Budget length')
+
+plt.show()
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_mbe.png',dpi=600)
+plt.close(fig)
+
+# =============================================================================
+fig, axs = plt.subplots(1, 3, sharey=True)
+
+for i in range(0,3):
+    axs[i].hist(diff_n[48*i:48*(i+1)], range(-4,4), facecolor='#727bda', density=1,
+          align = 'left',edgecolor='k')
+
+    axs[i].set_ylim((0,1))
+    axs[i].set_xlim((-5,3))
+
+    axs[i].set_xticks(range(-4,3))
+    axs[i].set_yticks(np.arange(0,1, 0.1))
+
+    axs[i].set_facecolor('white')
+    axs[i].spines['bottom'].set_color('k')
+    axs[i].spines['left'].set_color('k')
+    axs[i].tick_params(axis='y', colors='k')
+    axs[i].title.set_text('S'+str(i+1))
+axs[1].set_xlabel('Number estimation (reported - correct)')
+axs[0].set_ylabel('Frequency')
+plt.show()
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_hist_all.png',dpi=600)
+plt.close(fig)
 # =============================================================================
 # rc scatter all - final
 fig, axs = plt.subplots(2, 3, sharey=True)
@@ -422,32 +492,6 @@ axs[0].set_ylabel('Number of undos per trial')
 plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_max.png',dpi=600)
 plt.close(fig)
-
-
-## =============================================================================
-#fig, axs = plt.subplots(1, 3, sharey=True)
-#
-#for i in range(0,3):
-#    axs[i].boxplot([f_t_rc[48*i:48*(i+1)], f_t_undo[48*i:48*(i+1)]],widths = 0.6)  
-#    axs[i].plot([1,2],[f_t_rc[48*i:48*(i+1)], f_t_undo[48*i:48*(i+1)]], 'o',
-#       markerfacecolor = '#727bda',markeredgecolor = 'none',alpha = 0.2)     
-#    #plotline1, caplines1, barlinecols1 = ax.errorbar(ind, [mean(mean_t_rc),mean(mean_t_undo)], yerr=[err_rc,err_undo], lolims=True, capsize = 0, ls='None', color='k')
-#    #caplines1[0].set_marker('_')
-#    #caplines1[0].set_markersize(7)
-#    axs[i].set_ylim((0,80))
-#    
-#    axs[i].set_xticklabels(['w/o undo','w/ undo'])
-#    #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
-#    axs[i].set_facecolor('white')
-#    axs[i].spines['bottom'].set_color('k')
-#    axs[i].spines['left'].set_color('k')
-#    axs[i].tick_params(axis='y', colors='k')
-#    axs[i].title.set_text('S'+str(i+1))
-#axs[0].set_ylabel('First-move response time (s)')
-#plt.show()
-#fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/f_t_rc_hist_all.png',dpi=600)
-#plt.close(fig)
-
 # =============================================================================
 # whole time boxplot - final
 fig, axs = plt.subplots(1, 3, sharey=True)
@@ -473,32 +517,25 @@ plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc_hist_all.png',dpi=600)
 plt.close(fig)
 
-## =============================================================================
-#fig, axs = plt.subplots(1, 3, sharey=True)
-#
-#for i in range(0,3):
-#    axs[i].boxplot([rm_t[48*i:48*(i+1)], rm_t_undo[48*i:48*(i+1)]],widths = 0.6)  
-#    axs[i].plot([1,2],[rm_t[48*i:48*(i+1)], rm_t_undo[48*i:48*(i+1)]], 'o',
-#       markerfacecolor = '#727bda',markeredgecolor = 'none',alpha = 0.2)     
-#    #plotline1, caplines1, barlinecols1 = ax.errorbar(ind, [mean(mean_t_rc),mean(mean_t_undo)], yerr=[err_rc,err_undo], lolims=True, capsize = 0, ls='None', color='k')
-#    #caplines1[0].set_marker('_')
-#    #caplines1[0].set_markersize(7)
-#    axs[i].set_ylim((0,110))
-#    
-#    axs[i].set_xticklabels(['w/o undo','w/ undo'])
-#    #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
-#    axs[i].set_facecolor('white')
-#    axs[i].spines['bottom'].set_color('k')
-#    axs[i].spines['left'].set_color('k')
-#    axs[i].tick_params(axis='y', colors='k')
-#    axs[i].title.set_text('S'+str(i+1))
-#axs[0].set_ylabel('Trial duration excluding first-move rt(s)')
-#plt.show()
-#fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rm_t_rc_hist_all.png',dpi=600)
-#plt.close(fig)
-#
 # =============================================================================
 # action time
+def as_si(x, ndp):
+    s = '{x:0.{ndp:d}e}'.format(x=x, ndp=ndp)
+    m, e = s.split('e')
+    return r'{m:s}\times 10^{{{e:d}}}'.format(m=m, e=int(e))
+
+def text(p):
+    if p < 0.001:
+        axs[i].text((x1+x2)*.5, y+h, r"$p = {0:s}$".format(as_si(p,1)), ha='center', va='bottom', color=col)
+    elif p > 0.1:
+        axs[i].text((x1+x2)*.5, y+h, r"$p = {:.2f}$".format(p), ha='center', va='bottom', color=col)
+
+    elif 0.01 < p < 0.1:
+        axs[i].text((x1+x2)*.5, y+h, r"$p = {:.3f}$".format(p), ha='center', va='bottom', color=col)
+    else:
+        axs[i].text((x1+x2)*.5, y+h, r"$p = {:.4f}$".format(p), ha='center', va='bottom', color=col)
+
+
 fig, axs = plt.subplots(1, 3, sharey=True)
 
 for i in range(0,3):
@@ -529,31 +566,51 @@ for i in range(0,3):
     stat1, p1 = wilcoxon(df_part['f_t_rc'], df_part['f_t_undo'])
     x1, x2 = 1,2  
     if bx['caps'][1]._y[0] > bx['caps'][3]._y[0]:
-        y1, h1, col = bx['caps'][1]._y[0] + 2, 2, 'k'
+        y, h, col = bx['caps'][1]._y[0] + 2, 2, 'k'
     else:
-        y1, h1, col = bx['caps'][3]._y[0] + 2, 2, 'k'
+        y, h, col = bx['caps'][3]._y[0] + 2, 2, 'k'
     
-    axs[i].plot([x1, x1, x2, x2], [y1, y1+h1, y1+h1, y1], lw=1.5, c=col)
-    axs[i].text((x1+x2)*.5, y1+h1, 'p = '+ '{:.10f}'.format(p1), ha='center', va='bottom', color=col)
-    del y1,h1
-
+    axs[i].plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+    text(p1)
+    
     #--------------------------------------
     stat2, p2 = wilcoxon(df_part['m_t_everyact_rc'], df_part['m_t_everyc_undo'])
 
     x1, x2 = 2.5,3.5  
-    y2, h2, col = bx['caps'][5]._y[0] + 2, 2, 'k'
-    axs[i].plot([x1, x1, x2, x2], [y2, y2+h2, y2+h2, y2], lw=1.5, c=col)
-    axs[i].text((x1+x2)*.5, y2+h2, 'p = '+ '{:.5f}'.format(p2), ha='center', va='bottom', color=col)
-    del y2,h2
-
+    y, h, col = bx['caps'][5]._y[0] + 2, 2, 'k'
+    axs[i].plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+    text(p2)
     #--------------------------------------
     stat3, p3 = wilcoxon(df_part['t_s_rc'], df_part['t_s_undo'])
 
     x1, x2 = 4,5  
     y, h, col = bx['caps'][11]._y[0] + 2, 2, 'k'
     axs[i].plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-    axs[i].text((x1+x2)*.5, y+h, 'p = '+ '{:.5f}'.format(p3), ha='center', va='bottom', color=col)
-    del y,h
+    text(p3)
+    #--------------------------------------
+    stat4, p4 = wilcoxon(df_part['f_t_rc'], df_part['m_t_everyact_rc'])
+
+    x1, x2 = 1,2.5  
+    if bx['caps'][1]._y[0] > bx['caps'][3]._y[0]:
+        y, h, col = bx['caps'][1]._y[0] + 6, 2, 'k'
+    else:
+        y, h, col = bx['caps'][3]._y[0] + 6, 2, 'k'
+        
+    axs[i].plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+    text(p4)
+    #--------------------------------------
+    stat5, p5 = wilcoxon(df_part['f_t_undo'], df_part['m_t_everyc_undo'])
+
+    x1, x2 = 2,3.5  
+    if bx['caps'][1]._y[0] > bx['caps'][3]._y[0]:
+        y, h, col = bx['caps'][1]._y[0] + 12, 2, 'k'
+    else:
+        y, h, col = bx['caps'][3]._y[0] + 12, 2, 'k'
+        
+    axs[i].plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+    text(p5)
+
+
     #--------------------------------------
 
     axs[i].set_xticks([1.5,3,4.5,5.5])
