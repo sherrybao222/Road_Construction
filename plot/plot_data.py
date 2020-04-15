@@ -11,6 +11,7 @@ import pandas as pd
 
 data_all = [] # prepare for all data
 subs = [1,2,4] # subject index
+budget = [200,350,400]
 
 # import experiment data
 for num in subs:
@@ -72,6 +73,7 @@ mean_rc = [] # mean of number of connect city in rc
 mean_undo = [] # mean of number of connect city in undo trl
 ac_num = [] # accuracy for num_est
 budget_numest = [0]*3 # accuracy/mbe/mae for num_est for every budget
+budget_numest_err = [0]*3
 pc_undo = [] # Percentage of using undos among all undo trials
 mean_t_rc = [] # mean of whole trial time for rc trl
 mean_t_undo = [] # mean of whole trial time for undo trl
@@ -210,6 +212,17 @@ for i in range(0,3):
         sub2.append(mean(sorted_mx[i][16*j:16*(j+1),6]))
     budget_numest[i] = [sub,sub1,sub2]
 
+for i in range(0,3):
+    sub = []
+    sub1 = []
+    sub2 = []
+    for j in range(0,3):
+        sub.append(stdev(sorted_mx[i][16*j:16*(j+1),4])/math.sqrt(16))
+        sub1.append(stdev(sorted_mx[i][16*j:16*(j+1),5])/math.sqrt(16))
+        sub2.append(stdev(sorted_mx[i][16*j:16*(j+1),6])/math.sqrt(16))
+    budget_numest_err[i] = [sub,sub1,sub2]
+
+
 # organize some data into dataframe  
 # intialise data of lists.
 
@@ -267,6 +280,11 @@ for i in range(0,3):
     ind = [0.5,0.8,1.1]
     axs[i].bar(ind,budget_numest[i][2],width = 0.1,
            color = '#99cccc',edgecolor='k')
+           
+    plotline1, caplines1, barlinecols1 = axs[i].errorbar(ind, budget_numest[i][2], yerr=budget_numest_err[i][2], lolims=True, capsize = 0, ls='None', color='k')
+    caplines1[0].set_marker('_')
+    caplines1[0].set_markersize(5)
+
     axs[i].set_ylim((0,3))
     axs[i].set_xticks([0.3,0.5,0.8,1.1,1.3])
     axs[i].set_xticklabels(['',200,350,500,''])
@@ -277,7 +295,7 @@ for i in range(0,3):
     axs[i].title.set_text('S'+str(i+1))
     
 axs[0].set_ylabel('Mean absolute error in number estimation')
-axs[1].set_xlabel('Budget length')
+axs[1].set_xlabel('Budget length (px)')
 
 plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_mae.png',dpi=600)
@@ -290,6 +308,17 @@ for i in range(0,3):
     ind = [0.5,0.8,1.1]
     axs[i].bar(ind,budget_numest[i][1],width = 0.1,
            color = '#99cccc',edgecolor='k')
+    
+    new_err =[]
+    for j,x in enumerate(budget_numest_err[i][1]):
+        if budget_numest[i][1][j]< 0:
+            new_err.append(-x)
+        else:
+            new_err.append(x)
+    plotline1, caplines1, barlinecols1 = axs[i].errorbar(ind, budget_numest[i][1], yerr=new_err, lolims=True, capsize = 0, ls='None', color='k')
+    caplines1[0].set_marker('_')
+    caplines1[0].set_markersize(5)
+
     axs[i].set_ylim((-3,1))
     axs[i].set_xticks([0.3,0.5,0.8,1.1,1.3])
     axs[i].set_xticklabels(['',200,350,500,''])
@@ -300,35 +329,44 @@ for i in range(0,3):
     axs[i].tick_params(axis='y', colors='k')
     axs[i].title.set_text('S'+str(i+1))
     
-axs[0].set_ylabel('Mean bias error in number estimation')
-axs[1].set_xlabel('Budget length')
+axs[0].set_ylabel('Mean error in number estimation')
+axs[1].set_xlabel('Budget length (px)')
 
 plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_mbe.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
-fig, axs = plt.subplots(1, 3, sharey=True)
+# num_hist for every budget
+fig, axs = plt.subplots(3, 3, sharey=True)
 
-for i in range(0,3):
-    axs[i].hist(diff_n[48*i:48*(i+1)], range(-4,4), facecolor='#727bda', density=1,
-          align = 'left',edgecolor='k')
+for i in range(0,3): # subject
+    for j in range(0,3): # budget level
+        axs[i,j].hist(sorted_mx[i][16*j:16*(j+1),5], range(-4,4), facecolor='#727bda', density=1,
+              align = 'left',edgecolor='k')
+    
+        axs[i,j].set_ylim((0,1))
+        axs[i,j].set_xlim((-5,3))
+    
+        axs[i,j].set_xticks(range(-4,3))
+        axs[i,j].set_yticks(np.arange(0,1.1, 0.1))
+        axs[i,j].set_yticklabels([0,'',0.2,'',0.4,'',0.6,'',0.8,'',1.0])
+    
+        axs[i,j].set_facecolor('white')
+        axs[i,j].spines['bottom'].set_color('k')
+        axs[i,j].spines['left'].set_color('k')
+        axs[i,j].tick_params(axis='y', colors='k',direction='in',left = True)
+        axs[i,1].title.set_text('S'+str(i+1))
+        axs[0,j].text(-2, 0.8, 'budget = '+ '{:.0f}'.format(budget[j])+'px',fontsize=10)
 
-    axs[i].set_ylim((0,1))
-    axs[i].set_xlim((-5,3))
+fig.subplots_adjust(top=1)
+axs[2,1].set_xlabel('Number estimation (reported - correct)')
+axs[1,0].set_ylabel('Frequency')
+fig.set_figheight(11)
+fig.set_figwidth(10)
 
-    axs[i].set_xticks(range(-4,3))
-    axs[i].set_yticks(np.arange(0,1, 0.1))
-
-    axs[i].set_facecolor('white')
-    axs[i].spines['bottom'].set_color('k')
-    axs[i].spines['left'].set_color('k')
-    axs[i].tick_params(axis='y', colors='k')
-    axs[i].title.set_text('S'+str(i+1))
-axs[1].set_xlabel('Number estimation (reported - correct)')
-axs[0].set_ylabel('Frequency')
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_hist_all.png',dpi=600)
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_hist_budget.png',dpi=600,bbox_inches='tight')
 plt.close(fig)
 # =============================================================================
 # rc scatter all - final
@@ -616,7 +654,7 @@ for i in range(0,3):
     axs[i].set_xticks([1.5,3,4.5,5.5])
 #    axs[i].set_xticklabels(labels)
     #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
-    axs[i].set_xticklabels(labels = ['first choice\nwithout undo with undo','later choices\nwithout undo with undo', 'submit\nwithout undo with undo','undo'])
+    axs[i].set_xticklabels(labels = ['first choice\nwithout undo with undo','later choices\n\nwithout undo with undo', 'submit\nwithout undo with undo','undo'],fontsize=16)
 
     axs[i].set_facecolor('white')
     axs[i].spines['bottom'].set_color('k')
@@ -624,7 +662,7 @@ for i in range(0,3):
     axs[i].tick_params(axis='y', colors='k', direction='in',left = True)   
     axs[i].tick_params(axis='x', colors='k')
     axs[i].title.set_text('S'+str(i+1))
-axs[0].set_ylabel('Response time(s)')
+axs[0].set_ylabel('Response time (s)',fontsize=16)
 
 fig.set_figwidth(26)
 fig.set_figheight(12)
