@@ -564,14 +564,14 @@ def as_si(x, ndp):
 
 def text(p):
     if p < 0.001:
-        axs[i].text((x1+x2)*.5, y+h, r"$p = {0:s}$".format(as_si(p,1)), ha='center', va='bottom', color=col)
+        axs[i].text((x1+x2)*.5, y+h, r"$p = {0:s}$".format(as_si(p,1)), ha='center', va='bottom', color=col, fontsize = 16)
     elif p > 0.1:
-        axs[i].text((x1+x2)*.5, y+h, r"$p = {:.2f}$".format(p), ha='center', va='bottom', color=col)
+        axs[i].text((x1+x2)*.5, y+h, r"$p = {:.2f}$".format(p), ha='center', va='bottom', color=col, fontsize = 16)
 
     elif 0.01 < p < 0.1:
-        axs[i].text((x1+x2)*.5, y+h, r"$p = {:.3f}$".format(p), ha='center', va='bottom', color=col)
+        axs[i].text((x1+x2)*.5, y+h, r"$p = {:.3f}$".format(p), ha='center', va='bottom', color=col, fontsize = 16)
     else:
-        axs[i].text((x1+x2)*.5, y+h, r"$p = {:.4f}$".format(p), ha='center', va='bottom', color=col)
+        axs[i].text((x1+x2)*.5, y+h, r"$p = {:.4f}$".format(p), ha='center', va='bottom', color=col, fontsize = 16)
 
 
 fig, axs = plt.subplots(1, 3, sharey=True)
@@ -651,15 +651,15 @@ for i in range(0,3):
 
     #--------------------------------------
 
+#    axs[i].set_xticks([1,1.5,2,2.5,3,3.5,4,4.5,5,5.5])
+#    axs[i].set_xticklabels(labels = ['\nwithout undo','first choice','\n\nwith undo','\nwithout undo','later choices','\n\nwith undo', '\nwithout undo','submit','\n\nwith undo','undo'],fontsize=16)
     axs[i].set_xticks([1.5,3,4.5,5.5])
-#    axs[i].set_xticklabels(labels)
-    #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
-    axs[i].set_xticklabels(labels = ['first choice\nwithout undo with undo','later choices\n\nwithout undo with undo', 'submit\nwithout undo with undo','undo'],fontsize=16)
+    axs[i].set_xticklabels(labels = ['first choice \nw/o undo w/ undo','later choices \nw/o undo w/ undo', 'submit \nw/o undo w/ undo','undo'],fontsize=15)
 
     axs[i].set_facecolor('white')
     axs[i].spines['bottom'].set_color('k')
     axs[i].spines['left'].set_color('k')
-    axs[i].tick_params(axis='y', colors='k', direction='in',left = True)   
+    axs[i].tick_params(axis='y', colors='k', direction='in',left = True, labelsize = 16) 
     axs[i].tick_params(axis='x', colors='k')
     axs[i].title.set_text('S'+str(i+1))
 axs[0].set_ylabel('Response time (s)',fontsize=16)
@@ -668,7 +668,7 @@ fig.set_figwidth(26)
 fig.set_figheight(12)
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t.png',dpi=600,bbox_inches='tight')
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t_v2.png',dpi=600,bbox_inches='tight')
 plt.close(fig)
 
 # =============================================================================
