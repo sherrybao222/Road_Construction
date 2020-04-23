@@ -193,7 +193,7 @@ diff_n = [] # number estimation (reported - correct)
 zip_obj = zip(num,num_list)
 for x,y in zip_obj:
     diff_n.append(x-y)
-    
+
 #rm_t = []
 #zip_obj = zip(t_rc,f_t_rc)
 #for x,y in zip_obj:
@@ -253,8 +253,12 @@ print("length rc: "+ str(len(diff)))
 stat, p = wilcoxon(f_t_rc, f_t_undo)
 mrc = median(f_t_rc)
 mundo = median(f_t_undo)
-print('stat=%.3f, p=%.10f, median rc= %.3f, median undo=%.3f' % (stat, p,mrc,mundo))
+# print('stat=%.3f, p=%.10f, median rc= %.3f, median undo=%.3f' % (stat, p,mrc,mundo))
 
+
+# correlation of errors between RC and NE
+rc_c_ne = np.corrcoef(diff[126:144],diff_n[126:144])
+print('correlation:'+ str(rc_c_ne[0][1]))
 
 #----------------------------------------------------------------
 # Student's t-test
