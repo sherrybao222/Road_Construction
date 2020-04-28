@@ -390,6 +390,7 @@ for j in range(0,2):
         axs[j,i].set_aspect(abs(x1-x0)/abs(y1-y0))
         
         axs[j,i].plot(axs[j,i].get_xlim(), axs[j,i].get_ylim(), ls="--", c=".3") # diagnal
+        axs[j,i].plot((8,12), (4,8), ls="--", c=".3") # diagnal
         axs[j,i].grid(b=True, which='major', color='k', linestyle='--',alpha=0.2)
         axs[j,i].set_facecolor('white')
         
@@ -435,6 +436,57 @@ fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/p
 plt.close(fig)
 
 # =============================================================================
+# rc scatter basic - final
+fig, axs = plt.subplots(1, 3, sharey=True)
+for i in range(0,3):
+    u, c = np.unique(np.c_[rc_list[48*i:48*(i+1)],rc[48*i:48*(i+1)]], return_counts=True, axis=0)
+    u1, c1 = np.unique(np.c_[rc_list[48*i:48*(i+1)],undo[48*i:48*(i+1)]], return_counts=True, axis=0)
+    axs[i].scatter(u[:,0],u[:,1],s =c*15,facecolors='none',
+                       edgecolors = '#727bda')
+    #ax = sns.heatmap(num_mx,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
+    
+    axs[i].set_xlim((4,12))
+    axs[i].set_ylim((4,12))
+    x0,x1 = axs[i].get_xlim()
+    y0,y1 = axs[i].get_ylim()
+    axs[i].set_aspect(abs(x1-x0)/abs(y1-y0))
+    
+    axs[i].plot(axs[i].get_xlim(), axs[i].get_ylim(), ls="--", c=".3") # diagnal
+    axs[i].plot((8,12), (4,8), ls="--", c=".3") # diagnal
+    axs[i].grid(b=True, which='major', color='k', linestyle='--',alpha=0.2)
+    axs[i].set_facecolor('white')
+    
+    axs[i].set_xticks(np.arange(x0,x1, 1.0))
+    axs[i].set_yticks(np.arange(y0,y1, 1.0))
+    axs[i].title.set_text('S'+str(i+1))
+    
+    axs[i].set_xlabel("Number connectable (maximal)")
+    axs[0].set_ylabel("Number connected (actual)")
+
+rc_led_1 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#727bda',
+                          markersize=math.sqrt(1*15), label='1')
+rc_led_2 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#727bda',
+                          markersize=math.sqrt(5*15), label='5')
+rc_led_3 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#727bda',
+                          markersize=math.sqrt(10*15), label='10')
+rc_led_4 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#727bda',
+                          markersize=math.sqrt(15*15), label='15')
+
+lgd = plt.legend(title="Number of trials",
+        handles=[rc_led_1,rc_led_2,rc_led_3,rc_led_4],facecolor = 'white',ncol=2)
+
+#for vpack in lgd._legend_handle_box.get_children():
+#        vpack.get_children()[0].get_children()[0].set_width(0)
+       
+#ax.set_aspect('equal')
+fig.set_figwidth(12)
+fig.set_figheight(9)
+
+plt.show()
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_basic.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
+plt.close(fig)
+
+# =============================================================================
 # rc_undo_hist - final
 fig, axs = plt.subplots(1, 3, sharey=True)
 for i in range(0,3):
@@ -473,6 +525,38 @@ fig.set_figwidth(10)
 
 plt.show()
 fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_undo_hist_all.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
+plt.close(fig)
+
+# =============================================================================
+# rc_hist - final
+fig, axs = plt.subplots(1, 3, sharey=True)
+for i in range(0,3):
+    mean1 = mean(diff[48*i:48*(i+1)])
+#    mean2 = mean(diff_undo[48*i:48*(i+1)])
+
+    axs[i].hist(diff[48*i:48*(i+1)], range(-4,2), color='#0776d8', density=1,
+                 align = 'left',edgecolor='k')
+
+    axs[i].set_ylim((0,1))
+    axs[i].set_xlim((-4,1))
+    axs[i].set_xticks(range(-3,1))
+    axs[i].set_yticks(np.arange(0,1.1, 0.1))
+    axs[i].set_yticklabels([0,'',0.2,'',0.4,'',0.6,'',0.8,'',1.0])
+
+
+    axs[i].set_facecolor('white')
+    axs[i].spines['bottom'].set_color('k')
+    axs[i].spines['left'].set_color('k')
+    axs[i].tick_params(axis='y', colors='k',direction='in',left = True)
+    axs[i].title.set_text('S'+str(i+1))
+    axs[i].text(-3.5, 0.7, 'mean:'+ '{:.2f}'.format(mean1),fontsize=10)
+axs[1].set_xlabel('Number (actual connected - maximum connectable)')
+axs[0].set_ylabel('Proportion of trials')
+
+fig.set_figwidth(10)
+
+plt.show()
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_hist_all.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
 plt.close(fig)
 
 # =============================================================================
@@ -599,6 +683,35 @@ for i in range(0,3):
        undobox],positions =[1,2,2.5,3.5,4,5,5.5],widths = 0.3,showfliers=False,whis = 1.5,
        medianprops = dict(color = 'k')) 
     
+    # normality test
+    # Shapiro-Wilk Test
+    from scipy.stats import shapiro
+
+    from scipy.stats import normaltest
+    stats = [np.nan]*6
+    ps = [np.nan]*6
+    for s in range(len(stats)):
+        stats[s],ps[s]  = shapiro([math.log10(x) for x in df_part.iloc[:,s]])
+        print('Statistics=%.3f, p=%.3f' % (stats[s], ps[s]))
+        # interpret
+        alpha = 0.05
+        if ps[s] > alpha:
+        	print('Sample looks Gaussian (fail to reject H0)')
+        else:
+        	print('Sample does not look Gaussian (reject H0)')   
+    
+    from scipy.stats import anderson
+    result = [np.nan]*6
+    for s in range(len(result)):
+        result[s]= anderson([math.log10(x) for x in df_part.iloc[:,s]])
+        print('Statistic: %.3f' % result[s].statistic)
+        p = 0
+        for i in range(len(result[s].critical_values)):
+        	sl, cv = result[s].significance_level[i], result[s].critical_values[i]
+        	if result[s].statistic < result[s].critical_values[i]:
+        		print('%.3f: %.3f, data looks normal (fail to reject H0)' % (sl, cv))
+        	else:
+        		print('%.3f: %.3f, data does not look normal (reject H0)' % (sl, cv))
     
     # statistical annotation
     stat1, p1 = wilcoxon(df_part['f_t_rc'], df_part['f_t_undo'])
@@ -651,24 +764,24 @@ for i in range(0,3):
 
     #--------------------------------------
 
-#    axs[i].set_xticks([1,1.5,2,2.5,3,3.5,4,4.5,5,5.5])
-#    axs[i].set_xticklabels(labels = ['\nwithout undo','first choice','\n\nwith undo','\nwithout undo','later choices','\n\nwith undo', '\nwithout undo','submit','\n\nwith undo','undo'],fontsize=16)
-    axs[i].set_xticks([1.5,3,4.5,5.5])
-    axs[i].set_xticklabels(labels = ['first choice \nw/o undo w/ undo','later choices \nw/o undo w/ undo', 'submit \nw/o undo w/ undo','undo'],fontsize=15)
+    axs[i].set_xticks([1.1,1.5,1.9,2.6,3,3.4,4.1,4.5,4.9,5.5])
+    axs[i].set_xticklabels(labels = ['\nwithout \nundo','first choice','\nwith \nundo','\nwithout \nundo','later choices','\nwith \nundo', '\nwithout \nundo','submit','\nwith \nundo','undo'],fontsize=18)
+#    axs[i].set_xticks([1.5,3,4.5,5.5])
+#    axs[i].set_xticklabels(labels = ['first choice \nw/o undo w/ undo','later choices \nw/o undo w/ undo', 'submit \nw/o undo w/ undo','undo'],fontsize=15)
 
     axs[i].set_facecolor('white')
     axs[i].spines['bottom'].set_color('k')
     axs[i].spines['left'].set_color('k')
     axs[i].tick_params(axis='y', colors='k', direction='in',left = True, labelsize = 16) 
     axs[i].tick_params(axis='x', colors='k')
-    axs[i].title.set_text('S'+str(i+1))
-axs[0].set_ylabel('Response time (s)',fontsize=16)
+    axs[i].set_title('S'+str(i+1), fontsize = 16)
+axs[0].set_ylabel('Response time (s)',fontsize=18)
 
 fig.set_figwidth(26)
 fig.set_figheight(12)
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t_v2.png',dpi=600,bbox_inches='tight')
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t.png',dpi=600,bbox_inches='tight')
 plt.close(fig)
 
 # =============================================================================
