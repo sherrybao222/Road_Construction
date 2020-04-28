@@ -408,11 +408,13 @@ axs[1].set_xlabel('Number connected (actual - maximum)')
 axs[0].set_ylabel('Proportion of trials')
 
 import matplotlib.patches as mpatches
-rc_led = mpatches.Patch(color='#0776d8', label='w/o undo')
-undo_led = mpatches.Patch(color='#e13f42', label='w/ undo')
+rc_led = mpatches.Patch(color='#0776d8', label='without undo')
+undo_led = mpatches.Patch(color='#e13f42', label='with undo')
 plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
+
+fig.set_figwidth(10)
 # plt.show()
-# fig.savefig('/Users/fqx/Dropbox/Spring 2020/Honors/Fig & Note/rc_undo_hist_all.png',dpi=600)
+# fig.savefig('/Users/fqx/Dropbox/Spring 2020/Honors/Fig & Note/rc_undo_hist_all_2.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
@@ -497,7 +499,7 @@ for i in range(0,3):
     #caplines1[0].set_markersize(7)
     axs[i].set_ylim((0,110))
     
-    axs[i].set_xticklabels(['w/o undo','w/ undo'])
+    axs[i].set_xticklabels(['without undo','with undo'])
     #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
     axs[i].set_facecolor('white')
     axs[i].spines['bottom'].set_color('k')
@@ -505,7 +507,7 @@ for i in range(0,3):
     axs[i].tick_params(axis='y', colors='k')
     axs[i].title.set_text('S'+str(i+1))
 axs[0].set_ylabel('Trial duration (s)')
-# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc_hist_all.png',dpi=600)
+# fig.savefig('/Users/fqx/Dropbox/Spring 2020/Honors/Fig & Note/t_rc_hist_all.png',dpi=600)
 plt.close(fig)
 
 ## =============================================================================
@@ -693,7 +695,7 @@ ax.plot([1,2],[mean_t_rc, mean_t_undo], 'o')
 #caplines1[0].set_markersize(7)
 ax.set_ylim((10,45))
 
-ax.set_xticklabels(['w/o undo','w/ undo'])
+ax.set_xticklabels(['without undo','with undo'])
 #ax.grid(b=True, which='major', axis = 'y',color='k', linestyle='--')
 ax.set_facecolor('white')
 ax.spines['bottom'].set_color('k')
@@ -701,7 +703,8 @@ ax.spines['left'].set_color('k')
 ax.tick_params(axis='y', colors='k')
 plt.ylabel('trial duration (s)')
 
-# fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc.png',dpi=600)
+fig.show()
+fig.savefig('/Users/fqx/Dropbox/Spring 2020/Honors/Fig & Note/t_rc.png',dpi=600)
 plt.close(fig)
 
 
