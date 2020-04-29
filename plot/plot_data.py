@@ -377,7 +377,7 @@ for j in range(0,2):
         u1, c1 = np.unique(np.c_[rc_list[48*i:48*(i+1)],undo[48*i:48*(i+1)]], return_counts=True, axis=0)
         if j == 0:
             axs[j,i].scatter(u[:,0],u[:,1],s =c*15,facecolors='none',
-                           edgecolors = '#727bda')
+                           edgecolors = '#0776d8')
         else:
             axs[j,i].scatter(u1[:,0],u1[:,1],s =c*15,facecolors='none',
                            edgecolors = '#e13f42')
@@ -389,8 +389,8 @@ for j in range(0,2):
         y0,y1 = axs[j,i].get_ylim()
         axs[j,i].set_aspect(abs(x1-x0)/abs(y1-y0))
         
-        axs[j,i].plot(axs[j,i].get_xlim(), axs[j,i].get_ylim(), ls="--", c=".3") # diagnal
-        axs[j,i].plot((8,12), (4,8), ls="--", c=".3") # diagnal
+        h1, = axs[j,i].plot(axs[j,i].get_xlim(), axs[j,i].get_ylim(), ls="--",color = 'k',label='optimal') # diagnal
+        h2, = axs[j,i].plot((8,12), (4,8), ls="--", color = '#968aad',label='greedy') # diagnal
         axs[j,i].grid(b=True, which='major', color='k', linestyle='--',alpha=0.2)
         axs[j,i].set_facecolor('white')
         
@@ -420,9 +420,11 @@ undo_led_3 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#e
 undo_led_4 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#e13f42',
                           markersize=math.sqrt(15*15), label='15')
 
-lgd = axs[0,2].legend(bbox_to_anchor=(2.04, 0.1),prop={'size': 12},title="Number of trials",handletextpad=0.01,handlelength=3,
+lgd = plt.legend(bbox_to_anchor=(2.04, 1),prop={'size': 12},title="Number of trials",handletextpad=0.01,handlelength=3,
            handles=[title_1,rc_led_1,rc_led_2,rc_led_3,rc_led_4,
                     title_2,undo_led_1,undo_led_2,undo_led_3,undo_led_4],facecolor = 'white',ncol=2)
+plt.legend(handles=[h1,h2],bbox_to_anchor=(2.04,0.3),facecolor = 'white')
+plt.gca().add_artist(lgd)
 
 for vpack in lgd._legend_handle_box.get_children():
         vpack.get_children()[0].get_children()[0].set_width(0)
@@ -432,7 +434,7 @@ fig.set_figwidth(12)
 fig.set_figheight(9)
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_all.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_all.png',dpi=600, bbox_inches='tight')
 plt.close(fig)
 
 # =============================================================================
@@ -442,7 +444,7 @@ for i in range(0,3):
     u, c = np.unique(np.c_[rc_list[48*i:48*(i+1)],rc[48*i:48*(i+1)]], return_counts=True, axis=0)
     u1, c1 = np.unique(np.c_[rc_list[48*i:48*(i+1)],undo[48*i:48*(i+1)]], return_counts=True, axis=0)
     axs[i].scatter(u[:,0],u[:,1],s =c*15,facecolors='none',
-                       edgecolors = '#727bda')
+                       edgecolors = '#0776d8')
     #ax = sns.heatmap(num_mx,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
     
     axs[i].set_xlim((4,12))
@@ -451,8 +453,8 @@ for i in range(0,3):
     y0,y1 = axs[i].get_ylim()
     axs[i].set_aspect(abs(x1-x0)/abs(y1-y0))
     
-    axs[i].plot(axs[i].get_xlim(), axs[i].get_ylim(), ls="--", c=".3") # diagnal
-    axs[i].plot((8,12), (4,8), ls="--", c=".3") # diagnal
+    h1, = axs[i].plot(axs[i].get_xlim(), axs[i].get_ylim(), ls="--",color = 'k',label='optimal') # diagnal
+    h2, = axs[i].plot((8,12), (4,8), ls="--", color = '#968aad',label='greedy') # diagnal
     axs[i].grid(b=True, which='major', color='k', linestyle='--',alpha=0.2)
     axs[i].set_facecolor('white')
     
@@ -473,8 +475,10 @@ rc_led_4 = mlines.Line2D([], [], color='white', marker='o',markeredgecolor='#727
                           markersize=math.sqrt(15*15), label='15')
 
 lgd = plt.legend(title="Number of trials",
-        handles=[rc_led_1,rc_led_2,rc_led_3,rc_led_4],facecolor = 'white',ncol=2)
+        handles=[rc_led_1,rc_led_2,rc_led_3,rc_led_4],facecolor = 'white',ncol=2,bbox_to_anchor=(1.04,1))
 
+lgd2= plt.legend(handles=[h1,h2],bbox_to_anchor=(1.04,0.5),facecolor = 'white')
+plt.gca().add_artist(lgd)
 #for vpack in lgd._legend_handle_box.get_children():
 #        vpack.get_children()[0].get_children()[0].set_width(0)
        
@@ -483,7 +487,7 @@ fig.set_figwidth(12)
 fig.set_figheight(9)
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_basic.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
+fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_basic.png',dpi=600, bbox_inches='tight')#bbox_extra_artists=(lgd,lgd2),
 plt.close(fig)
 
 # =============================================================================
@@ -691,7 +695,7 @@ for i in range(0,3):
     stats = [np.nan]*6
     ps = [np.nan]*6
     for s in range(len(stats)):
-        stats[s],ps[s]  = shapiro([math.log10(x) for x in df_part.iloc[:,s]])
+        stats[s],ps[s]  = shapiro([math.log2(x) for x in df_part.iloc[:,s]])
         print('Statistics=%.3f, p=%.3f' % (stats[s], ps[s]))
         # interpret
         alpha = 0.05
@@ -703,7 +707,7 @@ for i in range(0,3):
     from scipy.stats import anderson
     result = [np.nan]*6
     for s in range(len(result)):
-        result[s]= anderson([math.log10(x) for x in df_part.iloc[:,s]])
+        result[s]= anderson([math.log2(x) for x in df_part.iloc[:,s]])
         print('Statistic: %.3f' % result[s].statistic)
         p = 0
         for i in range(len(result[s].critical_values)):
