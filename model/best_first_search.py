@@ -4,18 +4,10 @@ import math
 import random
 from scipy.spatial import distance_matrix
 
-
-## define class for returning multiple values
-#class ReturnValue:
-#  def __init__(self, value, determined, cities_remain):
-#     self.value = value
-#     self.determined = determined
-#     self.cities_remain = cities_remain
 #----------------------------------------------------------------------
-
 def calculate_value(node, cities, dist, budget, n_c):
     # weight
-    w_c = 1000
+    w_c = 1
     w_u = 1
     w_b = 1
     
@@ -36,7 +28,7 @@ def calculate_value(node, cities, dist, budget, n_c):
     else:
         node.determined = 0
     
-    value = w_c * n_c + w_u * n_u + w_b * (budget/100)
+    value = w_c * n_c + w_u * n_u + w_b * (budget/100) + np.random.normal()
     
     node.value = value
     node.budget = budget
@@ -45,22 +37,6 @@ def calculate_value(node, cities, dist, budget, n_c):
     
 #------------------------------------------------------------------------
 def determined(root):
-#    try:
-#        n =  max(root.children,key=lambda node:node.value)
-#        if bool(n.children):
-#            determined = 1
-#        else:
-#            if n.determined == 1:
-#                determined = 1  
-#            else:
-#                determined = 0
-#                
-#    except:
-#        if root.determined == 1:
-#            determined = 1  
-#        else:
-#            determined = 0
-
     if root.determined == 1:
         determined = 1  
     else:
@@ -80,7 +56,7 @@ def select_node(root):
     return n
 
 #------------------------------------------------------------------------
-def expand_node(n, dist):
+def expand_node(n, dist, theta):
     
     s = n.name
         
@@ -93,11 +69,14 @@ def expand_node(n, dist):
             
     #------------------------------------------------------------------ 
     # pruning    
-#    V_max = max(c.value)
-    
-#    for c in children:
-#        if abs(c.value - V_max) > theta:
-#            remove_child(c)
+    try:
+        V_max = max(n.children, key=lambda node:node.value)
+        
+        for c in n.children:
+            if abs(c.value - V_max.value) > theta:
+                remove_child(c)
+    except:
+        pass
  
 #------------------------------------------------------------------------           
 def backpropagate(n,root):
@@ -112,25 +91,43 @@ def backpropagate(n,root):
 #------------------------------------------------------------------------
 def stop(gamma):
     return random.random() < gamma
-
+#------------------------------------------------------------------------
+def lapse(lambda_):
+    return random.random() < lambda_
+#------------------------------------------------------------------------
+def remove_child(c):
+    c.parent = None
+    del c
 #------------------------------------------------------------------------   
 def make_move(s): 
     
-#    if lapse(lambda_):
-#        return ramdom_move(s)
-#    else:
-    
+    if lapse(lambda_):
+        return ramdom_move(s,dist_city)
+    else:    
     #------------------------------------------------------------------                 
-    root = s
-    
-    while (not stop(gamma)) and (not determined(root)):
-        n = select_node(root)
-        expand_node(n,dist_city)
-        backpropagate(n,root) 
-            
-    n =  max(root.children,key=lambda node:node.value)
+        root = s
+        
+        while (not stop(gamma)) and (not determined(root)):
+            n = select_node(root)
+            expand_node(n,dist_city,theta)
+            backpropagate(n,root) 
+                
+        n =  max(root.children,key=lambda node:node.value)
      
     return n
+#------------------------------------------------------------------------
+def ramdom_move(s,dist):
+    candidates = []
+    for c in s.city:
+        if dist[s.name][c] <= s.budget:
+            candidates.append(c)   
+    n = Node(random.choice(candidates), parent = s)
+    budget_remain = s.budget - dist[s.name][n.name]
+    n_cc = s.n_c + 1
+    calculate_value(n, s.city, dist, budget_remain, n_cc)
+
+    return n
+
 #--------------------------------------------------------------------------
 class Map:
     def __init__(self):#, map_content, map_id): 
@@ -179,6 +176,8 @@ class Map:
 
 # setting parameters
 gamma = 0.1
+theta = 5
+lambda_ = 0.1
 
 # generate map
 trial = Map()
@@ -197,7 +196,9 @@ now = start
 while True:    
     choice = make_move(now)
     now = choice
-    print(now.name)
+    try:  print(now.name)
+    except: print(now)
+   
     if now.determined == 1:
         break
 
