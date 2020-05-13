@@ -5,11 +5,16 @@ import random
 from scipy.spatial import distance_matrix
 
 #----------------------------------------------------------------------
-def calculate_value(node, cities, dist, budget, n_c):
-    # weight
-    w_c = 1
-    w_u = 1
-    w_b = 1
+def new_node(name, parent, cities, dist, budget, n_c, weights):
+    
+    node = Node(name,parent) 
+    
+    if parent is not None:
+        budget_remain = budget - dist[parent.name][node.name]
+    else:
+        budget_remain = budget
+        
+    n_cc = n_c + 1
     
     #------------------------------------------------------------------ 
     # calculate n of cities within reach
@@ -19,29 +24,47 @@ def calculate_value(node, cities, dist, budget, n_c):
     del cities_remain[node.name] # delete the current chosen node
 
     for c in cities_remain:
-        if dist[node.name][c] <= budget:
+        if dist[node.name][c] <= budget_remain:
             n_u = n_u + 1
-            
+
+    #------------------------------------------------------------------                            
+    value = weights[0] * n_cc + weights[1] * n_u + weights[2] * (budget_remain/100) #+ np.random.normal()
+
+    #------------------------------------------------------------------                            
+    node.value = value
+    node.budget = budget_remain
+    node.n_c = n_cc
+    node.city = cities_remain
+
     #------------------------------------------------------------------    
     if n_u == 0:
         node.determined = 1
     else:
         node.determined = 0
     
-    value = w_c * n_c + w_u * n_u + w_b * (budget/100) + np.random.normal()
-    
-    node.value = value
-    node.budget = budget
-    node.n_c = n_c
-    node.city = cities_remain
-    
+    return node
+
+#------------------------------------------------------------------------
+def dropfeature(sigma):
+    # weight
+    w_c = 1
+    w_u = 1
+    w_b = 1
+
+    if random.random() < sigma:
+        w_c = 0
+    if random.random() < sigma:
+        w_u = 0
+    if random.random() < sigma:
+        w_b = 0
+    return [w_c,w_u,w_b]
+       
 #------------------------------------------------------------------------
 def determined(root):
     if root.determined == 1:
         determined = 1  
     else:
         determined = 0
-
 
     return determined
     
@@ -56,17 +79,13 @@ def select_node(root):
     return n
 
 #------------------------------------------------------------------------
-def expand_node(n, dist, theta):
+def expand_node(n, dist, theta, weights):
     
     s = n.name
         
     for child in n.city:
         if dist[s][child] <= n.budget:
-            c = Node(child, parent = n) # child node
-            budget_remain = n.budget - dist[s][child]
-            n_cc = n.n_c + 1
-            calculate_value(c, n.city, dist, budget_remain, n_cc)
-            
+            new_node(child, n, n.city, dist, n.budget, n.n_c, weights)            
     #------------------------------------------------------------------ 
     # pruning    
     try:
@@ -89,8 +108,8 @@ def backpropagate(n,root):
         backpropagate(n.parent,root)
     
 #------------------------------------------------------------------------
-def stop(gamma):
-    return random.random() < gamma
+def stop(gamma,count):
+    return ((random.random() < gamma) or count > 7)
 #------------------------------------------------------------------------
 def lapse(lambda_):
     return random.random() < lambda_
@@ -104,12 +123,31 @@ def make_move(s):
     if lapse(lambda_):
         return ramdom_move(s,dist_city)
     else:    
-    #------------------------------------------------------------------                 
+    #------------------------------------------------------------------  
+        weights = dropfeature(sigma)               
         root = s
         
-        while (not stop(gamma)) and (not determined(root)):
+        count = 0 # count of same selected node
+        
+        # 1st iteration
+        n = select_node(root)
+        print('select node: '+ str(n.name))
+        expand_node(n,dist_city,theta,weights)
+        backpropagate(n,root) 
+        
+        # from 2nd iteration
+        while (not stop(gamma,count)) and (not determined(root)):
+            selectnode = n
+                
             n = select_node(root)
-            expand_node(n,dist_city,theta)
+            
+            if n.name == selectnode.name:
+                count = count+1
+            else:
+                count = 0
+                
+            print('select node: '+ str(n.name))
+            expand_node(n,dist_city,theta,weights)
             backpropagate(n,root) 
                 
         n =  max(root.children,key=lambda node:node.value)
@@ -120,12 +158,8 @@ def ramdom_move(s,dist):
     candidates = []
     for c in s.city:
         if dist[s.name][c] <= s.budget:
-            candidates.append(c)   
-    n = Node(random.choice(candidates), parent = s)
-    budget_remain = s.budget - dist[s.name][n.name]
-    n_cc = s.n_c + 1
-    calculate_value(n, s.city, dist, budget_remain, n_cc)
-
+            candidates.append(c)       
+    n = new_node(random.choice(candidates), s, s.city, dist, s.budget, s.n_c, [1,1,1])
     return n
 
 #--------------------------------------------------------------------------
@@ -175,9 +209,10 @@ class Map:
         self.distance = self.loadmap.distance.tolist()
 
 # setting parameters
-gamma = 0.1
-theta = 5
-lambda_ = 0.1
+gamma = 0.01
+theta = 15
+lambda_ = 0
+sigma = 0.01
 
 # generate map
 trial = Map()
@@ -187,17 +222,12 @@ dist_city = trial.distance.copy()
 
 # -------------------------------------------------------------------------
 # main 
-start = Node(0)
-n_c = 0 # number of connected cities
-calculate_value(start, dict_city_remain, 
-                dist_city, trial.budget_remain, n_c) # calculate start node value
+start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, 0, [1,1,1])
 now = start
-
 while True:    
     choice = make_move(now)
     now = choice
-    try:  print(now.name)
-    except: print(now)
+    print('choice: '+ str(now.name))
    
     if now.determined == 1:
         break
