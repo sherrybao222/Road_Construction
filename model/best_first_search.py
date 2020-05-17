@@ -118,7 +118,7 @@ def remove_child(c):
     c.parent = None
     del c
 #------------------------------------------------------------------------   
-def make_move(s): 
+def make_move(s,dist_city): 
     
     if lapse(lambda_):
         return ramdom_move(s,dist_city)
@@ -131,7 +131,7 @@ def make_move(s):
         
         # 1st iteration
         n = select_node(root)
-        print('select node: '+ str(n.name))
+#        print('select node: '+ str(n.name))
         expand_node(n,dist_city,theta,weights)
         backpropagate(n,root) 
         
@@ -146,7 +146,7 @@ def make_move(s):
             else:
                 count = 0
                 
-            print('select node: '+ str(n.name))
+#            print('select node: '+ str(n.name))
             expand_node(n,dist_city,theta,weights)
             backpropagate(n,root) 
                 
@@ -214,31 +214,33 @@ theta = 15
 lambda_ = 0
 sigma = 0.01
 
-# generate map
-trial = Map()
-dict_city = dict(zip(list(range(0,trial.N)), trial.xy)) 
-dict_city_remain = dict_city.copy()
-dist_city = trial.distance.copy()
-
 # -------------------------------------------------------------------------
 # main 
-start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, 0, [1,1,1])
-now = start
-while True:    
-    choice = make_move(now)
-    now = choice
-    print('choice: '+ str(now.name))
-   
-    if now.determined == 1:
-        break
+if __name__ == "__main__":
 
-from anytree import RenderTree
-for pre, _, node in RenderTree(start):
-     print("%s%s:%s" % (pre, node.name,node.value))
-     
-#from anytree.exporter import DotExporter
-#for line in DotExporter(start):
-#    print(line)
-#
-#from anytree.exporter import UniqueDotExporter
-#UniqueDotExporter(start).to_dotfile("tree.dot")
+    # generate map
+    trial = Map()
+    dict_city = dict(zip(list(range(0,trial.N)), trial.xy)) 
+    dict_city_remain = dict_city.copy()
+    dist_city = trial.distance.copy()
+    
+    start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, -1, [1,1,1])
+    now = start
+    while True:    
+        choice = make_move(now,dist_city)
+        now = choice
+        print('choice: '+ str(now.name))
+       
+        if now.determined == 1:
+            break
+    
+    from anytree import RenderTree
+    for pre, _, node in RenderTree(start):
+         print("%s%s:%s" % (pre, node.name,node.n_c))
+         
+    #from anytree.exporter import DotExporter
+    #for line in DotExporter(start):
+    #    print(line)
+    #
+    #from anytree.exporter import UniqueDotExporter
+    #UniqueDotExporter(start).to_dotfile("tree.dot")
