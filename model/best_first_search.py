@@ -1,8 +1,17 @@
-import numpy as np
 from anytree import Node
+from anytree import RenderTree
+from anytree.exporter import JsonExporter, DictExporter
+import numpy as np
 import math
 import random
 from scipy.spatial import distance_matrix
+
+import sys
+
+orig_stdout = sys.stdout
+f = open('out.txt', 'w')
+sys.stdout = f
+
 
 #----------------------------------------------------------------------
 def new_node(name, parent, cities, dist, budget, n_c, weights):
@@ -131,10 +140,19 @@ def make_move(s,dist_city):
         
         # 1st iteration
         n = select_node(root)
-#        print('select node: '+ str(n.name))
-        expand_node(n,dist_city,theta,weights)
-        backpropagate(n,root) 
+        print('select node: '+ str(n.name))
         
+        expand_node(n,dist_city,theta,weights)
+        print('expand_node:')
+        for pre, _, node in RenderTree(start):
+            print("%s%s:%s" % (pre, node.name,node.value))
+            
+        print('backpropagate:')
+        backpropagate(n,root)         
+        for pre, _, node in RenderTree(start):
+            print("%s%s:%s" % (pre, node.name,node.value))
+
+            
         # from 2nd iteration
         while (not stop(gamma,count)) and (not determined(root)):
             selectnode = n
@@ -146,9 +164,18 @@ def make_move(s,dist_city):
             else:
                 count = 0
                 
-#            print('select node: '+ str(n.name))
+            print('select node: '+ str(n.name))
+            
             expand_node(n,dist_city,theta,weights)
+            expand_node(n,dist_city,theta,weights)
+            print('expand_node:')
+            for pre, _, node in RenderTree(start):
+                print("%s%s:%s" % (pre, node.name,node.value))
+                
+            print('backpropagate:')
             backpropagate(n,root) 
+            for pre, _, node in RenderTree(start):
+                print("%s%s:%s" % (pre, node.name,node.value))
                 
         n =  max(root.children,key=lambda node:node.value)
      
@@ -171,42 +198,50 @@ class Map:
 
     def circle_map(self):
         # map parameters
-        self.N = 15     # total city number, including start
-        self.radius = 10     # radius of city
-        self.total = 400    # total budget
-        self.budget_remain = 400    # remaining budget
-
-        self.R = 400*400 #circle radius' sqaure
-        self.r = np.random.uniform(0, self.R, self.N) 
-        self.phi = np.random.uniform(0,2 * math.pi, self.N) 
-        self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
-        self.x = self.x.astype(int)
-        self.y = np.sqrt(self.r) * np.sin(self.phi) + 800
-        self.y = self.y.astype(int)
-        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
+        self.N = 10     # total city number, including start
+        self.radius = 5     # radius of city
+        self.total = 300    # total budget
+        self.budget_remain = 300    # remaining budget
+        
+        self.R = 200*200 #circle radius' sqaure
+        self.r = np.random.uniform(0, self.R, self.N).tolist() 
+        self.phi = np.random.uniform(0,2 * math.pi, self.N).tolist()  
+        self.x = np.sqrt(self.r) * np.cos(self.phi)
+        self.x = self.x.astype(int).tolist() 
+        self.y = np.sqrt(self.r) * np.sin(self.phi)
+        self.y = self.y.astype(int).tolist() 
+        self.xy = [(self.x[i], self.y[i]) for i in range(0, len(self.x))]   # combine x and y
         
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
+        self.dist_city = self.distance.copy()
+                
+        self.dict_city = dict(zip(list(range(0,self.N)), self.xy)) 
+        self.dict_city_remain = self.dict_city.copy()
       
     def load_map(self, map_content, map_id):
         
-        self.loadmap = map_content['map_list'][0,map_id][0,0]
+        self.loadmap = map_content[map_id]
         self.order = np.nan
         
-        self.N = self.loadmap.N.tolist()[0][0]
+        self.N = self.loadmap['N']
         self.radius = 5     # radius of city
-        self.total = self.loadmap.total.tolist()[0][0]   # total budget
-        self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
+        self.total = self.loadmap['total']   # total budget
+        self.budget_remain = self.loadmap['total'] # remaining budget()
         
-        self.R = self.loadmap.R.tolist()[0]
-        self.r = self.loadmap.r.tolist()[0]
-        self.phi = self.loadmap.phi.tolist()[0]
-        self.x = self.loadmap.x.tolist()[0]
-        self.y = self.loadmap.y.tolist()[0]
-        self.xy = self.loadmap.xy.tolist()
+        self.R = self.loadmap['R']
+        self.r = self.loadmap['r']
+        self.phi = self.loadmap['phi']
+        self.x = self.loadmap['x']
+        self.y = self.loadmap['y']
+        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
         
-        self.city_start = self.loadmap.city_start.tolist()[0]
-        self.distance = self.loadmap.distance.tolist()
+        self.city_start = self.xy[0]    # start city
+        self.distance = self.loadmap['distance']      
+        self.dist_city = self.distance.copy()
+                
+        self.dict_city = dict(zip(list(range(0,self.N)), self.xy)) 
+        self.dict_city_remain = self.dict_city.copy()
 
 # setting parameters
 gamma = 0.01
@@ -230,13 +265,42 @@ if __name__ == "__main__":
         choice = make_move(now,dist_city)
         now = choice
         print('choice: '+ str(now.name))
-       
+        for pre, _, node in RenderTree(start):
+            print("%s%s:%s" % (pre, node.name,node.value))
+        
+        import matplotlib.pyplot as plt
+        fig, axs = plt.subplots(1, 1, sharey=True)
+
+        axs.plot(trial.x,trial.y,'o',
+       markerfacecolor = '#727bda',markeredgecolor = 'none')
+        #ax = sns.heatmap(num_mx,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
+        
+        axs.set_xlim((-300,300))
+        axs.set_ylim((-200,200))
+        x0,x1 = axs.get_xlim()
+        y0,y1 = axs.get_ylim()
+        axs.set_aspect(abs(x1-x0)/abs(y1-y0))
+        
+        axs.set_facecolor('white')
+        
         if now.determined == 1:
             break
+        
     
-    from anytree import RenderTree
     for pre, _, node in RenderTree(start):
-         print("%s%s:%s" % (pre, node.name,node.n_c))
+         print("%s%s:%s" % (pre, node.name,node.value))
+
+sys.stdout = orig_stdout
+f.close()
+
+#    exporter = DictExporter(attriter=lambda attrs: [(k, v) for k, v in attrs if k == "value"])
+#    import dicttoxml  
+#    xml = dicttoxml.dicttoxml(exporter.export(start),attr_type=False )   
+#    from xml.dom.minidom import parseString
+#    dom = parseString(xml)
+#    with open("test.xml", "w") as f:
+#        f.write(dom.toprettyxml())
+         
          
     #from anytree.exporter import DotExporter
     #for line in DotExporter(start):
