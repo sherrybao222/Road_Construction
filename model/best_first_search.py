@@ -6,13 +6,6 @@ import math
 import random
 from scipy.spatial import distance_matrix
 
-import sys
-
-orig_stdout = sys.stdout
-f = open('out.txt', 'w')
-sys.stdout = f
-
-
 #----------------------------------------------------------------------
 def new_node(name, parent, cities, dist, budget, n_c, weights):
     
@@ -252,6 +245,13 @@ sigma = 0.01
 # -------------------------------------------------------------------------
 # main 
 if __name__ == "__main__":
+    
+    import sys
+
+    orig_stdout = sys.stdout
+    f = open('out.txt', 'w')
+    sys.stdout = f
+
 
     # generate map
     trial = Map()
@@ -259,47 +259,57 @@ if __name__ == "__main__":
     dict_city_remain = dict_city.copy()
     dist_city = trial.distance.copy()
     
+    choice_sequence = [0]
     start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, -1, [1,1,1])
     now = start
     while True:    
         choice = make_move(now,dist_city)
         now = choice
         print('choice: '+ str(now.name))
+        choice_sequence.append(now.name)
         for pre, _, node in RenderTree(start):
             print("%s%s:%s" % (pre, node.name,node.value))
-        
-        import matplotlib.pyplot as plt
-        fig, axs = plt.subplots(1, 1, sharey=True)
-
-        axs.plot(trial.x,trial.y,'o',
-       markerfacecolor = '#727bda',markeredgecolor = 'none')
-        #ax = sns.heatmap(num_mx,cmap="YlGnBu",linewidths=.3,linecolor = 'k')
-        
-        axs.set_xlim((-300,300))
-        axs.set_ylim((-200,200))
-        x0,x1 = axs.get_xlim()
-        y0,y1 = axs.get_ylim()
-        axs.set_aspect(abs(x1-x0)/abs(y1-y0))
-        
-        axs.set_facecolor('white')
-        
+                
         if now.determined == 1:
             break
+
+    # visualize map     
+    import matplotlib.pyplot as plt
+    fig, axs = plt.subplots(1, 1, sharey=True)
+
+    axs.plot(trial.x,trial.y,'o', markerfacecolor = 'k',markeredgecolor = 'none')
+    axs.plot(trial.x[0],trial.y[0],'o', markerfacecolor = '#FF6666',markeredgecolor = 'none')
+    for i in range(0,trial.N):
+        plt.text(trial.x[i]+10,trial.y[i]+10, i, fontsize=7)
         
+    import operator         
+    plt.plot(operator.itemgetter(*choice_sequence)(trial.x), 
+         operator.itemgetter(*choice_sequence)(trial.y), 'b-')
+
+    axs.set_xlim((-300,300))
+    axs.set_ylim((-200,200))
+    x0,x1 = axs.get_xlim()
+    y0,y1 = axs.get_ylim()
+    axs.set_aspect(abs(x1-x0)/abs(y1-y0))
     
+    axs.set_facecolor('white')
+    plt.axis('off')
+    
+    fig.set_figwidth(10)
+    plt.show()
+    
+    # visualize tree         
     for pre, _, node in RenderTree(start):
          print("%s%s:%s" % (pre, node.name,node.value))
 
-sys.stdout = orig_stdout
-f.close()
+    sys.stdout = orig_stdout
+    f.close()
 
-#    exporter = DictExporter(attriter=lambda attrs: [(k, v) for k, v in attrs if k == "value"])
-#    import dicttoxml  
-#    xml = dicttoxml.dicttoxml(exporter.export(start),attr_type=False )   
-#    from xml.dom.minidom import parseString
-#    dom = parseString(xml)
-#    with open("test.xml", "w") as f:
-#        f.write(dom.toprettyxml())
+    import dict2xml
+    exporter = DictExporter(attriter=lambda attrs: [(k, v) for k, v in attrs if k == "name"])
+    xml = dict2xml.dict2xml(exporter.export(start))   
+    with open("test.xml", "w") as f:
+        f.write(xml)
          
          
     #from anytree.exporter import DotExporter
