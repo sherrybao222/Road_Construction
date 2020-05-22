@@ -1,10 +1,8 @@
 from anytree import Node
 from anytree import RenderTree
-from anytree.exporter import JsonExporter, DictExporter
-import numpy as np
-import math
+#from anytree.exporter import JsonExporter, DictExporter
 import random
-from scipy.spatial import distance_matrix
+from map_class import Map
 
 #----------------------------------------------------------------------
 def new_node(name, parent, cities, dist, budget, n_c, weights):
@@ -160,7 +158,6 @@ def make_move(s,dist_city):
             print('select node: '+ str(n.name))
             
             expand_node(n,dist_city,theta,weights)
-            expand_node(n,dist_city,theta,weights)
             print('expand_node:')
             for pre, _, node in RenderTree(start):
                 print("%s%s:%s" % (pre, node.name,node.value))
@@ -183,59 +180,6 @@ def ramdom_move(s,dist):
     return n
 
 #--------------------------------------------------------------------------
-class Map:
-    def __init__(self):#, map_content, map_id): 
-        
-        self.circle_map()
-#        self.load_map(map_content, map_id)
-
-    def circle_map(self):
-        # map parameters
-        self.N = 10     # total city number, including start
-        self.radius = 5     # radius of city
-        self.total = 300    # total budget
-        self.budget_remain = 300    # remaining budget
-        
-        self.R = 200*200 #circle radius' sqaure
-        self.r = np.random.uniform(0, self.R, self.N).tolist() 
-        self.phi = np.random.uniform(0,2 * math.pi, self.N).tolist()  
-        self.x = np.sqrt(self.r) * np.cos(self.phi)
-        self.x = self.x.astype(int).tolist() 
-        self.y = np.sqrt(self.r) * np.sin(self.phi)
-        self.y = self.y.astype(int).tolist() 
-        self.xy = [(self.x[i], self.y[i]) for i in range(0, len(self.x))]   # combine x and y
-        
-        self.city_start = self.xy[0]    # start city
-        self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
-        self.dist_city = self.distance.copy()
-                
-        self.dict_city = dict(zip(list(range(0,self.N)), self.xy)) 
-        self.dict_city_remain = self.dict_city.copy()
-      
-    def load_map(self, map_content, map_id):
-        
-        self.loadmap = map_content[map_id]
-        self.order = np.nan
-        
-        self.N = self.loadmap['N']
-        self.radius = 5     # radius of city
-        self.total = self.loadmap['total']   # total budget
-        self.budget_remain = self.loadmap['total'] # remaining budget()
-        
-        self.R = self.loadmap['R']
-        self.r = self.loadmap['r']
-        self.phi = self.loadmap['phi']
-        self.x = self.loadmap['x']
-        self.y = self.loadmap['y']
-        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
-        
-        self.city_start = self.xy[0]    # start city
-        self.distance = self.loadmap['distance']      
-        self.dist_city = self.distance.copy()
-                
-        self.dict_city = dict(zip(list(range(0,self.N)), self.xy)) 
-        self.dict_city_remain = self.dict_city.copy()
-
 # setting parameters
 gamma = 0.01
 theta = 15
@@ -245,13 +189,12 @@ sigma = 0.01
 # -------------------------------------------------------------------------
 # main 
 if __name__ == "__main__":
-    
-    import sys
 
+    # save console output 2/2    
+    import sys
     orig_stdout = sys.stdout
     f = open('out.txt', 'w')
     sys.stdout = f
-
 
     # generate map
     trial = Map()
@@ -259,6 +202,7 @@ if __name__ == "__main__":
     dict_city_remain = dict_city.copy()
     dist_city = trial.distance.copy()
     
+    # simulate
     choice_sequence = [0]
     start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, -1, [1,1,1])
     now = start
@@ -273,6 +217,7 @@ if __name__ == "__main__":
         if now.determined == 1:
             break
 
+# -------------------------------------------------------------------------
     # visualize map     
     import matplotlib.pyplot as plt
     fig, axs = plt.subplots(1, 1, sharey=True)
@@ -302,19 +247,23 @@ if __name__ == "__main__":
     for pre, _, node in RenderTree(start):
          print("%s%s:%s" % (pre, node.name,node.value))
 
+    # save console output 2/2
     sys.stdout = orig_stdout
     f.close()
 
-    import dict2xml
-    exporter = DictExporter(attriter=lambda attrs: [(k, v) for k, v in attrs if k == "name"])
-    xml = dict2xml.dict2xml(exporter.export(start))   
-    with open("test.xml", "w") as f:
-        f.write(xml)
+# -------------------------------------------------------------------------
+#  convert to xml
+#    import dict2xml
+#    exporter = DictExporter(attriter=lambda attrs: [(k, v) for k, v in attrs if k == "name"])
+#    xml = dict2xml.dict2xml(exporter.export(start))   
+#    with open("test.xml", "w") as f:
+#        f.write(xml)
          
-         
-    #from anytree.exporter import DotExporter
-    #for line in DotExporter(start):
-    #    print(line)
-    #
-    #from anytree.exporter import UniqueDotExporter
-    #UniqueDotExporter(start).to_dotfile("tree.dot")
+# -------------------------------------------------------------------------
+#  convert to dot
+#    from anytree.exporter import DotExporter
+#    for line in DotExporter(start):
+#        print(line)
+#    
+#    from anytree.exporter import UniqueDotExporter
+#    UniqueDotExporter(start).to_dotfile("tree.dot")
