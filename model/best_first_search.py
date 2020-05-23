@@ -2,6 +2,7 @@ from anytree import Node
 from anytree import RenderTree
 #from anytree.exporter import JsonExporter, DictExporter
 import random
+import numpy as np
 from map_class import Map
 
 #----------------------------------------------------------------------
@@ -45,19 +46,16 @@ def new_node(name, parent, cities, dist, budget, n_c, weights):
     return node
 
 #------------------------------------------------------------------------
-def dropfeature(sigma):
-    # weight
-    w_c = 1
-    w_u = 1
-    w_b = 1
-
+def dropfeature(set_weights,sigma):
+    new_weights = set_weights.copy()
+    
     if random.random() < sigma:
-        w_c = 0
+        new_weights[0] = 0
     if random.random() < sigma:
-        w_u = 0
+        new_weights[1] = 0
     if random.random() < sigma:
-        w_b = 0
-    return [w_c,w_u,w_b]
+        new_weights[2] = 0
+    return new_weights
        
 #------------------------------------------------------------------------
 def determined(root):
@@ -108,8 +106,8 @@ def backpropagate(n,root):
         backpropagate(n.parent,root)
     
 #------------------------------------------------------------------------
-def stop(gamma,count):
-    return ((random.random() < gamma) or count > 7)
+def stop(gamma,count,count_par):
+    return ((random.random() < gamma) or count > count_par)
 #------------------------------------------------------------------------
 def lapse(lambda_):
     return random.random() < lambda_
@@ -124,67 +122,75 @@ def make_move(s,dist_city):
         return ramdom_move(s,dist_city)
     else:    
     #------------------------------------------------------------------  
-        weights = dropfeature(sigma)               
+        weights = dropfeature(set_weights,sigma)              
         root = s
         
         count = 0 # count of same selected node
         
         # 1st iteration
-        n = select_node(root)
-        print('select node: '+ str(n.name))
-        
-        expand_node(n,dist_city,theta,weights)
-        print('expand_node:')
-        for pre, _, node in RenderTree(start):
-            print("%s%s:%s" % (pre, node.name,node.value))
+        if (not determined(root)):
+            n = select_node(root)
+            print('select node: '+ str(n.name))
             
-        print('backpropagate:')
-        backpropagate(n,root)         
-        for pre, _, node in RenderTree(start):
-            print("%s%s:%s" % (pre, node.name,node.value))
+            expand_node(n,dist_city,theta,weights)
+#            print('expand_node:')
+#            for pre, _, node in RenderTree(start):
+#                print("%s%s:%s" % (pre, node.name,node.value))
+                
+            backpropagate(n,root)   
+#            print('backpropagate:')
+#            for pre, _, node in RenderTree(start):
+#                print("%s%s:%s" % (pre, node.name,node.value))
 
+            selectnode = max(root.children,key=lambda node:node.value)
             
         # from 2nd iteration
-        while (not stop(gamma,count)) and (not determined(root)):
-            selectnode = n
-                
+        while (not stop(gamma,count,count_par)) and (not determined(root)):                
             n = select_node(root)
             
-            if n.name == selectnode.name:
-                count = count+1
-            else:
-                count = 0
                 
             print('select node: '+ str(n.name))
             
             expand_node(n,dist_city,theta,weights)
-            print('expand_node:')
-            for pre, _, node in RenderTree(start):
-                print("%s%s:%s" % (pre, node.name,node.value))
+#            print('expand_node:')
+#            for pre, _, node in RenderTree(start):
+#                print("%s%s:%s" % (pre, node.name,node.value))
                 
-            print('backpropagate:')
             backpropagate(n,root) 
-            for pre, _, node in RenderTree(start):
-                print("%s%s:%s" % (pre, node.name,node.value))
+#            print('backpropagate:')
+#            for pre, _, node in RenderTree(start):
+#                print("%s%s:%s" % (pre, node.name,node.value))
+
+            new_selectnode = max(root.children,key=lambda node:node.value)
+            
+            if new_selectnode == selectnode:
+                count = count+1
+            else:
+                count = 0
+            
+            selectnode = new_selectnode
+
                 
-        n =  max(root.children,key=lambda node:node.value)
+        max_ =  max(root.children,key=lambda node:node.value)
      
-    return n
+    return max_
 #------------------------------------------------------------------------
 def ramdom_move(s,dist):
     candidates = []
     for c in s.city:
         if dist[s.name][c] <= s.budget:
             candidates.append(c)       
-    n = new_node(random.choice(candidates), s, s.city, dist, s.budget, s.n_c, [1,1,1])
+    n = new_node(random.choice(candidates), s, s.city, dist, s.budget, s.n_c, set_weights)
     return n
 
 #--------------------------------------------------------------------------
 # setting parameters
-gamma = 0.01
-theta = 15
-lambda_ = 0
-sigma = 0.01
+gamma = 0.01 # stopping probability
+theta = 15 # prunning criteria
+lambda_ = 0 # lapse rate
+sigma = 0.01 # drop feature probability
+count_par = 5
+set_weights = [1,1,1]
 
 # -------------------------------------------------------------------------
 # main 
@@ -204,7 +210,7 @@ if __name__ == "__main__":
     
     # simulate
     choice_sequence = [0]
-    start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, -1, [1,1,1])
+    start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, -1, set_weights)
     now = start
     while True:    
         choice = make_move(now,dist_city)

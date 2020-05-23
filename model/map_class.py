@@ -11,7 +11,7 @@ class Map:
 
     def circle_map(self):
         # map parameters
-        self.N = 10     # total city number, including start
+        self.N = 30    # total city number, including start
         self.radius = 5     # radius of city
         self.total = 300    # total budget
         self.budget_remain = 300    # remaining budget
