@@ -1,8 +1,9 @@
-import numpy as np
 from anytree import Node
-import math
+from anytree import RenderTree
+#from anytree.exporter import JsonExporter, DictExporter
 import random
-from scipy.spatial import distance_matrix
+import numpy as np
+from map_class import Map
 
 #----------------------------------------------------------------------
 def new_node(name, parent, cities, dist, budget, n_c, weights):
@@ -45,19 +46,16 @@ def new_node(name, parent, cities, dist, budget, n_c, weights):
     return node
 
 #------------------------------------------------------------------------
-def dropfeature(sigma):
-    # weight
-    w_c = 1
-    w_u = 1
-    w_b = 1
-
+def dropfeature(set_weights,sigma):
+    new_weights = set_weights.copy()
+    
     if random.random() < sigma:
-        w_c = 0
+        new_weights[0] = 0
     if random.random() < sigma:
-        w_u = 0
+        new_weights[1] = 0
     if random.random() < sigma:
-        w_b = 0
-    return [w_c,w_u,w_b]
+        new_weights[2] = 0
+    return new_weights
        
 #------------------------------------------------------------------------
 def determined(root):
@@ -108,8 +106,8 @@ def backpropagate(n,root):
         backpropagate(n.parent,root)
     
 #------------------------------------------------------------------------
-def stop(gamma,count):
-    return ((random.random() < gamma) or count > 7)
+def stop(gamma,count,count_par):
+    return ((random.random() < gamma) or count > count_par)
 #------------------------------------------------------------------------
 def lapse(lambda_):
     return random.random() < lambda_
@@ -118,127 +116,160 @@ def remove_child(c):
     c.parent = None
     del c
 #------------------------------------------------------------------------   
-def make_move(s): 
+def make_move(s,dist_city): 
     
     if lapse(lambda_):
         return ramdom_move(s,dist_city)
     else:    
     #------------------------------------------------------------------  
-        weights = dropfeature(sigma)               
+        weights = dropfeature(set_weights,sigma)              
         root = s
         
         count = 0 # count of same selected node
         
         # 1st iteration
-        n = select_node(root)
-        print('select node: '+ str(n.name))
-        expand_node(n,dist_city,theta,weights)
-        backpropagate(n,root) 
-        
-        # from 2nd iteration
-        while (not stop(gamma,count)) and (not determined(root)):
-            selectnode = n
+        if (not determined(root)):
+            n = select_node(root)
+            print('select node: '+ str(n.name))
+            
+            expand_node(n,dist_city,theta,weights)
+#            print('expand_node:')
+#            for pre, _, node in RenderTree(start):
+#                print("%s%s:%s" % (pre, node.name,node.value))
                 
+            backpropagate(n,root)   
+#            print('backpropagate:')
+#            for pre, _, node in RenderTree(start):
+#                print("%s%s:%s" % (pre, node.name,node.value))
+
+            selectnode = max(root.children,key=lambda node:node.value)
+            
+        # from 2nd iteration
+        while (not stop(gamma,count,count_par)) and (not determined(root)):                
             n = select_node(root)
             
-            if n.name == selectnode.name:
+                
+            print('select node: '+ str(n.name))
+            
+            expand_node(n,dist_city,theta,weights)
+#            print('expand_node:')
+#            for pre, _, node in RenderTree(start):
+#                print("%s%s:%s" % (pre, node.name,node.value))
+                
+            backpropagate(n,root) 
+#            print('backpropagate:')
+#            for pre, _, node in RenderTree(start):
+#                print("%s%s:%s" % (pre, node.name,node.value))
+
+            new_selectnode = max(root.children,key=lambda node:node.value)
+            
+            if new_selectnode == selectnode:
                 count = count+1
             else:
                 count = 0
+            
+            selectnode = new_selectnode
+
                 
-            print('select node: '+ str(n.name))
-            expand_node(n,dist_city,theta,weights)
-            backpropagate(n,root) 
-                
-        n =  max(root.children,key=lambda node:node.value)
+        max_ =  max(root.children,key=lambda node:node.value)
      
-    return n
+    return max_
 #------------------------------------------------------------------------
 def ramdom_move(s,dist):
     candidates = []
     for c in s.city:
         if dist[s.name][c] <= s.budget:
             candidates.append(c)       
-    n = new_node(random.choice(candidates), s, s.city, dist, s.budget, s.n_c, [1,1,1])
+    n = new_node(random.choice(candidates), s, s.city, dist, s.budget, s.n_c, set_weights)
     return n
 
 #--------------------------------------------------------------------------
-class Map:
-    def __init__(self):#, map_content, map_id): 
-        
-        self.circle_map()
-#        self.load_map(map_content, map_id)
-
-    def circle_map(self):
-        # map parameters
-        self.N = 15     # total city number, including start
-        self.radius = 10     # radius of city
-        self.total = 400    # total budget
-        self.budget_remain = 400    # remaining budget
-
-        self.R = 400*400 #circle radius' sqaure
-        self.r = np.random.uniform(0, self.R, self.N) 
-        self.phi = np.random.uniform(0,2 * math.pi, self.N) 
-        self.x = np.sqrt(self.r) * np.cos(self.phi) + 1000
-        self.x = self.x.astype(int)
-        self.y = np.sqrt(self.r) * np.sin(self.phi) + 800
-        self.y = self.y.astype(int)
-        self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
-        
-        self.city_start = self.xy[0]    # start city
-        self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
-      
-    def load_map(self, map_content, map_id):
-        
-        self.loadmap = map_content['map_list'][0,map_id][0,0]
-        self.order = np.nan
-        
-        self.N = self.loadmap.N.tolist()[0][0]
-        self.radius = 5     # radius of city
-        self.total = self.loadmap.total.tolist()[0][0]   # total budget
-        self.budget_remain = self.loadmap.total.copy().tolist()[0][0]  # remaining budget()
-        
-        self.R = self.loadmap.R.tolist()[0]
-        self.r = self.loadmap.r.tolist()[0]
-        self.phi = self.loadmap.phi.tolist()[0]
-        self.x = self.loadmap.x.tolist()[0]
-        self.y = self.loadmap.y.tolist()[0]
-        self.xy = self.loadmap.xy.tolist()
-        
-        self.city_start = self.loadmap.city_start.tolist()[0]
-        self.distance = self.loadmap.distance.tolist()
-
 # setting parameters
-gamma = 0.01
-theta = 15
-lambda_ = 0
-sigma = 0.01
-
-# generate map
-trial = Map()
-dict_city = dict(zip(list(range(0,trial.N)), trial.xy)) 
-dict_city_remain = dict_city.copy()
-dist_city = trial.distance.copy()
+gamma = 0.01 # stopping probability
+theta = 15 # prunning criteria
+lambda_ = 0 # lapse rate
+sigma = 0.01 # drop feature probability
+count_par = 5
+set_weights = [1,1,1]
 
 # -------------------------------------------------------------------------
 # main 
-start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, 0, [1,1,1])
-now = start
-while True:    
-    choice = make_move(now)
-    now = choice
-    print('choice: '+ str(now.name))
-   
-    if now.determined == 1:
-        break
+if __name__ == "__main__":
 
-from anytree import RenderTree
-for pre, _, node in RenderTree(start):
-     print("%s%s:%s" % (pre, node.name,node.value))
-     
-#from anytree.exporter import DotExporter
-#for line in DotExporter(start):
-#    print(line)
-#
-#from anytree.exporter import UniqueDotExporter
-#UniqueDotExporter(start).to_dotfile("tree.dot")
+    # save console output 2/2    
+    import sys
+    orig_stdout = sys.stdout
+    f = open('out.txt', 'w')
+    sys.stdout = f
+
+    # generate map
+    trial = Map()
+    dict_city = dict(zip(list(range(0,trial.N)), trial.xy)) 
+    dict_city_remain = dict_city.copy()
+    dist_city = trial.distance.copy()
+    
+    # simulate
+    choice_sequence = [0]
+    start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, -1, set_weights)
+    now = start
+    while True:    
+        choice = make_move(now,dist_city)
+        now = choice
+        print('choice: '+ str(now.name))
+        choice_sequence.append(now.name)
+        for pre, _, node in RenderTree(start):
+            print("%s%s:%s" % (pre, node.name,node.value))
+                
+        if now.determined == 1:
+            break
+
+# -------------------------------------------------------------------------
+    # visualize map     
+    import matplotlib.pyplot as plt
+    fig, axs = plt.subplots(1, 1, sharey=True)
+
+    axs.plot(trial.x,trial.y,'o', markerfacecolor = 'k',markeredgecolor = 'none')
+    axs.plot(trial.x[0],trial.y[0],'o', markerfacecolor = '#FF6666',markeredgecolor = 'none')
+    for i in range(0,trial.N):
+        plt.text(trial.x[i]+10,trial.y[i]+10, i, fontsize=7)
+        
+    import operator         
+    plt.plot(operator.itemgetter(*choice_sequence)(trial.x), 
+         operator.itemgetter(*choice_sequence)(trial.y), 'b-')
+
+    axs.set_xlim((-300,300))
+    axs.set_ylim((-200,200))
+    x0,x1 = axs.get_xlim()
+    y0,y1 = axs.get_ylim()
+    axs.set_aspect(abs(x1-x0)/abs(y1-y0))
+    
+    axs.set_facecolor('white')
+    plt.axis('off')
+    
+    fig.set_figwidth(10)
+    plt.show()
+    
+    # visualize tree         
+    for pre, _, node in RenderTree(start):
+         print("%s%s:%s" % (pre, node.name,node.value))
+
+    # save console output 2/2
+    sys.stdout = orig_stdout
+    f.close()
+
+# -------------------------------------------------------------------------
+#  convert to xml
+#    import dict2xml
+#    exporter = DictExporter(attriter=lambda attrs: [(k, v) for k, v in attrs if k == "name"])
+#    xml = dict2xml.dict2xml(exporter.export(start))   
+#    with open("test.xml", "w") as f:
+#        f.write(xml)
+         
+# -------------------------------------------------------------------------
+#  convert to dot
+#    from anytree.exporter import DotExporter
+#    for line in DotExporter(start):
+#        print(line)
+#    
+#    from anytree.exporter import UniqueDotExporter
+#    UniqueDotExporter(start).to_dotfile("tree.dot")
