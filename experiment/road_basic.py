@@ -5,6 +5,7 @@ import math
 from scipy.spatial import distance_matrix
 import numpy as np
 #import scipy.io as sio
+from psychopy import visual, core 
 
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
@@ -510,9 +511,12 @@ if __name__ == "__main__":
     pg.font.init()
       
     # display setup
-    screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
+    screen = visual.Window((WIDTH,HEIGHT)) 
+    #pg.display.set_mode()  
+    # pg.FULLSCREEN pg.RESIZABLE
+    # WIDTH, HEIGHT), flags=pg.FULLSCREEN
  
-    screen.fill(GREY)
+#    screen.fill(GREY)
     
     # load maps
 #    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
