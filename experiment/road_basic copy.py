@@ -5,6 +5,7 @@ import math
 from scipy.spatial import distance_matrix
 import numpy as np
 #import scipy.io as sio
+from psychopy import visual, core, event
 
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
@@ -114,8 +115,8 @@ class Map:
         self.trl = [trl_id]
         self.mapid = [map_id]
         self.cond = [2] # condition
-        self.time = [round((pg.time.get_ticks()/1000), 2)] # mouse click time 
-        self.pos = [pg.mouse.get_pos()]
+        self.time = [round((core.getTime()/1000), 2)] # mouse click time, [time.get_ticks()] change to PsychoPy
+        self.pos = [mouse.getPos()] #[pg.mouse.get_pos()] to Py
         self.click = [0] # mouse click indicator
         self.undo_press = [0] # undo indicator
         
@@ -242,10 +243,13 @@ class Draw:
 
     def cities(self,mmap,screen): # draw city dots       
         for city in mmap.xy[1:]: # exclude start city
-            self.city = pg.draw.circle(screen, BLACK, city, mmap.radius)  
-#            self.city = draw_circle(screen,city,mmap.radius,BLACK)
-        self.start = pg.draw.circle(screen, RED, mmap.city_start, mmap.radius)
-#        self.start = draw_circle(screen,mmap.city_start,mmap.radius,RED)
+#            self.city = pg.draw.circle(screen, BLACK, city, mmap.radius)  
+            self.city = visual.Circle(screen,mmap.radius,edges=30) #color=BLACK) #draw_circle(screen,city,mmap.radius,BLACK)
+            self.city.autoDraw = True
+#            self.city.draw()
+#        self.start = pg.draw.circle(screen, RED, mmap.city_start, mmap.radius)
+        self.start = visual.Circle(screen,mmap.radius,edges=30) #color=RED) #draw_circle(screen,mmap.city_start,mmap.radius,RED)
+        self.start.draw()
     
     def budget(self, mmap, mouse,screen):  
         # current mouse position
@@ -324,11 +328,12 @@ def post_block(screen,blk):
 # helper function
 # =============================================================================
 def text_write(text, size, color, x, y,screen):  # function that can display any text
+    visual.TextStim (screen,text,font='',pos=(x,y))
     font_object = pg.font.SysFont(pg.font.get_default_font(), size)
     text_surface = font_object.render(text, True, color)
     text_rectangle = text_surface.get_rect()
     text_rectangle.center = x, y
-    screen.blit(text_surface, text_rectangle.center)
+#    screen.blit(text_surface, text_rectangle.center)
 
 def draw_line(screen,X0, X1, color):
     mylist = [x + y for x, y in zip(X0, X1)]
@@ -436,13 +441,13 @@ def road_basic(screen,map_content,n_trials, blk, n_blk, mode):
     if mode == 'game':
 #        screen.fill(GREY)
         game_start(screen,blk)
-#        screen.update()
-        pg.display.flip()
+        screen.update()
+#        pg.display.flip()
     elif mode == 'try':
 #        screen.fill(GREY)
         trial_start(screen)
-#        screen.update()
-        pg.display.flip()
+        screen.update()
+#        pg.display.flip()
 
     # instruction
     # -------------------------------------------------------------------------    
@@ -504,7 +509,7 @@ RED = (255, 102, 102)
 GREEN = (0, 204, 102)
 BLACK = (0, 0, 0)
 
-WIDTH = 1500 #1900
+WIDTH = 1000 #1900
 HEIGHT = 900 #1000
 
 if __name__ == "__main__":
@@ -512,12 +517,12 @@ if __name__ == "__main__":
     pg.font.init()
       
     # display setup
-#    screen = visual.Window((WIDTH,HEIGHT)) 
-    screen = pg.display.set_mode((WIDTH, HEIGHT))  
+    screen = visual.Window((WIDTH,HEIGHT),monitor="testMonitor") 
+    #pg.display.set_mode()  
     # pg.FULLSCREEN pg.RESIZABLE
     # WIDTH, HEIGHT), flags=pg.FULLSCREEN
  
-    screen.fill(GREY)
+#    screen.fill(GREY)
     
     # load maps
 #    map_content = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
@@ -533,5 +538,8 @@ if __name__ == "__main__":
     
     trials = road_basic(screen,map_content,n_trials,blk,n_blk,mode)
     
-    pg.display.quit()
-    pg.quit()
+    screen.close()
+    core.quit()
+#    pg.display.quit()
+#    pg.quit()
+#
