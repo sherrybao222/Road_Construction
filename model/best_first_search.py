@@ -130,7 +130,7 @@ def make_move(s,dist_city):
         # 1st iteration
         if (not determined(root)):
             n = select_node(root)
-            print('select node: '+ str(n.name))
+#            print('select node: '+ str(n.name))
             
             expand_node(n,dist_city,theta,weights)
 #            print('expand_node:')
@@ -149,7 +149,7 @@ def make_move(s,dist_city):
             n = select_node(root)
             
                 
-            print('select node: '+ str(n.name))
+#            print('select node: '+ str(n.name))
             
             expand_node(n,dist_city,theta,weights)
 #            print('expand_node:')
