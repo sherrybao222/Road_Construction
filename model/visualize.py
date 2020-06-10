@@ -78,7 +78,11 @@ class Map:
                                 
         self.n_city.append(self.choice.n_c)
         print(self.choice.n_c)  
-        self.now = self.choice     
+#        self.now = self.choice  
+        
+        self.new_start = new_node(self.choice.name, None, self.now.city, self.dist_city, self.choice.budget, self.now.n_c, [1,1,1])
+        self.now = self.new_start
+
     def check_end(self): # check if trial end
         if self.now.determined:
             return False # end
@@ -340,7 +344,7 @@ if __name__ == "__main__":
     pg.font.init()
       
     # display setup
-    screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
+    screen = pg.display.set_mode((WIDTH, HEIGHT))#, flags=pg.FULLSCREEN)  # pg.FULLSCREEN pg.RESIZABLE
         
     # Fill background 
     screen.fill(GREY)
@@ -348,7 +352,7 @@ if __name__ == "__main__":
     # load maps
     import json
     #with open('/Users/fqx/Spring 2020/Ma Lab/GitHub/Road_Construction/map/basic_map_24','r') as file:
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/map/active_map/basic_map_48_all4','r') as file: 
+    with open('/Users/sherrybao/Downloads/research/road_construction/rc_all_data/map/active_map/basic_map_48_all4','r') as file: 
         map_content = json.load(file)[0] 
     
     

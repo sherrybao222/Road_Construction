@@ -224,7 +224,7 @@ if __name__ == "__main__":
         if choice.determined == 1:
             break
         
-        new_start = new_node(choice.name, None, now.city, dist_city, now.budget, now.n_c, set_weights)
+        new_start = new_node(choice.name, None, now.city, dist_city, choice.budget, now.n_c, set_weights)
         now = new_start
 
 # -------------------------------------------------------------------------
