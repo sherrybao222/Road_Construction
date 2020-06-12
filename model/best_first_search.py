@@ -130,7 +130,7 @@ def make_move(s,dist_city):
         # 1st iteration
         if (not determined(root)):
             n = select_node(root)
-            print('select node: '+ str(n.name))
+#            print('select node: '+ str(n.name))
             
             expand_node(n,dist_city,theta,weights)
 #            print('expand_node:')
@@ -149,7 +149,7 @@ def make_move(s,dist_city):
             n = select_node(root)
             
                 
-            print('select node: '+ str(n.name))
+#            print('select node: '+ str(n.name))
             
             expand_node(n,dist_city,theta,weights)
 #            print('expand_node:')
@@ -199,7 +199,7 @@ if __name__ == "__main__":
     # save console output 2/2    
     import sys
     orig_stdout = sys.stdout
-    f = open('out.txt', 'w')
+    f = open('output.txt', 'w')
     sys.stdout = f
 
     # generate map
@@ -214,14 +214,18 @@ if __name__ == "__main__":
     now = start
     while True:    
         choice = make_move(now,dist_city)
-        now = choice
-        print('choice: '+ str(now.name))
-        choice_sequence.append(now.name)
-        for pre, _, node in RenderTree(start):
+        print('choice: '+ str(choice.name))
+        choice_sequence.append(choice.name)
+        
+        # visualize tree                 
+        for pre, _, node in RenderTree(now):
             print("%s%s:%s" % (pre, node.name,node.value))
-                
-        if now.determined == 1:
+        
+        if choice.determined == 1:
             break
+        
+        new_start = new_node(choice.name, None, now.city, dist_city, choice.budget, now.n_c, set_weights)
+        now = new_start
 
 # -------------------------------------------------------------------------
     # visualize map     
@@ -249,13 +253,10 @@ if __name__ == "__main__":
     fig.set_figwidth(10)
     plt.show()
     
-    # visualize tree         
-    for pre, _, node in RenderTree(start):
-         print("%s%s:%s" % (pre, node.name,node.value))
-
     # save console output 2/2
     sys.stdout = orig_stdout
     f.close()
+    
 
 # -------------------------------------------------------------------------
 #  convert to xml
