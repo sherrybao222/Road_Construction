@@ -1,9 +1,12 @@
 from map_class import Map
-from best_first_search import new_node,make_move
+from best_first_search import new_node,make_move,params
 import time
 from statistics import mean
 
 def single_trial(map_content, map_id):
+    '''
+    simulation of one map
+    '''
     
     # generate map
     trial = Map(map_content, map_id)
@@ -15,10 +18,10 @@ def single_trial(map_content, map_id):
     choice_sequence = [0]
     time_sequence = []
     start_time = time.time()
-    start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, -1, set_weights)
+    start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, -1, para.weights)
     now = start
     while True:
-        choice = make_move(now,dist_city)
+        choice = make_move(now,dist_city,para)
 #        print('choice: '+ str(choice.name))
         choice_sequence.append(choice.name)
         move_time = (time.time() - start_time)
@@ -28,7 +31,7 @@ def single_trial(map_content, map_id):
             break
         
         start_time = time.time()
-        new_start = new_node(choice.name, None, now.city, dist_city, choice.budget, now.n_c, set_weights)
+        new_start = new_node(choice.name, None, now.city, dist_city, choice.budget, now.n_c, para.weights)
         now = new_start
         
         
@@ -36,6 +39,10 @@ def single_trial(map_content, map_id):
     return choice_sequence,time_sequence
 
 def all_trial(map_content,n_maps):
+    '''
+    simulation of all maps
+    '''
+
     all_done = False
     choices_all = []
     times_all = []
@@ -51,8 +58,13 @@ def all_trial(map_content,n_maps):
 
 # =============================================================================
 # setting up parameters
-    
-set_weights = [1,1,1]
+
+# set parameters
+inparams = [1, 1, 1, 0.01, 15, 0.05, 0.01]
+para = params(w1=inparams[0], w2=inparams[1], w3=inparams[2], 
+					stopping_probability=inparams[3],
+					pruning_threshold=inparams[4],
+					lapse_rate=inparams[5], feature_dropping_rate=inparams[6])
 
 if __name__ == "__main__":
           
