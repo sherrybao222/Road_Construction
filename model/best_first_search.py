@@ -12,7 +12,7 @@ class params:
 					pruning_threshold,
 					lapse_rate,
 					feature_dropping_rate,
-					count_par = 5):
+					count_par = 50):
 		self.weights = [w1, w2, w3]
 		self.feature_dropping_rate = feature_dropping_rate
 		self.stopping_probability = stopping_probability
@@ -214,7 +214,7 @@ if __name__ == "__main__":
     '''
     #--------------------------------------------------------------------------
     # set parameters
-    inparams = [1, 1, 1, 0.01, 15, 0.05, 0.01]
+    inparams = [1, 1, 1, 0.01, 15, 0.01, 0.01]
     para = params(w1=inparams[0], w2=inparams[1], w3=inparams[2], 
     					stopping_probability=inparams[3],
     					pruning_threshold=inparams[4],

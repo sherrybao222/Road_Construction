@@ -60,7 +60,7 @@ def all_trial(map_content,n_maps):
 # setting up parameters
 
 # set parameters
-inparams = [1, 1, 1, 0.01, 15, 0.05, 0.01]
+inparams = [1, 1, 1, 0.01, 10, 0.01, 0.01]
 para = params(w1=inparams[0], w2=inparams[1], w3=inparams[2], 
 					stopping_probability=inparams[3],
 					pruning_threshold=inparams[4],
