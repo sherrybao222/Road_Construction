@@ -19,15 +19,6 @@ n_1 = 1
 n_2 = 1
 n_3 = 1
 
-## load maps from mat
-#train_num_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_test.mat',  struct_as_record=False)
-#train_basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_basic_map.mat',  struct_as_record=False)
-#train_undo_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/training_test_undo.mat',  struct_as_record=False)
-#
-#num_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test.mat',  struct_as_record=False)
-#basic_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/basic_map_24.mat',  struct_as_record=False)
-#undo_map = sio.loadmat('/Users/sherrybao/Downloads/Research/Road_Construction/map/test_undo.mat',  struct_as_record=False)
-
 # load maps from json
 # /home/malab/Desktop/Road_Construction/
 # /Users/sherrybao/Downloads/Research/Road_Construction/

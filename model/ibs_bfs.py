@@ -60,7 +60,7 @@ def ibs_early_stopping(inparams,
 			if hit_target[idx]: # if current move was already hit by previous iterations
 				LL_k += harmonic_sum(count_iteration[idx])
 				continue
-			decision = make_move(now,dist_city,para)
+			decision = MakeMove(Node(id_to_board(subject_data[idx],subject_puzzle[idx]),None,params), params, puzzle_cache[subject_puzzle[idx]], subject_puzzle[idx])
 			if make_id(decision.board)==subject_answer[idx]: # hit
 				hit_target[idx] = True
 				LL_k += harmonic_sum(count_iteration[idx])
