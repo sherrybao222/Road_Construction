@@ -1,3 +1,8 @@
+'''
+preprocess raw data
+generate a sheet for each board position (choice) and corresponding feature
+'''
+
 import json
 import pandas as pd
 
