@@ -19,22 +19,24 @@ n_1 = 1
 n_2 = 1
 n_3 = 1
 
+# directories
+home_dir = '/Users/sherrybao/Downloads/research/'
+input_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/'
+map_dir = 'road_construction/map/active_map/'
+
 # load maps from json
-# /home/malab/Desktop/Road_Construction/
-# /Users/sherrybao/Downloads/Research/Road_Construction/
-# /Users/fqx/Dropbox/Spring 2020/Ma Lab/GitHub/Road_Construction/
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/active_map/num_training','r') as file:
+with open(home_dir + map_dir + 'num_training','r') as file:
     train_num_map = json.load(file) 
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/active_map/basic_map_training','r') as file:
+with open(home_dir + map_dir + 'basic_map_training','r') as file:
     train_basic_map = json.load(file) 
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/active_map/undo_map_training','r') as file:
+with open(home_dir + map_dir + 'undo_map_training','r') as file:
     train_undo_map = json.load(file) 
 
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/active_map/num_48','r') as file:
+with open(home_dir + map_dir + 'num_48','r') as file:
     num_map = json.load(file) 
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/active_map/basic_map_48_all4','r') as file:
+with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
     basic_map = json.load(file) 
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/map/active_map/undo_map_48_all4','r') as file:
+with open(home_dir + map_dir + 'undo_map_48_all4','r') as file:
     undo_map = json.load(file) 
 
 # blocks
