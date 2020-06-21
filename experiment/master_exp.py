@@ -21,7 +21,6 @@ n_3 = 1
 
 # directories
 home_dir = '/Users/sherrybao/Downloads/research/'
-input_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/'
 map_dir = 'road_construction/map/active_map/'
 
 # load maps from json
