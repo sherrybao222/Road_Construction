@@ -1,5 +1,7 @@
 from best_first_search import new_node,make_move,params
 import time
+import pandas as pd
+import json
 
 def harmonic_sum(n):
 	''' 
@@ -60,8 +62,13 @@ def ibs_early_stopping(inparams,
 			if hit_target[idx]: # if current move was already hit by previous iterations
 				LL_k += harmonic_sum(count_iteration[idx])
 				continue
-			decision = MakeMove(Node(id_to_board(subject_data[idx],subject_puzzle[idx]),None,params), params, puzzle_cache[subject_puzzle[idx]], subject_puzzle[idx])
-			if make_id(decision.board)==subject_answer[idx]: # hit
+            dist = basic_map[0][subject_data.loc[idx,'map_id']]['distance']
+            node_now = new_node(subject_data.loc[idx,'choice_all'], None, subject_data.loc[idx,'remain_all'], 
+                                dist, subject_data.loc[idx,'budget_all'], subject_data.loc[idx,'n_city_all'], 
+                                para.weights)
+			decision = make_move(node_now,dist,para)
+            
+            if make_id(decision.board)==subject_answer[idx]: # hit
 				hit_target[idx] = True
 				LL_k += harmonic_sum(count_iteration[idx])
 			else: # not hit
@@ -81,4 +88,16 @@ def ibs_early_stopping(inparams,
 	print('Final LL_k: '+str(LL_k))
 	return LL_k
 
+# -----------------------------------------------------------------------------
+# directories
+home_dir = '/Users/sherrybao/Downloads/research/'
+input_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/'
+map_dir = 'road_construction/map/active_map/'
+
+subs = [1]#,2,4] # subject index 
+
+for sub in subs:
+    sub_data = pd.read_csv(home_dir + input_dir + 'preprocess_sub_'+str(sub) + '.csv')
+with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
+    basic_map = json.load(file) 
 
