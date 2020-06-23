@@ -13,16 +13,22 @@ data_all = [] # prepare for all data
 subs = [1,2,4] # subject index
 budget = [200,350,400]
 
+# directories
+home_dir = '/Users/sherrybao/Downloads/research/'
+map_dir = 'road_construction/rc_all_data/pilot_031220/map/'
+data_dir = 'road_construction/rc_all_data/data/data_pilot/'
+out_dir = 'road_construction/rc_all_data/plot/fig/'
+
 # import experiment data
 for num in subs:
-    with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/data_copy/data_pilot/sub_'+str(num)+'/test_all_'+str(num),'r') as file: 
+    with open(home_dir + data_dir + 'sub_'+str(num)+'/test_all_'+str(num),'r') as file: 
         all_data = json.load(file)
         data_all.append(all_data)
         
 # import map
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/pilot_031220/map/num_48','r') as file: 
+with open(home_dir + data_dir + 'num_48','r') as file: 
     num_map = json.load(file) 
-with open('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/map/active_map/basic_map_48_all4','r') as file: 
+with open(home_dir + data_dir + 'basic_map_48_all4','r') as file: 
     rc_map = json.load(file) 
 
 # map index
@@ -270,7 +276,7 @@ axs[0].set_ylabel("Number estimation (reported)")
 fig.set_figwidth(12)
 
 #ax.set_aspect('equal')
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_est_scatter_all.png',dpi=600)
+fig.savefig(out_dir + 'num_est_scatter_all.png',dpi=600)
 plt.close(fig)
 
 # ----------------------------------------------------
@@ -298,7 +304,7 @@ axs[0].set_ylabel('Mean absolute error in number estimation')
 axs[1].set_xlabel('Budget length (px)')
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_mae.png',dpi=600)
+fig.savefig(out_dir + 'num_mae.png',dpi=600)
 plt.close(fig)
 
 # ----------------------------------------------------
@@ -333,7 +339,7 @@ axs[0].set_ylabel('Mean error in number estimation')
 axs[1].set_xlabel('Budget length (px)')
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_mbe.png',dpi=600)
+fig.savefig(out_dir + 'num_mbe.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
@@ -366,7 +372,7 @@ fig.set_figheight(11)
 fig.set_figwidth(10)
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/num_hist_budget.png',dpi=600,bbox_inches='tight')
+fig.savefig(out_dir + 'num_hist_budget.png',dpi=600,bbox_inches='tight')
 plt.close(fig)
 # =============================================================================
 # rc scatter all - final
@@ -434,7 +440,7 @@ fig.set_figwidth(12)
 fig.set_figheight(9)
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_all.png',dpi=600, bbox_inches='tight')
+fig.savefig(out_dir + 'rc_scatter_all.png',dpi=600, bbox_inches='tight')
 plt.close(fig)
 
 # =============================================================================
@@ -487,7 +493,7 @@ fig.set_figwidth(12)
 fig.set_figheight(9)
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_scatter_basic.png',dpi=600, bbox_inches='tight')#bbox_extra_artists=(lgd,lgd2),
+fig.savefig(out_dir + 'rc_scatter_basic.png',dpi=600, bbox_inches='tight')#bbox_extra_artists=(lgd,lgd2),
 plt.close(fig)
 
 # =============================================================================
@@ -528,7 +534,7 @@ lgd = plt.legend(handles=[rc_led,undo_led],facecolor = 'white')
 fig.set_figwidth(10)
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_undo_hist_all.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
+fig.savefig(out_dir + 'rc_undo_hist_all.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
 plt.close(fig)
 
 # =============================================================================
@@ -560,7 +566,7 @@ axs[0].set_ylabel('Proportion of trials')
 fig.set_figwidth(10)
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/rc_hist_all.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
+fig.savefig(out_dir + 'rc_hist_all.png',dpi=600,bbox_extra_artists=(lgd,), bbox_inches='tight')
 plt.close(fig)
 
 # =============================================================================
@@ -584,7 +590,7 @@ for i in range(0,3):
 axs[1].set_xlabel('Number of undos per trial')
 axs[0].set_ylabel('Number of undos per trial')
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_hist_all.png',dpi=600)
+fig.savefig(out_dir + 'n_undo_hist_all.png',dpi=600)
 plt.close(fig)
 # =============================================================================
 # n_undo - n_max - final
@@ -616,7 +622,7 @@ axs[1].set_xlabel('Maximum connectable number')
 axs[0].set_ylabel('Number of undos per trial')
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/n_undo_max.png',dpi=600)
+fig.savefig(out_dir + 'n_undo_max.png',dpi=600)
 plt.close(fig)
 # =============================================================================
 # whole time boxplot - final
@@ -640,7 +646,7 @@ for i in range(0,3):
     axs[i].title.set_text('S'+str(i+1))
 axs[0].set_ylabel('Trial duration (s)')
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc_hist_all.png',dpi=600)
+fig.savefig(out_dir + 't_rc_hist_all.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
@@ -785,7 +791,7 @@ fig.set_figwidth(26)
 fig.set_figheight(12)
 
 plt.show()
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/action_t.png',dpi=600,bbox_inches='tight')
+fig.savefig(out_dir + 'action_t.png',dpi=600,bbox_inches='tight')
 plt.close(fig)
 
 # =============================================================================
@@ -810,7 +816,7 @@ ax.spines['left'].set_color('k')
 ax.tick_params(axis='y', colors='k')
 plt.ylabel('connected number of cities')
 
-fig.savefig('av_rc.png',dpi=600)
+fig.savefig(out_dir + 'av_rc.png',dpi=600)
 plt.close(fig)
 
 # ---------------------------------------------------
@@ -834,7 +840,7 @@ ax.spines['left'].set_color('k')
 ax.tick_params(axis='y', colors='k')
 plt.ylabel('trial duration (s)')
 
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/t_rc.png',dpi=600)
+fig.savefig(out_dir + 't_rc.png',dpi=600)
 plt.close(fig)
 
 
@@ -858,7 +864,7 @@ ax.spines['left'].set_color('k')
 ax.tick_params(axis='y', colors='k')
 plt.ylabel('time spent until first move (s)')
 
-fig.savefig('/Users/sherrybao/Downloads/Research/Road_Construction/rc_all_data/plot/fig/f_t_rc.png',dpi=600)
+fig.savefig(out_dir + 'f_t_rc.png',dpi=600)
 plt.close(fig)
 
 # ---------------------------------------------------
@@ -880,7 +886,7 @@ ax.spines['left'].set_color('k')
 ax.tick_params(axis='y', colors='k')
 plt.ylabel('undo percentage')
 
-fig.savefig('pc_undo.png',dpi=600)
+fig.savefig(out_dir + 'pc_undo.png',dpi=600)
 plt.close(fig)
 
 # ----------------------------------------------------
@@ -903,7 +909,7 @@ ax.tick_params(axis='y', colors='k')
 plt.ylabel('accuracy in number estimation')
 plt.xlabel('budget length')
 
-fig.savefig('av_num.png',dpi=600)
+fig.savefig(out_dir + 'av_num.png',dpi=600)
 plt.close(fig)
 
 # =============================================================================
