@@ -68,7 +68,7 @@ def ibs_early_stopping(inparams,
                                 para.weights)
 			decision = make_move(node_now,dist,para)
             
-            if make_id(decision.board)==subject_answer[idx]: # hit
+            if decision.name == subject_answer[idx]: # hit
 				hit_target[idx] = True
 				LL_k += harmonic_sum(count_iteration[idx])
 			else: # not hit
