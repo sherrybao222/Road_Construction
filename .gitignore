@@ -58,3 +58,4 @@ Plot/fig/Icon
 rc_all_data/
 rushhour/
 model/output.txt
+*.pyc
