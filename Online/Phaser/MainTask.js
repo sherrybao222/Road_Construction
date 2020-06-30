@@ -9,8 +9,9 @@ const  height = 900
 //city/response list for debug
 const locations = [[200,150],[270,90],[460,200],[300,300]];
 let choice_locdyn = [[200,150]];
-let choice_dyn = [];
-let budget_dyn = [60,40,100];
+let choice_dyn = [[200,150]];
+let budget_dyn = [];
+let budget_remain = [400];
 
 class MainTask extends Phaser.Scene {
     constructor() {
@@ -41,12 +42,16 @@ class MainTask extends Phaser.Scene {
 
     };
 
+    //create matrix based on city number
+    //use phaser math to calculate distance
+    //fill-in the matrix and store this info
+
     data_rc(){
       // this.choice_dyn = [];
       choice_locdyn.push(this.city);
       choice_dyn.push(this.city);
       this.check = 0; //change choice indicator after saving them
-      console.log(choice_dyn);
+      // console.log(choice_dyn);
     };
 
     //load json map into javascript
@@ -84,35 +89,16 @@ class MainTask extends Phaser.Scene {
         };
         let start = this.circle.fillCircle(locations[0][0],locations[0][1],6);
         city_list.push(start);
-        // this.city.setInteractive(city_list,this.onObjectClicked);
         this.circle.fillCircle(30,50,6);
-        // this.city.setInteractive(this.city,this.onObjectClicked);
-        // this.input.on('gameobjectdown',this.onObjectClicked);
     };
-
-    // onObjectClicked(pointer,city_list){
-    //   // if (pointer == city_list.prototype.some()){
-    //     // console.log("clicked");
-    //   // };
-    // };
 
     road(){
       //function name and this.name don't use the same
       //otherwise lead to naming bug
+
       //create road and define style
       this.line = this.add.graphics();
       this.line.lineStyle(4, grey, 1.0);
-
-      //click and draw
-      // this.input.on('pointerdown', function(pointer){
-      //     // console.log('down');
-      //     let line2 = new Phaser.Geom.Line(
-      //       choice_locdyn[choice_locdyn.length-1][0],
-      //       choice_locdyn[choice_locdyn.length-1][1],
-      //       pointer.x,pointer.y);
-      //     this.road.strokeLineShape(line2);
-      //     // this.add.text(pointer.x,pointer.y,"Road Construction")
-      //     },this);
 
       // draw the connected cities from "mmap.choice_locdyn"
       for (var i=0; i<choice_locdyn.length-1; i++){
@@ -140,8 +126,8 @@ class MainTask extends Phaser.Scene {
       let cy = this.mouse_y - y;
       let radians = Math.atan2(cy,cx);
       //mmap.budget_dyn[-1]
-      this.budget_pos_x = x + budget_dyn[budget_dyn.length - 1] * Math.cos(radians);
-      this.budget_pos_y = y + budget_dyn[budget_dyn.length - 1] * Math.sin(radians);
+      this.budget_pos_x = x + budget_remain[budget_remain.length - 1] * Math.cos(radians);
+      this.budget_pos_y = y + budget_remain[budget_remain.length - 1] * Math.sin(radians);
 
       //draw budget line
       let line = new Phaser.Geom.Line(x,y,this.budget_pos_x,this.budget_pos_y);
@@ -149,21 +135,35 @@ class MainTask extends Phaser.Scene {
     };
 
     make_choice(pointer){
-      // let x2 = this.mouse_x;
-      // let y2 = this.mouse_y;
       for (var i=1; i<locations.length; i++){
         this.mouse_distance = Math.hypot(locations[i][0]-this.pointer.x,
           locations[i][1]-this.pointer.y);
+
         // 3 is based on visual testing, not based on radius
         if (this.mouse_distance <= 3 && choice_dyn.includes(choice_dyn[i])==false){
           // console.log(choice_dyn.includes(i));
           // console.log(this.mouse_distance);
           this.index = i; //index of chosen city
-          this.city = locations[i];
-          // this.city = this.xy[i]; //location of chosen city
-          this.check = 1; //indicator showing people made a valid choice
+          this.choice_distance = Phaser.Math.Distance.Between(
+                                choice_dyn[choice_dyn.length-1][0],choice_dyn[choice_dyn.length-1][1],
+                                locations[this.index][0], locations[this.index][1]);
+          if (this.choice_distance <= budget_remain[budget_remain.length-1]){
+            this.city = locations[i];
+            // this.city = this.xy[i]; //location of chosen city
+            this.check = 1; //indicator showing people made a valid choice
+            // budget_dyn.push(this.choice_distance);
+          };
         };
       };
+    };
+
+    budget_update(){
+      let remain = budget_remain[budget_remain.length-1] - this.choice_distance;
+                  // budget_dyn[budget_dyn.length-1];
+      //the unit right now doesn't seem right
+      budget_remain.push(remain);
+      console.log(this.choice_distance);
+      console.log(budget_remain);
     };
 
     update(){
@@ -179,26 +179,10 @@ class MainTask extends Phaser.Scene {
             if (this.check == 1){
                 // console.log("left down");
                 this.data_rc();
+                this.budget_update();
                 this.road();
             };
         };
       }, this);
-      // console.log(choice_dyn);
-      // this.make_choice(); //this enable live update while playing
-
-      //check choice
-      // if (this.pointer.noButtonDown() == false){
-      //   console.log("clicked");
-      // };
-      // this.input.on('pointerdown', function () {
-      //   // console.log(this.check);
-      //   this.make_choice(); //once made on valid choice, it's always 1
-      //   if (this.check == 1){
-      //     console.log('down');
-      //     // this.data();
-      //   //   this.add.text(pointer.x,pointer.y,"Road Construction");
-      //   };
-      // },this);
-
     };
 }

@@ -75,3 +75,28 @@ function create ()
 //   // let angle = Phaser.Math.Angle.Between(line.x,line.y,mouse.x,mouse.y);
 //   // line.setRotation(angle+Math.PI/2);
 // }
+
+//click and draw
+// this.input.on('pointerdown', function(pointer){
+//     // console.log('down');
+//     let line2 = new Phaser.Geom.Line(
+//       choice_locdyn[choice_locdyn.length-1][0],
+//       choice_locdyn[choice_locdyn.length-1][1],
+//       pointer.x,pointer.y);
+//     this.road.strokeLineShape(line2);
+//     // this.add.text(pointer.x,pointer.y,"Road Construction")
+//     },this);
+
+//check choice
+// if (this.pointer.noButtonDown() == false){
+//   console.log("clicked");
+// };
+// this.input.on('pointerdown', function () {
+//   // console.log(this.check);
+//   this.make_choice(); //once made on valid choice, it's always 1
+//   if (this.check == 1){
+//     console.log('down');
+//     // this.data();
+//   //   this.add.text(pointer.x,pointer.y,"Road Construction");
+//   };
+// },this);
