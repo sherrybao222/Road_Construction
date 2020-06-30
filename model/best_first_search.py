@@ -21,7 +21,7 @@ class params:
 		self.count_par = count_par
         
 #----------------------------------------------------------------------
-def new_node(name, parent, cities, dist, budget, n_c, weights):
+def new_node(name, parent, cities, dist, budget, n_c, weights, *args):
     
     '''
     creat new tree node
@@ -38,14 +38,18 @@ def new_node(name, parent, cities, dist, budget, n_c, weights):
     
     #------------------------------------------------------------------ 
     # calculate n of cities within reach
-    n_u = 0
     
-    cities_remain = cities.copy()
-    del cities_remain[node.name] # delete the current chosen node
-
-    for c in cities_remain:
-        if dist[node.name][c] <= budget_remain:
-            n_u = n_u + 1
+    if len(args) != 0:
+        for arg in args:
+            n_u = arg
+    else: 
+        n_u = 0
+        cities_remain = cities.copy()
+        try: del cities_remain[node.name] # delete the current chosen node
+        except: pass
+        for c in cities_remain:
+            if dist[node.name][c] <= budget_remain:
+                n_u = n_u + 1
 
     #------------------------------------------------------------------                            
     value = weights[0] * n_cc + weights[1] * n_u + weights[2] * (budget_remain/100) + np.random.normal()
@@ -54,7 +58,9 @@ def new_node(name, parent, cities, dist, budget, n_c, weights):
     node.value = value
     node.budget = budget_remain
     node.n_c = n_cc
-    node.city = cities_remain
+    node.n_u = n_u
+    try: node.city = cities_remain # all cities, not only cities within reach
+    except: node.city = cities
 
     #------------------------------------------------------------------    
     if n_u == 0:
@@ -221,18 +227,18 @@ if __name__ == "__main__":
     					lapse_rate=inparams[5], feature_dropping_rate=inparams[6])
 
     #--------------------------------------------------------------------------
-    # save console output 2/2    
-    import sys
-    orig_stdout = sys.stdout
-    f = open('output.txt', 'w')
-    sys.stdout = f
-
     # generate map
     trial = Map()
     dict_city = dict(zip(list(range(0,trial.N)), trial.xy)) 
     dict_city_remain = dict_city.copy()
     dist_city = trial.distance.copy()
     
+    # save console output 2/1   
+    import sys
+    orig_stdout = sys.stdout
+    f = open('output.txt', 'w')
+    sys.stdout = f
+
     # simulate
     choice_sequence = [0]
     start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, -1, para.weights)
@@ -251,6 +257,10 @@ if __name__ == "__main__":
         
         new_start = new_node(choice.name, None, now.city, dist_city, choice.budget, now.n_c, para.weights)
         now = new_start
+
+    # save console output 2/2
+    sys.stdout = orig_stdout
+    f.close()
 
 # -------------------------------------------------------------------------
     # visualize map     
@@ -278,9 +288,6 @@ if __name__ == "__main__":
     fig.set_figwidth(10)
     plt.show()
     
-    # save console output 2/2
-    sys.stdout = orig_stdout
-    f.close()
     
 
 # -------------------------------------------------------------------------
