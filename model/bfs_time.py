@@ -1,5 +1,5 @@
 from map_class import Map
-from best_first_search import new_node,make_move,params
+from best_first_search import new_node_current,make_move,params
 import time
 from statistics import mean
 
@@ -17,8 +17,10 @@ def single_trial(map_content, map_id):
     # simulate
     choice_sequence = [0]
     time_sequence = []
+    
     start_time = time.time()
-    start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, -1, para.weights)
+    
+    start = new_node_current(0, dict_city_remain, dist_city, trial.budget_remain, 0, para.weights)
     now = start
     while True:
         choice = make_move(now,dist_city,para)
@@ -31,10 +33,10 @@ def single_trial(map_content, map_id):
             break
         
         start_time = time.time()
-        new_start = new_node(choice.name, None, now.city, dist_city, choice.budget, now.n_c, para.weights)
+        
+        new_start = new_node_current(choice.name, choice.city, dist_city, 
+                                     choice.budget, choice.n_c, para.weights)        
         now = new_start
-        
-        
         
     return choice_sequence,time_sequence
 
@@ -56,25 +58,31 @@ def all_trial(map_content,n_maps):
         
     return choices_all,times_all
 
-# =============================================================================
-# setting up parameters
-
-# set parameters
-inparams = [1, 1, 1, 0.01, 10, 0.01, 0.01]
-para = params(w1=inparams[0], w2=inparams[1], w3=inparams[2], 
-					stopping_probability=inparams[3],
-					pruning_threshold=inparams[4],
-					lapse_rate=inparams[5], feature_dropping_rate=inparams[6])
 
 if __name__ == "__main__":
+    
+    # directories
+    home_dir = '/Users/sherrybao/Downloads/research/'
+    map_dir = 'road_construction/map/active_map/'
+
+    # =============================================================================
+    # setting up parameters
+    
+    # set parameters
+    inparams = [1, 1, 1, 0.01, 10, 0.01, 0.01]
+    para = params(w1=inparams[0], w2=inparams[1], w3=inparams[2], 
+    					stopping_probability=inparams[3],
+    					pruning_threshold=inparams[4],
+    					lapse_rate=inparams[5], feature_dropping_rate=inparams[6])
+
           
     # load maps
     import json
-    with open('/Users/sherrybao/Downloads/research/road_construction/rc_all_data/map/active_map/basic_map_48_all4','r') as file: 
+    with open(home_dir + map_dir + 'basic_map_48_all4','r') as file: 
         map_content = json.load(file)[0] 
 
     n_maps = 48
     choices_all,times_all = all_trial(map_content,n_maps)
 
-flat_list = [item for sublist in times_all for item in sublist]
-avg_move = mean(flat_list)
+    flat_list = [item for sublist in times_all for item in sublist]
+    avg_move = mean(flat_list)

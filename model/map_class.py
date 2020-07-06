@@ -4,11 +4,11 @@ from scipy.spatial import distance_matrix
 
 
 class Map:
-    def __init__(self, map_content, map_id): 
+    def __init__(self, map_content=None, map_id=None):
         
-#        self.circle_map()
         self.load_map(map_content, map_id)
-
+#        self.circle_map()
+            
     def circle_map(self):
         # map parameters
         self.N = 11    # total city number, including start

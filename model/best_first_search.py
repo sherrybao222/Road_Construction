@@ -12,7 +12,7 @@ class params:
 					pruning_threshold,
 					lapse_rate,
 					feature_dropping_rate,
-					count_par = 50):
+					count_par = 10):
 		self.weights = [w1, w2, w3]
 		self.feature_dropping_rate = feature_dropping_rate
 		self.stopping_probability = stopping_probability
@@ -21,49 +21,84 @@ class params:
 		self.count_par = count_par
         
 #----------------------------------------------------------------------
-def new_node(name, parent, cities, dist, budget, n_c, weights, *args):
+def new_node_current(name, cities, dist, budget, n_c, weights, **kargs):
     
     '''
-    creat new tree node
+    creat new tree node with current node's information
     '''
     
-    node = Node(name,parent) 
-    
-    if parent is not None:
-        budget_remain = budget - dist[parent.name][node.name]
-    else:
-        budget_remain = budget
-        
-    n_cc = n_c + 1
-    
+    node = Node(name,None) 
+       
     #------------------------------------------------------------------ 
-    # calculate n of cities within reach
-    
-    if len(args) != 0:
-        for arg in args:
-            n_u = arg
-    else: 
+    # calculate n of cities within reach    
+    if len(kargs) != 0:
+        pass
+    else:
         n_u = 0
         cities_remain = cities.copy()
+    
         try: del cities_remain[node.name] # delete the current chosen node
         except: pass
+
         for c in cities_remain:
-            if dist[node.name][c] <= budget_remain:
+            if dist[node.name][c] <= budget:
                 n_u = n_u + 1
-
-    #------------------------------------------------------------------                            
-    value = weights[0] * n_cc + weights[1] * n_u + weights[2] * (budget_remain/100) + np.random.normal()
-
-    #------------------------------------------------------------------                            
-    node.value = value
-    node.budget = budget_remain
-    node.n_c = n_cc
     node.n_u = n_u
+    
+    #------------------------------------------------------------------                            
     try: node.city = cities_remain # all cities, not only cities within reach
     except: node.city = cities
+        
+    node.budget = budget
+    node.n_c = n_c
+
+    #------------------------------------------------------------------                            
+    value = weights[0] * node.n_c + weights[1] * node.n_u + \
+            weights[2] * (node.budget/100) + np.random.normal()
+
+    node.value = value
 
     #------------------------------------------------------------------    
-    if n_u == 0:
+    if node.n_u == 0:
+        node.determined = 1
+    else:
+        node.determined = 0
+    
+    return node
+
+def new_node_previous(name, parent, dist, weights):
+    
+    '''
+    creat new tree node with parent node's information
+    '''
+    node = Node(name,parent) 
+    
+    node.budget = parent.budget - dist[parent.name][node.name]
+    node.n_c = parent.n_c + 1
+
+    #------------------------------------------------------------------ 
+    # calculate n of cities within reach    
+    n_u = 0
+    cities_remain = parent.city.copy()
+    
+    try: del cities_remain[node.name] # delete the current chosen node
+    except: pass
+
+    for c in cities_remain:
+        if dist[node.name][c] <= node.budget:
+            n_u = n_u + 1
+            
+    node.n_u = n_u
+    node.city = cities_remain # all cities, not only cities within reach
+       
+    #------------------------------------------------------------------                            
+    value = weights[0] * node.n_c + weights[1] * node.n_u + \
+            weights[2] * (node.budget/100) + np.random.normal()
+
+    node.value = value
+
+    #------------------------------------------------------------------    
+    if node.n_u == 0:
         node.determined = 1
     else:
         node.determined = 0
@@ -108,7 +143,7 @@ def expand_node(n, dist, theta, weights):
         
     for child in n.city:
         if dist[s][child] <= n.budget:
-            new_node(child, n, n.city, dist, n.budget, n.n_c, weights)            
+            new_node_previous(child, n, dist, weights)            
     #------------------------------------------------------------------ 
     # pruning    
     try:
@@ -209,7 +244,7 @@ def ramdom_move(s,dist,set_weights):
     for c in s.city:
         if dist[s.name][c] <= s.budget:
             candidates.append(c)       
-    n = new_node(random.choice(candidates), s, s.city, dist, s.budget, s.n_c, set_weights)
+    n = new_node_previous(random.choice(candidates), s, dist, set_weights)
     return n
 
 # -------------------------------------------------------------------------
@@ -241,7 +276,7 @@ if __name__ == "__main__":
 
     # simulate
     choice_sequence = [0]
-    start = new_node(0, None, dict_city_remain, dist_city, trial.budget_remain, -1, para.weights)
+    start = new_node_current(0, dict_city_remain, dist_city, trial.budget_remain, 0, para.weights)
     now = start
     while True:    
         choice = make_move(now,dist_city,para)
@@ -255,7 +290,8 @@ if __name__ == "__main__":
         if choice.determined == 1:
             break
         
-        new_start = new_node(choice.name, None, now.city, dist_city, choice.budget, now.n_c, para.weights)
+        new_start = new_node_current(choice.name, choice.city, dist_city, 
+                                     choice.budget, choice.n_c, para.weights)        
         now = new_start
 
     # save console output 2/2
