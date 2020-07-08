@@ -7,11 +7,8 @@ const width = 1000;
 const  height = 900
 
 //city/response list for debug
-const locations = [[200,150],[270,90],[460,200],[300,300]];
-// let choice_locdyn = [[200,150]];
-// let choice_dyn = [[200,150]];
-// let budget_dyn = [];
-// let budget_remain = [400];
+//no load function yet
+const locations = [[200,150],[270,90],[460,200],[300,200],[450,230],[378,229]];
 
 class MainTask extends Phaser.Scene {
     constructor() {
@@ -37,7 +34,7 @@ class MainTask extends Phaser.Scene {
         this.order = NaN;
 
         //this.N = this.loadmap['N'];
-        this.radius = 5;
+        // this.radius = 5;
 
         //this.total = this.loadmap['total'];
         //this.budget_remain = this.loadmap['total'];
@@ -65,11 +62,12 @@ class MainTask extends Phaser.Scene {
       this.trl = [trl_id];
       this.mapid = [map_id];
       this.cond = [2]; //condition
+
       let time = Phaser.Input.Pointer.downTime;
       this.time = [Math.round(time/1000,2)];
       // console.log(this.time);
-      // this.time = [Math.round((this.time/1000),2)];
       //mouse click time, double check
+
       this.pointer = this.input.activePointer;
       this.pos = [[this.pointer.x,this.pointer.y]];
       this.click = [0];  //click indicator
@@ -110,28 +108,28 @@ class MainTask extends Phaser.Scene {
       this.n_city.push(this.n_city[this.n_city.length-1]+1);
       this.check = 0; //change choice indicator after saving them
 
+      //need to double check this delete function
       delete this.index;
       delete this.city;
     };
 
 
-    //so far these are simple function, no agruament yet
+    //so far these are simple function, no agruaments yet
     cities(){
         //create visuals and define style
         this.circle = this.add.graphics();
         this.circle.fillStyle(grey,.5);
+        // this.circle.fillCircle(30,50,6);
 
-        let city_list = [];
+        //drawing all cities from the map list
         for (var i=1; i<locations.length; i++){
           this.x = locations[i][0];
           this.y = locations[i][1];
           let city = this.circle.fillCircle(this.x,this.y,6);
         };
-        // let start_x = this.city_start[0];
-        // let start_y = this.city_start[1];
-        // there is a bug calling this.city_start ???
+
+        //drawing the starting city
         let start = this.circle.fillCircle(this.city_start[0],this.city_start[1],6);
-        // this.circle.fillCircle(30,50,6);
     };
 
     road(){
@@ -143,6 +141,7 @@ class MainTask extends Phaser.Scene {
       this.line.lineStyle(4, grey, 1.0);
 
       // draw the connected cities from "mmap.choice_locdyn"
+      // double check i<= this.choice_locdyn.length 
       for (var i=0; i<this.choice_locdyn.length-1; i++){
           let line = new Phaser.Geom.Line(
           this.choice_locdyn[i][0],this.choice_locdyn[i][1],
@@ -185,25 +184,31 @@ class MainTask extends Phaser.Scene {
 
         // 5 is based on visual testing, not based on radius
         if (this.mouse_distance <= 5 && this.choice_dyn.includes(this.choice_dyn[i])==false){
+          // choice_dyn.include bug, already included but haven't click
           this.index = i; //index of chosen city
           //no distance matrix
           //online calculation of distance using map list and pointer
           this.choice_distance = Phaser.Math.Distance.Between(
                                 // locations[this.choice_dyn.length-1][0],
                                 // locations[this.choice_dyn.length-1][1],
+                                // previous city
                                 this.choice_locdyn[this.choice_locdyn.length-1][0],
                                 this.choice_locdyn[this.choice_locdyn.length-1][1],
                                 // this.city[0],this.city[1]);
+                                //chosen city
                                 locations[this.index][0], locations[this.index][1]);
 
           // console.log(this.budget_remain);
           // console.log("budget list: "+ this.budget_dyn);
           // console.log("current distance: " + this.choice_distance);
+          console.log("correct city & haven't choosen");
+          console.log("distance is " + this.choice_distance);
 
           if (this.choice_distance <= this.budget_remain){
             this.city = locations[i];
             // this.city = this.xy[i]; //location of chosen city
             this.check = 1; //indicator showing people made a valid choice
+            console.log("enough budget to connect!")
           };
         };
       };
@@ -226,12 +231,13 @@ class MainTask extends Phaser.Scene {
 
       this.input.on('pointerdown', function (pointer){
         if (this.pointer.leftButtonDown()){
+            console.log(this.check);
             this.make_choice();
             if (this.check == 1){
                 this.budget_update();
                 this.exp_data(this.pointer,1,1,1,1);
                 console.log(this.choice_his);
-                //seems like data saved multiple times for one click 
+                //seems like data saved multiple times for one click
                 this.road();
             };
         };
