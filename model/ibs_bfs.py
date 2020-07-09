@@ -237,17 +237,21 @@ if __name__ == "__main__":
     input_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/'
     map_dir = 'road_construction/map/active_map/'
     
-    inparams = [1, 1, 1, 0.01, 15, 0.01, 0.01]
-    
-    subs = [2]#,2,4] # subject index 
-    
-    for sub in subs:
-        sub_data = pd.read_csv(home_dir + input_dir + 'mod_ibs_preprocess_sub_'+str(sub) + '.csv')
+    inparams = [1, 1, 1, 0.01, 15, 0.05, 0.1]
+
     with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
         basic_map = json.load(file) 
     
-    LL_lower = np.sum([np.log(1.0/n) for n in list(sub_data['n_u_all'])])
+    subs = [1,4]#,2,4] # subject index 
     
-#    ibs_early_stopping(inparams, LL_lower, sub_data)
-#    ibs_basic(inparams,sub_data)
-    R = compute_repeats(inparams, 100, 10000, sub_data)
+    for sub in subs:
+        sub_data = pd.read_csv(home_dir + input_dir + 'mod_ibs_preprocess_sub_'+str(sub) + '.csv')
+    
+        LL_lower = np.sum([np.log(1.0/n) for n in list(sub_data['n_u_all'])])
+    
+    #    ibs_early_stopping(inparams, LL_lower, sub_data)
+    #    ibs_basic(inparams,sub_data)
+        R = compute_repeats(inparams, 100, 2000, sub_data)
+    
+        with open('n_repeat_' + str(sub),'w') as file: 
+            json.dump(R,file)
