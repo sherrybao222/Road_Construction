@@ -21,7 +21,7 @@ class params:
 		self.count_par = count_par
         
 #----------------------------------------------------------------------
-def new_node_current(name, cities, dist, budget, n_c, weights, **kargs):
+def new_node_current(name, cities, dist, budget, n_c, weights, **kwargs):
     
     '''
     creat new tree node with current node's information
@@ -31,8 +31,10 @@ def new_node_current(name, cities, dist, budget, n_c, weights, **kargs):
        
     #------------------------------------------------------------------ 
     # calculate n of cities within reach    
-    if len(kargs) != 0:
-        pass
+    if len(kwargs) != 0:
+        for key, value in kwargs.items():
+            if key == "n_u":
+                n_u = value
     else:
         n_u = 0
         cities_remain = cities.copy()
