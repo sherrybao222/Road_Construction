@@ -4,6 +4,8 @@
 const grey = 0xFAF7F6;
 const black = 0x000000;
 const green = 0xA2EF4C;
+
+//window setting for now
 const width = 800 //1000;
 const height = 600 //900
 
@@ -31,9 +33,7 @@ class MainTask extends Phaser.Scene {
         //call your major functions
         this.load_map();
         this.exp_data_init(1,1,1);
-        this.budget();
-        this.cities();
-        this.scorebar();
+        this.draw_map();
 
     };
 
@@ -139,7 +139,12 @@ class MainTask extends Phaser.Scene {
 
       this.n_city.push(this.n_city[this.n_city.length-1]);
     };
-//-----------------------------------------------------------------------------
+//-------Game--Visualization----------------------------------------------------
+    draw_map(){
+      this.budget();
+      this.cities();
+      this.scorebar();
+    };
 
     //so far these are simple function, no agruaments yet
     cities(){
@@ -158,7 +163,6 @@ class MainTask extends Phaser.Scene {
         //drawing the starting city
         let start = this.circle.fillCircle(this.city_start[0],this.city_start[1],6);
     };
-
     road(){
       //function name and this.name don't use the same
       //otherwise lead to naming bug
@@ -176,7 +180,6 @@ class MainTask extends Phaser.Scene {
           this.line.strokeLineShape(line);
       };
     };
-
     budget(){
       //create budget line and define style
       this.budget_line = this.add.graphics();
