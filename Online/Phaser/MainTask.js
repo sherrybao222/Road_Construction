@@ -2,9 +2,10 @@
 
 //color constants
 const grey = 0xFAF7F6;
+const black = 0x000000;
 const green = 0xA2EF4C;
-const width = 1000;
-const height = 900
+const width = 800 //1000;
+const height = 600 //900
 
 //city/response list for debug
 //no load function yet
@@ -32,6 +33,7 @@ class MainTask extends Phaser.Scene {
         this.exp_data_init(1,1,1);
         this.budget();
         this.cities();
+        this.scorebar();
 
     };
 
@@ -202,7 +204,98 @@ class MainTask extends Phaser.Scene {
       this.budget_line.strokeLineShape(line);
     };
 
+//-------Score--Bar----------------------------------------------------------------------
+    scorebar(){
+      //score bar parameters
+      this.width = 100 //1000;
+      this.height = 400 //480;
+      this.box = 12;
+      this.top = 50 //200; //distance to screen top
+
+      this.box_center(); //center for labels
+      this.incentive(); //calculate incentive: N^2
+      // this.indicator(mmap)
+      this.indicator(); //incentive score indicator, merged with older arrow function
+      this.number();
+    };
+
+    box_center(){
+      this.box_height = this.height / this.box
+      this.center_list = []
+      this.uni_height = this.box_height / 2
+      this.x = this.width / 2 + 600  //larger the number, further to right, 1300
+
+      for (var i=0; i<this.box; i++){
+        //double check here, maybe bug
+        // const box_y = i * this.box_height + this.uni_height;
+        let loc = [this.x, i * this.box_height + this.uni_height];
+        this.center_list.push(loc);
+      };
+    };
+
+    incentive(){
+      this.score = Array.from(Array(this.box).keys());
+      this.incentive_score = [];
+      for (let i of this.score){
+        i = (i**2) * 0.01;
+        this.incentive_score.push(i);
+      };
+    };
+
+    indicator(){
+      //mmap as argument
+      this.indicator_loc = this.center_list[this.n_city[this.n_city.length-1]];
+      //mmap.n_city[-1]
+      this.indicator_loc_best = this.center_list[Math.max(this.n_city)];
+      //mmap.n_city;
+
+      //create triagle arrow and define style
+      this.triangle = this.add.graphics();
+      this.triangle.fillStyle(grey);
+
+      //arrow parameter
+      let point = [this.indicator_loc[0] - 30, this.indicator_loc[1]+this.top+10];
+      let v2 = [point[0] - 10, point[1] + 10];
+      let v3 = [point[0] - 10, point[1] - 10];
+      this.triangle.fillTriangle(point[0], point[1], v2[0],v2[1],v3[0],v3[1]);
+    };
+
+    //drawing score Bar
+    number(){
+      //create rectangle and define style
+      this.rect = this.add.graphics();
+
+      let left = this.center_list[0][0] - 25;
+      let hex_c = [0x66CC66,0x74C366,0x82B966,0x90B066,
+                    0x9EA766,0xAC9E66,0xB99466,0xC78B66,
+                    0xD58266,0xE37966,0xF16F66,0xFF6666] //color list
+
+      for (var i=0; i<this.box; i++){
+        let loc = this.center_list[i];
+        let text = this.incentive_score[i];
+
+        //score bar outline
+        this.rect.fillStyle(grey);
+        this.rect.fillRect(left,loc[1]+this.top-this.uni_height,
+        this.width,this.box_height);
+
+        //score bar fill
+        this.rect.fillStyle(hex_c[i]);
+        this.rect.fillRect(left,loc[1]+this.top-this.uni_height+2,
+        this.width,this.box_height);
+
+        this.add.text(loc[0],loc[1]+this.top,text);
+      };
+
+      // scorebar title
+      this.add.text(this.center_list[0][0]-20,this.center_list[0][1]+this.top-50,
+     'Bonus in dollars');
+    };
+
 //-----------------------------------------------------------------------------
+
+
+//---------Check---User---Input-------------------------------------------------
     make_choice(pointer){
       //do not evaluate the starting point
       for (var i=1; i<locations.length; i++){
@@ -232,6 +325,7 @@ class MainTask extends Phaser.Scene {
     check_end(){
       let distance_copy = dis_matrix[this.choice_dyn[this.choice_dyn.length-1]].slice();
       // copy distance list for current city
+      // take note of the const i of sytax
       for (const i of this.choice_dyn){
         distance_copy[i] = 0;
       };
@@ -244,12 +338,16 @@ class MainTask extends Phaser.Scene {
         };
       };
 
-//-----------------------------------------------------------------------------
+//--------GAME--LOOP------------------------------------------------------------
     update(){
       this.add.text(20,20,"Road Construction");
-      //destroy as a function to update per frame
-      this.budget_line.destroy();
+      //clear as a function to update per frame
+      this.budget_line.clear();
+      this.triangle.clear();
       this.budget();
+      this.scorebar();
+      // this.number();
+
 
       this.input.on('pointerdown', function (pointer){
         //maybe change to button up?
