@@ -31,26 +31,30 @@ class MainTask extends Phaser.Scene {
     create(){
         console.log("Ready!");
         //call your major functions
-        this.load_map();
-        this.exp_data_init(1,1,1);
-        this.draw_map();
+        // be carefull with the arguement
+        this.game_map(locations,1,1,1);
 
+    };
+    game_map(map_content,trl_id,blk,map_id){
+      this.load_map(map_content,map_id);
+      this.exp_data_init(blk,trl_id,map_id);
+      this.draw_map(map_content);
     };
 
     //load json map into javascript
     load_map(map_content, map_id){
-        //this.loadmap = map_content[map_id];
-        this.order = NaN;
-
-        //this.N = this.loadmap['N'];
-        // this.radius = 5;
-
-        //this.total = this.loadmap['total'];
-        //this.budget_remain = this.loadmap['total'];
-
-        //this.R = this.loadmap['R'];
-        //this.r = this.loadmap['r'];
-        //this.phi = this.loadmap['phi'];
+        // this.loadmap = map_content[map_id];
+        // this.order = NaN;
+        //
+        // this.N = this.loadmap['N'];
+        // this.radius = 5; //radius of city
+        //
+        // this.total = this.loadmap['total'];
+        // this.budget_remain = this.loadmap['total'];
+        //
+        // this.R = this.loadmap['R'];
+        // this.r = this.loadmap['r'];
+        // this.phi = this.loadmap['phi'];
         // this.x = this.load_map['x'].map(x => x[0] + width/2);
         // this.y = this.load_map['y'].map(x => x[1] + height/2);
         // this.xy = this.x.map(x => [x,this.y[this.x.indexOf(x)]]);
@@ -140,30 +144,38 @@ class MainTask extends Phaser.Scene {
       this.n_city.push(this.n_city[this.n_city.length-1]);
     };
 //-------Game--Visualization----------------------------------------------------
-    draw_map(){
-      this.budget();
-      this.cities();
-      this.scorebar();
+    draw_map(mmap){
+      this.budget(mmap);
+      this.cities(mmap);
+      this.scorebar(mmap);
     };
 
     //so far these are simple function, no agruaments yet
-    cities(){
+    cities(mmap){
         //create visuals and define style
         this.circle = this.add.graphics();
         this.circle.fillStyle(grey,.5);
         // this.circle.fillCircle(30,50,6);
 
-        //drawing all cities from the map list
-        for (var i=1; i<locations.length; i++){
-          this.x = locations[i][0];
-          this.y = locations[i][1];
+        //draw based on load map function
+        //need mmap.xy.length for final version
+        for (var i=1; i<mmap.length; i++){
+          this.x = mmap[i][0];
+          this.y = mmap[i][1];
           let city = this.circle.fillCircle(this.x,this.y,6);
         };
+
+        //drawing all cities from the map list
+        // for (var i=1; i<locations.length; i++){
+        //   this.x = locations[i][0];
+        //   this.y = locations[i][1];
+        //   let city = this.circle.fillCircle(this.x,this.y,6);
+        // };
 
         //drawing the starting city
         let start = this.circle.fillCircle(this.city_start[0],this.city_start[1],6);
     };
-    road(){
+    road(mmap){
       //function name and this.name don't use the same
       //otherwise lead to naming bug
 
@@ -172,6 +184,13 @@ class MainTask extends Phaser.Scene {
       this.line.lineStyle(4, grey, 1.0);
 
       // draw the connected cities from "mmap.choice_locdyn"
+      // for (var i=0; i<mmap.choice_locdyn.length-1; i++){
+      //     let line = new Phaser.Geom.Line(
+      //     mmap.choice_locdyn[i][0],mmap.choice_locdyn[i][1],
+      //     mmap.choice_locdyn[i+1][0],mmap.choice_locdyn[i+1][1]);
+      //     this.line.strokeLineShape(line);
+      // };
+
       // double check i<= this.choice_locdyn.length
       for (var i=0; i<this.choice_locdyn.length-1; i++){
           let line = new Phaser.Geom.Line(
@@ -180,7 +199,7 @@ class MainTask extends Phaser.Scene {
           this.line.strokeLineShape(line);
       };
     };
-    budget(){
+    budget(mmap){
       //create budget line and define style
       this.budget_line = this.add.graphics();
       this.budget_line.lineStyle(4, green, 1.0);
@@ -189,8 +208,23 @@ class MainTask extends Phaser.Scene {
       this.mouse_x = game.input.mousePointer.x;
       this.mouse_y = game.input.mousePointer.y;
 
-      //current city loc: mmap.choice_locdyn[-1][0]
-      //JS negative index is different
+      //budget based on load mmap
+      // let x = mmap.choice_locdyn[mmap.choice_locdyn.length - 1][0];
+      // let y = mmap.choice_locdyn[mmap.choice_locdyn.length - 1][1];
+      // //budget follow mouse
+      // let cx = this.pointer.x - x;
+      // let cy = this.pointer.y - y;
+      // let radians = Math.atan2(cy,cx);
+      // //mmap.budget_dyn[-1]
+      // this.budget_pos_x = x + mmap.budget_dyn[mmap.budget_dyn.length - 1] * Math.cos(radians);
+      // // console.log(this.budget_dyn);
+      // this.budget_pos_y = y + mmap.budget_dyn[mmap.budget_dyn.length - 1] * Math.sin(radians);
+      // //console.log(this.budget_pos_x); Nan here debug
+      // //draw budget line
+      // let line = new Phaser.Geom.Line(x,y,this.budget_pos_x,this.budget_pos_y);
+      // this.budget_line.strokeLineShape(line);
+
+      //budget based on const map list
       let x = this.choice_locdyn[this.choice_locdyn.length - 1][0];
       let y = this.choice_locdyn[this.choice_locdyn.length - 1][1];
       //budget follow mouse
@@ -208,7 +242,7 @@ class MainTask extends Phaser.Scene {
     };
 
 //-------Score--Bar----------------------------------------------------------------------
-    scorebar(){
+    scorebar(mmap){
       //score bar parameters
       this.width = 100 //1000;
       this.height = 400 //480;
@@ -217,8 +251,7 @@ class MainTask extends Phaser.Scene {
 
       this.box_center(); //center for labels
       this.incentive(); //calculate incentive: N^2
-      // this.indicator(mmap)
-      this.indicator(); //incentive score indicator, merged with older arrow function
+      this.indicator(mmap); //incentive score indicator, merged with older arrow function
       this.number();
     };
 
@@ -245,12 +278,14 @@ class MainTask extends Phaser.Scene {
       };
     };
 
-    indicator(){
-      //mmap as argument
+    indicator(mmap){
+      //based on mmap load
+      // this.indicator_loc = this.center_list[mmap.n_city[mmap.n_city.length-1]];
+      // this.indicator_loc_best = this.center_list[Math.max(mmap.n_city)];
+
+      //based on const list maps
       this.indicator_loc = this.center_list[this.n_city[this.n_city.length-1]];
-      //mmap.n_city[-1]
       this.indicator_loc_best = this.center_list[Math.max(this.n_city)];
-      //mmap.n_city;
 
       //create triagle arrow and define style
       this.triangle = this.add.graphics();
@@ -341,16 +376,20 @@ class MainTask extends Phaser.Scene {
         };
       };
 
+//--------Single---Trial--------------------------------------------------------
+    // trial(all_done, trl_done, map_content, trl_id, blk, map_id){
+    //   trial =
+    // };
+
+
 //--------GAME--LOOP------------------------------------------------------------
     update(){
       this.add.text(20,20,"Road Construction");
-      //clear as a function to update per frame
+      //clear as a function to update per frame without previous record
       this.budget_line.clear();
       this.triangle.clear();
       this.budget();
       this.scorebar();
-      // this.number();
-
 
       this.input.on('pointerdown', function (pointer){
         //maybe change to button up?
@@ -366,7 +405,9 @@ class MainTask extends Phaser.Scene {
                 this.static_data(this.pointer,1,1,1,1);
               };
             }else{
-              this.add.text(20,50,"Trial End");
+              this.add.text(20,50,"Press RETURN to submit");
+              //based on key press to change scenes
+              this.input.keyboard.on('keydown_ENTER', ()=>this.scene.start('Instruction'));
             };
         };
       }, this);
