@@ -8,7 +8,7 @@ class Instruction extends Phaser.Scene {
     create(){
       console.log("instruciton ready!");
       this.trial_start(true);
-      this.input.keyboard.on('keydown_ENTER', ()=>this.scene.start('MainTask'));
+      this.input.keyboard.on('keydown_ENTER', ()=>this.scene.start('RCundo'));
       // this.input.on('pointerdown',()=>this.game_start(1,true));
     };
 
@@ -33,6 +33,6 @@ class Instruction extends Phaser.Scene {
     };
 
     update(){
-      
+
     };
 }

@@ -4,7 +4,7 @@ var config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    scene: [Instruction,MainTask]
+    scene: [Instruction,RCundo,MainTask]
         // {
         //     // preload: preload,
         //     // create: create,
