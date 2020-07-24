@@ -59,108 +59,7 @@ def ibs_basic(inparams,subject_data):
     LL = sum(L)
     print('Final LL: '+str(LL)+', time lapse: '+str(time.time()-start_time))
     return LL
-    
-def ibs_repeat(inparams,subject_data,repeat):
-    '''
-        ibs without early stopping
-        sequential
-        with trial-dependent repeated sampling
-        returns the log likelihood of current subject dataset
-    '''
-    start_time = time.time()
-    # initialize parameters
-    para = params(w1=inparams[0],w2=inparams[1],w3=inparams[2],
-          stopping_probability=inparams[3],
-          pruning_threshold=inparams[4],
-          lapse_rate=inparams[5],
-          feature_dropping_rate=inparams[6])	
-    L = [0]*len(subject_data) # initialize log likelihood for each move in the dataset
-    for idx in range(len(subject_data)): # loop over all moves
-        for r in range(repeats[idx]):
-            K = 1
-            
-            dist = basic_map[0][subject_data.loc[idx,'map_id']]['distance']
-            node_now = new_node_current(subject_data.loc[idx,'choice_all'],
-                                ast.literal_eval(subject_data.loc[idx,'remain_all']), 
-                                dist, subject_data.loc[idx,'budget_all'], subject_data.loc[idx,'n_city_all'], 
-                                para.weights, n_u = subject_data.loc[idx,'n_u_all'])
-            decision = make_move(node_now,dist,para)
-            
-            while not (decision.name == subject_data.loc[idx,'choice_next_all']):
-                K += 1
-                print('move_id: '+str(idx)+', iteration: '+str(K))
-                
-                node_now = new_node_current(subject_data.loc[idx,'choice_all'],
-                        ast.literal_eval(subject_data.loc[idx,'remain_all']), 
-                        dist, subject_data.loc[idx,'budget_all'], subject_data.loc[idx,'n_city_all'], 
-                        para.weights, n_u = subject_data.loc[idx,'n_u_all'])
-                decision = make_move(node_now,dist,para)
-    
-            
-            L[idx] += -harmonic_sum(K) # sum of repeats
-        L[idx] = L[idx]/repeats[idx]
-        
-    LL = sum(L)
-    print('Final LL: '+str(LL)+', time lapse: '+str(time.time()-start_time))
-    return LL
 
-def compute_repeats(inparams, repeat, budget_S, subject_data):
-    '''
-        practical implementation of trial-dependent repeated ibs
-        1. Choose a default parameter vector,
-            and run IBS with a large numberzof repeats (e.g. R=100)
-        2. Compute the optimal repeats R* given the estimated likelihood p^
-            ane a total budget of expected samples S per likelihood evaluation,
-            and round up.
-        3. Return the computed repeat number for each trial.        
-    '''            
-    start_time = time.time()
-    
-    # initialize parameters
-    para = params(w1=inparams[0],w2=inparams[1],w3=inparams[2],
-                  stopping_probability=inparams[3],
-                  pruning_threshold=inparams[4],
-                  lapse_rate=inparams[5],
-                  feature_dropping_rate=inparams[6])	
-    
-    L = [0]*len(subject_data) # initialize log likelihood for each move in the dataset
-    for idx in range(len(subject_data)): # loop over all moves
-        for r in range(repeat):
-            K = 1
-            
-            dist = basic_map[0][subject_data.loc[idx,'map_id']]['distance']
-            node_now = new_node_current(subject_data.loc[idx,'choice_all'],
-                                ast.literal_eval(subject_data.loc[idx,'remain_all']), 
-                                dist, subject_data.loc[idx,'budget_all'], subject_data.loc[idx,'n_city_all'], 
-                                para.weights, n_u = subject_data.loc[idx,'n_u_all'])
-            decision = make_move(node_now,dist,para)
-            
-            while not (decision.name == subject_data.loc[idx,'choice_next_all']):
-                K += 1
-#                print('move_id: '+str(idx)+', iteration: '+str(K))
-                
-                node_now = new_node_current(subject_data.loc[idx,'choice_all'],
-                        ast.literal_eval(subject_data.loc[idx,'remain_all']), 
-                        dist, subject_data.loc[idx,'budget_all'], subject_data.loc[idx,'n_city_all'], 
-                        para.weights, n_u = subject_data.loc[idx,'n_u_all'])
-                decision = make_move(node_now,dist,para)
-    
-            
-            L[idx] += -harmonic_sum(K) # sum of repeats
-        L[idx] = L[idx]/repeat # LL average among repeats for each trial
-        print('idx='+str(idx)+',LL='+str(L[idx]))
-    
-    P = np.exp(L) # calculate "likelihood" probability from log likelihood of each trial
-    # compute optimal repeat for each trial
-    R = [0]*len(subject_data) # initialize computed number of repeats for each trial
-    for i in range(len(subject_data)): # equation 39
-        for j in range(len(subject_data)):
-            R[i] += np.sqrt(special.spence(1-P[j])/P[j])
-        R[i] = math.ceil(budget_S * (1/R[i]) * np.sqrt(P[i]*special.spence(1-P[i]))) # equation 39, round up
-    print('computed repeats:' + str(R))
-    print('time lapse: '+str(time.time()-start_time))
-    return R
-        
 def ibs_early_stopping(inparams, LL_lower, subject_data):
     
     '''
@@ -229,6 +128,64 @@ def ibs_early_stopping(inparams, LL_lower, subject_data):
     print('IBS total time lapse '+str(time.time() - start_time))
     print('Final LL_k: '+str(LL_k))
     return LL_k
+
+def compute_repeats(inparams, repeat, budget_S, subject_data):
+    '''
+        practical implementation of trial-dependent repeated ibs
+        1. Choose a default parameter vector,
+            and run IBS with a large numberzof repeats (e.g. R=100)
+        2. Compute the optimal repeats R* given the estimated likelihood p^
+            ane a total budget of expected samples S per likelihood evaluation,
+            and round up.
+        3. Return the computed repeat number for each trial.        
+    '''            
+    start_time = time.time()
+    
+    # initialize parameters
+    para = params(w1=inparams[0],w2=inparams[1],w3=inparams[2],
+                  stopping_probability=inparams[3],
+                  pruning_threshold=inparams[4],
+                  lapse_rate=inparams[5],
+                  feature_dropping_rate=inparams[6])	
+    
+    L = [0]*len(subject_data) # initialize log likelihood for each move in the dataset
+    for idx in range(len(subject_data)): # loop over all moves
+        for r in range(repeat):
+            K = 1
+            
+            dist = basic_map[0][subject_data.loc[idx,'map_id']]['distance']
+            node_now = new_node_current(subject_data.loc[idx,'choice_all'],
+                                ast.literal_eval(subject_data.loc[idx,'remain_all']), 
+                                dist, subject_data.loc[idx,'budget_all'], subject_data.loc[idx,'n_city_all'], 
+                                para.weights, n_u = subject_data.loc[idx,'n_u_all'])
+            decision = make_move(node_now,dist,para)
+            
+            while not (decision.name == subject_data.loc[idx,'choice_next_all']):
+                K += 1
+#                print('move_id: '+str(idx)+', iteration: '+str(K))
+                
+                node_now = new_node_current(subject_data.loc[idx,'choice_all'],
+                        ast.literal_eval(subject_data.loc[idx,'remain_all']), 
+                        dist, subject_data.loc[idx,'budget_all'], subject_data.loc[idx,'n_city_all'], 
+                        para.weights, n_u = subject_data.loc[idx,'n_u_all'])
+                decision = make_move(node_now,dist,para)
+    
+            
+            L[idx] += -harmonic_sum(K) # sum of repeats
+        L[idx] = L[idx]/repeat # LL average among repeats for each trial
+        print('idx='+str(idx)+',LL='+str(L[idx]))
+    
+    P = np.exp(L) # calculate "likelihood" probability from log likelihood of each trial
+    # compute optimal repeat for each trial
+    R = [0]*len(subject_data) # initialize computed number of repeats for each trial
+    for i in range(len(subject_data)): # equation 39
+        for j in range(len(subject_data)):
+            R[i] += np.sqrt(special.spence(1-P[j])/P[j])
+        R[i] = math.ceil(budget_S * (1/R[i]) * np.sqrt(P[i]*special.spence(1-P[i]))) # equation 39, round up
+    print('computed repeats:' + str(R))
+    print('time lapse: '+str(time.time()-start_time))
+    return R
+        
 
 if __name__ == "__main__":
     # -----------------------------------------------------------------------------
