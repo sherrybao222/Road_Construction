@@ -5,7 +5,7 @@ import numpy as np
 import json
 import pandas as pd
 
-def fixed_basic(inparams,subject_data,basic_map):
+def fixed_basic(inparams,subject_data,basic_map,K = 1000): # K = fixed sampling number
     '''
         fixed_sampling
         sequential
@@ -21,7 +21,6 @@ def fixed_basic(inparams,subject_data,basic_map):
               feature_dropping_rate=inparams[6])	
     L = [0]*len(subject_data) # initialize log likelihood for each move in the dataset
     hits = [0]*len(subject_data) # initialize hits for each move
-    K = 1000 # fixed sampling number
     
     for idx in range(len(subject_data)): # loop over all moves
         hit_check = [0]*K # initialize hit check
@@ -36,9 +35,9 @@ def fixed_basic(inparams,subject_data,basic_map):
             if (decision.name == subject_data.loc[idx,'choice_next_all']):
                 hit_check[k] = 1
         
-        hits = sum(hit_check)
-        L[idx] = np.log((hits+1)/(K+1))
-        print('idx='+str(idx)+',hits='+str(hits)+',LL='+str(L[idx]))
+        hits[idx] = sum(hit_check)
+        L[idx] = np.log((hits[idx]+1)/(K+1))
+        print('idx='+str(idx)+',hits='+str(hits[idx])+',LL='+str(L[idx]))
         
     LL = sum(L)
     print('Final LL: '+str(LL)+', time lapse: '+str(time.time()-start_time))
@@ -57,7 +56,7 @@ if __name__ == "__main__":
     with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
         basic_map = json.load(file) 
     
-    subs = [2,4]#,2,4] # subject index 
+    subs = [1,2,4]#,2,4] # subject index 
     
     for sub in subs:
         sub_data = pd.read_csv(home_dir + input_dir + 'mod_ibs_preprocess_sub_'+str(sub) + '.csv')
