@@ -30,8 +30,10 @@ def ibs_repeat(inparams,subject_data,repeats,basic_map):
           feature_dropping_rate=inparams[6])	
     L = [0]*len(subject_data) # initialize log likelihood for each move in the dataset
     L_all = [] # ll for all calculation
+    
     for idx in range(len(subject_data)): # loop over all moves
         L_repeat = [0]* repeats[idx]
+        
         for r in range(repeats[idx]):
             K = 1
             
@@ -44,7 +46,6 @@ def ibs_repeat(inparams,subject_data,repeats,basic_map):
             
             while not (decision.name == subject_data.loc[idx,'choice_next_all']):
                 K += 1
-                print('move_id: '+str(idx)+', iteration: '+str(K))
                 
                 node_now = new_node_current(subject_data.loc[idx,'choice_all'],
                         ast.literal_eval(subject_data.loc[idx,'remain_all']), 
@@ -52,9 +53,12 @@ def ibs_repeat(inparams,subject_data,repeats,basic_map):
                         para.weights, n_u = subject_data.loc[idx,'n_u_all'])
                 decision = make_move(node_now,dist,para)
             
+            print('move_id: '+str(idx)+', iteration: '+str(K)+', repeat: '+str(r))
+
             L_repeat[r] = -harmonic_sum(K)
-        L_all.append(L_repeat)   
+            
         L[idx] = sum(L_repeat)/repeats[idx]
+        L_all.append(L_repeat) 
         
         print('LL for '+ str(idx)+': '+str(L[idx]))
         
@@ -76,7 +80,7 @@ if __name__ == "__main__":
     with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
         basic_map = json.load(file) 
         
-    subs = [1]#,2,4] # subject index 
+    subs = [1,2,4] # subject index 
         
     for sub in subs:
         sub_data = pd.read_csv(home_dir + input_dir + 'mod_ibs_preprocess_sub_'+str(sub) + '.csv')

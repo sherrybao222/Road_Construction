@@ -46,15 +46,14 @@ def ibs_basic(inparams,subject_data):
         
         while not (decision.name == subject_data.loc[idx,'choice_next_all']):
             K += 1
-            print('move_id: '+str(idx)+', iteration: '+str(K))
             
             node_now = new_node_current(subject_data.loc[idx,'choice_all'],
                     ast.literal_eval(subject_data.loc[idx,'remain_all']), 
                     dist, subject_data.loc[idx,'budget_all'], subject_data.loc[idx,'n_city_all'], 
                     para.weights, n_u = subject_data.loc[idx,'n_u_all'])
             decision = make_move(node_now,dist,para)
-
-        
+     
+        print('move_id: '+str(idx)+', iteration: '+str(K))
         L[idx] = -harmonic_sum(K)
     LL = sum(L)
     print('Final LL: '+str(LL)+', time lapse: '+str(time.time()-start_time))
@@ -162,14 +161,14 @@ def compute_repeats(inparams, repeat, budget_S, subject_data):
             
             while not (decision.name == subject_data.loc[idx,'choice_next_all']):
                 K += 1
-#                print('move_id: '+str(idx)+', iteration: '+str(K))
                 
                 node_now = new_node_current(subject_data.loc[idx,'choice_all'],
                         ast.literal_eval(subject_data.loc[idx,'remain_all']), 
                         dist, subject_data.loc[idx,'budget_all'], subject_data.loc[idx,'n_city_all'], 
                         para.weights, n_u = subject_data.loc[idx,'n_u_all'])
                 decision = make_move(node_now,dist,para)
-    
+            
+#            print('move_id: '+str(idx)+', iteration: '+str(K))
             
             L[idx] += -harmonic_sum(K) # sum of repeats
         L[idx] = L[idx]/repeat # LL average among repeats for each trial
