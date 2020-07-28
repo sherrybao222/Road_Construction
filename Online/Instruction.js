@@ -1,3 +1,9 @@
+/*
+This contains the instructions for the task extended from the Phaser scene
+Class. It use setVisible function to display text.
+Not completed flow of instructions
+*/
+
 class Instruction extends Phaser.Scene {
     constructor() {
         super('Instruction');
@@ -8,8 +14,8 @@ class Instruction extends Phaser.Scene {
     create(){
       console.log("instruciton ready!");
       this.trial_start(true);
+      //change scenes on key press command
       this.input.keyboard.on('keydown_ENTER', ()=>this.scene.start('RCundo'));
-      // this.input.on('pointerdown',()=>this.game_start(1,true));
     };
 
     game_start(blk,show){
