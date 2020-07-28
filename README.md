@@ -1,6 +1,6 @@
 # Road_Construction
 
-This project, Road Construction, was initiated by Qixiu Fu (CAS 2020), collaborated with Dongqi Bao and advised by Wei Ji Ma as part of Qixiu’s senior honors thesis. Preparation of this project including literature research and experimental design started in July 2019, and with the support from Dongqi, in lab experiment was ready in February 2020 and pilot data collection was completed yet limited by COVID-19 outbreak in March (N = 3). Despite unexpected situations, Qixiu completed her thesis in May. 
+This project, Road Construction, was initiated by Qixiu Fu (CAS 2020), collaborated with Dongqi Bao and advised by Wei Ji Ma as part of Qixiu’s senior honors thesis. Preparation of this project including literature research and experimental design started in July 2019, and with the support from Dongqi, in-lab experiment was ready in February 2020 and pilot data collection was completed yet limited by COVID-19 outbreak in March (N = 3). Despite unexpected situations, Qixiu completed her thesis in May. 
 
 This Github depository was created by Dongqi and it stores the in-lab experiments code, data analysis, modelling, and draft code for the online adaptation of the road construction task.
 
