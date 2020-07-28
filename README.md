@@ -4,20 +4,17 @@ This project, Road Construction, was initiated by Qixiu Fu (CAS 2020), collabora
 
 This Github depository was created by Dongqi and it stores the in-lab experiments code, data analysis, modelling, and draft code for the online adaptation of the road construction task.
 
----Folder Descriptions---
+---Folder Descriptions---  
+Demo_script: task demostration.   
+Experiment: contains all the in-lab experimental codes for 3 tasks (RC, RCundo, NE).  
+Map: contains the codes we used to generate and select map configuration.   
+Model: contains code for IBS model.  
+Online_version: contains Javascript codes for adapting the task online.  
+Plot: data analysis and ploting code.  
+Social_version: task demostration for a social version of the game.  
 
-Demo_script: task demostration. 
-Experiment: contains all the in-lab experimental codes for 3 tasks (RC, RCundo, NE).
-Map: contains the codes we used to generate and select map configuration. 
-Model: contains code for IBS model.
-Online_version: contains Javascript codes for adapting the task online.
-Plot: data analysis and ploting code.
-Social_version: task demostration for a social version of the game.
+---Additional Note---  
+The selected map sets we used for the task is currenly not on Github. It was saved in the Google Drive folder under the pilot experiment.  
 
----Additional Note---
-
-The selected map sets we used for the task is currenly not on Github. It was saved in the Google Drive folder under the pilot experiment.
-
----Contact---
-
-Qixiu Fu: qf278@nyu.edu
+---Contact---  
+Qixiu Fu: qf278@nyu.edu  
