@@ -31,11 +31,11 @@ for s = 1:length(subs)
     fname = fullfile(home_dir,input_dir,join(['n_repeat_',int2str(sub)]));
     repeats = jsondecode(fileread(fname));
     
-    [x,fval] = bads(@ibs_ll,x0,lb,ub,plb,pub,nonbcon,options,[sub_data,repeats,basic_map]);
+    [x,fval] = bads(@bads_ll,x0,lb,ub,plb,pub,nonbcon,options,[sub_data,repeats,basic_map]);
 end
 
 
-function y = ibs_ll(x,sub_data,repeats,basic_map)
+function y = bads_ll(x,sub_data,repeats,basic_map)
     %ROSENBROCKS Rosenbrock's 'banana' function in any dimension.
 
     y = py.ibs_bads.ibs_interface(x(1), x(2), x(3), x(4), x(5), x(6), x(7) ,sub_data,repeats,basic_map);

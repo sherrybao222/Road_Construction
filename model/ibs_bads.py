@@ -40,7 +40,7 @@ def ibs_repeat(inparams,subject_data,repeats,basic_map):
             
             while not (decision.name == subject_data.loc[idx,'choice_next_all']):
                 K += 1
-                print('move_id: '+str(idx)+', iteration: '+str(K))
+                # print('move_id: '+str(idx)+', iteration: '+str(K))
                 
                 node_now = new_node_current(subject_data.loc[idx,'choice_all'],
                         ast.literal_eval(subject_data.loc[idx,'remain_all']), 
@@ -51,7 +51,7 @@ def ibs_repeat(inparams,subject_data,repeats,basic_map):
             L[idx] += -harmonic_sum(K) # sum of repeats
         L[idx] = L[idx]/repeats[idx]
         
-        print('LL for '+ str(idx)+': '+str(L[idx]))
+        # print('LL for '+ str(idx)+': '+str(L[idx]))
         
     LL = sum(L)
     print('Final LL: '+str(LL)+', time lapse: '+str(time.time()-start_time))
