@@ -63,5 +63,5 @@ if __name__ == "__main__":
         
         LL, L, hits = fixed_basic(inparams,sub_data,basic_map)       
             
-        with open(home_dir + output_dir + 'fixed_LL_' + str(sub),'w') as file: 
+        with open(home_dir + output_dir + 'fixed_LL_3_' + str(sub),'w') as file: 
             json.dump((LL,L,hits),file)

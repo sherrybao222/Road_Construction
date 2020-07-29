@@ -54,12 +54,10 @@ def ibs_repeat(inparams,subject_data,repeats,basic_map):
                 decision = make_move(node_now,dist,para)
             
             print('move_id: '+str(idx)+', iteration: '+str(K)+', repeat: '+str(r))
-
             L_repeat[r] = -harmonic_sum(K)
             
         L[idx] = sum(L_repeat)/repeats[idx]
-        L_all.append(L_repeat) 
-        
+        L_all.append(L_repeat)        
         print('LL for '+ str(idx)+': '+str(L[idx]))
         
     LL = sum(L)
@@ -90,5 +88,5 @@ if __name__ == "__main__":
             
         nLL, L, L_all = ibs_repeat(inparams,sub_data,repeats,basic_map)
         	
-        with open(home_dir + output_dir + 'repeat_ibs_LL_' + str(sub),'w') as file: 
+        with open(home_dir + output_dir + 'repeat_ibs_LL_3_' + str(sub),'w') as file: 
             json.dump((-nLL,L,L_all),file)
