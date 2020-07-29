@@ -1,3 +1,8 @@
+'''
+    choose maps meeting a certain criteria
+    which has a difference of 4 cities for optimal and greedy path
+'''
+
 import scipy.io as sio
 
 ## load maps from mat file
@@ -63,7 +68,7 @@ while len(basic_map) < 48 and ind < 2000:
     filter_map(basic_map, basic_all, diff_list, optimal_list, optimal_number,ind)
     ind = ind + 1
 #
-# json
+# saving json
 with open('basic_map_48_all4','w') as file: 
     json.dump((basic_map,optimal,optimal_n),file)            
 # saving mat

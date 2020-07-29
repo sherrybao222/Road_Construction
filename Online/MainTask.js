@@ -1,8 +1,12 @@
-//this create context/scene seperatly to be called in the main file
+/*
+This is the first working draft of the RC basic task. This file is later used
+to incooperate with undo function. This contains draft for the load function
+(need a server to debug this function), for local debug purpose, the current
+file use random generated constants value.
 
-//the following part on const and Map class can't be repeated
-//in the undo and basic file, maybe can just merge into one
-
+Unfinished work include: load function, data saving on mouse and time, trial
+and block loop
+*/
 
 //color constants
 const grey = 0xFAF7F6;
@@ -51,7 +55,7 @@ class Map{
     // this.distance = this.loadmap['distance'];
     this.distance = dis_matrix; //for debug purpose
     // this.city_start = [200,150]; //for debug same as the first one in the list
-    // console.log(this.xy); //not working join list is working
+    // console.log(this.xy); //join list is not working
 
     //generate circle map parameters
     this.N = 6; //totall city number, including start
@@ -71,13 +75,11 @@ class Map{
 
     let time = Phaser.Input.Pointer.downTime;
     this.time = [Math.round(time/1000,2)];
-    // console.log(this.time);
-    //mouse click time, double check
+    //double check mouse click time
 
     this.pointer = new Phaser.Input.Pointer();
-    this.mouse_x = this.pointer.x;
-    this.mouse_y = this.pointer.y;
-    // this.mouse_y = game.input.mousePointer.y;
+    this.mouse_x = game.input.mousePointer.x;
+    this.mouse_y = game.input.mousePointer.y;
     //double check mouse saving here
     this.pos = [[this.mouse_x,this.mouse_y]];
     this.click = [0];  //click indicator
@@ -102,7 +104,6 @@ class Map{
     this.trl.push(trl_id);
     this.mapid.push(map_id);
     this.cond.push(2);
-    //time & mouse need to double check
     this.time.push(time);
     this.pos.push(mouse);
     this.click.push(1);
@@ -119,31 +120,8 @@ class Map{
     this.n_city.push(this.n_city[this.n_city.length-1]+1);
     this.check = 0; //change choice indicator after saving them
 
-    //need to double check this delete function
     delete this.index;
     delete this.city;
-  }
-
-  undo_data(mouse, time, blk, trl_id, map_id){
-    this.blk.push(blk);
-    this.trl.push(trl_id);
-    this.mapid.push(map_id);
-    this.cond.push(3); //undo condition
-    this.time.push(time);
-    this.pos.push(mouse);
-    this.click.push(0);
-    this.undo_press.push(1);
-
-    //pop function = list.splice(3, 1)  remove 1 item at index 3
-    this.choice_dyn.splice(this.choice_dyn.length-1,1);
-    this.choice_locdyn.splice(this.choice_locdyn.length-1,1);
-    this.choice_his.push(this.choice_dyn[this.choice_dyn.length-1]);
-    this.choice_loc.push(this.choice_locdyn[this.choice_locdyn.length-1]);
-
-    this.budget_dyn.splice(this.budget_dyn.length-1,1);
-    this.budget_his.push(this.budget_dyn[this.budget_dyn.length-1]);
-
-    this.n_city.push(this.n_city[this.n_city.length-1]-1);
   }
 
   static_data(mouse, time, blk, trl_id, map_id){
@@ -207,23 +185,19 @@ class Map{
 
 }
 
-//creat a single trial under Map class
-let trial = new Map(locations,1,1,1);
-
-// phaser scene control = Python Draw Class merged with ScoreBar Class
-class RCundo extends Phaser.Scene {
+// phaser scene = Python Draw Class and merged with ScoreBar Class
+class MainTask extends Phaser.Scene {
     constructor() {
-        super('RCundo');
+        super('MainTask');
     }
     preload()
     {
 
     }
     create(){
-        console.log("Road Undo Ready!");
-        //create undo key press on Z
-        this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
-        this.draw_map(trial,game.input.mousePointer.x,game.input.mousePointer.y);
+        console.log("Road Basic Ready!");
+        this.trial = new Map(locations,1,1,1); //new trial object from Map Class
+        this.draw_map(this.trial,game.input.mousePointer.x,game.input.mousePointer.y);
         //double check the mouse input
     }
 
@@ -233,7 +207,16 @@ class RCundo extends Phaser.Scene {
       this.budget(mmap,mouse_x,mouse_y);
       this.cities(mmap);
       this.scorebar(mmap);
-      this.road(mmap);
+
+      //add the two if statments from python
+      // if (mmap.choice_dyn.length >= 2){
+      //   this.road(mmap);
+      // };
+
+      //need to code to update this condition
+      if (mmap.check_end_ind){
+        this.add.text(100,400,'You are out of budget');
+      };
     }
 
     //individual component of map setup
@@ -382,21 +365,21 @@ class RCundo extends Phaser.Scene {
       this.add.text(20,20,"Road Construction");
       this.budget_line.clear();
       this.triangle.clear();
-      this.line.clear();
-      this.draw_map(trial,game.input.mousePointer.x,game.input.mousePointer.y);
+      this.budget(this.trial,game.input.mousePointer.x,game.input.mousePointer.y);
+      this.scorebar(this.trial);
 
-//the single trial loop need to double check condition, right now only depends on key press
-//need to move the following part to single trial function  
       this.input.on('pointerdown', function (pointer){
         //double check pointer function
         if (pointer.leftButtonDown()){
-            if (trial.check_end()){
-              trial.make_choice(game.input.mousePointer.x,game.input.mousePointer.y);
-              if (trial.check == 1){
-                  trial.budget_update();
-                  trial.exp_data(trial.pointer,1,1,1,1);
+          console.log(this.trial.choice_dyn);
+            if (this.trial.check_end()){
+              this.trial.make_choice(game.input.mousePointer.x,game.input.mousePointer.y);
+              if (this.trial.check == 1){
+                  this.trial.budget_update();
+                  this.trial.exp_data(this.pointer,1,1,1,1);
+                  this.road(this.trial);
               }else{
-                trial.static_data(trial.pointer,1,1,1,1);
+                this.trial.static_data(this.pointer,1,1,1,1);
               };
             }else{
               this.add.text(20,50,"Press RETURN to submit");
@@ -405,11 +388,5 @@ class RCundo extends Phaser.Scene {
             };
         };
       }, this);
-
-      if (this.keyZ.isDown && trial.choice_dyn[trial.choice_dyn.length-1]!=0){
-        console.log("Z pressed");
-        trial.undo_data(trial.pointer.pointerdown,"tick_second",1,1,1);
-      };
-
     }
 }

@@ -1,5 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+'''
+    testing greedy and optimal algorithms with random generated maps
+    and plot path of these algorithms
+'''
 
 import numpy as np
 import math
@@ -7,6 +9,7 @@ from itertools import combinations, permutations
 import operator 
 import matplotlib.pyplot as plt
 
+# helper function
 def remove_nest(l,output): 
     for i in l: 
         if type(i) == list: 
@@ -102,7 +105,7 @@ while i <= N-2:
 #plt.plot(x,y,'go')
 #plt.show()   
 
-# draw greedy path
+# draw greedy path (with budget)
 #plt.plot(operator.itemgetter(*greedy_index)(x), 
 #         operator.itemgetter(*greedy_index)(y), 'bo-')
 #for i,txt in enumerate(greedy_index):
@@ -110,10 +113,11 @@ while i <= N-2:
 #plt.plot(x,y,'go')
 #plt.show()   
 
-# draw greedy path
+# draw greedy path (without budget)
 plt.plot(operator.itemgetter(*index_greedy)(x), 
          operator.itemgetter(*index_greedy)(y), 'bo-')
 for i,txt in enumerate(index_greedy):
     plt.text(x[txt],y[txt],i, fontsize=11)
 plt.plot(x,y,'go')
 plt.show()  
+
