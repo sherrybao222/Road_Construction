@@ -70,7 +70,7 @@ if __name__ == "__main__":
     home_dir = '/Users/sherrybao/Downloads/research/'
                 #'/Users/Toby/Downloads/bao/'
     input_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/'
-    output_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/'
+    output_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/ll/'
     map_dir = 'road_construction/map/active_map/'  
     
     inparams = [1, 1, 1, 0.01, 15, 0.05, 0.1]
@@ -78,15 +78,15 @@ if __name__ == "__main__":
     with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
         basic_map = json.load(file) 
         
-    subs = [1,2,4] # subject index 
+    subs = [4] # subject index 
         
     for sub in subs:
         sub_data = pd.read_csv(home_dir + input_dir + 'mod_ibs_preprocess_sub_'+str(sub) + '.csv')
      
-        with open(home_dir + input_dir + 'n_repeat_' + str(sub),'r') as file:
+        with open(home_dir + output_dir + 'n_repeat_80000_' + str(sub),'r') as file:
             repeats = json.load(file) 
             
-        nLL, L, L_all = ibs_repeat(inparams,sub_data,repeats,basic_map)
+        nLL, L, L_all = ibs_repeat(inparams,sub_data,repeats[0],basic_map)
         	
-        with open(home_dir + output_dir + 'repeat_ibs_LL_3_' + str(sub),'w') as file: 
+        with open(home_dir + output_dir + 'repeat_ibs_LL_80000_3_' + str(sub),'w') as file: 
             json.dump((-nLL,L,L_all),file)

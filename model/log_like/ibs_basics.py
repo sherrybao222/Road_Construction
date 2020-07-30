@@ -128,7 +128,22 @@ def ibs_early_stopping(inparams, LL_lower, subject_data,basic_map):
     print('Final LL_k: '+str(LL_k))
     return LL_k
 
-def compute_repeats(inparams, repeat, budget_S, subject_data, basic_map):
+def prep_compute_repeats(inparams, repeat, subject_data, basic_map):
+    '''
+        repeat ibs_basic
+    '''   
+#    start_time = time.time()
+    L_repeat = [0]* repeat
+    
+    for r in range(repeat): 
+        dumped, L_repeat[r] = ibs_basic(inparams,subject_data,basic_map)
+        # cannot use early stopping because not all move has a calculated ll        
+    
+#    print('time lapse: '+str(time.time()-start_time))
+    return L_repeat
+
+
+def compute_repeats(budget_S, data_size, L_repeat):
     '''
         practical implementation of trial-dependent repeated ibs
         1. Choose a default parameter vector,
@@ -137,27 +152,19 @@ def compute_repeats(inparams, repeat, budget_S, subject_data, basic_map):
             ane a total budget of expected samples S per likelihood evaluation,
             and round up.
         3. Return the computed repeat number for each trial.        
-    ''' 
-               
-    start_time = time.time()
-    L_repeat = [0]* repeat
-    
-    for r in range(repeat): 
-        dumped, L_repeat[r] = ibs_basic(inparams,subject_data,basic_map)
-        # cannot use early stopping because not all move has a calculated ll        
+    '''               
 
     L = np.mean(L_repeat, axis=0) # LL average among repeats for each trial
     
     P = np.exp(L) # calculate "likelihood" probability from log likelihood of each trial
     # compute optimal repeat for each trial
-    R = [0]*len(subject_data) # initialize computed number of repeats for each trial
-    for i in range(len(subject_data)): # equation 39
-        for j in range(len(subject_data)):
+    R = [0]*data_size # initialize computed number of repeats for each trial
+    for i in range(data_size): # equation 39
+        for j in range(data_size):
             R[i] += np.sqrt(special.spence(1-P[j])/P[j])
         R[i] = math.ceil(budget_S * (1/R[i]) * np.sqrt(P[i]*special.spence(1-P[i]))) # equation 39, round up
     print('computed repeats:' + str(R))
-    print('time lapse: '+str(time.time()-start_time))
-    return R, L_repeat
+    return R
         
 
 if __name__ == "__main__":
@@ -165,7 +172,7 @@ if __name__ == "__main__":
     # directories
     home_dir = '/Users/sherrybao/Downloads/research/'
     input_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/'
-    output_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/'
+    output_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/ll/'
     map_dir = 'road_construction/map/active_map/'
     
     inparams = [1, 1, 1, 0.01, 15, 0.05, 0.1]
@@ -173,14 +180,20 @@ if __name__ == "__main__":
     with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
         basic_map = json.load(file) 
     
-    subs = [1]#,2,4] # subject index 
+    subs = [1,2,4] # subject index 
     
     for sub in subs:
         sub_data = pd.read_csv(home_dir + input_dir + 'mod_ibs_preprocess_sub_'+str(sub) + '.csv')
+        sub_size = len(sub_data)
     
 #        LL_lower = np.sum([np.log(1.0/n) for n in list(sub_data['n_u_all'])])
-    
-        R, L_repeat = compute_repeats(inparams, 2, 6000, sub_data, basic_map)
-    
-        with open(home_dir + output_dir + 'n_repeat_' + str(sub),'w') as file: 
-            json.dump((R, L_repeat), file)
+        L_repeat = prep_compute_repeats(inparams, 100, sub_data, basic_map)
+            
+        with open(home_dir + output_dir + 'L_repeat_' + str(sub),'w') as file: 
+            json.dump((L_repeat), file)
+            
+#        budget = 5
+#        R = compute_repeats(sub_size*budget, sub_size, L_repeat)
+            
+#        with open(home_dir + output_dir + 'n_repeat_80000_' + str(sub),'w') as file: 
+#            json.dump((R), file)
