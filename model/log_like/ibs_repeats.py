@@ -3,6 +3,7 @@ import time
 import ast # to convert string to list
 import json
 import pandas as pd
+import numpy as np
 
 def harmonic_sum(n):
 	''' 
@@ -78,15 +79,37 @@ if __name__ == "__main__":
     with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
         basic_map = json.load(file) 
         
-    subs = [4] # subject index 
-        
+    subs = [1,2,4] # subject index 
+    n_run = 10 # number of repeated runs
+    budget = 100
+    
+    nll_all = [] # nll for all repeats and subjects
+    
     for sub in subs:
+        nll_all_r = [] # nll for all repeats
+
         sub_data = pd.read_csv(home_dir + input_dir + 'mod_ibs_preprocess_sub_'+str(sub) + '.csv')
-     
-        with open(home_dir + output_dir + 'n_repeat_80000_' + str(sub),'r') as file:
+
+        with open(home_dir + output_dir + 'n_repeat_b' + str(budget) + 
+                  '_' + str(sub),'r') as file:
             repeats = json.load(file) 
             
-        nLL, L, L_all = ibs_repeat(inparams,sub_data,repeats[0],basic_map)
-        	
-        with open(home_dir + output_dir + 'repeat_ibs_LL_80000_3_' + str(sub),'w') as file: 
-            json.dump((-nLL,L,L_all),file)
+        for r in range(n_run):
+            
+            nLL, L, L_all = ibs_repeat(inparams,sub_data,repeats,basic_map)
+            nll_all_r.append(nLL)	
+            
+            with open(home_dir + output_dir + 'repeat_ibs_LL_b'+str(budget)+'_r'+
+                      str(r)+'_' + str(sub),'w') as file: 
+                json.dump({'total ll':-nLL,
+                           'move ll':L,
+                           'repeat move ll':L_all},file,indent=4)
+    
+        nll_all.append(nll_all_r)
+    
+    nll_std = list(np.std(nll_all,axis=1))
+    
+    with open(home_dir + output_dir + 'std_ibs_b'+str(budget),'w') as file: 
+        json.dump({'all nll':nll_all,
+               'std':nll_std},file,indent=4)
+

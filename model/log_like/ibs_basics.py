@@ -187,13 +187,16 @@ if __name__ == "__main__":
         sub_size = len(sub_data)
     
 #        LL_lower = np.sum([np.log(1.0/n) for n in list(sub_data['n_u_all'])])
-        L_repeat = prep_compute_repeats(inparams, 100, sub_data, basic_map)
+#        L_repeat = prep_compute_repeats(inparams, 100, sub_data, basic_map)
+#            
+#        with open(home_dir + output_dir + 'L_repeat_' + str(sub),'w') as file: 
+#            json.dump((L_repeat), file)
+        with open(home_dir + output_dir + 'L_repeat_' + str(sub),'r') as file:
+            L_repeat = json.load(file) 
             
-        with open(home_dir + output_dir + 'L_repeat_' + str(sub),'w') as file: 
-            json.dump((L_repeat), file)
+        budget = 100
+        R = compute_repeats(sub_size*budget, sub_size, L_repeat)
             
-#        budget = 5
-#        R = compute_repeats(sub_size*budget, sub_size, L_repeat)
-            
-#        with open(home_dir + output_dir + 'n_repeat_80000_' + str(sub),'w') as file: 
-#            json.dump((R), file)
+        with open(home_dir + output_dir + 'n_repeat_b' + str(budget) + 
+                  '_' + str(sub),'w') as file: 
+            json.dump(R, file)
