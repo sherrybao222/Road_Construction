@@ -68,11 +68,11 @@ def ibs_repeat(inparams,subject_data,repeats,basic_map):
 
 if __name__ == "__main__":
     # directories
-    home_dir = '/Users/sherrybao/Downloads/research/'
+    home_dir = '/Users/sherrybao/google_drive/'
                 #'/Users/Toby/Downloads/bao/'
-    input_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/'
-    output_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/ll/'
-    map_dir = 'road_construction/map/active_map/'  
+    input_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/'
+    output_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/ll/'
+    map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'  
     
     inparams = [1, 1, 1, 0.01, 15, 0.05, 0.1]
 
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         basic_map = json.load(file) 
         
     subs = [1,2,4] # subject index 
-    n_run = 10 # number of repeated runs
+    n_run = 1 # number of repeated runs
     budget = 100
     
     nll_all = [] # nll for all repeats and subjects
@@ -93,7 +93,7 @@ if __name__ == "__main__":
         with open(home_dir + output_dir + 'n_repeat_b' + str(budget) + 
                   '_' + str(sub),'r') as file:
             repeats = json.load(file) 
-            
+        
         for r in range(n_run):
             
             nLL, L, L_all = ibs_repeat(inparams,sub_data,repeats,basic_map)
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     
     nll_std = list(np.std(nll_all,axis=1))
     
-    with open(home_dir + output_dir + 'std_ibs_b'+str(budget),'w') as file: 
+    with open(home_dir + output_dir + 'std_ibs_r'+str(budget),'w') as file: 
         json.dump({'all nll':nll_all,
                'std':nll_std},file,indent=4)
 
