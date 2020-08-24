@@ -92,7 +92,7 @@ def ibs_early_stopping(inparams, LL_lower, subject_data,basic_map):
                     
         LL_k = 0
         k += 1
-        print('Iteration k='+str(k), flush=True)
+#        print('Iteration k='+str(k), flush=True)
 		
         for idx in range(len(subject_data)):
             
@@ -114,18 +114,18 @@ def ibs_early_stopping(inparams, LL_lower, subject_data,basic_map):
                 count_iteration[idx] += 1
                 
         LL_k = -LL_k - (hit_target.count(False))*harmonic_sum(k)
-        print('\tKth LL_k '+str(LL_k), flush=True)
+#        print('\tKth LL_k '+str(LL_k), flush=True)
         
         hit_number = hit_target.count(True)
-        print('\thit_target '+str(hit_number), flush=True)
-        print('\tmax_position '+str(count_iteration.index(max(count_iteration))))
+#        print('\thit_target '+str(hit_number), flush=True)
+#        print('\tmax_position '+str(count_iteration.index(max(count_iteration))))
 
         
 #        print('IBS iter time lapse '+str(time.time() - iter_start_time), flush=True)
 
 
     print('IBS total time lapse '+str(time.time() - start_time))
-    print('Final LL_k: '+str(LL_k))
+#    print('Final LL_k: '+str(LL_k))
     return LL_k
 
 def prep_compute_repeats(inparams, repeat, subject_data, basic_map):

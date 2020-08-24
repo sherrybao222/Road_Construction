@@ -109,7 +109,7 @@ if __name__ == "__main__":
     
     nll_std = list(np.std(nll_all,axis=1))
     
-    with open(home_dir + output_dir + 'std_ibs_r'+str(budget),'w') as file: 
+    with open(home_dir + output_dir + 'std_ibs_b'+str(budget),'w') as file: 
         json.dump({'all nll':nll_all,
                'std':nll_std},file,indent=4)
 
