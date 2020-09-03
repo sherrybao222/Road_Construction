@@ -3,6 +3,23 @@ import json
 import pandas as pd
 import numpy as np
 
+def ibs_grepeats(inparams, LL_lower, sub_data,basic_map,repeats):
+    '''
+        ibs with early stopping
+        sequential
+        with non-trial-dependent repeated sampling defined by a general repeat number
+        returns the log likelihood of current subject dataset
+    '''
+    nll_single_r = [] # nll for single repeat of a single run
+    
+    for r in range(repeats):
+        nLL = ibs_early_stopping(inparams, LL_lower, sub_data,basic_map)
+        nll_single_r.append(nLL)
+        print('subject:'+str(sub)+',run:'+str(n)+',repeat:'+str(r)+',ll:'+str(nLL))
+
+    nll_avg = sum(nll_single_r)/repeats 
+    return nll_avg
+           
 
 if __name__ == "__main__":
     # directories
@@ -20,7 +37,7 @@ if __name__ == "__main__":
         
     subs = [1,2,4] # subject index 
     n_run = 5 # number of runs
-    repeats = 10
+    repeats = 30
     
     nll_all = [] # nll for all runs and subjects
     
@@ -31,14 +48,8 @@ if __name__ == "__main__":
         LL_lower = np.sum([np.log(1.0/n) for n in list(sub_data['n_u_all'])])
         
         for n in range(n_run): 
-            nll_single_r = [] # nll for single repeat of a single run
-
-            for r in range(repeats):
-                nLL = ibs_early_stopping(inparams, LL_lower, sub_data,basic_map)
-                nll_single_r.append(nLL)
-                print('subject:'+str(sub)+',run:'+str(n)+',repeat:'+str(r)+',ll:'+str(nLL))
-
-            nll_avg = sum(nll_single_r)/repeats            
+            nll_avg = ibs_grepeats(inparams, LL_lower, sub_data,basic_map,repeats)            
+            
             with open(home_dir + output_dir + 'grepeat_ibs_LL_r'+str(repeats)+'_n'+
                       str(n)+'_s' + str(sub),'w') as file: 
                 json.dump({'total ll':nll_avg},file,indent=4)
