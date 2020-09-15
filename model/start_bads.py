@@ -1,7 +1,7 @@
-from ibs_bads import ibs_repeat
-import matlab.engine
-import json
-import pandas as pd
+from ibs_general_repeats import ibs_grepeats
+# import matlab.engine
+# import json
+# import pandas as pd
 
 '''
 starting script to test BADS interface
@@ -44,13 +44,5 @@ BADS will call a matlab ll.m script
     
 # eng.quit()
 
-# ----------------------------------------------------------------------------
-from prepare import sub_data,repeats,basic_map # import x and y data
 
-def ibs_interface(w1, w2, w3, w4, w5, w6, w7):
-	'''
-	interface used to connect BADS and ibs_repeat
-	'''
-	inparams = [w1, w2, w3, w4, w5, w6, w7]
-	print('inparams '+str(inparams))
-	return ibs_repeat(inparams,sub_data,repeats,basic_map)
+    

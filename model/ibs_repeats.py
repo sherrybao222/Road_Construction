@@ -68,7 +68,7 @@ def ibs_repeat(inparams,subject_data,repeats,basic_map):
 
 if __name__ == "__main__":
     # directories
-    home_dir = '/Users/sherrybao/google_drive/'
+    home_dir = '/Users/dbao/google_drive/'
                 #'/Users/Toby/Downloads/bao/'
     input_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/'
     output_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/ll/'

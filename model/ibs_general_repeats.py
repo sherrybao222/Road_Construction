@@ -15,16 +15,15 @@ def ibs_grepeats(inparams, LL_lower, sub_data,basic_map,repeats):
     for r in range(repeats):
         nLL = ibs_early_stopping(inparams, LL_lower, sub_data,basic_map)
         nll_single_r.append(nLL)
-        print('subject:'+str(sub)+',run:'+str(n)+',repeat:'+str(r)+',ll:'+str(nLL))
+        # print('subject:'+str(sub)+',run:'+str(n)+',repeat:'+str(r)+',ll:'+str(nLL))
 
     nll_avg = sum(nll_single_r)/repeats 
-    return nll_avg
+    return -nll_avg
            
 
 if __name__ == "__main__":
     # directories
-    home_dir = '/Users/sherrybao/google_drive/'
-                #'/Users/Toby/Downloads/bao/'
+    home_dir = '/Users/dbao/google_drive/'
     input_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/'
     output_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/ll/'
     map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'  
