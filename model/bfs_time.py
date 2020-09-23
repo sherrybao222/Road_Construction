@@ -8,7 +8,7 @@ def single_trial(map_content, map_id):
     simulation of one map
     '''
     
-    # generate map
+    # load map from map file
     trial = Map(map_content, map_id)
     dict_city = dict(zip(list(range(0,trial.N)), trial.xy)) 
     dict_city_remain = dict_city.copy()
@@ -34,6 +34,7 @@ def single_trial(map_content, map_id):
         
         start_time = time.time()
         
+        # use previously chosen node as new start
         new_start = new_node_current(choice.name, choice.city, dist_city, 
                                      choice.budget, choice.n_c, para.weights)        
         now = new_start
@@ -62,14 +63,15 @@ def all_trial(map_content,n_maps):
 if __name__ == "__main__":
     
     # directories
-    home_dir = '/Users/sherrybao/Downloads/research/'
-    map_dir = 'road_construction/map/active_map/'
+    home_dir = '/Users/dbao/google_drive/'
+    map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'
 
     # =============================================================================
     # setting up parameters
     
     # set parameters
-    inparams = [1, 1, 1, 0.01, 10, 0.01, 0.01]
+    inparams = [6.57470703125, 2.3291015625, 9.737548828125, 0.0, 30.0, 1.4526367187489564e-05, 0.312255859375]
+    #[1, 1, 1, 0.01, 10, 0.01, 0.01]
     para = params(w1=inparams[0], w2=inparams[1], w3=inparams[2], 
     					stopping_probability=inparams[3],
     					pruning_threshold=inparams[4],
