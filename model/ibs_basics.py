@@ -176,7 +176,7 @@ if __name__ == "__main__":
     output_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/ll/'
     map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'
     
-    inparams = [0.1, 0.1, 0.1, 0.01, 15, 0.05, 0.1] #[1, 1, 1, 0, 30, 1, 0]
+    inparams = [1, 1, 1, 0.01, 15, 0.05, 0.1] #[1, 1, 1, 0, 30, 1, 0]
 
     with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
         basic_map = json.load(file) 
