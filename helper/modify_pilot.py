@@ -2,10 +2,10 @@ import pandas as pd
 import ast # to convert string to list
 
 # directories
-home_dir = '/Users/sherrybao/Downloads/research/'
-inoutput_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/'
+home_dir = '/Users/dbao/google_drive/'
+inoutput_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/'
 
-subs = [1,2,4] # subject index 
+subs = [2,4] # subject index 
 
 for num in subs:
     
@@ -29,7 +29,16 @@ for num in subs:
     
     data.to_csv(home_dir + inoutput_dir + 'mod_ibs_preprocess_sub_'+str(num) + '.csv', index=False)
 
-        
+
+# ============================================================================= 
+for num in subs:
+
+    data = pd.read_csv(home_dir + inoutput_dir + 'mod_ibs_preprocess_sub_'+str(num) + '.csv')
+    
+    for i in range(len(data)):
+        data.loc[i,'n_city_all'] = data.loc[i,'n_city_all'] - 1
+    
+    data.to_csv(home_dir + inoutput_dir + 'mod_ibs_preprocess_sub_'+str(num) + '.csv', index=False)       
             
         
 
