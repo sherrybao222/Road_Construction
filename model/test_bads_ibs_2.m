@@ -1,15 +1,15 @@
-diary myDiaryFile % save output in command window
+diary myDiaryFile_2 % save output in command window
 tic % record time
 
 % w1, w2, w3,stopping_probability,pruning_threshold,lapse_rate,feature_dropping_rate,
 
-x0 = [1, 1, 1, 0.1, 15, 0.1, 0.1];    % Starting point
+x0 = [1, 1, 1, 0.1, 10, 0.1, 0.1];    % Starting point
 
 lb = [0, 0, 0, 0, 0.1, 0, 0];   % Lower bounds
 ub = [10, 10, 10, 1, 30, 1, 1];   % Upper bounds
 
 plb = [0, 0, 0, 0, 0.1, 0.001, 0];   % Lower bounds
-pub = [10, 10, 10, 1, 30, 0.3, 0.5];   % Upper bounds
+pub = [10, 10, 10, 1, 20, 0.5, 0.5];   % Upper bounds
 
 
 [x,fval] = bads(@bads_ll,x0,lb,ub,plb,pub);

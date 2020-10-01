@@ -117,9 +117,9 @@ def ibs_early_stopping(inparams, LL_lower, subject_data,basic_map):
         LL_k = -LL_k - (hit_target.count(False))*harmonic_sum(k)
 #        print('\tKth LL_k '+str(LL_k), flush=True)
         
-        hit_number = hit_target.count(True)
-        print('\thit_target '+str(hit_number), flush=True)
-        print('\tmax_position '+str(count_iteration.index(max(count_iteration))))
+        # hit_number = hit_target.count(True)
+        # print('\thit_target '+str(hit_number), flush=True)
+        # print('\tmax_position '+str(count_iteration.index(max(count_iteration))))
 
         
         # print('IBS iter time lapse '+str(time.time() - iter_start_time), flush=True)
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     output_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/ll/'
     map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'
     
-    inparams = [1, 1, 1, 0.01, 15, 0.05, 0.1] #[1, 1, 1, 0, 30, 1, 0]
+    inparams = [0.1, 0.1, 0.1, 0.01, 15, 0.05, 0.1] #[1, 1, 1, 0, 30, 1, 0]
 
     with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
         basic_map = json.load(file) 
@@ -207,6 +207,7 @@ if __name__ == "__main__":
 
         LL_lower = np.sum([np.log(1.0/n) for n in list(sub_data['n_u_all'])])
         nLL, count_iteration = ibs_early_stopping(inparams, LL_lower, sub_data, basic_map)
+        count_random = list(sub_data['n_u_all'])
         
         mean_count = mean(count_iteration)
         sem = np.std(count_iteration)/math.sqrt(len(count_iteration))

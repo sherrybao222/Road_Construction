@@ -56,7 +56,7 @@ def new_node_current(name, cities, dist, budget, n_c, weights, **kwargs):
 
     #------------------------------------------------------------------                            
     value = weights[0] * node.n_c + weights[1] * node.n_u + \
-            weights[2] * (node.budget/100) + np.random.normal()
+            weights[2] * (node.budget/30) + np.random.normal()
 
     node.value = value
 
