@@ -17,8 +17,8 @@ def ibs_grepeats(inparams, LL_lower, sub_data,basic_map,repeats):
         nll_single_r.append(nLL)
         # print('subject:'+str(sub)+',run:'+str(n)+',repeat:'+str(r)+',ll:'+str(nLL))
 
-    nll_avg = sum(nll_single_r)/repeats 
-    return -nll_avg
+    nll_avg = -sum(nll_single_r)/repeats 
+    return nll_avg
            
 
 if __name__ == "__main__":
@@ -35,8 +35,8 @@ if __name__ == "__main__":
         basic_map = json.load(file) 
         
     subs = [1,2,4] # subject index 
-    n_run = 5 # number of runs
-    repeats = 30
+    n_run = 10 # number of runs
+    repeats = 2
     
     nll_all = [] # nll for all runs and subjects
     

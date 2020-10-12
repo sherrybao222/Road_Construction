@@ -29,6 +29,7 @@ def ibs_repeat(inparams,subject_data,repeats,basic_map):
           pruning_threshold=inparams[4],
           lapse_rate=inparams[5],
           feature_dropping_rate=inparams[6])	
+    
     L = [0]*len(subject_data) # initialize log likelihood for each move in the dataset
     L_all = [] # ll for all calculation
     
@@ -80,8 +81,8 @@ if __name__ == "__main__":
         basic_map = json.load(file) 
         
     subs = [1,2,4] # subject index 
-    n_run = 1 # number of repeated runs
-    budget = 100
+    n_run = 10 # number of repeated runs
+    budget = 30
     
     nll_all = [] # nll for all repeats and subjects
     

@@ -127,7 +127,7 @@ def ibs_early_stopping(inparams, LL_lower, subject_data,basic_map):
 
     print('IBS total time lapse '+str(time.time() - start_time))
 #    print('Final LL_k: '+str(LL_k))
-    return LL_k,count_iteration
+    return LL_k #,count_iteration
 
 def prep_compute_repeats(inparams, repeat, subject_data, basic_map):
     '''
@@ -173,7 +173,7 @@ if __name__ == "__main__":
     # directories
     home_dir = '/Users/dbao/google_drive/'
     input_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/'
-    output_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/ll/'
+    output_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/ll/'
     map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'
     
     inparams = [1, 1, 1, 0.01, 15, 0.05, 0.1] #[1, 1, 1, 0, 30, 1, 0]
@@ -181,7 +181,7 @@ if __name__ == "__main__":
     with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
         basic_map = json.load(file) 
     
-    subs = [1]#,2,4] # subject index 
+    subs = [1,2,4] # subject index 
     
     for sub in subs:
         sub_data = pd.read_csv(home_dir + input_dir + 'mod_ibs_preprocess_sub_'+str(sub) + '.csv')
@@ -194,20 +194,20 @@ if __name__ == "__main__":
         # with open(home_dir + output_dir + 'L_repeat_' + str(sub),'w') as file: 
         #     json.dump((L_repeat), file)
 
-        # with open(home_dir + output_dir + 'L_repeat_' + str(sub),'r') as file:
-        #     L_repeat = json.load(file) 
+        with open(home_dir + output_dir + 'L_repeat_' + str(sub),'r') as file:
+            L_repeat = json.load(file) 
             
-        # budget = 100
-        # R = compute_repeats(sub_size*budget, sub_size, L_repeat)
+        budget = 30
+        R = compute_repeats(sub_size*budget, sub_size, L_repeat)
             
-        # with open(home_dir + output_dir + 'n_repeat_b' + str(budget) + 
-        #           '_' + str(sub),'w') as file: 
-        #     json.dump(R, file)
+        with open(home_dir + output_dir + 'n_repeat_b' + str(budget) + 
+                  '_' + str(sub),'w') as file: 
+            json.dump(R, file)
 # ===========================================================================
-
-        LL_lower = np.sum([np.log(1.0/n) for n in list(sub_data['n_u_all'])])
-        nLL, count_iteration = ibs_early_stopping(inparams, LL_lower, sub_data, basic_map)
-        count_random = list(sub_data['n_u_all'])
+# compare random sample number and sample number from ibs with a set of parameters
+        # LL_lower = np.sum([np.log(1.0/n) for n in list(sub_data['n_u_all'])])
+        # nLL, count_iteration = ibs_early_stopping(inparams, LL_lower, sub_data, basic_map)
+        # count_random = list(sub_data['n_u_all'])
         
-        mean_count = mean(count_iteration)
-        sem = np.std(count_iteration)/math.sqrt(len(count_iteration))
+        # mean_count = mean(count_iteration)
+        # sem = np.std(count_iteration)/math.sqrt(len(count_iteration))
