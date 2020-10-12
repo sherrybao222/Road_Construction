@@ -2,10 +2,15 @@ import json
 import pandas as pd
 import numpy as np
 
-# directories
-home_dir = '/Users/dbao/google_drive/'
-input_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/'
-map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'
+## directories
+# home_dir = '/Users/dbao/google_drive/'
+# input_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/'
+# map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'
+
+# hpc directories
+home_dir = 'scratch/db4058/data/'
+input_dir = 'data_pilot_preprocessed/'
+map_dir = 'active_map/'
 
 with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
     basic_map = json.load(file) 
