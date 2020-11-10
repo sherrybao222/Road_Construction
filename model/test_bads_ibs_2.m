@@ -1,14 +1,15 @@
-%pyenv('Version','~/.conda/envs/road/bin/python')
-addpath('bads-master')
+myHOME = '/home/db4058/';
+addpath([myHOME, '/toolbox/bads-master'])
 
-%diary myDiaryFile_2 % save output in command window
-tic % record time
+% save output in command window
+%diary myDiaryFile_2 
+tStart = tic; % record time
 
 % set random seeds
 rng ('default')
 seed = rng; 
 
-%% w1, w2, w3,stopping_probability,pruning_threshold,lapse_rate,feature_dropping_rate
+% w1, w2, w3,stopping_probability,pruning_threshold,lapse_rate,feature_dropping_rate
 
 LB = [0, 0, 0, 0, 0.1, 0, 0];   % Lower bounds
 UB = [10, 10, 10, 1, 30, 1, 1];   % Upper bounds
@@ -29,8 +30,10 @@ for r = 1:N_STARTS
     Output(r).fval = fval;
 end
 
-toc
+tEnd = toc(tStart);
 %diary off
+
+save('test.mat')
 
 
 

@@ -8,7 +8,7 @@ import numpy as np
 # map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'
 
 # hpc directories
-home_dir = 'scratch/db4058/data/'
+home_dir = '/home/db4058/road_construction/data/'
 input_dir = 'data_pilot_preprocessed/'
 map_dir = 'active_map/'
 
@@ -25,4 +25,4 @@ for sub in subs:
     #     repeats = json.load(file) 
 
     # general repeats
-    repeats = 1
+    repeats = 20
