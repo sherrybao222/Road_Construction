@@ -1,26 +1,36 @@
-diary myDiaryFile_2 % save output in command window
+%pyenv('Version','~/.conda/envs/road/bin/python')
+addpath('bads-master')
+
+%diary myDiaryFile_2 % save output in command window
 tic % record time
 
-% w1, w2, w3,stopping_probability,pruning_threshold,lapse_rate,feature_dropping_rate,
+% set random seeds
+rng ('default')
+seed = rng; 
 
-x0 = [1, 1, 1, 0.1, 10, 0.1, 0.1];    % Starting point
+%% w1, w2, w3,stopping_probability,pruning_threshold,lapse_rate,feature_dropping_rate
 
-lb = [0, 0, 0, 0, 0.1, 0, 0];   % Lower bounds
-ub = [10, 10, 10, 1, 30, 1, 1];   % Upper bounds
+LB = [0, 0, 0, 0, 0.1, 0, 0];   % Lower bounds
+UB = [10, 10, 10, 1, 30, 1, 1];   % Upper bounds
 
-plb = [0, 0, 0, 0, 0.1, 0.001, 0];   % Lower bounds
-pub = [10, 10, 10, 1, 20, 0.5, 0.5];   % Upper bounds
+PLB = [0, 0, 0, 0, 0.1, 0.001, 0];   % Lower bounds
+PUB = [10, 10, 10, 1, 20, 0.5, 0.5];   % Upper bounds
 
+N_STARTS = 20; % number of different x0
 
-[x,fval] = bads(@bads_ll,x0,lb,ub,plb,pub);
+for r = 1:N_STARTS
+    nvars = numel(PLB);
+    X0 = PLB + rand(1,nvars) .* (PUB - PLB);   % Starting point
+    
+    [x,fval] = bads(@bads_ll,X0,LB,UB,PLB,PUB);
+    
+    Output(r).x0 = x0;
+    Output(r).x = x;
+    Output(r).fval = fval;
+end
 
 toc
-diary off
+%diary off
 
-function y = bads_ll(x)
 
-y = py.bads_ibs.ibs_interface(x(1), x(2), x(3), x(4), x(5), x(6), x(7));
-disp(y);
-
-end
 

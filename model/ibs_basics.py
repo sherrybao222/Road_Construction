@@ -200,10 +200,10 @@ if __name__ == "__main__":
         budget = 30
         R = compute_repeats(sub_size*budget, sub_size, L_repeat)
             
-        with open(home_dir + output_dir + 'n_repeat_b' + str(budget) + 
-                  '_' + str(sub),'w') as file: 
-            json.dump(R, file)
-# ===========================================================================
+#         with open(home_dir + output_dir + 'n_repeat_b' + str(budget) + 
+#                   '_' + str(sub),'w') as file: 
+#             json.dump(R, file)
+# # ===========================================================================
 # compare random sample number and sample number from ibs with a set of parameters
         # LL_lower = np.sum([np.log(1.0/n) for n in list(sub_data['n_u_all'])])
         # nLL, count_iteration = ibs_early_stopping(inparams, LL_lower, sub_data, basic_map)
