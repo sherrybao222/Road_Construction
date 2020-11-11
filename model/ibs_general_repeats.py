@@ -2,7 +2,14 @@ from ibs_basics import ibs_early_stopping
 import json
 import pandas as pd
 import numpy as np
+import multiprocessing
+from functools import partial
 
+
+def run_ibs_early_stopping(inparams, LL_lower, sub_data, basic_map,r):
+    nLL = ibs_early_stopping(inparams, LL_lower, sub_data, basic_map)
+    return nLL
+    
 def ibs_grepeats(inparams, LL_lower, sub_data,basic_map,repeats):
     '''
         ibs with early stopping
@@ -12,11 +19,18 @@ def ibs_grepeats(inparams, LL_lower, sub_data,basic_map,repeats):
     '''
     nll_single_r = [] # nll for single repeat of a single run
     
-    for r in range(repeats):
-        nLL = ibs_early_stopping(inparams, LL_lower, sub_data,basic_map)
-        nll_single_r.append(nLL)
+
+#    for r in range(repeats):
+#        nLL = ibs_early_stopping(inparams, LL_lower, sub_data,basic_map)
+#        nll_single_r.append(nLL)
         # print('subject:'+str(sub)+',run:'+str(n)+',repeat:'+str(r)+',ll:'+str(nLL))
 
+    a_pool = multiprocessing.Pool(10)
+    func = partial(run_ibs_early_stopping,inparams, LL_lower, sub_data, basic_map)
+    nll_single_r = a_pool.map(func, range(repeats))
+    a_pool.close()
+    a_pool.join()
+    
     nll_avg = -sum(nll_single_r)/repeats 
     return nll_avg
            
