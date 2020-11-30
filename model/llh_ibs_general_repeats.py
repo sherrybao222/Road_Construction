@@ -1,4 +1,4 @@
-from ibs_basics import ibs_early_stopping
+from llh_ibs_basics import ibs_early_stopping
 import json
 import pandas as pd
 import numpy as np
@@ -11,6 +11,24 @@ def run_ibs_early_stopping(inparams, LL_lower, sub_data, basic_map,r):
     return nLL
     
 def ibs_grepeats(inparams, LL_lower, sub_data,basic_map,repeats):
+    '''
+        ibs with early stopping
+        sequential
+        with non-trial-dependent repeated sampling defined by a general repeat number
+        returns the log likelihood of current subject dataset
+    '''
+    nll_single_r = [] # nll for single repeat of a single run
+    
+
+    for r in range(repeats):
+        nLL,time_sequence,count_iteration = ibs_early_stopping(inparams, LL_lower, sub_data,basic_map)
+        nll_single_r.append(nLL)
+        # print('subject:'+str(sub)+',run:'+str(n)+',repeat:'+str(r)+',ll:'+str(nLL))
+    
+    nll_avg = -sum(nll_single_r)/repeats 
+    return nll_avg,time_sequence,count_iteration
+
+def ibs_grepeats_hpc(inparams, LL_lower, sub_data,basic_map,repeats):
     '''
         ibs with early stopping
         sequential

@@ -25,4 +25,4 @@ for sub in subs:
     #     repeats = json.load(file) 
 
     # general repeats
-    repeats = 10
+    repeats = 1

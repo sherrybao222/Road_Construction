@@ -1,7 +1,7 @@
 from map_class import Map
-from best_first_search import new_node_current,make_move,params
+from model_bfs import new_node_current,make_move,params
 import time
-from statistics import mean
+from statistics import mean,stdev,sqrt
 
 def single_trial(map_content, map_id):
     '''
@@ -65,13 +65,13 @@ if __name__ == "__main__":
     # directories
     home_dir = '/Users/dbao/google_drive/'
     map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'
+    input_dir = 'road_construction/experiments/pilot_0320/data/'
 
     # =============================================================================
     # setting up parameters
     
     # set parameters
-    inparams = [6.57470703125, 2.3291015625, 9.737548828125, 0.0, 30.0, 1.4526367187489564e-05, 0.312255859375]
-    #[1, 1, 1, 0.01, 10, 0.01, 0.01]
+    inparams = [1, 1, 1, 0.01, 15, 0.05, 0.1]
     para = params(w1=inparams[0], w2=inparams[1], w3=inparams[2], 
     					stopping_probability=inparams[3],
     					pruning_threshold=inparams[4],
@@ -88,3 +88,16 @@ if __name__ == "__main__":
 
     flat_list = [item for sublist in times_all for item in sublist]
     avg_move = mean(flat_list)
+    
+    # =============================================================================
+    # use hpc ibs bfs time output
+    import json
+    with open(home_dir + input_dir + 'check_time_sample','r') as file: 
+        time_sample = json.load(file)
+
+    
+    time_avg = mean(time_sample['time sequence'])
+    time_err = stdev(time_sample['time sequence'])/sqrt(len(time_sample['time sequence']))
+    
+    sample = mean(time_sample['number of samples'])
+    sample_err = stdev(time_sample['number of samples'])/sqrt(len(time_sample['number of samples']))

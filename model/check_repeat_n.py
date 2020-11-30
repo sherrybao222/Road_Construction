@@ -2,11 +2,10 @@ import json
 import numpy as np
 
 # directories
-home_dir = '/Users/sherrybao/Downloads/research/'
-            #'/Users/Toby/Downloads/bao/'
-input_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/'
-output_dir = 'road_construction/rc_all_data/data/data_pilot_preprocessed/ll/'
-map_dir = 'road_construction/map/active_map/'  
+home_dir = '/Users/dbao/google_drive/'
+input_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/'
+output_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/ll/'
+map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'  
 
 sub = 2
 

@@ -1,4 +1,4 @@
-from best_first_search import new_node_current,make_move,params
+from model_bfs import new_node_current,make_move,params
 import time
 import pandas as pd
 import numpy as np
@@ -7,6 +7,7 @@ import ast # to convert string to list
 from scipy import special
 import math
 from statistics import mean
+
 
 
 def harmonic_sum(n):
@@ -68,6 +69,7 @@ def ibs_early_stopping(inparams, LL_lower, subject_data,basic_map):
     returns the log likelihood of current subject
     '''
     start_time = time.time()
+    time_sequence = [] # bfs time sequence
     
     # initialize parameters
     para = params(w1=inparams[0],w2=inparams[1],w3=inparams[2],
@@ -102,11 +104,22 @@ def ibs_early_stopping(inparams, LL_lower, subject_data,basic_map):
                 continue # end the current idx and continue calculation for the next
                         
             dist = basic_map[0][subject_data.loc[idx,'map_id']]['distance']
-            node_now = new_node_current(subject_data.loc[idx,'choice_all'],
-                                ast.literal_eval(subject_data.loc[idx,'remain_all']), 
-                                dist, subject_data.loc[idx,'budget_all'], subject_data.loc[idx,'n_city_all'], 
-                                para.weights, n_u = subject_data.loc[idx,'n_u_all'])
+            name = subject_data.loc[idx,'choice_all']
+            remain = ast.literal_eval(subject_data.loc[idx,'remain_all'])
+            budget_remain = subject_data.loc[idx,'budget_all']
+            n_city = subject_data.loc[idx,'n_city_all']
+            n_u = subject_data.loc[idx,'n_u_all']
+            
+            bfs_start_time = time.time() # record bfs start time
+            
+            node_now = new_node_current(name,
+                                remain, 
+                                dist, budget_remain, n_city, 
+                                para.weights, n_u = n_u)
             decision = make_move(node_now,dist,para)
+            
+            move_time = (time.time() - bfs_start_time)
+            time_sequence.append(move_time) # record bfs time
             
             if decision.name == subject_data.loc[idx,'choice_next_all']: # hit
                 hit_target[idx] = True
@@ -127,7 +140,7 @@ def ibs_early_stopping(inparams, LL_lower, subject_data,basic_map):
 
     print('IBS total time lapse '+str(time.time() - start_time))
 #    print('Final LL_k: '+str(LL_k))
-    return LL_k #,count_iteration
+    return LL_k, time_sequence,count_iteration
 
 def prep_compute_repeats(inparams, repeat, subject_data, basic_map):
     '''

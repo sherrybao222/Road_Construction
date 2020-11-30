@@ -4,6 +4,7 @@ import math
 from scipy.spatial import distance_matrix
 import numpy as np
 from best_first_search import make_move, new_node
+
 # generate map and its corresponding parameters about people's choice
 # ============================================================================
 class Map:
