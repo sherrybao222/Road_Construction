@@ -18,3 +18,12 @@ var config = {
 
 //this set up the canvas and game framework
 var game = new Phaser.Game(config);
+
+//YES LOADING WORKED HERE, can see info in console 
+fetch("./assets/basic_map_training.json")
+.then(function(resp){
+return resp.json();
+})
+.then(function(data){
+console.log(data)
+});
