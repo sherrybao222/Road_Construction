@@ -40,12 +40,13 @@ export default class MainTask extends Phaser.Scene {
     }
     create(){
         console.log("Road Basic Ready!");
+        //'this' parameter refers to the Phaser Scene
         this.trial = new Map(this,locations,1,1,1); //new trial object from Map Class
         this.draw_map(this.trial,this.input.mousePointer.x,this.input.mousePointer.y);
         //double check the mouse input
     }
 
-    //-------Map--Visualization--Functions--------------------------------------
+    //-------Map Visualization --------------------------------------
     //this call the basic map setup
     draw_map(mmap,mouse_x,mouse_y){
       this.budget(mmap,mouse_x,mouse_y);
@@ -63,7 +64,7 @@ export default class MainTask extends Phaser.Scene {
       };
     }
 
-    //individual component of map setup
+    //-------individual component of map visualization--------------------------------------
     cities(mmap){
       //create city and define style
       this.circle = this.add.graphics();
@@ -208,14 +209,14 @@ export default class MainTask extends Phaser.Scene {
     update(){
       this.add.text(20,20,"Road Construction");
       this.budget_line.clear();
-      this.triangle.clear();
+      this.triangle.clear(); //wat is this ?? I am lost myself...
       this.budget(this.trial,this.input.mousePointer.x,this.input.mousePointer.y);
       this.scorebar(this.trial);
 
       this.input.on('pointerdown', function (pointer){
         //double check pointer function
         if (pointer.leftButtonDown()){
-          console.log(this.trial.choice_dyn);
+//          console.log(this.trial.choice_dyn);
             if (this.trial.check_end()){
               this.trial.make_choice(this.input.mousePointer.x,this.input.mousePointer.y);
               if (this.trial.check == 1){

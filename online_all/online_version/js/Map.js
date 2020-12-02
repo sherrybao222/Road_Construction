@@ -1,5 +1,7 @@
-//organize the code 
-
+/*
+This is the Map class that generate key map attributes, data saving, and update functions
+the constants location and dis_matrix below are for debug purpose when load json is not working
+*/
 
 //color constants
 const grey = 0xFAF7F6;
@@ -20,13 +22,14 @@ const dis_matrix = [[0.00,92.19544457,264.7640459,111.80339887,262.48809497,194.
 
 //map class (map load, data saving, user check)
 export default class Map{
+    //the Phaser Scene will be passed in as a parameter to access time/mouse/location etc
   constructor(scene, map_content,trl_id,blk,map_id){
     this.load_map(map_content,map_id);
     this.exp_data_init(scene,blk,trl_id,map_id);
   }
 
-  //load json map into javascript
-  //uncommented one are for local debug
+  //uncommented one are for local debug, NOT COMPLETED
+  //details see index.js
   load_map(map_content, map_id){
     // this.loadmap = map_content[map_id];
     // this.order = NaN;
@@ -65,15 +68,13 @@ export default class Map{
     this.trl = [trl_id];
     this.mapid = [map_id];
     this.cond = [2]; //condition, road basic
-
+    
+    //need to double check how to access Scene time 
     //let time = scene.Input.Pointer.downTime; bug
     //this.time = [Math.round(time/1000,2)]; bug
-    //double check mouse click time
 
-    //this.pointer = new scene.Input.Pointer();
     this.mouse_x = scene.input.mousePointer.x;
     this.mouse_y = scene.input.mousePointer.y;
-    //double check mouse saving here
     this.pos = [[this.mouse_x,this.mouse_y]];
     this.click = [0];  //click indicator
     this.undo_press = [0];
@@ -163,7 +164,7 @@ export default class Map{
  check_end(){
     let distance_copy = this.distance[this.choice_dyn[this.choice_dyn.length-1]].slice();
     // copy distance list for current city
-    // take note of the const i of sytax
+    // take note of the 'const i of' sytax
     for (const i of this.choice_dyn){
         distance_copy[i] = 0;
     };
