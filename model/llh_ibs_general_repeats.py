@@ -26,7 +26,7 @@ def ibs_grepeats(inparams, LL_lower, sub_data,basic_map,repeats):
         # print('subject:'+str(sub)+',run:'+str(n)+',repeat:'+str(r)+',ll:'+str(nLL))
     
     nll_avg = -sum(nll_single_r)/repeats 
-    return nll_avg,time_sequence,count_iteration
+    return nll_avg#,time_sequence,count_iteration
 
 def ibs_grepeats_hpc(inparams, LL_lower, sub_data,basic_map,repeats):
     '''

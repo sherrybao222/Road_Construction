@@ -1,40 +1,43 @@
+function bads_run(hpc,job_id,task_id,sub)
+    % set euler
+    % euler = parcluster('local');
+    % pool = parpool(euler,1);
+    if hpc == 1
+    % set directory
+        myHOME = '/home/db4058/';
+        addpath([myHOME, '/toolbox/bads-master'])
+    end
 
-% set euler
-% euler = parcluster('local');
-% pool = parpool(euler,1);
+    % save output in command window
+    %diary myDiaryFile_2 
+    tStart = tic; % record time
 
-% set directory
-myHOME = '/home/db4058/';
-addpath([myHOME, '/toolbox/bads-master'])
+    % w1, w2, w3,stopping_probability,pruning_threshold,lapse_rate,feature_dropping_rate
 
-% save output in command window
-%diary myDiaryFile_2 
-tStart = tic; % record time
+    LB = [0, 0, 0, 0, 0.1, 0.01, 0];   % Lower bounds
+    UB = [10, 10, 10, 1, 30, 1, 1];   % Upper bounds
 
-% w1, w2, w3,stopping_probability,pruning_threshold,lapse_rate,feature_dropping_rate
+    PLB = [0, 0, 0, 0, 0.1, 0.01, 0];   % Lower bounds
+    PUB = [10, 10, 10, 1, 20, 0.5, 0.5];   % Upper bounds
 
-LB = [0, 0, 0, 0, 0.1, 0, 0];   % Lower bounds
-UB = [10, 10, 10, 1, 30, 1, 1];   % Upper bounds
+    nvars = numel(PLB);
+    rand_coe = rand(1,nvars);
+    X0 = PLB + rand_coe .* (PUB - PLB)  % Starting point
+    
+    funwdata = @(x) bads_ll(x,sub);
+    
+    [x,fval] = bads(funwdata,X0,LB,UB,PLB,PUB);
 
-PLB = [0, 0, 0, 0, 0.1, 0.001, 0];   % Lower bounds
-PUB = [10, 10, 10, 1, 20, 0.5, 0.5];   % Upper bounds
-
-%     nvars = numel(PLB);
-%     rand_coe = rand(1,nvars);
-%     X0 = PLB + rand_coe .* (PUB - PLB);   % Starting point
-X0 = [1, 1, 1, 0.1, 10, 0.1, 0.1];  
-
-[x,fval] = bads(@bads_ll,X0,LB,UB,PLB,PUB);
-
-Output.x0 = x0;
-Output.x = x;
-Output.fval = fval;
+    Output.x0 = X0;
+    Output.x = x;
+    Output.fval = fval;
 
 
-tEnd = toc(tStart);
-% diary off
+    tEnd = toc(tStart);
+    % diary off
+    filename = sprintf('result/bads_%.0f_%.0f.mat',job_id,task_id);
+    save(filename)
 
-save('test.mat')
-
-% pool.delete()
+    % pool.delete()
+end
 
