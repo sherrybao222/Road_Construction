@@ -15,7 +15,7 @@ export default class Instruction extends Phaser.Scene {
       console.log("instruciton ready!");
       this.trial_start(true);
       //change scenes on key press command
-      this.input.keyboard.on('keydown_ENTER', ()=>this.scene.start('MainTask'));
+      this.input.keyboard.on('keydown_ENTER', ()=>this.scene.start('RCundo'));
     };
 
     game_start(blk,show){

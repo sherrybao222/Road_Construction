@@ -5,6 +5,10 @@ see the MainTask file. This is the file that will be run when open the html
 file in Chrome. 
 */
 
+//import the Map class module (mostly copy pasted, but made some modification for phaser features)
+//need to double check scene parameters in the Map class 
+import Map from "../Map.js";
+
 //color constants
 const grey = 0xFAF7F6;
 const black = 0x000000;
@@ -21,196 +25,8 @@ const dis_matrix = [[0.00,92.19544457,264.7640459,111.80339887,262.48809497,194.
                     [262.48809497,228.03508502,31.6227766,152.97058541,0.00,72.00694411],
                     [194.74342094,176.02556632,86.97700846,83.21658489,72.00694411,0.00]];
 
-class Map{
-  constructor(map_content,trl_id,blk,map_id){
-    this.load_map(map_content,map_id);
-    this.exp_data_init(blk,trl_id,map_id);
-  }
-
-  //load json map into javascript
-  //uncommented one are for local debug
-  load_map(map_content, map_id){
-    // this.loadmap = map_content[map_id];
-    // this.order = NaN;
-    //
-    // this.N = this.loadmap['N'];
-    // this.radius = 5; //radius of city
-    //
-    // this.total = this.loadmap['total'];
-    // this.budget_remain = this.loadmap['total'];
-    //
-    // this.R = this.loadmap['R'];
-    // this.r = this.loadmap['r'];
-    // this.phi = this.loadmap['phi'];
-    // this.x = this.load_map['x'].map(x => x[0] + width/2);
-    // this.y = this.load_map['y'].map(x => x[1] + height/2);
-    // this.xy = this.x.map(x => [x,this.y[this.x.indexOf(x)]]);
-    this.xy = map_content; // for debug purpose
-    this.city_start = map_content[0]; //for debug
-    // this.distance = this.loadmap['distance'];
-    this.distance = dis_matrix; //for debug purpose
-    // this.city_start = [200,150]; //for debug same as the first one in the list
-    // console.log(this.xy); //not working join list is working
-
-    //generate circle map parameters
-    this.N = 6; //totall city number, including start
-    this.radius = 10; //radius of city
-    this.total = 400; //total budget
-    this.budget_remain = 400; //remaining budget
-
-    this.R = 400*400; //circle radius' sqaure
-  }
-
-  //------------DATA--COLLECTION--------------------------------------------------
-  exp_data_init(blk, trl_id, map_id){
-    this.blk = [blk];
-    this.trl = [trl_id];
-    this.mapid = [map_id];
-    this.cond = [2]; //condition, road basic
-
-    // this.time_p = new Phaser.Time.Clock(new RCundo());
-    // this.time = [this.time_p];
-    // console.log(this.time_p);
-    this.time = [];
-    //mouse click time, double check
-
-//bug here, can't cross class
-    // this.pointer = new Phaser.Input.Pointer();
-    // this.mouse_x = this.pointer.x;
-    // this.mouse_y = this.pointer.y;
-
-    // this.mouse_x = game.input.mousePointer.x;
-    // this.mouse_y = game.input.mousePointer.y;
-    //double check mouse saving here, initiate empty list
-    this.pos = [];
-    this.click = [0];  //click indicator
-    this.undo_press = [0];
-
-    this.choice_dyn = [0];
-    this.choice_locdyn = [this.city_start];
-    this.choice_his = [0];
-    this.choice_loc = [this.city_start];
-
-    this.budget_dyn = [this.total];
-    this.budget_his = [this.total];
-
-    this.n_city = [0]; //number of cities connected
-    this.check = 0; //indicator showing if people make valid choice
-
-    this.check_end_ind = 0;
-  }
-
-  exp_data(mouse, time, blk, trl_id, map_id){
-    this.blk.push(blk);
-    this.trl.push(trl_id);
-    this.mapid.push(map_id);
-    this.cond.push(2);
-    this.time.push(time);
-    this.pos.push(mouse);
-    this.click.push(1);
-    this.undo_press.push(0);
-
-    this.choice_dyn.push(this.index);
-    this.choice_locdyn.push(this.city);
-    this.choice_his.push(this.index);
-    this.choice_loc.push(this.city);
-
-    this.budget_dyn.push(this.budget_remain);
-    this.budget_his.push(this.budget_remain);
-
-    this.n_city.push(this.n_city[this.n_city.length-1]+1);
-    this.check = 0; //change choice indicator after saving them
-
-    //need to double check this delete function
-    delete this.index;
-    delete this.city;
-  }
-
-  undo_data(mouse, time, blk, trl_id, map_id){
-    this.blk.push(blk);
-    this.trl.push(trl_id);
-    this.mapid.push(map_id);
-    this.cond.push(3); //undo condition
-    this.time.push(time);
-    this.pos.push(mouse);
-    this.click.push(0);
-    this.undo_press.push(1);
-
-    //pop function = list.splice(3, 1)  remove 1 item at index 3
-    this.choice_dyn.splice(this.choice_dyn.length-1,1);
-    this.choice_locdyn.splice(this.choice_locdyn.length-1,1);
-    this.choice_his.push(this.choice_dyn[this.choice_dyn.length-1]);
-    this.choice_loc.push(this.choice_locdyn[this.choice_locdyn.length-1]);
-
-    this.budget_dyn.splice(this.budget_dyn.length-1,1);
-    this.budget_his.push(this.budget_dyn[this.budget_dyn.length-1]);
-
-    this.n_city.push(this.n_city[this.n_city.length-1]-1);
-  }
-
-  static_data(mouse, time, blk, trl_id, map_id){
-    this.blk.push(blk);
-    this.trl.push(trl_id);
-    this.mapid.push(map_id);
-    this.cond.push(2);
-    this.time.push(time);
-    this.pos.push(mouse);
-    this.click.push(0);
-    this.undo_press.push(0);
-
-    this.choice_his.push(this.choice_dyn[this.choice_dyn.length-1]);
-    this.choice_loc.push(this.choice_locdyn[this.choice_locdyn.length-1]);
-    this.budget_his.push(this.budget_dyn[this.budget_dyn.length-1]);
-
-    this.n_city.push(this.n_city[this.n_city.length-1]);
-  }
-
-  //---------Check---User---Input-------------------------------------------------
-  make_choice(mouse_x,mouse_y){
-  //do not evaluate the starting point
-    for (var i=1; i<this.xy.length; i++){
-      this.mouse_distance = Math.hypot(this.xy[i][0]-mouse_x,
-      this.xy[i][1]-mouse_y);
-      //currently entering input.pointer, not useing the created pointer object
-      //this.xy = locations
-
-      // 5 is based on visual testing, not based on radius
-      // check whether is close to city locations && this city hasn't been chosen yet
-      if (this.mouse_distance <= 5 && this.choice_dyn.includes(i)==false){
-        this.index = i; //index of chosen city
-        this.city = this.xy[i];//location of chosen city
-        this.check = 1; //indicator showing people made a valid choice
-      };
-    };
-  }
-
- budget_update(){
-  //get distance from current choice to previous choice
-  let dist = this.distance[this.index][this.choice_dyn[this.choice_dyn.length-1]];
-  this.budget_remain = this.budget_dyn[this.budget_dyn.length-1] - dist;
-  }
-
-//check if trial end, not all dots are evaluated right
- check_end(){
-    let distance_copy = this.distance[this.choice_dyn[this.choice_dyn.length-1]].slice();
-    // copy distance list for current city
-    // take note of the const i of sytax
-    for (const i of this.choice_dyn){
-        distance_copy[i] = 0;
-    };
-
-    if (distance_copy.some(i =>
-      i < this.budget_dyn[this.budget_dyn.length-1] && i != 0)){
-      return true;
-    }else{
-      return false;
-      };
-  }
-
-}
-
 //creat a single trial under Map class
-let trial = new Map(locations,1,1,1);
+//let trial = new Map(locations,1,1,1);
 
 //Phaser scene template: filename = constructor super(filename), add the
 //same name to the scene lists in script.js, and add script path in html
@@ -229,7 +45,8 @@ export default class RCundo extends Phaser.Scene {
 
         //create undo key press on Z
         this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
-        this.draw_map(trial,game.input.mousePointer.x,game.input.mousePointer.y);
+        this.trial = new Map(this,locations,1,1,1); //new trial object from Map Class
+        this.draw_map(this.trial,this.input.mousePointer.x,this.input.mousePointer.y);
     }
 
     //-------Map--Visualization--Functions--------------------------------------
@@ -388,7 +205,7 @@ export default class RCundo extends Phaser.Scene {
       this.budget_line.clear();
       this.triangle.clear();
       this.line.clear();
-      this.draw_map(trial,this.input.mousePointer.x,this.input.mousePointer.y);
+      this.draw_map(this.trial,this.input.mousePointer.x,this.input.mousePointer.y);
 
 //the single trial loop need to double check condition, right now only depends on key press
 //need to move the following part to single trial function
@@ -396,14 +213,14 @@ export default class RCundo extends Phaser.Scene {
       this.input.on('pointerdown', function (pointer){
         //double check pointer function
         if (pointer.leftButtonDown()){
-            if (trial.check_end()){
-              trial.make_choice(this.input.mousePointer.x,this.input.mousePointer.y);
-              if (trial.check == 1){
-                  trial.budget_update();
-                  trial.exp_data([this.input.mousePointer.x,this.input.mousePointer.y],this.input.mousePointer.downTime,1,1,1);
+            if (this.trial.check_end()){
+              this.trial.make_choice(this.input.mousePointer.x,this.input.mousePointer.y);
+              if (this.trial.check == 1){
+                  this.trial.budget_update();
+                 this.trial.exp_data([this.input.mousePointer.x,this.input.mousePointer.y],this.input.mousePointer.downTime,1,1,1);
               }else{
-                //double check why static here?
-                trial.static_data(t[this.input.mousePointer.x,this.input.mousePointer.y],this.input.mousePointer.downTime,1,1,1);
+                //double check why static here
+                  this.trial.static_data([this.input.mousePointer.x,this.input.mousePointer.y],this.input.mousePointer.downTime,1,1,1);
                 // console.log('else');
               };
             }else{
@@ -415,9 +232,10 @@ export default class RCundo extends Phaser.Scene {
       }, this);
 
 //if hold the key, it will continue undoing
-      if (this.keyZ.isDown && trial.choice_dyn[trial.choice_dyn.length-1]!=0){
+      if (this.keyZ.isDown && this.trial.choice_dyn[this.trial.choice_dyn.length-1]!=0){
         console.log("Z pressed");
-        trial.undo_data([this.input.mousePointer.x,this.input.mousePointer.y],this.keyZ.timeDown,1,1,1);
+          //haven't code this part of data saving yet and undo draw back
+        //this.trial.undo_data([this.input.mousePointer.x,this.input.mousePointer.y],this.keyZ.timeDown,1,1,1);
         // console.log(trial.pos);
         // console.log(trial.time);
       };

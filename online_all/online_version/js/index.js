@@ -5,15 +5,15 @@ a standard template using constructor(); preload();create();update().
 More info see resources in Road Construction_QxDq (Google Drive)
 */
 
-import Instruction from "./Instruction.js";
-import MainTask from "./MainTask.js";
-import RCundo from "./RCundo.js";
+import Instruction from "./scenes/Instruction.js";
+import MainTask from "./scenes/MainTask.js";
+import RCundo from "./scenes/RCundo.js";
 
 var config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    scene: [Instruction,MainTask]
+    scene: [Instruction,MainTask,RCundo]
   };
 
 //this set up the canvas and game framework

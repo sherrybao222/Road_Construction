@@ -8,8 +8,11 @@ Unfinished work include: load function, data saving on mouse and time, trial
 and block loop
 */
 
-import Map from "./Map.js";
+//import the Map class module (mostly copy pasted, but made some modification for phaser features)
+//need to double check scene parameters in the Map class 
+import Map from "../Map.js";
 
+//for current debug purposes 
 //color constants
 const grey = 0xFAF7F6;
 const black = 0x000000;
@@ -27,7 +30,6 @@ const dis_matrix = [[0.00,92.19544457,264.7640459,111.80339887,262.48809497,194.
                     [262.48809497,228.03508502,31.6227766,152.97058541,0.00,72.00694411],
                     [194.74342094,176.02556632,86.97700846,83.21658489,72.00694411,0.00]];
 
-// phaser scene = Python Draw Class and merged with ScoreBar Class
 export default class MainTask extends Phaser.Scene {
     constructor() {
         super('MainTask');

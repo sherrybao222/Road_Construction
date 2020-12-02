@@ -22,7 +22,7 @@ const dis_matrix = [[0.00,92.19544457,264.7640459,111.80339887,262.48809497,194.
 export default class Map{
   constructor(scene, map_content,trl_id,blk,map_id){
     this.load_map(map_content,map_id);
-    this.exp_data_init(scene, blk,trl_id,map_id);
+    this.exp_data_init(scene,blk,trl_id,map_id);
   }
 
   //load json map into javascript
@@ -97,7 +97,7 @@ export default class Map{
     this.trl.push(trl_id);
     this.mapid.push(map_id);
     this.cond.push(2);
-    this.time.push(time);
+//    this.time.push(time); bug
     this.pos.push(mouse);
     this.click.push(1);
     this.undo_press.push(0);
@@ -122,7 +122,7 @@ export default class Map{
     this.trl.push(trl_id);
     this.mapid.push(map_id);
     this.cond.push(2);
-    this.time.push(time);
+    //this.time.push(time); bug 
     this.pos.push(mouse);
     this.click.push(0);
     this.undo_press.push(0);
