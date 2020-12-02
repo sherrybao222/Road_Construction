@@ -215,7 +215,7 @@ let trial = new Map(locations,1,1,1);
 //Phaser scene template: filename = constructor super(filename), add the
 //same name to the scene lists in script.js, and add script path in html
 
-class RCundo extends Phaser.Scene {
+export default class RCundo extends Phaser.Scene {
     constructor() {
         super('RCundo');
     }
