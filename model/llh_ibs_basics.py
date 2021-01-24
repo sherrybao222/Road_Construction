@@ -184,7 +184,7 @@ def compute_repeats(budget_S, data_size, L_repeat):
 if __name__ == "__main__":
     # -----------------------------------------------------------------------------
     # directories
-    home_dir = '/Users/dbao/google_drive/'
+    home_dir = '/Users/dbao/google_drive_db/'
     input_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/'
     output_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/ll/'
     map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'

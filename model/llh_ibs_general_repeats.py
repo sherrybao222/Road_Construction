@@ -18,7 +18,6 @@ def ibs_grepeats(inparams, LL_lower, sub_data,basic_map,repeats):
         returns the log likelihood of current subject dataset
     '''
     nll_single_r = [] # nll for single repeat of a single run
-    
 
     for r in range(repeats):
         nLL,time_sequence,count_iteration = ibs_early_stopping(inparams, LL_lower, sub_data,basic_map)
@@ -55,9 +54,9 @@ def ibs_grepeats_hpc(inparams, LL_lower, sub_data,basic_map,repeats):
 
 if __name__ == "__main__":
     # directories
-    home_dir = '/Users/dbao/google_drive/'
+    home_dir = '/Users/dbao/google_drive_db/'
     input_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/'
-    output_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/ll/'
+    output_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/ll_greedy/'
     map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'  
     
     # set parameters
@@ -67,7 +66,7 @@ if __name__ == "__main__":
         basic_map = json.load(file) 
         
     subs = [1,2,4] # subject index 
-    n_run = 10 # number of runs
+    n_run = 1 # number of runs
     repeats = 2
     
     nll_all = [] # nll for all runs and subjects
