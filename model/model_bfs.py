@@ -4,6 +4,7 @@ from anytree import RenderTree
 import random
 import numpy as np
 from map_class import Map
+import math
 
 #----------------------------------------------------------------------
 class params:
@@ -55,9 +56,20 @@ def new_node_current(name, cities, dist, budget, n_c, weights, **kwargs):
     node.n_c = n_c
 
     #------------------------------------------------------------------                            
-    value = weights[0] * node.n_c + weights[1] * node.n_u + \
-            weights[2] * (node.budget/30) + np.random.normal()
+    # value = weights[0] * node.n_c + weights[1] * node.n_u + \
+    #         weights[2] * (node.budget/30) + np.random.normal()
+            
+    # if node.budget == 300:
+    #     value = weights[1] * node.n_u/pow(node.budget,2) * 10000 + \
+    #         np.random.normal()
+    # else:
+    #     value = weights[0] * node.n_c/(300 - node.budget) * 100 + \
+    #         weights[1] * node.n_u/pow(node.budget,2) * 10000 + \
+    #         np.random.normal()
 
+    value = weights[0] * node.n_c + weights[1] * node.n_u + \
+            np.random.normal()
+            
     node.value = value
 
     #------------------------------------------------------------------    
@@ -94,8 +106,19 @@ def new_node_previous(name, parent, dist, weights):
     node.city = cities_remain # all cities, not only cities within reach
        
     #------------------------------------------------------------------                            
+    # value = weights[0] * node.n_c + weights[1] * node.n_u + \
+    #         weights[2] * (node.budget/100) + np.random.normal()
+            
+    # if node.budget == 300:
+    #     value = weights[1] * node.n_u/pow(node.budget,2) * 10000 + \
+    #         np.random.normal()
+    # else:
+    #     value = weights[0] * node.n_c/(300 - node.budget) * 100 + \
+    #         weights[1] * node.n_u/pow(node.budget,2) * 10000 + \
+    #         np.random.normal()
+    
     value = weights[0] * node.n_c + weights[1] * node.n_u + \
-            weights[2] * (node.budget/100) + np.random.normal()
+            np.random.normal()
 
     node.value = value
 
@@ -271,10 +294,10 @@ if __name__ == "__main__":
     dist_city = trial.distance.copy()
     
     # save console output 2/1   
-    import sys
-    orig_stdout = sys.stdout
-    f = open('output.txt', 'w')
-    sys.stdout = f
+    # import sys
+    # orig_stdout = sys.stdout
+    # f = open('output.txt', 'w')
+    # sys.stdout = f
 
     # simulate
     choice_sequence = [0]
@@ -297,8 +320,8 @@ if __name__ == "__main__":
         now = new_start
 
     # save console output 2/2
-    sys.stdout = orig_stdout
-    f.close()
+    # sys.stdout = orig_stdout
+    # f.close()
 
 # -------------------------------------------------------------------------
     # visualize map     
