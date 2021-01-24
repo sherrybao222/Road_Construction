@@ -3,7 +3,7 @@ from scipy.stats import shapiro
 import numpy as np
 
 ## directories
-home_dir = '/Users/dbao/google_drive/'
+home_dir = '/Users/dbao/google_drive_db/'
 input_dir = 'road_construction/experiments/pilot_0320/data/data_pilot_preprocessed/'
 map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'
 
@@ -18,6 +18,9 @@ for idx, sub in enumerate(subs):
     budget_remain = subject_data.loc[:,'budget_all']
     n_city = subject_data.loc[:,'n_city_all']
     n_u = subject_data.loc[:,'n_u_all']
+    
+    n_c_speed = n_city/(300 - budget_remain)
+    n_u_speed = n_u/pow(budget_remain, 2)
 
     # # normality test
     # stat, p = shapiro(n_u)
