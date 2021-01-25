@@ -13,18 +13,18 @@ import pandas as pd
 # import data 
 
 data_all = [] # prepare for all data
-subs = [2,3,9] # subject index
+subs = [1,2,4] # subject index
 budget = [200,350,400]
 
 # directories
 home_dir = '/Users/dbao/google_drive_db/'
 map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'  
-data_dir = 'road_construction/experiments/pilot_0320/data/data_old/'  
+data_dir = 'road_construction/experiments/pilot_0320/data/data_pilot/'  
 #out_dir = 'road_construction/experiments/pilot_0320/figures/'  
 
 # import experiment data
 for num in subs:
-    with open(home_dir + data_dir + 'data_00'+str(num)+'/test_all_'+str(num),'r') as file: 
+    with open(home_dir + data_dir + 'sub_'+str(num)+'/test_all_'+str(num),'r') as file: 
         all_data = json.load(file)
         data_all.append(all_data)
         
@@ -94,50 +94,50 @@ mean_f_t_undo = []# mean of first move time for undo trl
 
 
 for data in data_all:
-    for i in range(len(data)): # index for every trial
-        if data[i]['cond'][-1] == 1:
-            num.append(int(data[i]['num_est'][-1]))
-            budget_list.append(data[i]['total'])
+    for i in range(len(data[0])): # index for every trial
+        if data[0][i]['cond'][-1] == 1:
+            num.append(int(data[0][i]['num_est'][-1]))
+            budget_list.append(data[0][i]['total'])
             
             num_ind.append(i)
             
-        if data[i]['cond'][-1] == 2:
-            rc.append(data[i]['n_city'][-1])
-            t_rc.append(data[i]['time'][-1]-data[i]['time'][0])
+        if data[0][i]['cond'][-1] == 2:
+            rc.append(data[0][i]['n_city'][-1])
+            t_rc.append(data[0][i]['time'][-1]-data[0][i]['time'][0])
             
            
-            ind_choice = next(x for x, val in enumerate(data[i]['choice_his']) 
+            ind_choice = next(x for x, val in enumerate(data[0][i]['choice_his']) 
             if val != 0)  # index for first move
-            f_t_rc.append(data[i]['time'][ind_choice]-data[i]['time'][0])
+            f_t_rc.append(data[0][i]['time'][ind_choice]-data[0][i]['time'][0])
             
-            v = np.array(data[i]['choice_his'])
+            v = np.array(data[0][i]['choice_his'])
             temp = np.where(v[:-1] != v[1:])[0]
             rc_t_all.append(list(map(lambda x : x + 1, temp)))
             
-            temp = [data[i]['time'][rc_t_all[-1][p+1]]-data[i]['time'][rc_t_all[-1][p]] for p,x in enumerate(rc_t_all[-1]) if p<len(rc_t_all[-1])-1]
+            temp = [data[0][i]['time'][rc_t_all[-1][p+1]]-data[0][i]['time'][rc_t_all[-1][p]] for p,x in enumerate(rc_t_all[-1]) if p<len(rc_t_all[-1])-1]
             t_everyact_rc.append(temp)
             m_t_everyact_rc.append(median(t_everyact_rc[-1]))
             
-            t_s_rc.append(data[i]['time'][-1]-data[i]['time'][rc_t_all[-1][-1]])           
+            t_s_rc.append(data[0][i]['time'][-1]-data[0][i]['time'][rc_t_all[-1][-1]])           
             
             rc_ind.append(i)
             
-        if data[i]['cond'][-1] == 3:
-            undo.append(data[i]['n_city'][-1])
-            t_undo.append(data[i]['time'][-1]-data[i]['time'][0])
+        if data[0][i]['cond'][-1] == 3:
+            undo.append(data[0][i]['n_city'][-1])
+            t_undo.append(data[0][i]['time'][-1]-data[0][i]['time'][0])
             
-            ind_choice = next(x for x, val in enumerate(data[i]['choice_his']) 
+            ind_choice = next(x for x, val in enumerate(data[0][i]['choice_his']) 
                                   if val != 0)# index for first move
-            f_t_undo.append(data[i]['time'][ind_choice]-data[i]['time'][0])
+            f_t_undo.append(data[0][i]['time'][ind_choice]-data[0][i]['time'][0])
 
-            v = np.array(data[i]['choice_his'])
+            v = np.array(data[0][i]['choice_his'])
             temp = np.where(v[:-1] != v[1:])[0]
             rcu_t_all.append(list(map(lambda x : x + 1, temp)))
             
-            temp = [data[i]['time'][rcu_t_all[-1][p+1]]-data[i]['time'][rcu_t_all[-1][p]] for p,x in enumerate(rcu_t_all[-1]) if p<len(rcu_t_all[-1])-1]
+            temp = [data[0][i]['time'][rcu_t_all[-1][p+1]]-data[0][i]['time'][rcu_t_all[-1][p]] for p,x in enumerate(rcu_t_all[-1]) if p<len(rcu_t_all[-1])-1]
             t_everyact_undo.append(temp)
 
-            u_t_all.append([i for i,x in enumerate(data[i]['undo_press']) 
+            u_t_all.append([i for i,x in enumerate(data[0][i]['undo_press']) 
                                         if x == 1])
             
             np_rcu_t_all = np.array(rcu_t_all[-1])# change to numpy array for next opertation
@@ -148,11 +148,11 @@ for data in data_all:
             t_everyc_undo.append([e for e in t_everyact_undo[-1] if e not in t_everyundo[-1]])
             m_t_everyc_undo.append(median(t_everyc_undo[-1]))
 
-            t_s_undo.append(data[i]['time'][-1]-data[i]['time'][rcu_t_all[-1][-1]])
+            t_s_undo.append(data[0][i]['time'][-1]-data[0][i]['time'][rcu_t_all[-1][-1]])
 
-            n_undo.append(sum(data[i]['undo_press']))
+            n_undo.append(sum(data[0][i]['undo_press']))
             
-            if 1 in set(data[i]['undo_press']):
+            if 1 in set(data[0][i]['undo_press']):
                 undo_click.append(1)
             else:
                 undo_click.append(0)
@@ -247,7 +247,7 @@ data = {'sub':sub, 'num_ind':num_ind, 'rc_ind':rc_ind, 'undo_ind':undo_ind,
   
 # Create DataFrame 
 df = pd.DataFrame(data) 
-df.to_csv('filtered.csv', index=True)
+# df.to_csv('filtered.csv', index=True)
 # =============================================================================
 # plotting per subject    
 # =============================================================================
