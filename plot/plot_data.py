@@ -9,28 +9,32 @@ import matplotlib.lines as mlines
 from scipy.stats import wilcoxon
 import pandas as pd 
 
+## ==========================================================================
+# import data 
+
 data_all = [] # prepare for all data
-subs = [1,2,4] # subject index
+subs = [2,3,9] # subject index
 budget = [200,350,400]
 
 # directories
-home_dir = '/Users/sherrybao/Downloads/research/'
-map_dir = 'road_construction/rc_all_data/pilot_031220/map/'
-data_dir = 'road_construction/rc_all_data/data/data_pilot/'
-out_dir = 'road_construction/rc_all_data/plot/fig/'
+home_dir = '/Users/dbao/google_drive_db/'
+map_dir = 'road_construction/experiments/pilot_0320/map/active_map/'  
+data_dir = 'road_construction/experiments/pilot_0320/data/data_old/'  
+#out_dir = 'road_construction/experiments/pilot_0320/figures/'  
 
 # import experiment data
 for num in subs:
-    with open(home_dir + data_dir + 'sub_'+str(num)+'/test_all_'+str(num),'r') as file: 
+    with open(home_dir + data_dir + 'data_00'+str(num)+'/test_all_'+str(num),'r') as file: 
         all_data = json.load(file)
         data_all.append(all_data)
         
 # import map
-with open(home_dir + data_dir + 'num_48','r') as file: 
+with open(home_dir + map_dir + 'num_48','r') as file: 
     num_map = json.load(file) 
-with open(home_dir + data_dir + 'basic_map_48_all4','r') as file: 
+with open(home_dir + map_dir + 'basic_map_48_all4','r') as file: 
     rc_map = json.load(file) 
 
+## ==========================================================================
 # map index
 num_ind = []
 rc_ind = []
@@ -42,8 +46,8 @@ rc = []
 undo = []
 
 # correct answer
-num_list = num_map[2]*3 # duplicate for all subjects
-rc_list = rc_map[2]*3
+num_list = num_map[2]*len(subs) # duplicate for all subjects
+rc_list = rc_map[2]*len(subs)
 
 undo_click = [] # if commit undo in a trial
 n_undo = [] #number of undo
@@ -57,10 +61,11 @@ f_t_rc = [] # first move
 f_t_undo = [] # first move
 
 # get time index for further calculatation of time of a single move
-rc_t_all = [] #choice index in basic trl
-rcu_t_all = [] # choice and undo index in undo trl
-u_t_all = [] # undo index in undo trl
-rc_u_t_all = [] # choice index in undo trl
+rc_t_all = [] #choice index in basic condition
+
+rcu_t_all = [] # choice and undo index in undo condition
+u_t_all = [] # undo index in undo condition
+rc_u_t_all = [] # choice index in undo condition
 
 # time of a single move
 t_everyact_rc = [] # time for choice (exclude first choice) in basic
@@ -89,54 +94,50 @@ mean_f_t_undo = []# mean of first move time for undo trl
 
 
 for data in data_all:
-    for i in range(len(data[0])): # index for every trial
-        if data[0][i]['cond'][-1] == 1:
-            num.append(int(data[0][i]['num_est'][-1]))
-            budget_list.append(data[0][i]['total'])
+    for i in range(len(data)): # index for every trial
+        if data[i]['cond'][-1] == 1:
+            num.append(int(data[i]['num_est'][-1]))
+            budget_list.append(data[i]['total'])
             
             num_ind.append(i)
             
-        if data[0][i]['cond'][-1] == 2:
-            rc.append(data[0][i]['n_city'][-1])
-            t_rc.append(data[0][i]['time'][-1]-data[0][i]['time'][0])
+        if data[i]['cond'][-1] == 2:
+            rc.append(data[i]['n_city'][-1])
+            t_rc.append(data[i]['time'][-1]-data[i]['time'][0])
             
            
-            ind_choice = next(x for x, val in enumerate(data[0][i]['choice_his']) 
+            ind_choice = next(x for x, val in enumerate(data[i]['choice_his']) 
             if val != 0)  # index for first move
-            f_t_rc.append(data[0][i]['time'][ind_choice]-data[0][i]['time'][0])
+            f_t_rc.append(data[i]['time'][ind_choice]-data[i]['time'][0])
             
-            v = np.array(data[0][i]['choice_his'])
+            v = np.array(data[i]['choice_his'])
             temp = np.where(v[:-1] != v[1:])[0]
             rc_t_all.append(list(map(lambda x : x + 1, temp)))
             
-            temp = [data[0][i]['time'][rc_t_all[-1][p+1]]-data[0][i]['time'][rc_t_all[-1][p]] for p,x in enumerate(rc_t_all[-1]) if p<len(rc_t_all[-1])-1]
+            temp = [data[i]['time'][rc_t_all[-1][p+1]]-data[i]['time'][rc_t_all[-1][p]] for p,x in enumerate(rc_t_all[-1]) if p<len(rc_t_all[-1])-1]
             t_everyact_rc.append(temp)
             m_t_everyact_rc.append(median(t_everyact_rc[-1]))
             
-            t_s_rc.append(data[0][i]['time'][-1]-data[0][i]['time'][rc_t_all[-1][-1]])           
+            t_s_rc.append(data[i]['time'][-1]-data[i]['time'][rc_t_all[-1][-1]])           
             
             rc_ind.append(i)
             
-        if data[0][i]['cond'][-1] == 3:
-            undo.append(data[0][i]['n_city'][-1])
-            t_undo.append(data[0][i]['time'][-1]-data[0][i]['time'][0])
+        if data[i]['cond'][-1] == 3:
+            undo.append(data[i]['n_city'][-1])
+            t_undo.append(data[i]['time'][-1]-data[i]['time'][0])
             
-            ind_choice = next(x for x, val in enumerate(data[0][i]['choice_his']) 
+            ind_choice = next(x for x, val in enumerate(data[i]['choice_his']) 
                                   if val != 0)# index for first move
-            f_t_undo.append(data[0][i]['time'][ind_choice]-data[0][i]['time'][0])
-            
-            v = np.array(data[0][i]['choice_his'])
-            temp = np.where(v[:-1] != v[1:])[0]
-            rc_t_all.append(list(map(lambda x : x + 1, temp)))
+            f_t_undo.append(data[i]['time'][ind_choice]-data[i]['time'][0])
 
-            v = np.array(data[0][i]['choice_his'])
+            v = np.array(data[i]['choice_his'])
             temp = np.where(v[:-1] != v[1:])[0]
             rcu_t_all.append(list(map(lambda x : x + 1, temp)))
             
-            temp = [data[0][i]['time'][rcu_t_all[-1][p+1]]-data[0][i]['time'][rcu_t_all[-1][p]] for p,x in enumerate(rcu_t_all[-1]) if p<len(rcu_t_all[-1])-1]
+            temp = [data[i]['time'][rcu_t_all[-1][p+1]]-data[i]['time'][rcu_t_all[-1][p]] for p,x in enumerate(rcu_t_all[-1]) if p<len(rcu_t_all[-1])-1]
             t_everyact_undo.append(temp)
 
-            u_t_all.append([i for i,x in enumerate(data[0][i]['undo_press']) 
+            u_t_all.append([i for i,x in enumerate(data[i]['undo_press']) 
                                         if x == 1])
             
             np_rcu_t_all = np.array(rcu_t_all[-1])# change to numpy array for next opertation
@@ -147,11 +148,11 @@ for data in data_all:
             t_everyc_undo.append([e for e in t_everyact_undo[-1] if e not in t_everyundo[-1]])
             m_t_everyc_undo.append(median(t_everyc_undo[-1]))
 
-            t_s_undo.append(data[0][i]['time'][-1]-data[0][i]['time'][rcu_t_all[-1][-1]])
+            t_s_undo.append(data[i]['time'][-1]-data[i]['time'][rcu_t_all[-1][-1]])
 
-            n_undo.append(sum(data[0][i]['undo_press']))
+            n_undo.append(sum(data[i]['undo_press']))
             
-            if 1 in set(data[0][i]['undo_press']):
+            if 1 in set(data[i]['undo_press']):
                 undo_click.append(1)
             else:
                 undo_click.append(0)
