@@ -80,9 +80,9 @@ if __name__ == "__main__":
         for n in range(n_run): 
             nll_avg = ibs_grepeats(inparams, LL_lower, sub_data,basic_map,repeats)            
             
-            with open(home_dir + output_dir + 'grepeat_ibs_LL_r'+str(repeats)+'_n'+
-                      str(n)+'_s' + str(sub),'w') as file: 
-                json.dump({'total ll':nll_avg},file,indent=4)
+            # with open(home_dir + output_dir + 'grepeat_ibs_LL_r'+str(repeats)+'_n'+
+            #           str(n)+'_s' + str(sub),'w') as file: 
+            #     json.dump({'total ll':nll_avg},file,indent=4)
             
             nll_all_r.append(nll_avg)
     
@@ -90,6 +90,6 @@ if __name__ == "__main__":
     
     nll_std = list(np.std(nll_all,axis=1))
     
-    with open(home_dir + output_dir + 'std_ibs_r'+str(repeats),'w') as file: 
-        json.dump({'all nll':nll_all,
-               'std':nll_std},file,indent=4)
+    # with open(home_dir + output_dir + 'std_ibs_r'+str(repeats),'w') as file: 
+    #     json.dump({'all nll':nll_all,
+    #            'std':nll_std},file,indent=4)

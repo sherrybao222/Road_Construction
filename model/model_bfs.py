@@ -67,8 +67,12 @@ def new_node_current(name, cities, dist, budget, n_c, weights, **kwargs):
     #         weights[1] * node.n_u/pow(node.budget,2) * 10000 + \
     #         np.random.normal()
 
-    value = weights[0] * node.n_c + weights[1] * node.n_u + \
+    # value = weights[0] * node.n_c + weights[1] * node.n_u + \
+    #         np.random.normal()
+            
+    value = weights[0] * node.n_c - weights[2] * ((300 - node.budget)/30) + \
             np.random.normal()
+
             
     node.value = value
 
@@ -117,7 +121,10 @@ def new_node_previous(name, parent, dist, weights):
     #         weights[1] * node.n_u/pow(node.budget,2) * 10000 + \
     #         np.random.normal()
     
-    value = weights[0] * node.n_c + weights[1] * node.n_u + \
+    # value = weights[0] * node.n_c + weights[1] * node.n_u + \
+    #         np.random.normal()
+    
+    value = weights[0] * node.n_c - weights[2] * ((300 - node.budget)/30) + \
             np.random.normal()
 
     node.value = value
