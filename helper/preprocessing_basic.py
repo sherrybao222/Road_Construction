@@ -1,5 +1,5 @@
 '''
-preprocess raw data
+preprocess raw data for basic condition
 generate a sheet for each board position (choice) and corresponding feature
 '''
 
