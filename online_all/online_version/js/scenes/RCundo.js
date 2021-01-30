@@ -7,7 +7,7 @@ file in Chrome.
 
 //import the Map class module (mostly copy pasted, but made some modification for phaser features)
 //need to double check scene parameters in the Map class 
-import Map from "../Map.js";
+import Map from "../elements/Map.js";
 
 //color constants
 const grey = 0xFAF7F6;

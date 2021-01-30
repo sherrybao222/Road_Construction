@@ -6,6 +6,7 @@ More info see resources in Road Construction_QxDq (Google Drive)
 */
 
 //import task scenes 
+import EnterID from "./scenes/EnterID.js";
 import Instruction from "./scenes/Instruction.js";
 import MainTask from "./scenes/MainTask.js";
 import RCundo from "./scenes/RCundo.js";
@@ -15,7 +16,8 @@ var config = {
     type: Phaser.AUTO,
     width: 1000,
     height: 600,
-    scene: [Instruction,
+    scene: [EnterID,
+            Instruction,
             MainTask,
             RCundo
            ], //need to add all scenes here
@@ -23,13 +25,13 @@ var config = {
     dom: {
         createContainer: true    //to allow text input DOM element
     },
-//    plugins: {
-//        scene: [{
-//            key: 'rexUI',
-//            plugin: rexuiplugin, //load the UI plugins here for all scenes
-//            mapping: 'rexUI'
-//        }]
-//    },
+    plugins: {
+        scene: [{
+            key: 'rexUI',
+            plugin: rexuiplugin, //load the UI plugins here for all scenes
+            mapping: 'rexUI'
+        }]
+    },
     audio: {
         disableWebAudio: true
     }

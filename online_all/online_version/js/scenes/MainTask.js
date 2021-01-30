@@ -12,6 +12,11 @@ and block loop
 //need to double check scene parameters in the Map class 
 import Map from "../elements/Map.js";
 
+//import some js from Pavlovia lib to enable data saving
+//import * as data from "../../lib/data-2020.2.js";
+//import { saveTrialData } from '../util.js';
+
+
 
 //for current debug purposes 
 //color constants
@@ -233,26 +238,24 @@ export default class MainTask extends Phaser.Scene {
             //example: this.time.delayedCall(30000, trialEnd, [], this);
             //it needs to be a callback within this scene's context (maybe is already in the context)
                 
-              trialEnd();
+              this.trialEnd(1,1,1);
               //based on key press to change scenes
               this.input.keyboard.on('keydown_ENTER', ()=>this.scene.start('Instruction'));
             };
         };
       }, this);
     }
-}
-
-
-/////////call this function when a trial end to save all data/////////////////
-var trialEnd = function () {
     
-    //change this for RC trial-block flow
+    ///////////////Data saving at end of trial///////////////////////////////
+    trialEnd(blk,trl_id,map_id){
+        //change this for RC trial-block flow
 //    if ((trial+1)%repeat == 0){
 //        this.scene.start('MainTask');
 //    }else{
 //        this.scene.start('RCundo');
 //    }
-
+    
+    var trial = 0; //debug purpose
     ///this add data to Phaser global data registry
     ///make sure variables are created, this is a template
     this.registry.set("trial"+trial, {blockNo: blk,
@@ -274,6 +277,7 @@ var trialEnd = function () {
     
     /////////this require Pav intergration and debug
 //    saveTrialData(this.registry.get(`trial${trial}`));
-    console.log(this.registry.getAll()); //for debugging
+    console.log(this.registry.getAll()); //it's saving, but can be buggy, somehow it's called multiple times
     trial++;
-};
+    }
+}
