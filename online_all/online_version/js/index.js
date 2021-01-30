@@ -10,22 +10,32 @@ import Instruction from "./scenes/Instruction.js";
 import MainTask from "./scenes/MainTask.js";
 import RCundo from "./scenes/RCundo.js";
 
-//game configuration, can export this later if needed 
+//set the game configuration 
 var config = {
     type: Phaser.AUTO,
     width: 1000,
     height: 600,
-    scene: [Instruction,MainTask,RCundo]
+    scene: [Instruction,
+            MainTask,
+            RCundo
+           ], //need to add all scenes here
+    parent: 'game-container',    //ID of the DOM element to add the canvas to
+    dom: {
+        createContainer: true    //to allow text input DOM element
+    },
+//    plugins: {
+//        scene: [{
+//            key: 'rexUI',
+//            plugin: rexuiplugin, //load the UI plugins here for all scenes
+//            mapping: 'rexUI'
+//        }]
+//    },
+    audio: {
+        disableWebAudio: true
+    }
+
   };
 
+//set up the canvas and game framework
 var game = new Phaser.Game(config);
-
-//this is the testing code for loading json file
-//YES LOADING WORKED HERE, can see info in console 
-fetch("./assets/basic_map_training.json")
-.then(function(resp){
-return resp.json();
-})
-.then(function(data){
-console.log(data)
-});
+//console.log(game);

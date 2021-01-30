@@ -10,7 +10,8 @@ and block loop
 
 //import the Map class module (mostly copy pasted, but made some modification for phaser features)
 //need to double check scene parameters in the Map class 
-import Map from "../Map.js";
+import Map from "../elements/Map.js";
+
 
 //for current debug purposes 
 //color constants
@@ -46,7 +47,7 @@ export default class MainTask extends Phaser.Scene {
         //double check the mouse input
     }
 
-    //-------Map Visualization --------------------------------------
+    //////////////////Map Visualization////////////////////
     //this call the basic map setup
     draw_map(mmap,mouse_x,mouse_y){
       this.budget(mmap,mouse_x,mouse_y);
@@ -64,7 +65,7 @@ export default class MainTask extends Phaser.Scene {
       };
     }
 
-    //-------individual component of map visualization--------------------------------------
+    //////////////////Functions of map visualization/////////////////////
     cities(mmap){
       //create city and define style
       this.circle = this.add.graphics();
@@ -116,7 +117,7 @@ export default class MainTask extends Phaser.Scene {
       this.budget_line.strokeLineShape(line);
     }
 
-    //-------Score--Bar---------------------------------------------------------
+    //////////////////Score Bar functions////////////////////////////////
     scorebar(mmap){
       //score bar parameters
       this.width = 100 //1000;
@@ -202,14 +203,14 @@ export default class MainTask extends Phaser.Scene {
     // };
 
 
-//--------GAME--LOOP------------------------------------------------------------
+    ///////////////GAME LOOP update per frame///////////////////////////////
 //important note for update:
 //create general, clear first in update & then redraw again
 //clear as a function to update per frame without previous record
     update(){
       this.add.text(20,20,"Road Construction");
       this.budget_line.clear();
-      this.triangle.clear(); //wat is this ?? I am lost myself...
+      this.triangle.clear(); //wat is this ?? I am lost...
       this.budget(this.trial,this.input.mousePointer.x,this.input.mousePointer.y);
       this.scorebar(this.trial);
 
@@ -228,6 +229,11 @@ export default class MainTask extends Phaser.Scene {
               };
             }else{
               this.add.text(20,50,"Press RETURN to submit");
+            //add the trialEnd saving function here
+            //example: this.time.delayedCall(30000, trialEnd, [], this);
+            //it needs to be a callback within this scene's context (maybe is already in the context)
+                
+              trialEnd();
               //based on key press to change scenes
               this.input.keyboard.on('keydown_ENTER', ()=>this.scene.start('Instruction'));
             };
@@ -235,3 +241,39 @@ export default class MainTask extends Phaser.Scene {
       }, this);
     }
 }
+
+
+/////////call this function when a trial end to save all data/////////////////
+var trialEnd = function () {
+    
+    //change this for RC trial-block flow
+//    if ((trial+1)%repeat == 0){
+//        this.scene.start('MainTask');
+//    }else{
+//        this.scene.start('RCundo');
+//    }
+
+    ///this add data to Phaser global data registry
+    ///make sure variables are created, this is a template
+    this.registry.set("trial"+trial, {blockNo: blk,
+                                    trialNo: trl_id,
+                                    mapID: map_id,
+                                    condition: this.trial.cond,
+                                    time: this.time.now,
+                                    position: [this.input.mousePointer.x,this.input.mousePointer.y], //need to double check this saving
+                                    click: this.trial.click,
+                                    undo: this.trial.undo_press,
+                                    choiceDyn: this.trial.choice_dyn,
+                                    choiceLocDyn: this.trial.choice_locdyn,
+                                    choiceHis: this.trial.choice_his,
+                                    choiceLoc: this.trial.choice_loc,
+                                    budgetDyn: this.trial.budget_dyn,
+                                    budgetHis: this.trial.budget_his,
+                                    nCity: this.trial.n_city,
+                                         });
+    
+    /////////this require Pav intergration and debug
+//    saveTrialData(this.registry.get(`trial${trial}`));
+    console.log(this.registry.getAll()); //for debugging
+    trial++;
+};
