@@ -12,7 +12,7 @@ function draw_map(mmap,mouse_x,mouse_y){
     if (mmap.check_end_ind){
         this.add.text(100,400,'You are out of budget');
     };
-        }
+}
   
 function drawCity(scene, mmap, color){
     // define style
@@ -63,83 +63,86 @@ function drawRoad(scene, mmap, color){
 
 class scorebar {
 
-    constructor(mmap){
+    constructor(scene,mmap,color){
         //score bar parameters
-        this.width = 100;
-        this.height = 400;
-        this.box = 12;
-        this.top = 50; //distance to screen top
+        this.barWidth = 100;
+        this.barHeight = 400;
+        this.nrBox = 12;
+        this.distToTop = 50; //distance to screen top
     
-        this.box_center(); //center for labels
+        this.boxCenter(scene); //center for labels
         this.incentive(); //calculate incentive: N^2
-        this.indicator(mmap); //incentive score indicator, merged with older arrow function
-        this.number();
+        this.drawScorebar(scene);
+        this.indicator(scene,mmap,color);
         }
     
-    box_center(){
-        this.box_height = this.height / this.box
-        this.center_list = []
-        this.uni_height = this.box_height / 2
-        this.x = this.width / 2 + 600  //larger the number, further to right, 1300
+    boxCenter(scene){
+        this.boxHeight = this.barHeight / this.nrBox;
+        this.centerList = [];
+        this.halfHeight = this.boxHeight / 2;
+        this.x = this.barWidth / 2 + scene.cameras.main.width / 2;  //larger the number, further to right
 
-        for (var i=0; i<this.box; i++){
-            let loc = [this.x, i * this.box_height + this.uni_height];
-            this.center_list.push(loc);
+        for (var i = 0; i < this.nrBox; i++){
+            let boxLoc = [this.x, i * this.boxHeight + this.halfHeight];
+            this.centerList.push(boxLoc);
         };
     }
   
     incentive(){
-        this.score = Array.from(Array(this.box).keys());
-        this.incentive_score = [];
-        for (let i of this.score){
+        this.Score = [];
+        for (var i = 0; i < this.nrBox; i++){
             i = (i**2) * 0.01;
-            this.incentive_score.push(i);
+            this.Score.push(i);
         };
-        };
-  
-    indicator(mmap){
-        this.indicator_loc = this.center_list[mmap.n_city[mmap.n_city.length-1]];
-        this.indicator_loc_best = this.center_list[Math.max(mmap.n_city)];
+    };
 
-        //create triangle arrow and define style
-        this.triangle = this.add.graphics();
-        this.triangle.fillStyle(grey);
-
-        //arrow parameter
-        let point = [this.indicator_loc[0] - 30, this.indicator_loc[1]+this.top+10];
-        let v2 = [point[0] - 10, point[1] + 10];
-        let v3 = [point[0] - 10, point[1] - 10];
-        this.triangle.fillTriangle(point[0], point[1], v2[0],v2[1],v3[0],v3[1]);
-        }
-  
     //rendering score Bar
-    number(){
+    drawScorebar(scene){
         //create rectangle and define style
-        this.rect = this.add.graphics();
+        this.rect = scene.add.graphics();
 
-        let left = this.center_list[0][0] - 25;
-        let hex_c = [0x66CC66,0x74C366,0x82B966,0x90B066,
-                0x9EA766,0xAC9E66,0xB99466,0xC78B66,
-                0xD58266,0xE37966,0xF16F66,0xFF6666] //color list
+        let barLeft = this.centerList[0][0] - 25;
+        let colorBox = [0x66CC66,0x74C366,0x82B966,0x90B066,
+                    0x9EA766,0xAC9E66,0xB99466,0xC78B66,
+                    0xD58266,0xE37966,0xF16F66,0xFF6666] //color list
 
-        for (var i=0; i<this.box; i++){
-        let loc = this.center_list[i];
-        let text = this.incentive_score[i];
-        //score bar outline
-        this.rect.fillStyle(grey);
-        this.rect.fillRect(left,loc[1]+this.top-this.uni_height,
-        this.width,this.box_height);
-        //score bar fill
-        this.rect.fillStyle(hex_c[i]);
-        this.rect.fillRect(left,loc[1]+this.top-this.uni_height+2,
-        this.width,this.box_height);
+        for (var i = 0; i < this.nrBox; i++){
 
-        this.add.text(loc[0],loc[1]+this.top,text);
+            let boxLoc = this.centerList[i];
+            let text = this.Score[i];
+
+            //score bar outline
+            scene.rect.fillStyle(grey);
+            scene.rect.fillRect(barLeft, boxLoc[1] + this.distToTop - this.halfHeight, this.barWidth, this.boxHeight);
+
+            //score bar fill
+            scene.rect.fillStyle(colorBox[i]);
+            scene.rect.fillRect(barLeft, boxLoc[1] + this.distToTop - this.halfHeight + 2, this.barWidth, this.boxHeight); //? why + 2
+
+            scene.add.text(boxLoc[0], boxLoc[1] + this.distToTop, text);
+
         };
 
         // scorebar title
-        this.add.text(this.center_list[0][0]-20,this.center_list[0][1]+this.top-50,
-        'Bonus in dollars');
+        scene.add.text(this.centerList[0][0]-20, this.centerList[0][1] + this.distToTop - 50,
+                      'Bonus in dollars');
     }
+
+    indicator(scene,mmap,color){
+        this.indicatorLoc = this.centerList[mmap.cityNr[mmap.cityNr.length-1]];
+        this.indicatorLocBest = this.centerList[Math.max(mmap.cityNr)]; // undo 
+
+        //create triangle arrow and define style
+        this.triangle = scene.add.graphics();
+        this.triangle.fillStyle(color);
+
+        //arrow parameter
+        let point = [this.indicatorLoc[0] - 30, this.indicatorLoc[1] + this.distToTop + 10];
+        let v2 = [point[0] - 10, point[1] + 10];
+        let v3 = [point[0] - 10, point[1] - 10];
+        scene.triangle.fillTriangle(point[0], point[1], v2[0], v2[1], v3[0], v3[1]);
+        }
+  
+
 }
   
