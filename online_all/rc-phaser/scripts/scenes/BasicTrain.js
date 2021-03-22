@@ -42,50 +42,70 @@ export default class MainTask extends Phaser.Scene {
       this.mapID = 0; // for test
       this.mapContent = this.registry.values.basicTrain[mapID];
     }
-    preload()
-    {
 
+    preload(){
     }
+    
     create(){
         console.log("Road Basic Ready!");
-        //'this' parameter refers to the Phaser Scene
+
+        // create map and data saving structure
         this.map = new Map(this.mapContent, this.cameras.main.width, this.cameras.main.height); //new trial object from Map Class
-        this.draw_map(this.trial,this.input.mousePointer.x,this.input.mousePointer.y);
-        //double check the mouse input
+        
+        // draw cities
+        drawCity(this, this.map, this.black);
+        
+        // draw budget and move
+        this.input.on('pointermove', function (pointer) {
+            // define style
+            var graphics = this.add.graphics();
+            graphics.lineStyle(4, this.green, 1.0);
+
+            //budget follow mouse
+            let x = this.map.choiceLocDyn[this.map.choiceLocDyn.length - 1][0];
+            let y = this.map.choiceLocDyn[this.map.choiceLocDyn.length - 1][1];
+        
+            let radians = Math.atan2(pointer.y - y, pointer.x - x);
+        
+            var budgetPosX = x + this.map.budgetDyn[this.map.budgetDyn.length - 1] * Math.cos(radians);
+            var budgetPosY = y + this.map.budgetDyn[this.map.budgetDyn.length - 1] * Math.sin(radians);
+        
+            //draw budget line
+            let line = new Phaser.Geom.Line();
+            line.setTo(x, y, budgetPosX, budgetPosY);
+            graphics.strokeLineShape(line);
+
+          },this);   
+
+        // draw scorebar
+        this.scorebar = new scorebar(this, this.map, this.grey)
+
+        // add title
+        this.add.text(20,20,"Road Construction");
+
     }
 
-
-//--------Single---Trial--------------------------------------------------------
-    // trial(all_done, trl_done, map_content, trl_id, blk, map_id){
-    //   trial =
-    // };
-
-
-    ///////////////GAME LOOP update per frame///////////////////////////////
-//important note for update:
-//create general, clear first in update & then redraw again
-//clear as a function to update per frame without previous record
     update(){
-      this.add.text(20,20,"Road Construction");
-      this.budget_line.clear();
       this.triangle.clear(); //wat is this ?? I am lost...
-      this.budget(this.trial,this.input.mousePointer.x,this.input.mousePointer.y);
       this.scorebar(this.trial);
 
       this.input.on('pointerdown', function (pointer){
         //double check pointer function
         if (pointer.leftButtonDown()){
-//          console.log(this.trial.choice_dyn);
-            if (this.trial.check_end()){
-              this.trial.make_choice(this.input.mousePointer.x,this.input.mousePointer.y);
-              if (this.trial.check == 1){
-                  this.trial.budget_update();
-                  this.trial.exp_data(this.pointer,1,1,1,1);
-                  this.road(this.trial);
+
+            if (this.map.checkEnd()){
+              this.map.makeChoice(pointer.x, pointer.y);
+
+              if (this.map.check == 1){
+                  this.map.budgetUpdate();
+                  this.map.dataChoice(pointer,time); // time
+                  drawRoad(this, this.map, this.black)
+
               }else{
-                this.trial.static_data(this.pointer,1,1,1,1);
+                this.map.dataStatic(pointer, time); // time
               };
-            }else{
+
+            } else {
               this.add.text(20,50,"Press RETURN to submit");
             //add the trialEnd saving function here
             //example: this.time.delayedCall(30000, trialEnd, [], this);

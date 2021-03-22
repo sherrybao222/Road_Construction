@@ -125,9 +125,9 @@ export default class Map{
 
     if (cityDistRowCopy.some(i =>
       i < this.budgetDyn[this.budgetDyn.length-1] && i != 0)){
-      return true;
+      return true; // not end
     } else {
-      return false;
+      return false; // end
     };
   }
 
