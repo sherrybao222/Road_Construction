@@ -125,8 +125,8 @@ class scorebar {
         };
 
         // scorebar title
-        scene.add.text(this.centerList[0][0]-20, this.centerList[0][1] + this.distToTop - 50,
-                      'Bonus in dollars');
+        //scene.add.text(this.centerList[0][0]-20, this.centerList[0][1] + this.distToTop - 50,
+        //              'Bonus in dollars');
     }
 
     indicator(scene,mmap,color){

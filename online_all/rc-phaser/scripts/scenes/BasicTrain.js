@@ -17,6 +17,7 @@ export default class BasicTrain extends Phaser.Scene {
     this.green = 0x25A35A;
     this.red   = 0xB93D30;
 		this.colorText     = '#1C2833'; // black
+		this.warnColorText = '#943126'; // red
 
     var mapID = 0; // for test
     this.mapContent = this.registry.values.basicTrainMap[mapID];
@@ -97,6 +98,8 @@ export default class BasicTrain extends Phaser.Scene {
           } else {
             dataStatic(this.mapInfo, [pointer.x,pointer.y], elapsed); // time
           };
+        } else {
+          this.add.text(20, 100, "You are out of budget!", { fontFamily: 'Comic Sans MS', fontSize: '26px', color: this.warnColorText});
         };
       };
     }, this);
