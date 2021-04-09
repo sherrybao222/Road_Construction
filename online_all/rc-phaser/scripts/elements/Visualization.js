@@ -73,7 +73,7 @@ class scorebar {
     
         this.boxCenter(scene); //center for labels
         this.incentive(); //calculate incentive: N^2
-        this.drawScorebar(scene);
+        this.drawScorebar(scene, color);
         this.indicator(scene,mmap,color);
         }
     
@@ -81,7 +81,7 @@ class scorebar {
         this.boxHeight = this.barHeight / this.nrBox;
         this.centerList = [];
         this.halfHeight = this.boxHeight / 2;
-        this.x = this.barWidth / 2 + scene.cameras.main.width / 2;  //larger the number, further to right
+        this.x = this.barWidth / 2 + scene.cameras.main.width / 2 + 300;  //larger the number, further to right
 
         for (var i = 0; i < this.nrBox; i++){
             let boxLoc = [this.x, i * this.boxHeight + this.halfHeight];
@@ -92,13 +92,13 @@ class scorebar {
     incentive(){
         this.Score = [];
         for (var i = 0; i < this.nrBox; i++){
-            i = (i**2) * 0.01;
-            this.Score.push(i);
+            var newScore = Math.pow(i, 2);
+            this.Score.push(newScore);
         };
     };
 
     //rendering score Bar
-    drawScorebar(scene){
+    drawScorebar(scene, color){
         //create rectangle and define style
         this.rect = scene.add.graphics();
 
@@ -113,12 +113,12 @@ class scorebar {
             let text = this.Score[i];
 
             //score bar outline
-            scene.rect.fillStyle(grey);
-            scene.rect.fillRect(barLeft, boxLoc[1] + this.distToTop - this.halfHeight, this.barWidth, this.boxHeight);
+            this.rect.fillStyle(color);
+            this.rect.fillRect(barLeft, boxLoc[1] + this.distToTop - this.halfHeight, this.barWidth, this.boxHeight);
 
             //score bar fill
-            scene.rect.fillStyle(colorBox[i]);
-            scene.rect.fillRect(barLeft, boxLoc[1] + this.distToTop - this.halfHeight + 2, this.barWidth, this.boxHeight); //? why + 2
+            this.rect.fillStyle(colorBox[i]);
+            this.rect.fillRect(barLeft, boxLoc[1] + this.distToTop - this.halfHeight + 2, this.barWidth, this.boxHeight); //? why + 2
 
             scene.add.text(boxLoc[0], boxLoc[1] + this.distToTop, text);
 
@@ -141,7 +141,7 @@ class scorebar {
         let point = [this.indicatorLoc[0] - 30, this.indicatorLoc[1] + this.distToTop + 10];
         let v2 = [point[0] - 10, point[1] + 10];
         let v3 = [point[0] - 10, point[1] - 10];
-        scene.triangle.fillTriangle(point[0], point[1], v2[0], v2[1], v3[0], v3[1]);
+        this.triangle.fillTriangle(point[0], point[1], v2[0], v2[1], v3[0], v3[1]);
         }
   
 

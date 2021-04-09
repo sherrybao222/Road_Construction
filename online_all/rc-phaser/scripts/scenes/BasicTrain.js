@@ -16,6 +16,7 @@ export default class BasicTrain extends Phaser.Scene {
     this.black = 0x000000;
     this.green = 0x25A35A;
     this.red   = 0xB93D30;
+		this.colorText     = '#1C2833'; // black
 
     var mapID = 0; // for test
     this.mapContent = this.registry.values.basicTrainMap[mapID];
@@ -25,14 +26,13 @@ export default class BasicTrain extends Phaser.Scene {
   }
     
   create(){
-    // time
+    // time + mouse
     var time = new Date();
     var elapsed = time.getTime()-this.start; 
     var mouse = [this.input.mousePointer.x, this.input.mousePointer.y]
-
     // create map and data saving structure
-    this.mapInfo = new Map(this.mapContent, this.cameras.main.width, this.cameras.main.height, 1, 1, 1, mouse, elapsed); 
-    //mapContent, width, height, blockID, trialID, mapID, mouse, time    
+    this.mapInfo = new Map(this.mapContent, this.cameras.main.width, this.cameras.main.height, 1, 1, 1, mouse, elapsed);     //mapContent, width, height, blockID, trialID, mapID, mouse, time    
+
     // draw cities
     drawCity(this, this.mapInfo, this.black, this.red);
 
@@ -45,7 +45,7 @@ export default class BasicTrain extends Phaser.Scene {
     });
 
     // draw scorebar
-    //this.scorebar = new scorebar(this, this.map, this.grey)
+    this.scorebar = new scorebar(this, this.mapInfo, this.black)
 
     // draw budget and move
     this.input.on('pointermove', function (pointer) {
@@ -91,6 +91,9 @@ export default class BasicTrain extends Phaser.Scene {
             budgetUpdate(this.mapInfo);
             dataChoice(this.mapInfo,[pointer.x,pointer.y],elapsed); // time
             drawRoad(this, this.mapInfo, this.black)
+
+            this.scorebar.triangle.clear();
+            this.scorebar.indicator(this,this.mapInfo,this.black);
           } else {
             dataStatic(this.mapInfo, [pointer.x,pointer.y], elapsed); // time
           };
@@ -99,15 +102,12 @@ export default class BasicTrain extends Phaser.Scene {
     }, this);
 
     // add text
-    this.add.text(20,20,"Road Construction");
-    this.add.text(20,50,"Press RETURN to submit");
+    this.add.text(20, 50, "Press RETURN to submit", { fontFamily: 'Comic Sans MS', fontSize: '26px', color: this.colorText});
 
 
   }
 
   update(){
-    //this.triangle.clear(); //wat is this ?? I am lost...
-    //this.scorebar(this.trial);
   }
 
   staticDataTimer(){
