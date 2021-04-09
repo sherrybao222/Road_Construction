@@ -6,30 +6,40 @@ More info see resources in Road Construction_QxDq (Google Drive)
 */
 
 //import task scenes 
-// import Preload from "./scenes/Preload.js";
-import EnterID from "/js/scenes/EnterID.js"; //this is old foler directory, with new edits on data saving
-import MainTask from "/js/scenes/MainTask.js";
-import Instruction from "/scripts/scenes/Instruction.js";
+import Preload from "./scenes/Preload.js";
+import EnterID from "./scenes/EnterID.js"; 
 
-// import BasicTrain from "./scenes/BasicTrain.js";
-import Undo from "./scenes/Undo.js";
+import Instruction from "./scenes/Instruction.js";
+import BasicTrain from "./scenes/BasicTrain.js";
+
+import MainBasic from "./scenes/MainBasic.js";
+import MainUndo from "./scenes/MainUndo.js";
+
+
+// Load our scenes
+var preload = new Preload();
+var enterID = new EnterID();
+var instruction = new Instruction();
+var basicTrain = new BasicTrain();
+var mainBasic = new MainBasic();
+var mainUndo = new MainUndo()
+
 
 //set the game configuration 
 var config = {
+    parent: 'game-container',    //ID of the DOM element to add the canvas to
     type: Phaser.AUTO,
     width: 1000,
     height: 600,
-    scene: [//Preload,
-            EnterID,
-            Instruction,
-            MainTask, //the version that has proper data saving
-            // BasicTrain
-            //RCundo
-           ], //need to add all scenes here
-    parent: 'game-container',    //ID of the DOM element to add the canvas to
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+      },
+
     dom: {
         createContainer: true    //to allow text input DOM element
     },
+
     plugins: {
         scene: [{
             key: 'rexUI',
@@ -37,11 +47,27 @@ var config = {
             mapping: 'rexUI'
         }]
     },
+
     audio: {
         disableWebAudio: true
     }
 
   };
 
-//set up the canvas and game framework
 var game = new Phaser.Game(config);
+
+// load scenes
+game.scene.add('Preload', preload);
+game.scene.add("EnterID", enterID);
+game.scene.add("Instruction", instruction);
+game.scene.add("BasicTrain", basicTrain);
+game.scene.add("MainBasic", mainBasic);
+game.scene.add("MainUndo", mainUndo);
+
+// start 
+//var trialInd = localStorage.getItem('trialInd');
+//if (trialInd === null) {
+game.scene.start("BootScene");
+//} else {
+//  game.scene.start("PreloadScene");
+
