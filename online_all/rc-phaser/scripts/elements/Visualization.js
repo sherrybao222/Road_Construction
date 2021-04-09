@@ -14,18 +14,19 @@ function draw_map(mmap,mouse_x,mouse_y){
     };
 }
   
-function drawCity(scene, mmap, color){
+function drawCity(scene, mmap, colorMajor, colorMinor){
     // define style
     var graphics = scene.add.graphics();
-    graphics.fillStyle(color, 0.5);
+    graphics.fillStyle(colorMajor, 0.5);
 
     // draw cities except for the starting city
     for (var i = 1; i < mmap.xy.length; i++) {
-        this.circle.fillCircle(mmap.xy[i][0], mmap.xy[i][1], mmap.radius);
+        graphics.fillCircle(mmap.xy[i][0], mmap.xy[i][1], mmap.radius);
     };
 
     // draw the starting city
-    this.circle.fillCircle(mmap.cityStart[0], mmap.cityStart[1], mmap.radius);
+    graphics.fillStyle(colorMinor, 0.5);
+    graphics.fillCircle(mmap.cityStart[0], mmap.cityStart[1], mmap.radius);
 }
 
 function drawBudget(scene, mmap, color, mouseX, mouseY) {

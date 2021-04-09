@@ -1,6 +1,4 @@
-import {basicTrain} from './configs/basicTrain.js';
-
-
+import {basicTrainMap} from './configs/basicTrainMap.js';
 
 export default class PreloadScene extends Phaser.Scene {
 
@@ -9,6 +7,8 @@ export default class PreloadScene extends Phaser.Scene {
 	}
 
 	preload() {
+		// add configurations to registry
+		this.registry.set('basicTrainMap', basicTrainMap);
 
 		// Add loading screen bars
 		this.graphics = this.add.graphics();
@@ -28,16 +28,13 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.on('complete', this.complete, {scene:this.scene});
 
 		// load images
-
-		// add configurations to registry
-		this.registry.set('basicTrain', basicTrain);
 		
 	}
 
 	create() {	
 	}
 
-	// helper functions
+	// ----------------------helper functions-----------------------------
 
 	// show progress
 	updateBar(percentage) {
@@ -53,7 +50,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 	// scene change
 	complete() {
-		this.scene.start("EnterID");
+		this.scene.start("BasicTrain");
 	}
 
 }
