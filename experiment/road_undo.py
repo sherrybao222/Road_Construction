@@ -12,7 +12,7 @@ class Map:
     def __init__(self, map_content, trl_id, blk, map_id): 
         
         self.load_map(map_content, map_id)
-        self.data_init(blk,trl_id,map_id)
+        self.data_init(blk, trl_id, map_id)
 
 #   different maps
 # ----------------------------------------------------------------------------        
@@ -271,20 +271,20 @@ class Draw:
         text_write("Press RETURN to SUBMIT", 60, BLACK, 100, 300,screen)
 
     def check_end(self,screen):
-        text_write("You are out of budget", 60, RED, 100, 400,screen)
+        text_write("You are out of budget", 60, RED, 100, 400, screen)
 
 # ---------------------------------------------------------------------------------
     def number(self, scorebar, screen):
         left = scorebar.center_list[0][0] - 25
         c_list = [(102,204,102),(116,195,102),(130,185,102),(144,176,102),
                   (158,167,102),(172,158,102),(185,148,102),(199,139,102),
-                  (213,130,102),(227,121,102),(241,111,102),(255,102,102)]
+                  (213,130,102),(227,121,102),(241,111,102),(255,102,102)] # color list
         for i in range(scorebar.box):
             loc = scorebar.center_list[i]
             text = scorebar.incentive_score[i]
             pg.draw.rect(screen, c_list[i],
-                         (left, loc[1]+scorebar.top-scorebar.uni_height,
-                          scorebar.width, scorebar.box_height), 0)
+                         (left, loc[1] + scorebar.top - scorebar.uni_height,
+                          scorebar.width, scorebar.box_height), 0) # if width == 0, (default) fill the rectangle
             pg.draw.rect(screen, BLACK, (left, loc[1]+scorebar.top-scorebar.uni_height, 
                                          scorebar.width, scorebar.box_height), 2)  # width for line thickness
             text_write(str(text), int(scorebar.box_height - 15), BLACK, loc[0], loc[1]+scorebar.top , screen) # larger number, further to right
@@ -317,6 +317,7 @@ class Draw:
         x = scorebar.center_list[0][0]-20
         y = scorebar.center_list[0][1]+scorebar.top-60
         text_write("Bonus in dollars", 50, BLACK, x, y, screen)
+
 
 # instruction
 # =============================================================================
@@ -406,11 +407,11 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                     trial.make_choice(mouse_loc)
                     if trial.check == 1: # made valid choice
                         trial.budget_update()
-                        trial.data(mouse_loc, tick_second,blk,trl_id,map_id)
+                        trial.data(mouse_loc, tick_second, blk, trl_id, map_id)
                         draw_map.auto_snap(trial, screen)
                         scorebar.indicator(trial)
                     else:
-                        trial.static_data(mouse_loc,tick_second,blk,trl_id,map_id)
+                        trial.static_data(mouse_loc, tick_second, blk, trl_id, map_id)
                         trial.click[-1] = 1
                 else: # end
                     print("The End") # need other end function
@@ -494,7 +495,7 @@ def road_undo(screen,map_content,n_trials,blk,n_blk,mode):
         for trl_id in range(0, n_trials):
             map_id = trl_id + (n_blk - 1) * n_trials
             all_done,trial,trl_done = pygame_trial(all_done, trl_done, map_content, 
-                                                   trl_id + 1, screen,blk,map_id)
+                                                   trl_id + 1, screen, blk, map_id)
             trl_done = False
             trials.append(trial)
         all_done = True

@@ -11,7 +11,6 @@ import numpy as np
 class Map:
     def __init__(self, map_content, trl_id, blk, map_id): 
         
-#        self.gaussian_map()
         self.load_map(map_content, map_id)
         self.data_init(blk, trl_id, map_id)
        
@@ -79,7 +78,7 @@ class Map:
         self.r = self.loadmap['r']
         self.phi = self.loadmap['phi']
         self.x = [x + int(WIDTH/2) for x in self.loadmap['x']] 
-        self.y = [x + int(HEIGHT/2) for x in self.loadmap['y']]
+        self.y = [y + int(HEIGHT/2) for y in self.loadmap['y']]
         self.xy = [[self.x[i], self.y[i]] for i in range(0, len(self.x))]   # combine x and y
         
         self.city_start = self.xy[0]    # start city
@@ -100,7 +99,7 @@ class Map:
         self.budget_remain = self.budget_dyn[-1] - dist # budget update
        
     def check_end(self): # check if trial end
-        distance_copy = self.distance[self.choice_dyn[-1]].copy() # copy distance list for current city
+        distance_copy = self.distance[self.choice_dyn[-1]].copy()  # copy distance list for current city
         for x in self.choice_dyn:
             distance_copy[x] = 0
         if any(i < self.budget_dyn[-1] and i != 0 for i in distance_copy):
@@ -152,7 +151,7 @@ class Map:
         self.budget_his.append(self.budget_remain)
                                 
         self.n_city.append(self.n_city[-1] + 1)
-        self.check = 0 # change choice indicator after saving them
+        self.check = 0 # clear choice parameters after saving them
         self.num_est.append(np.nan)
 
         del self.index, self.city   
@@ -181,7 +180,7 @@ class ScoreBar:
         # only call once when initiated for this part
         # score bar parameters
         self.width = 100
-        self.height = 480
+        self.height = 500
         self.box = 12
         self.top = 200 # distance to screen top
 
@@ -294,7 +293,7 @@ class Draw:
         self.vertices = [point, v2, v3, v4, v5, v6, v7]
         pg.draw.polygon(screen, BLACK, self.vertices)
 
-    def title(self, scorebar,screen):
+    def title(self, scorebar, screen):
         x = scorebar.center_list[0][0]-20
         y = scorebar.center_list[0][1]+scorebar.top-60
         text_write("Bonus in dollars", 50, BLACK, x, y, screen)
@@ -370,24 +369,24 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
         for event in pg.event.get():
             tick_second = round((pg.time.get_ticks()/1000), 2)
             mouse_loc = pg.mouse.get_pos()
-#            draw_map.budget(trial, mouse_loc,screen)
+#            draw_map.budget(trial, mouse_loc, screen)
             
             if event.type == pg.QUIT:
                 all_done = True
     
             elif event.type == pg.MOUSEMOTION:
-#                draw_map.budget(trial,mouse_loc,screen)
+#                draw_map.budget(trial,mouse_loc, screen)
                 trial.static_data(mouse_loc,tick_second,blk,trl_id,map_id)
            
             elif event.type == pg.MOUSEBUTTONDOWN:
-#                draw_map.budget(trial,mouse_loc,screen)
+#                draw_map.budget(trial,mouse_loc, screen)
                 trial.click[-1] = 1
                 if trial.check_end(): # not end
                     trial.make_choice(mouse_loc)
                     if trial.check == 1: # made valid choice
                         trial.budget_update()
                         trial.data(mouse_loc, tick_second, blk, trl_id, map_id)
-                        draw_map.auto_snap(trial,screen)  
+                        draw_map.auto_snap(trial, screen)  
                         scorebar.indicator(trial)
                     else:
                         trial.static_data(mouse_loc, tick_second, blk, trl_id, map_id)
@@ -395,7 +394,7 @@ def pygame_trial(all_done, trl_done, map_content, trl_id, screen, blk, map_id):
                     print("The End") # need other end function
                 
             elif event.type == pg.MOUSEBUTTONUP:
-#                draw_map.budget(trial,mouse_loc,screen)
+#                draw_map.budget(trial,mouse_loc, screen)
                 trial.static_data(mouse_loc,tick_second,blk,trl_id,map_id)
                 if  not trial.check_end(): 
                     trial.check_end_ind = 1
@@ -463,7 +462,7 @@ def road_basic(screen,map_content,n_trials, blk, n_blk, mode):
     # -------------------------------------------------------------------------
     while not all_done:
         for trl_id in range(0, n_trials):
-            map_id = trl_id  + (n_blk - 1) * n_trials
+            map_id = trl_id + (n_blk - 1) * n_trials
             all_done,trial,trl_done = pygame_trial(all_done, trl_done, map_content, 
                                                    trl_id + 1, screen, blk, map_id)
             trl_done = False 
