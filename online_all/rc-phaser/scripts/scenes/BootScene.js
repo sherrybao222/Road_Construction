@@ -1,4 +1,4 @@
-
+import {validCode} from '../configs/validCode.js';
 
 export default class BootScene extends Phaser.Scene {
 
@@ -15,7 +15,7 @@ export default class BootScene extends Phaser.Scene {
 		this.registry.set('timeLimit', 10000) // ms
 
 		this.registry.set('validCode', validCode);
-		this.registry.set('gameTrialNr',  40);
+		this.registry.set('gameTrialNr',  2);
 		this.registry.set('trainTrialNr', 2);
 		this.registry.set('basicNr', 0); // initialize
 		this.registry.set('undoNr', 0); // initialize
@@ -32,14 +32,14 @@ export default class BootScene extends Phaser.Scene {
 		// localStorage.setItem('singleInd',  JSON.stringify(singleInd));
 		this.registry.set('undoInd', undoInd); 
 		
-		var oneAll = this.shuffleBlock(this.registry.values.gameTrialNr/10)
+		var cond = [2,3,3,2]
 		//localStorage.setItem('oneAll', JSON.stringify(oneAll));
-		this.registry.set('oneAll', oneAll); 
+		this.registry.set('cond', cond); 
 		
 	}
 
 	create() {		
-		this.scene.start("Preload");
+		this.scene.start("TitleScene");
 	}
 
 	// helper functions

@@ -1,4 +1,5 @@
-import {basicTrainMap} from './configs/basicTrainMap.js';
+import {basicTrainMap} from '../configs/basicTrainMap.js';
+import {undoTrainMap} from '../configs/undoTrainMap.js';
 
 export default class PreloadScene extends Phaser.Scene {
 
@@ -9,6 +10,7 @@ export default class PreloadScene extends Phaser.Scene {
 	preload() {
 		// add configurations to registry
 		this.registry.set('basicTrainMap', basicTrainMap);
+		this.registry.set('undoTrainMap', undoTrainMap);
 
 		// Add loading screen bars
 		this.graphics = this.add.graphics();
@@ -28,6 +30,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.on('complete', this.complete, {scene:this.scene});
 
 		// load images
+		this.load.image('paw', 'scripts/scenes/images/game/paw.png'); //just load something
 		
 	}
 
@@ -50,7 +53,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 	// scene change
 	complete() {
-		this.scene.start("BasicTrain");
+		this.scene.start("GameScene");
 	}
 
 }

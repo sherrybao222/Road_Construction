@@ -6,7 +6,7 @@ for debug purpose when load json is not working
 
 class Map{
   //the Phaser Scene will be passed in as a parameter to access time/mouse/location etc
-  constructor(mapContent, width, height, blockID, trialID, mapID, mouse, time){
+  constructor(cond, mapContent, width, height, blockID, trialID, mapID, mouse, time){
     this.loadMap(mapContent, width, height);
     this.dataInit(cond, blockID, trialID, mapID, mouse, time);
   }

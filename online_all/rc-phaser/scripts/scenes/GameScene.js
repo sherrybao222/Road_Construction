@@ -1,8 +1,8 @@
 // basic condition training session
-export default class BasicTrain extends Phaser.Scene {
+export default class GameScene extends Phaser.Scene {
 
   constructor() {
-      super('BasicTrain');
+      super('GameScene');
   }
 
   init() {
@@ -33,12 +33,11 @@ export default class BasicTrain extends Phaser.Scene {
 
 		if (this.cond === 2){
 			this.trialInd     = this.basicInd[this.basicNr];
-      this.mapContent = this.registry.values.basicTrainMap[mapID];    
+      this.mapContent = this.registry.values.basicTrainMap[this.trialInd];    
 		} else {
 			this.trialInd     = this.undoInd[this.undoNr];
-      this.mapContent = this.registry.values.basicTrainMap[mapID];    
+      this.mapContent = this.registry.values.undoTrainMap[this.trialInd];    
 		}
-
 
 		this.undoObj = this.input.keyboard.addKey('z');  // Get key object
   }
@@ -52,7 +51,7 @@ export default class BasicTrain extends Phaser.Scene {
     var elapsed = time.getTime()-this.start; 
     var mouse = [this.input.mousePointer.x, this.input.mousePointer.y]
     // create map and data saving structure
-    this.mapInfo = new Map(this.mapContent, this.cameras.main.width, this.cameras.main.height, 1, 1, 1, mouse, elapsed);     //mapContent, width, height, blockID, trialID, mapID, mouse, time    
+    this.mapInfo = new Map(this.cond, this.mapContent, this.cameras.main.width, this.cameras.main.height, 1, 1, 1, mouse, elapsed);     //mapContent, width, height, blockID, trialID, mapID, mouse, time    
 
     // draw cities
     drawCity(this, this.mapInfo, this.black, this.red);
@@ -98,7 +97,6 @@ export default class BasicTrain extends Phaser.Scene {
 
     // make choice
     this.input.on('pointerdown', function (pointer){
-      console.log(this.mapInfo.mousePos)
 
       var time = new Date();
       var elapsed = time.getTime()-this.start; 
@@ -148,7 +146,6 @@ export default class BasicTrain extends Phaser.Scene {
     var elapsed = time.getTime()-this.start; 
     var mouse = [this.input.mousePointer.x, this.input.mousePointer.y]
     dataStatic(this.mapInfo, mouse, elapsed)
-    console.log(this.mapInfo.mousePos)
 
   };
 }
