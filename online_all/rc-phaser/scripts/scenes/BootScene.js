@@ -1,4 +1,9 @@
 import {validCode} from '../configs/validCode.js';
+import {basicTrainMap} from '../configs/basicTrainMap.js';
+import {basicMap} from '../configs/basicMap.js';
+import {undoTrainMap} from '../configs/undoTrainMap.js';
+import {undoMap} from '../configs/undoMap.js';
+
 
 export default class BootScene extends Phaser.Scene {
 
@@ -14,8 +19,14 @@ export default class BootScene extends Phaser.Scene {
 		// add config
 		this.registry.set('timeLimit', 10000) // ms
 
+		// add configurations to registry
+		this.registry.set('basicTrainMap', basicTrainMap);
+		this.registry.set('basicMap', basicMap);
+		this.registry.set('undoTrainMap', undoTrainMap);
+		this.registry.set('undoMap', undoMap);
 		this.registry.set('validCode', validCode);
-		this.registry.set('gameTrialNr',  2);
+		
+		this.registry.set('gameTrialNr',  4);
 		this.registry.set('trainTrialNr', 2);
 		this.registry.set('basicNr', 0); // initialize
 		this.registry.set('undoNr', 0); // initialize

@@ -33,13 +33,15 @@ export default class GameScene extends Phaser.Scene {
 
 		if (this.cond === 2){
 			this.trialInd     = this.basicInd[this.basicNr];
-      this.mapContent = this.registry.values.basicTrainMap[this.trialInd];    
+      this.mapContent = this.registry.values.basicMap[this.trialInd];    
 		} else {
 			this.trialInd     = this.undoInd[this.undoNr];
-      this.mapContent = this.registry.values.undoTrainMap[this.trialInd];    
+      this.mapContent = this.registry.values.undoMap[this.trialInd];    
 		}
-
+    console.log(this.cond)
+    console.log(this.trialInd)
 		this.undoObj = this.input.keyboard.addKey('z');  // Get key object
+		this.nextObj = this.input.keyboard.addKey('enter');  // Get key object
   }
 
   preload(){
@@ -139,6 +141,11 @@ export default class GameScene extends Phaser.Scene {
       this.scorebar.indicator(this,this.mapInfo,this.black);
       dataUndo(this.mapInfo, mouse, elapsed); // time
     }
+
+		if (this.nextObj.isDown) {
+      this.next();
+    }
+    
 	}	
 
   staticDataTimer(){
@@ -146,7 +153,16 @@ export default class GameScene extends Phaser.Scene {
     var elapsed = time.getTime()-this.start; 
     var mouse = [this.input.mousePointer.x, this.input.mousePointer.y]
     dataStatic(this.mapInfo, mouse, elapsed)
+  }
 
-  };
+  next(){
+		if (this.cond === 2){
+			this.registry.values.basicNr += 1;
+		} else {
+			this.registry.values.undoNr += 1;
+		}
+    this.registry.values.trialCounter++; // move on to next trial
+		this.scene.start("GameScene");
+  }
 }
 
