@@ -131,7 +131,6 @@ class scorebar {
 
     indicator(scene,mmap,color){
         this.indicatorLoc = this.centerList[mmap.cityNr[mmap.cityNr.length-1]];
-        this.indicatorLocBest = this.centerList[Math.max(mmap.cityNr)]; // undo 
 
         //create triangle arrow and define style
         this.triangle = scene.add.graphics();
@@ -143,7 +142,19 @@ class scorebar {
         let v3 = [point[0] - 10, point[1] - 10];
         this.triangle.fillTriangle(point[0], point[1], v2[0], v2[1], v3[0], v3[1]);
         }
-  
 
+    whiteIndicator(scene,mmap,color){
+        this.indicatorLocBest = this.centerList[Math.max(mmap.cityNr)]; // undo 
+
+        //create triangle arrow and define style
+        this.triangle = scene.add.graphics();
+        this.triangle.fillStyle(color);
+
+        //arrow parameter
+        let point = [this.indicatorLocBest[0] - 30, this.indicatorLocBest[1] + this.distToTop + 10];
+        let v2 = [point[0] - 10, point[1] + 10];
+        let v3 = [point[0] - 10, point[1] - 10];
+        this.triangle.fillTriangle(point[0], point[1], v2[0], v2[1], v3[0], v3[1]);
+        }
 }
   

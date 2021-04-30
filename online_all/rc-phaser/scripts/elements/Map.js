@@ -8,7 +8,7 @@ class Map{
   //the Phaser Scene will be passed in as a parameter to access time/mouse/location etc
   constructor(mapContent, width, height, blockID, trialID, mapID, mouse, time){
     this.loadMap(mapContent, width, height);
-    this.dataInit(blockID, trialID, mapID, mouse, time);
+    this.dataInit(cond, blockID, trialID, mapID, mouse, time);
   }
 
   loadMap(mapContent, width, height){
@@ -27,13 +27,14 @@ class Map{
   }
 
   //------------DATA-STRUCTURE--------------------------------------------------
-  dataInit(blockID, trialID, mapID, mouse, time) {
+  dataInit(cond, blockID, trialID, mapID, mouse, time) {
 
 		// basic trial info
 		this.blockID       =    blockID;
 		this.trialID       =    trialID;
 		this.mapID         =    mapID;
-    this.condition     =    2; // basic: 2
+    this.condition     =    cond; // basic: 2; undo: 3
+
     // dynamic info
 		this.time          =    [time]; 
 		this.mousePos      =    [mouse]; 
@@ -90,7 +91,25 @@ function dataStatic(mmap, mouse, time){
   mmap.cityNr.push(mmap.cityNr[mmap.cityNr.length-1]);
 }
 
-  //---------Check---User---Input-------------------------------------------------
+function dataUndo(mmap, mouse, time){
+
+  mmap.time.push(time); 
+  mmap.mousePos.push(mouse); 
+  mmap.click.push(0); //click indicator
+  mmap.undo.push(1); 	
+  
+  mmap.choiceDyn.pop();
+  mmap.choiceLocDyn.pop();
+  mmap.choiceHis.push(mmap.choiceDyn[mmap.choiceDyn.length - 1]);
+  mmap.choiceLoc.push(mmap.choiceLocDyn[mmap.choiceLocDyn.length - 1]);
+  
+  mmap.budgetDyn.pop();
+  mmap.budgetHis.push(mmap.budgetDyn[mmap.budgetDyn.length - 1]);
+  
+  mmap.cityNr.push(mmap.cityNr[mmap.cityNr.length-1] - 1);
+}
+
+//---------Check---User---Input-------------------------------------------------
 function makeChoice(mmap, mouseX, mouseY){
 //do not evaluate the starting point
   for (var i = 1; i < mmap.xy.length; i++){

@@ -1,5 +1,3 @@
-import {basicTrainMap} from '../configs/basicTrainMap.js';
-
 // basic condition training session
 export default class BasicTrain extends Phaser.Scene {
 
@@ -8,7 +6,6 @@ export default class BasicTrain extends Phaser.Scene {
   }
 
   init() {
-    this.registry.set('basicTrainMap', basicTrainMap);    
     // time 
 		this.start = getTime();
 
@@ -19,8 +16,31 @@ export default class BasicTrain extends Phaser.Scene {
 		this.colorText     = '#1C2833'; // black
 		this.warnColorText = '#943126'; // red
 
-    var mapID = 0; // for test
-    this.mapContent = this.registry.values.basicTrainMap[mapID];
+		// trial parameters
+		this.basicNr   = parseInt(this.registry.values.basicNr); // localStorage.getItem('groupNr')
+		this.undoNr  = parseInt(this.registry.values.undoNr); // localStorage.getItem('singleNr')
+		
+		if ((this.basicNr+this.undoNr) != this.registry.values.trialCounter) { // in case there is mismatch
+			this.registry.values.trialCounter--;
+		}
+
+		this.trialCounter  = this.registry.values.trialCounter;
+		this.blockInd      = Math.floor(this.trialCounter/10);
+		this.cond        = this.registry.values.cond[this.blockInd]; // JSON.parse(localStorage.getItem('oneAll'))[this.blockInd]	
+
+		this.basicInd         = this.registry.values.basicInd;//JSON.parse(localStorage.getItem('groupInd'));
+		this.undoInd        = this.registry.values.undoInd;//JSON.parse(localStorage.getItem('singleInd'));
+
+		if (this.cond === 2){
+			this.trialInd     = this.basicInd[this.basicNr];
+      this.mapContent = this.registry.values.basicTrainMap[mapID];    
+		} else {
+			this.trialInd     = this.undoInd[this.undoNr];
+      this.mapContent = this.registry.values.basicTrainMap[mapID];    
+		}
+
+
+		this.undoObj = this.input.keyboard.addKey('z');  // Get key object
   }
 
   preload(){
@@ -110,8 +130,18 @@ export default class BasicTrain extends Phaser.Scene {
 
   }
 
-  update(){
-  }
+	update() {	   
+		// Is key down?
+		if (this.cond === 3 && this.undoObj.isDown && this.mapInfo.choiceDyn.length > 1) {
+      var time = new Date();
+      var elapsed = time.getTime()-this.start; 
+      var mouse = [this.input.mousePointer.x, this.input.mousePointer.y]
+  
+      this.scorebar.triangle.clear();
+      this.scorebar.indicator(this,this.mapInfo,this.black);
+      dataUndo(this.mapInfo, mouse, elapsed); // time
+    }
+	}	
 
   staticDataTimer(){
     var time = new Date();

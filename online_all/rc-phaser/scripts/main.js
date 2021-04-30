@@ -66,9 +66,5 @@ game.scene.add("BasicTrain", basicTrain);
 //game.scene.add("MainUndo", mainUndo);
 
 // start 
-//var trialInd = localStorage.getItem('trialInd');
-//if (trialInd === null) {
-game.scene.start("BasicTrain");
-//} else {
-//  game.scene.start("PreloadScene");
+game.scene.start("BootScene");
 
