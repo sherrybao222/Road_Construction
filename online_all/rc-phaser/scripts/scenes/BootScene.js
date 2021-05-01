@@ -42,12 +42,7 @@ export default class BootScene extends Phaser.Scene {
 		var undoInd   = Array.from(Array(this.registry.values.gameTrialNr/2).keys());
 		this.shuffleArray(undoInd)
 		// localStorage.setItem('singleInd',  JSON.stringify(singleInd));
-		this.registry.set('undoInd', undoInd); 
-		
-		var cond = [3,2,2,3]
-		//localStorage.setItem('oneAll', JSON.stringify(oneAll));
-		this.registry.set('cond', cond); 
-		
+		this.registry.set('undoInd', undoInd); 		
 	}
 
 	create() {		
