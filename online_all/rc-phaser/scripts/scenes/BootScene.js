@@ -18,6 +18,7 @@ export default class BootScene extends Phaser.Scene {
 		
 		// add config
 		this.registry.set('timeLimit', 10000) // ms
+		this.registry.set('shortBreak', 50000) // ms
 
 		// add configurations to registry
 		this.registry.set('basicTrainMap', basicTrainMap);

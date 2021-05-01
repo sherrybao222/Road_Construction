@@ -198,7 +198,14 @@ export default class GameScene extends Phaser.Scene {
 			this.registry.values.undoNr += 1;
 		}
     this.registry.values.trialCounter++; // move on to next trial
-		this.scene.start("GameScene");
+
+    if ((this.registry.values.trialCounter)%10 === 0){
+      this.scene.start("BreakScene");
+    } else {
+      this.scene.start("GameScene");
+    }
+
+
   }
 }
 
