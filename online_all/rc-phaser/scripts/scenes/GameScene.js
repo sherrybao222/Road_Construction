@@ -13,6 +13,7 @@ export default class GameScene extends Phaser.Scene {
     this.black = 0x000000;
     this.green = 0x25A35A;
     this.red   = 0xB93D30;
+    this.white = 0xFDFEFE;
 		this.colorText     = '#1C2833'; // black
 		this.warnColorText = '#943126'; // red
 
@@ -41,7 +42,7 @@ export default class GameScene extends Phaser.Scene {
     console.log(this.cond)
     console.log(this.trialInd)
 		this.undoObj = this.input.keyboard.addKey('z');  // Get key object
-		this.nextObj = this.input.keyboard.addKey('enter');  // Get key object
+		this.nextObj = this.input.keyboard.addKey({key:'enter', emitOnRepeat:false});  // Get key object
   }
 
   preload(){
@@ -57,6 +58,7 @@ export default class GameScene extends Phaser.Scene {
 
     // draw cities
     drawCity(this, this.mapInfo, this.black, this.red);
+    drawBudget(this, this.mapInfo, this.green, this.input.mousePointer)
 
     // save static data every 1s
     this.time.addEvent({
@@ -74,26 +76,9 @@ export default class GameScene extends Phaser.Scene {
 
       if (typeof this.line !== 'undefined') {
         this.budgetGraphics.clear()
-      } else {
-        this.line = new Phaser.Geom.Line();
       } 
 
-      // define style
-      this.budgetGraphics = this.add.graphics();
-      this.budgetGraphics.lineStyle(4, this.green, 1.0);
-
-      //budget follow mouse
-      let x = this.mapInfo.choiceLocDyn[this.mapInfo.choiceLocDyn.length - 1][0];
-      let y = this.mapInfo.choiceLocDyn[this.mapInfo.choiceLocDyn.length - 1][1];
-
-      let radians = Math.atan2(pointer.y - y, pointer.x - x);
-
-      var budgetPosX = x + this.mapInfo.budgetDyn[this.mapInfo.budgetDyn.length - 1] * Math.cos(radians);
-      var budgetPosY = y + this.mapInfo.budgetDyn[this.mapInfo.budgetDyn.length - 1] * Math.sin(radians);
-      
-      //draw budget line
-      this.line.setTo(x, y, budgetPosX, budgetPosY);
-      this.budgetGraphics.strokeLineShape(this.line);
+      drawBudget(this, this.mapInfo, this.green, pointer)
 
     },this);   
 
@@ -111,6 +96,10 @@ export default class GameScene extends Phaser.Scene {
           if (this.mapInfo.check == 1){ // if this is valid choice
             budgetUpdate(this.mapInfo);
             dataChoice(this.mapInfo,[pointer.x,pointer.y],elapsed); // time
+
+            if (typeof this.road !== 'undefined') {
+              this.roadGraphics.clear()
+            } 
             drawRoad(this, this.mapInfo, this.black)
 
             this.scorebar.triangle.clear();
@@ -132,14 +121,25 @@ export default class GameScene extends Phaser.Scene {
 
 	update() {	   
 		// Is key down?
-		if (this.cond === 3 && this.undoObj.isDown && this.mapInfo.choiceDyn.length > 1) {
+    
+		if (this.cond === 3 && Phaser.Input.Keyboard.JustDown(this.undoObj) && this.mapInfo.choiceDyn.length > 1) {
       var time = new Date();
       var elapsed = time.getTime()-this.start; 
       var mouse = [this.input.mousePointer.x, this.input.mousePointer.y]
   
-      this.scorebar.triangle.clear();
-      this.scorebar.indicator(this,this.mapInfo,this.black);
       dataUndo(this.mapInfo, mouse, elapsed); // time
+
+      // update indicator
+      this.scorebar.triangle.clear();
+      this.scorebar.whiteIndicator(this,this.mapInfo,this.white);
+
+      // redraw budget line
+      this.budgetGraphics.clear()
+      drawBudget(this, this.mapInfo, this.green, this.input.mousePointer)
+
+      // redraw road
+      this.roadGraphics.clear()
+      drawRoad(this, this.mapInfo, this.black)
     }
 
 		if (this.nextObj.isDown) {

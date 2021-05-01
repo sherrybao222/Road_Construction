@@ -1,19 +1,3 @@
-function draw_map(mmap,mouse_x,mouse_y){
-    this.budget(mmap,mouse_x,mouse_y);
-    this.cities(mmap);
-    this.scorebar(mmap);
-
-    //add the two if statments from python
-    // if (mmap.choice_dyn.length >= 2){
-    //   this.road(mmap);
-    // };
-
-    //need to code to update this condition
-    if (mmap.check_end_ind){
-        this.add.text(100,400,'You are out of budget');
-    };
-}
-  
 function drawCity(scene, mmap, colorMajor, colorMinor){
     // define style
     var graphics = scene.add.graphics();
@@ -29,36 +13,36 @@ function drawCity(scene, mmap, colorMajor, colorMinor){
     graphics.fillCircle(mmap.cityStart[0], mmap.cityStart[1], mmap.radius);
 }
 
-function drawBudget(scene, mmap, color, mouseX, mouseY) {
+function drawBudget(scene, mmap, color, pointer) {
     // define style
-    var graphics = scene.add.graphics();
-    graphics.lineStyle(4, color, 1.0);
+    scene.budgetGraphics = scene.add.graphics();
+    scene.budgetGraphics.lineStyle(4, color, 1.0);
 
     //budget follow mouse
     let x = mmap.choiceLocDyn[mmap.choiceLocDyn.length - 1][0];
     let y = mmap.choiceLocDyn[mmap.choiceLocDyn.length - 1][1];
 
-    let radians = Math.atan2(mouseY - y, mouseX - x);
+    let radians = Math.atan2(pointer.y - y, pointer.x - x);
 
     var budgetPosX = x + mmap.budgetDyn[mmap.budgetDyn.length - 1] * Math.cos(radians);
     var budgetPosY = y + mmap.budgetDyn[mmap.budgetDyn.length - 1] * Math.sin(radians);
 
     //draw budget line
-    let line = new Phaser.Geom.Line();
-    line.setTo(x, y, budgetPosX, budgetPosY);
-    graphics.strokeLineShape(line);
+    scene.line = new Phaser.Geom.Line();
+    scene.line.setTo(x, y, budgetPosX, budgetPosY);
+    scene.budgetGraphics.strokeLineShape(scene.line);
   }
 
 function drawRoad(scene, mmap, color){
     // define style
-    var graphics = scene.add.graphics();
-    graphics.lineStyle(4, color, 1.0);
+    scene.roadGraphics = scene.add.graphics();
+    scene.roadGraphics.lineStyle(4, color, 1.0);
 
     for (var i = 0; i < mmap.choiceLocDyn.length-1; i++) {
-        let line = new Phaser.Geom.Line(
+        scene.road = new Phaser.Geom.Line(
         mmap.choiceLocDyn[i][0],mmap.choiceLocDyn[i][1],
         mmap.choiceLocDyn[i+1][0],mmap.choiceLocDyn[i+1][1]);
-        graphics.strokeLineShape(line);
+        scene.roadGraphics.strokeLineShape(scene.road);
     };
 }
 
@@ -144,7 +128,10 @@ class scorebar {
         }
 
     whiteIndicator(scene,mmap,color){
-        this.indicatorLocBest = this.centerList[Math.max(mmap.cityNr)]; // undo 
+        var max = mmap.cityNr.reduce(function(a, b) {
+            return Math.max(a, b);
+        });
+        this.indicatorLocBest = this.centerList[max]; // get the best result 
 
         //create triangle arrow and define style
         this.triangle = scene.add.graphics();

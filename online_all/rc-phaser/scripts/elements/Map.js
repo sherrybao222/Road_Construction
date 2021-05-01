@@ -13,7 +13,7 @@ class Map{
 
   loadMap(mapContent, width, height){
     
-    this.cityNr        = mapContent['N'];
+    this.cityAll        = mapContent['N'];
     this.radius        = 5; //radius of city
     this.budgetTotal   = mapContent['total'];
     this.budgetRemain  = mapContent['total']; // initialize
@@ -103,6 +103,7 @@ function dataUndo(mmap, mouse, time){
   mmap.choiceHis.push(mmap.choiceDyn[mmap.choiceDyn.length - 1]);
   mmap.choiceLoc.push(mmap.choiceLocDyn[mmap.choiceLocDyn.length - 1]);
   
+  console.log(mmap.choiceLocDyn)
   mmap.budgetDyn.pop();
   mmap.budgetHis.push(mmap.budgetDyn[mmap.budgetDyn.length - 1]);
   
