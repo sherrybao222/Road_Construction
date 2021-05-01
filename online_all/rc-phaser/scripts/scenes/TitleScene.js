@@ -11,7 +11,7 @@ export default class TitleScene extends Phaser.Scene {
 		this.warnColor   = '#943126';
 
 		this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-		this.nextObj     = this.input.keyboard.addKey('space');  // Get key object
+		this.nextObj     = this.input.keyboard.addKey('enter');  // Get key object
 
 		// add configurations to registry
 		this.validCode   = this.registry.values.validCode;
@@ -20,7 +20,7 @@ export default class TitleScene extends Phaser.Scene {
 	create() {
 
         // add next sign
-        var nextSign      = 'After entering your code, press SPACE to start training';
+        var nextSign      = 'After entering your code, press ENTER to start training';
         this.add.text(this.screenCenterX, this.sys.game.config.height-50, nextSign, { fontFamily: 'Comic Sans MS', fontSize: '30px', color: this.textColor, aligh: 'center'}).setOrigin(0.5);
         this.add.text(this.screenCenterX, 300, 'Enter your code:', { fontFamily: 'Comic Sans MS', fontSize: '30px', color: this.textColor }).setOrigin(0.5);;
 

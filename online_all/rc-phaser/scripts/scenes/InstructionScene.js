@@ -12,6 +12,7 @@ export default class InstructionScene extends Phaser.Scene {
     init(data) {
       this.part  = data.part;
       this.textColor = '#1C2833';
+      this.nextObj     = this.input.keyboard.addKey('enter');  // Get key object
     };
 
     preload(){
@@ -38,6 +39,15 @@ export default class InstructionScene extends Phaser.Scene {
     };
 
     update(){
+      if (this.nextObj.isDown){
+        if (this.part == 3){
+          this.scene.start('GameScene');
+        } else if (this.part == 1){
+          this.scene.start('TrainScene', {trialInd:0, cond:2});
+        } else {
+          this.scene.start('TrainScene', {trialInd:0, cond:3});
+        }
+      }
     };
 
     basicInstruction(){

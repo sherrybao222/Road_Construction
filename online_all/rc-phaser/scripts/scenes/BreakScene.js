@@ -35,7 +35,7 @@ export default class BreakScene extends Phaser.Scene {
         var nextSign      = `Congratulations! You have finished ${this.nextBlockInd}/2 of your journey!\nThe next bunch of trials are ${condition} trials.\nYou can have a 5 min break now. When you are ready, press SPACE to continue. \nThe task will automatically continue if you don't press SPACE after 5 min.`;
         
         this.add.text(this.screenCenterX, this.sys.game.config.height-500, nextSign, { fontFamily: 'Comic Sans MS', fontSize: '22px', color: this.textColor, aligh: 'center'}).setOrigin(0.5);
-    
+		this.timerText  = this.add.text(1650-800, 50, [], {fontFamily: 'Comic Sans MS', fontSize: '40px', fill:'#1C2833'});
     }
 
 
@@ -43,6 +43,20 @@ export default class BreakScene extends Phaser.Scene {
         if (this.nextObj.isDown) {	
             this.next()
         }
+
+		// add timer text 		
+		this.timerText.setText('Remaining seconds: ' + this.timedEvent.getOverallRemainingSeconds().toString().substr(0, 4) + 's ')
+	
+		//While there is score in the score buffer, add it to the actual score
+        if(this.scoreBuffer > 0){
+			this.score += this.addScore;   
+			this.scoreLabel.text = this.score;      
+            this.scoreBuffer = 0;
+		} else if (this.scoreBuffer < 0){
+			this.score -= this.addScore;   
+			this.scoreLabel.text = this.score;      
+            this.scoreBuffer = 0;
+		}
     }
 
     next() {
