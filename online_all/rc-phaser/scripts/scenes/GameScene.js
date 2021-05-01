@@ -199,13 +199,14 @@ export default class GameScene extends Phaser.Scene {
 		}
     this.registry.values.trialCounter++; // move on to next trial
 
-    if ((this.registry.values.trialCounter)%10 === 0){
+    console.log(this.registry.values.trialCounter)
+    if (this.registry.values.trialCounter === this.registry.values.gameTrialNr){
+      this.scene.start("EndScene");
+    } else if ((this.registry.values.trialCounter)%10 === 0){
       this.scene.start("BreakScene");
     } else {
       this.scene.start("GameScene");
     }
-
-
   }
 }
 

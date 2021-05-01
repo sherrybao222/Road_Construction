@@ -4,6 +4,7 @@ import PreloadScene from './scenes/PreloadScene.js';
 
 import GameScene from './scenes/GameScene.js';
 import BreakScene from './scenes/BreakScene.js';
+import EndScene from './scenes/EndScene.js';
 
 // Load our scenes
 var bootScene = new BootScene();
@@ -11,6 +12,7 @@ var titleScene = new TitleScene();
 var preloadScene = new PreloadScene();
 var gameScene = new GameScene();
 var breakScene = new BreakScene();
+var endScene = new EndScene();
 
 //set the game configuration 
 var config = {
@@ -38,6 +40,7 @@ game.scene.add('TitleScene', titleScene);
 game.scene.add('PreloadScene', preloadScene);
 game.scene.add("GameScene", gameScene);
 game.scene.add("BreakScene", breakScene);
+game.scene.add("EndScene", endScene);
 
   // start 
 game.scene.start("BootScene");
