@@ -53,7 +53,7 @@ class scorebar {
         this.barWidth = 100;
         this.barHeight = 400;
         this.nrBox = 12;
-        this.distToTop = 50; //distance to screen top
+        this.distToTop = 150; //distance to screen top
     
         this.boxCenter(scene); //center for labels
         this.incentive(); //calculate incentive: N^2
@@ -86,7 +86,6 @@ class scorebar {
         //create rectangle and define style
         this.rect = scene.add.graphics();
 
-        let barLeft = this.centerList[0][0] - 25;
         let colorBox = [0x66CC66,0x74C366,0x82B966,0x90B066,
                     0x9EA766,0xAC9E66,0xB99466,0xC78B66,
                     0xD58266,0xE37966,0xF16F66,0xFF6666] //color list
@@ -96,21 +95,17 @@ class scorebar {
             let boxLoc = this.centerList[i];
             let text = this.Score[i];
 
-            //score bar outline
-            this.rect.fillStyle(color);
-            this.rect.fillRect(barLeft, boxLoc[1] + this.distToTop - this.halfHeight, this.barWidth, this.boxHeight);
-
             //score bar fill
-            this.rect.fillStyle(colorBox[i]);
-            this.rect.fillRect(barLeft, boxLoc[1] + this.distToTop - this.halfHeight + 2, this.barWidth, this.boxHeight); //? why + 2
-
-            scene.add.text(boxLoc[0], boxLoc[1] + this.distToTop, text);
+            var r2 = scene.add.rectangle(boxLoc[0], boxLoc[1] + this.distToTop - this.halfHeight, this.barWidth, this.boxHeight, colorBox[i]);
+            r2.setStrokeStyle(2, color);
+            
+            scene.add.text(boxLoc[0], boxLoc[1] + this.distToTop - this.halfHeight - 6, text, {fontFamily: 'Comic Sans MS', color:'#1C2833'});
 
         };
 
         // scorebar title
-        //scene.add.text(this.centerList[0][0]-20, this.centerList[0][1] + this.distToTop - 50,
-        //              'Bonus in dollars');
+        scene.add.text(this.centerList[0][0]-50, this.centerList[0][1] + this.distToTop - 80,
+                      'Bonus', {fontFamily: 'Comic Sans MS', fontSize: '26px', color:'#1C2833'});
     }
 
     indicator(scene,mmap,color){
@@ -121,7 +116,7 @@ class scorebar {
         this.triangle.fillStyle(color);
 
         //arrow parameter
-        let point = [this.indicatorLoc[0] - 30, this.indicatorLoc[1] + this.distToTop + 10];
+        let point = [this.indicatorLoc[0] - 50, this.indicatorLoc[1] + this.distToTop - this.halfHeight];
         let v2 = [point[0] - 10, point[1] + 10];
         let v3 = [point[0] - 10, point[1] - 10];
         this.triangle.fillTriangle(point[0], point[1], v2[0], v2[1], v3[0], v3[1]);
