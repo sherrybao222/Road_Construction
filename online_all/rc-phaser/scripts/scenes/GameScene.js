@@ -42,7 +42,7 @@ export default class GameScene extends Phaser.Scene {
     console.log(this.cond)
     console.log(this.trialInd)
 		this.undoObj = this.input.keyboard.addKey('z');  // Get key object
-		this.nextObj = this.input.keyboard.addKey({key:'enter', emitOnRepeat:false});  // Get key object
+		this.nextObj = this.input.keyboard.addKey('enter');  // Get key object
   }
 
   preload(){

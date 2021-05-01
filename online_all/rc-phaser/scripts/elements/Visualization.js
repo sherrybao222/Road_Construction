@@ -65,7 +65,7 @@ class scorebar {
         this.boxHeight = this.barHeight / this.nrBox;
         this.centerList = [];
         this.halfHeight = this.boxHeight / 2;
-        this.x = this.barWidth / 2 + scene.cameras.main.width / 2 + 300;  //larger the number, further to right
+        this.x = this.barWidth / 2 + scene.cameras.main.width / 2 + 500;  //larger the number, further to right
 
         for (var i = 0; i < this.nrBox; i++){
             let boxLoc = [this.x, i * this.boxHeight + this.halfHeight];

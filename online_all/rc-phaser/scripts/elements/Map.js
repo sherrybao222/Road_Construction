@@ -103,7 +103,6 @@ function dataUndo(mmap, mouse, time){
   mmap.choiceHis.push(mmap.choiceDyn[mmap.choiceDyn.length - 1]);
   mmap.choiceLoc.push(mmap.choiceLocDyn[mmap.choiceLocDyn.length - 1]);
   
-  console.log(mmap.choiceLocDyn)
   mmap.budgetDyn.pop();
   mmap.budgetHis.push(mmap.budgetDyn[mmap.budgetDyn.length - 1]);
   
@@ -140,7 +139,8 @@ function checkEnd(mmap) {
   for (var i in mmap.choiceDyn) {
     cityDistRowCopy[i] = 0;
   };
-
+  //console.log(cityDistRowCopy)
+  //console.log(mmap.budgetDyn)
   if (cityDistRowCopy.some(i =>
     i < mmap.budgetDyn[mmap.budgetDyn.length-1] && i != 0)){
     return true; // not end

@@ -15,8 +15,8 @@ var gameScene = new GameScene();
 var config = {
     parent: 'game-container',    //ID of the DOM element to add the canvas to
     type: Phaser.AUTO,
-    width: 1000,
-    height: 600,
+    width: 1900,
+    height: 1000,
     backgroundColor: "#C8C6C5",
     scale: {
         mode: Phaser.Scale.FIT,
