@@ -128,20 +128,20 @@ class scorebar {
         }
 
     whiteIndicator(scene,mmap,color){
-        var max = mmap.cityNr.reduce(function(a, b) {
+        scene.max = mmap.cityNr.reduce(function(a, b) {
             return Math.max(a, b);
         });
-        this.indicatorLocBest = this.centerList[max]; // get the best result 
+        this.indicatorLocBest = this.centerList[scene.max]; // get the best result 
 
         //create triangle arrow and define style
-        this.triangle = scene.add.graphics();
-        this.triangle.fillStyle(color);
+        this.whiteTriangle = scene.add.graphics();
+        this.whiteTriangle.fillStyle(color);
 
         //arrow parameter
         let point = [this.indicatorLocBest[0] - 30, this.indicatorLocBest[1] + this.distToTop + 10];
         let v2 = [point[0] - 10, point[1] + 10];
         let v3 = [point[0] - 10, point[1] - 10];
-        this.triangle.fillTriangle(point[0], point[1], v2[0], v2[1], v3[0], v3[1]);
+        this.whiteTriangle.fillTriangle(point[0], point[1], v2[0], v2[1], v3[0], v3[1]);
         }
 }
   

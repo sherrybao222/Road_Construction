@@ -97,7 +97,16 @@ export default class GameScene extends Phaser.Scene {
             budgetUpdate(this.mapInfo);
             dataChoice(this.mapInfo,[pointer.x,pointer.y],elapsed); // time
 
-            if (typeof this.road !== 'undefined') {
+            // clear best marker if neccessary
+            this.newMax = this.mapInfo.cityNr.reduce(function(a, b) {
+              return Math.max(a, b);
+            });
+            if (typeof this.max !== 'undefined' && this.newMax > this.max){
+              this.scorebar.whiteTriangle.clear();
+            }
+
+            // redraw road
+            if (typeof this.road !== 'undefined' ) {
               this.roadGraphics.clear()
             } 
             drawRoad(this, this.mapInfo, this.black)
@@ -126,12 +135,20 @@ export default class GameScene extends Phaser.Scene {
       var time = new Date();
       var elapsed = time.getTime()-this.start; 
       var mouse = [this.input.mousePointer.x, this.input.mousePointer.y]
-  
+
+      // best result marker
+      if (typeof this.max !== 'undefined'){
+        this.scorebar.whiteTriangle.clear();
+        this.scorebar.whiteIndicator(this,this.mapInfo,this.white);
+      } else {
+        this.scorebar.whiteIndicator(this,this.mapInfo,this.white);
+      }
+
       dataUndo(this.mapInfo, mouse, elapsed); // time
 
-      // update indicator
+      // draw current indicator
       this.scorebar.triangle.clear();
-      this.scorebar.whiteIndicator(this,this.mapInfo,this.white);
+      this.scorebar.indicator(this,this.mapInfo,this.black);
 
       // redraw budget line
       this.budgetGraphics.clear()
