@@ -39,8 +39,6 @@ export default class GameScene extends Phaser.Scene {
 			this.trialInd     = this.undoInd[this.undoNr];
       this.mapContent = this.registry.values.undoMap[this.trialInd];    
 		}
-    console.log(this.cond)
-    console.log(this.trialInd)
 		this.undoObj = this.input.keyboard.addKey('z');  // Get key object
 		this.nextObj = this.input.keyboard.addKey('enter');  // Get key object
   }

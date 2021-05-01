@@ -5,6 +5,7 @@ export default class PreloadScene extends Phaser.Scene {
 	}
 
 	preload() {
+
 		// Add loading screen bars
 		this.graphics = this.add.graphics();
 		this.newGraphics = this.add.graphics();

@@ -48,8 +48,15 @@ export default class TitleScene extends Phaser.Scene {
                 var entry = this.validCode[index];
 
                 if(entry.code == this.textEntry.text){
-                hasMatch = true;
-                break;
+                    hasMatch = true;
+                    if (entry.group === 1){
+                        var cond = [3,2,2,3]
+                        this.registry.set('cond', cond); 
+                    }else{
+                        var cond = [2,3,3,2]
+                        this.registry.set('cond', cond); 
+                    }
+                    break;
                 }
             }
 			if (hasMatch)	{	

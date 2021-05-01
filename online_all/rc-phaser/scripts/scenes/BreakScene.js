@@ -34,8 +34,8 @@ export default class BreakScene extends Phaser.Scene {
         this.timedEvent = this.time.addEvent({ delay: this.registry.values.shortBreak, callback: this.next, callbackScope: this});
         var nextSign      = `Congratulations! You have finished ${this.nextBlockInd}/2 of your journey!\nThe next bunch of trials are ${condition} trials.\nYou can have a 5 min break now. When you are ready, press SPACE to continue. \nThe task will automatically continue if you don't press SPACE after 5 min.`;
         
-        this.add.text(this.screenCenterX, this.sys.game.config.height-500, nextSign, { fontFamily: 'Comic Sans MS', fontSize: '22px', color: this.textColor, aligh: 'center'}).setOrigin(0.5);
-		this.timerText  = this.add.text(1650-800, 50, [], {fontFamily: 'Comic Sans MS', fontSize: '40px', fill:'#1C2833'});
+        this.add.text(this.screenCenterX, this.sys.game.config.height-500, nextSign, { fontFamily: 'Comic Sans MS', fontSize: '37px', color: this.textColor, aligh: 'center'}).setOrigin(0.5);
+		this.timerText  = this.add.text(this.screenCenterX, 50, [], {fontFamily: 'Comic Sans MS', fontSize: '37px', fill:'#1C2833'}).setOrigin(0.5);
     }
 
 
