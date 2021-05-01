@@ -46,7 +46,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 	// scene change
 	complete() {
-		this.scene.start("GameScene");
+		this.scene.start("InstructionScene", {part: 1});
 	}
 
 }

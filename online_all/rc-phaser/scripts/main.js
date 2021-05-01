@@ -1,7 +1,7 @@
 import BootScene from './scenes/BootScene.js';
 import TitleScene from './scenes/TitleScene.js';
 import PreloadScene from './scenes/PreloadScene.js';
-
+import InstructionScene from './scenes/InstructionScene.js';
 import GameScene from './scenes/GameScene.js';
 import BreakScene from './scenes/BreakScene.js';
 import EndScene from './scenes/EndScene.js';
@@ -10,6 +10,7 @@ import EndScene from './scenes/EndScene.js';
 var bootScene = new BootScene();
 var titleScene = new TitleScene();
 var preloadScene = new PreloadScene();
+var instructionScene = new InstructionScene();
 var gameScene = new GameScene();
 var breakScene = new BreakScene();
 var endScene = new EndScene();
@@ -38,6 +39,7 @@ var game = new Phaser.Game(config);
 game.scene.add('BootScene', bootScene);
 game.scene.add('TitleScene', titleScene);
 game.scene.add('PreloadScene', preloadScene);
+game.scene.add('InstructionScene', instructionScene);
 game.scene.add("GameScene", gameScene);
 game.scene.add("BreakScene", breakScene);
 game.scene.add("EndScene", endScene);
