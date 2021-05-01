@@ -90,6 +90,7 @@ export default class GameScene extends Phaser.Scene {
   
       if (pointer.leftButtonDown()){
         var notEnd = checkEnd(this.mapInfo);
+
         if (notEnd){ // if the trial not end
           makeChoice(this.mapInfo, pointer.x, pointer.y);
 
@@ -113,11 +114,18 @@ export default class GameScene extends Phaser.Scene {
 
             this.scorebar.triangle.clear();
             this.scorebar.indicator(this,this.mapInfo,this.black);
+            
+            // check end again
+            var notEnd = checkEnd(this.mapInfo);
+            if (notEnd != 1){
+              this.warningText = this.add.text(20, 100, "You are out of budget!", { fontFamily: 'Comic Sans MS', fontSize: '26px', color: this.warnColorText});
+            }
+
           } else {
             dataStatic(this.mapInfo, [pointer.x,pointer.y], elapsed); // time
           };
         } else {
-          this.add.text(20, 100, "You are out of budget!", { fontFamily: 'Comic Sans MS', fontSize: '26px', color: this.warnColorText});
+          this.warningText = this.add.text(20, 100, "You are out of budget!", { fontFamily: 'Comic Sans MS', fontSize: '26px', color: this.warnColorText});
         };
       };
     }, this);
@@ -157,6 +165,11 @@ export default class GameScene extends Phaser.Scene {
       // redraw road
       this.roadGraphics.clear()
       drawRoad(this, this.mapInfo, this.black)
+
+      // clear warning text
+      if (typeof this.warningText !== 'undefined'){
+        this.warningText.setVisible(false);
+      }
     }
 
 		if (this.nextObj.isDown) {
