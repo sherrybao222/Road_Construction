@@ -46,18 +46,7 @@ export default class BreakScene extends Phaser.Scene {
 
 		// add timer text 		
 		this.timerText.setText('Remaining seconds: ' + this.timedEvent.getOverallRemainingSeconds().toString().substr(0, 4) + 's ')
-	
-		//While there is score in the score buffer, add it to the actual score
-        if(this.scoreBuffer > 0){
-			this.score += this.addScore;   
-			this.scoreLabel.text = this.score;      
-            this.scoreBuffer = 0;
-		} else if (this.scoreBuffer < 0){
-			this.score -= this.addScore;   
-			this.scoreLabel.text = this.score;      
-            this.scoreBuffer = 0;
-		}
-    }
+	    }
 
     next() {
         this.scene.start("GameScene");
