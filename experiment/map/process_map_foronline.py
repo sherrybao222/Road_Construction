@@ -27,20 +27,17 @@ with open('basic_map_48_all4_online','w') as file:
     json.dump(new_basic_map,file)
 
 new_undo_map = []
-    
 for i in range(0,len(undo_map)): #[0]
     new_undo_map.append(undo_map[i]['loadmap'])
 with open('undo_map_48_all4_online','w') as file: 
     json.dump(new_undo_map,file)
 
-new_train_map = []
-for i in range(0,len(train_basic_map)): #[0]
-    new_train_map.append(train_basic_map[i]['loadmap'])
+new_train_map = train_basic_map[0]
 with open(home_dir + map_dir +'map_training_online','w') as file: 
     json.dump(new_train_map,file)
 
 new_undo_trainmap = []
-    for i in range(0,len(train_undo_map)): #[0]
+for i in range(0,len(train_undo_map)): #[0]
     new_undo_trainmap.append(train_undo_map[i]['loadmap'])
 with open(home_dir + map_dir +'undo_map_training_online','w') as file: 
     json.dump(new_undo_trainmap,file)
