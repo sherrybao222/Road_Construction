@@ -1,0 +1,33 @@
+
+Call:
+glm(formula = as.numeric(unlist(one_sumSeverityErrors)) ~ .^2, 
+    family = poisson(), data = one_data_)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-2.9061  -0.7566  -0.0060   0.4451   3.9518  
+
+Coefficients:
+                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)       -6.320e-01  8.924e-01  -0.708 0.478837    
+MAS                1.527e-01  7.590e-02   2.011 0.044280 *  
+LEFTOVER           1.731e-02  1.998e-02   0.866 0.386520    
+NOS                1.452e-03  2.609e-03   0.556 0.578019    
+NUMERROR           7.058e-02  1.614e-01   0.437 0.661850    
+MAS:LEFTOVER      -1.178e-03  1.679e-03  -0.702 0.482764    
+MAS:NOS           -5.987e-05  2.227e-04  -0.269 0.788022    
+MAS:NUMERROR       1.402e-02  1.392e-02   1.008 0.313651    
+LEFTOVER:NOS      -3.444e-06  8.327e-06  -0.414 0.679135    
+LEFTOVER:NUMERROR -9.268e-04  2.997e-04  -3.093 0.001983 ** 
+NOS:NUMERROR      -1.827e-04  5.112e-05  -3.574 0.000352 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 1944.50  on 827  degrees of freedom
+Residual deviance:  749.53  on 817  degrees of freedom
+AIC: 3860.4
+
+Number of Fisher Scoring iterations: 4
+

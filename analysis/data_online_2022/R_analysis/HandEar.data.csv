@@ -1,0 +1,121 @@
+subject,handed,ear,rtime
+1,Left,Left,330
+1,Left,Right,327
+1,Left,Both,303
+2,Left,Left,294
+2,Left,Right,339
+2,Left,Both,315
+3,Left,Left,307
+3,Left,Right,284
+3,Left,Both,290
+4,Left,Left,361
+4,Left,Right,377
+4,Left,Both,340
+5,Left,Left,338
+5,Left,Right,330
+5,Left,Both,295
+6,Left,Left,303
+6,Left,Right,303
+6,Left,Both,297
+7,Left,Left,353
+7,Left,Right,347
+7,Left,Both,319
+8,Left,Left,334
+8,Left,Right,350
+8,Left,Both,336
+9,Left,Left,323
+9,Left,Right,323
+9,Left,Both,330
+10,Left,Left,333
+10,Left,Right,318
+10,Left,Both,323
+11,Left,Left,359
+11,Left,Right,342
+11,Left,Both,346
+12,Left,Left,312
+12,Left,Right,357
+12,Left,Both,354
+13,Left,Left,307
+13,Left,Right,296
+13,Left,Both,312
+14,Left,Left,283
+14,Left,Right,327
+14,Left,Both,272
+15,Left,Left,357
+15,Left,Right,346
+15,Left,Both,320
+16,Left,Left,327
+16,Left,Right,293
+16,Left,Both,338
+17,Left,Left,327
+17,Left,Right,362
+17,Left,Both,321
+18,Left,Left,330
+18,Left,Right,353
+18,Left,Both,314
+19,Left,Left,318
+19,Left,Right,345
+19,Left,Both,320
+20,Left,Left,336
+20,Left,Right,337
+20,Left,Both,313
+21,Right,Left,304
+21,Right,Right,315
+21,Right,Both,287
+22,Right,Left,325
+22,Right,Right,311
+22,Right,Both,341
+23,Right,Left,359
+23,Right,Right,362
+23,Right,Both,341
+24,Right,Left,327
+24,Right,Right,287
+24,Right,Both,278
+25,Right,Left,361
+25,Right,Right,324
+25,Right,Both,320
+26,Right,Left,324
+26,Right,Right,325
+26,Right,Both,314
+27,Right,Left,353
+27,Right,Right,341
+27,Right,Both,323
+28,Right,Left,343
+28,Right,Right,316
+28,Right,Both,304
+29,Right,Left,330
+29,Right,Right,344
+29,Right,Both,318
+30,Right,Left,329
+30,Right,Right,318
+30,Right,Both,312
+31,Right,Left,316
+31,Right,Right,305
+31,Right,Both,312
+32,Right,Left,320
+32,Right,Right,352
+32,Right,Both,308
+33,Right,Left,341
+33,Right,Right,337
+33,Right,Both,323
+0      34,Right,Left,337
+1      34,Right,Right,304
+2      34,Right,Both,346
+3      35,Right,Left,325
+4      35,Right,Right,346
+5      35,Right,Both,322
+6      36,Right,Left,322
+7      36,Right,Right,371
+8      36,Right,Both,323
+9      37,Right,Left,280
+0      37,Right,Right,274
+1      37,Right,Both,298
+2      38,Right,Left,314
+3      38,Right,Right,309
+4      38,Right,Both,287
+5      39,Right,Left,277
+6      39,Right,Right,284
+7      39,Right,Both,308
+8      40,Right,Left,306
+9      40,Right,Right,292
+0      40,Right,Both,337

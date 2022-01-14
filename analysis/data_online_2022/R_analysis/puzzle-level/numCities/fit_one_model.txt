@@ -1,0 +1,27 @@
+
+Call:
+glm(formula = as.numeric(unlist(one_numCities)) ~ .^2, family = poisson(), 
+    data = one_data_)
+
+Deviance Residuals: 
+     Min        1Q    Median        3Q       Max  
+-2.76181  -0.24390   0.08274   0.37997   1.08120  
+
+Coefficients:
+              Estimate Std. Error z value Pr(>|z|)
+(Intercept)  2.364e+00  1.444e+00   1.637    0.102
+MAS         -1.516e-02  1.208e-01  -0.125    0.900
+NOS          7.143e-04  2.063e-03   0.346    0.729
+UNDO        -1.920e-01  1.479e+00  -0.130    0.897
+MAS:NOS     -6.412e-05  1.715e-04  -0.374    0.708
+MAS:UNDO     1.491e-02  1.241e-01   0.120    0.904
+NOS:UNDO     1.299e-05  2.375e-04   0.055    0.956
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 216.67  on 827  degrees of freedom
+Residual deviance: 216.11  on 821  degrees of freedom
+AIC: 3549
+
+Number of Fisher Scoring iterations: 4
+

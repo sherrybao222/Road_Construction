@@ -1,0 +1,28 @@
+{
+    "id": "CD3C333C",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1641193840440.0,
+    "source_on_save": false,
+    "relative_order": 7,
+    "properties": {
+        "id": "33b5e0020dde453b98a8fc7ed79f74d0",
+        "name": "glm1_0",
+        "title": "glm1_0",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 3059829585048,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1641193840440,
+    "read_only": false,
+    "read_only_alternatives": []
+}

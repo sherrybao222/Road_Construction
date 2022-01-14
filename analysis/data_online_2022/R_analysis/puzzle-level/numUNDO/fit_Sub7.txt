@@ -1,0 +1,31 @@
+
+Call:
+glm(formula = numUNDO[1:numPuzzle, i] ~ .^2, family = poisson(), 
+    data = data_)
+
+Deviance Residuals: 
+       Min          1Q      Median          3Q         Max  
+-1.667e-06  -1.667e-06  -1.667e-06  -1.667e-06  -1.667e-06  
+
+Coefficients: (4 not defined because of singularities)
+                    Estimate Std. Error z value Pr(>|z|)
+(Intercept)       -2.730e+01  1.768e+06       0        1
+MAS                       NA         NA      NA       NA
+LEFTOVER          -3.575e-16  3.474e+04       0        1
+NOS               -5.836e-16  7.593e+03       0        1
+NUMERROR          -3.128e-14  7.064e+05       0        1
+MAS:LEFTOVER              NA         NA      NA       NA
+MAS:NOS                   NA         NA      NA       NA
+MAS:NUMERROR              NA         NA      NA       NA
+LEFTOVER:NOS       2.540e-18  1.448e+02       0        1
+LEFTOVER:NUMERROR -3.364e-17  3.173e+03       0        1
+NOS:NUMERROR       1.471e-16  3.084e+03       0        1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 0.0000e+00  on 91  degrees of freedom
+Residual deviance: 2.5554e-10  on 85  degrees of freedom
+AIC: 14
+
+Number of Fisher Scoring iterations: 25
+

@@ -1,0 +1,27 @@
+
+Call:
+glm(formula = numCities[1:numPuzzle, i] ~ .^2, family = poisson(), 
+    data = data_)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.7518  -0.2591  -0.0602   0.2661   0.6787  
+
+Coefficients: (3 not defined because of singularities)
+             Estimate Std. Error z value Pr(>|z|)
+(Intercept)  1.997218   2.640028   0.757    0.449
+MAS                NA         NA      NA       NA
+NOS          0.000625   0.007528   0.083    0.934
+UNDO        -0.534479   2.831036  -0.189    0.850
+MAS:NOS            NA         NA      NA       NA
+MAS:UNDO           NA         NA      NA       NA
+NOS:UNDO     0.002036   0.008346   0.244    0.807
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 10.624  on 91  degrees of freedom
+Residual deviance: 10.080  on 88  degrees of freedom
+AIC: 392.18
+
+Number of Fisher Scoring iterations: 4
+
