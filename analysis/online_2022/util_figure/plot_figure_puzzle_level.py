@@ -309,75 +309,8 @@ class figure_plott:
         plt.close(fig)
 
 
-    def rc_undo_nct_progress_choice(self):
-        out_dir = self.out_dir
-
-        numCities = self.numCities
-        numcities_ = self.choicelevel_currNumCities
-        undo_ = self.choicelevel_undo
-        # subjects
-        ind_subjects = np.unique(self.choicelevel_subjects)
-        ind_currnct = np.unique(self.choicelevel_currNumCities)
-        nct = np.zeros((len(ind_subjects),len(ind_currnct)))
-
-
-        n_bins = 10
-        bin_ = np.histogram_bin_edges([0, 1], bins=n_bins)
-
-        undo_progress = np.zeros(undo_.shape)
-
-        mas = self.mas[:, 0]
-        cheat_sheet = np.zeros(np.unique(self.puzzleID[:,0]).shape)
-        for id, pz in enumerate(self.puzzleID[:, 0]):
-            cheat_sheet[int(pz)] = mas[id]
-
-        temp_plot = []
-        for i in range(len(ind_subjects)):
-            # temp_ =[]
-
-            ind_subid = np.where(self.choicelevel_subjects == i)
-            for pz in np.unique(self.puzzleID):
-                ind_currNumCities = np.where(self.choicelevel_puzzleID == pz)
-
-                ind_ind = np.intersect1d(ind_subid[0], ind_currNumCities[0])
-
-                undo_progress[ind_ind] = numcities_[ind_ind]/cheat_sheet[int(pz)]
-
-        # undo = np.zeros((undo_.shape[1], 7))
-        temp_hist = []
-        for i in range(len(ind_subjects)):
-            ind_subid = np.where(self.choicelevel_subjects == i)
-            ind = np.digitize(undo_progress[ind_subid], bin_)
-            sub_undo =undo_[ind_subid]
-            temp_hist.append([np.mean(sub_undo[np.where(ind == j)]) for j in range(len(bin_))])
-        temp_hist = np.array(temp_hist)
-
-
-        # undo once
-        mean_undo_ = np.nanmean(np.array(temp_hist), axis=0)
-        std_undo_ = np.nanstd(np.array(temp_hist), axis=0) / np.sqrt(len(ind_subjects))
-
-        x_pos = np.arange(n_bins)
-
-        fig, axs = plt.subplots(1, 1)
-        axs.bar(x_pos, mean_undo_[1:], yerr=std_undo_[1:],
-                   align='center', alpha=1, width=.4, ecolor='black', capsize=10, color=[1,1,1], edgecolor=[0,0,0])
-
-        axs.set_xticks(np.linspace(0,n_bins,n_bins+1)-.5)
-        axs.set_xticklabels(np.round(np.array(bin_),1))
-
-        plt.xlim(-1,n_bins)
-        axs.set_xlabel('progress (move-level n_cities / puzzle-level n_cities)')
-        axs.set_ylabel('p(undo)')
-        axs.yaxis.grid(True)
-        plt.ylim(0,.25)
-        # plt.xlim(0,n_bins)
-
-        fig.set_figwidth(8)
-        plt.show()
-        fig.savefig(out_dir + 'ct_progress_undo' + str(n_bins) + '.png', dpi=600, bbox_inches='tight')
-        plt.close(fig)
-
+# ========================================================================
+# Proportion of trials for each puzzle-level error in undo/basic conditions
     def rc_undo_hist_all_across_subjects_ag(self):
         data_all = self.data_all
 
@@ -560,6 +493,7 @@ class figure_plott:
         fig.close()
         
     def rc_undo_hist_all_across_subjects(self):
+        
         data_all = self.data_all
 
         BASIC_ALL = {'basic_list':[],'basic':[]}
@@ -686,6 +620,7 @@ class figure_plott:
         fig.savefig(self.out_dir + 'rc_undo_hist_all_across_subjects_5to0.png', dpi=600, bbox_extra_artists=(lgd,),
                     bbox_inches='tight')
         plt.close(fig)
+    
     def rc_severe_error_undo(self):
         data_all = self.data_all
         out_dir = self.out_dir
@@ -786,6 +721,7 @@ class figure_plott:
         plt.show()
         fig.savefig(out_dir + 'severity_error_undo_p.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
+   
     def rc_error_undo_length(self):
         data_all = self.data_all
         out_dir = self.out_dir
@@ -921,6 +857,9 @@ class figure_plott:
         plt.show()
         fig.savefig(out_dir + 'undo_once_series_p.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
+    
+# =========================================================================
+# Number of undo as a function of MAS
     def rc_undo_x_mas(self):
         data_all = self.data_all
         N_UNDO_MAS_ALL = {'n_undo_mas': [], 'p_n_undo_mas': [], 'mas_ind': []}
@@ -987,6 +926,7 @@ class figure_plott:
         plt.show()
         fig.savefig(self.out_dir + 'num_undo_X_MAS.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
+  
     def rc_undo_c_numciti(self):
         out_dir = self.out_dir
         w_undo =[]
@@ -1022,6 +962,7 @@ class figure_plott:
         plt.ylim([8, 10])
         fig.savefig(out_dir + 'nct_condition.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
+    
     def rc_undo_severity_of_errors_choice(self):
         out_dir = self.out_dir
 
@@ -1071,6 +1012,7 @@ class figure_plott:
         plt.show()
         fig.savefig(out_dir + 'severity_error0_undo.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
+    
     def rc_undo_severity_of_puzzle_errors_choice(self):
         out_dir = self.out_dir
 
@@ -1118,6 +1060,7 @@ class figure_plott:
         plt.show()
         fig.savefig(out_dir + 'severity_puzzle_error0_undo.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
+    
     def rc_undo_severity_of_errors_puzzle(self):
         out_dir = self.out_dir
 
@@ -1163,6 +1106,7 @@ class figure_plott:
         plt.show()
         fig.savefig(out_dir + 'severity_error0_undo_puzzle.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
+    
     def rc_undo_mas_choice(self):
         out_dir = self.out_dir
 
@@ -1207,6 +1151,9 @@ class figure_plott:
         plt.show()
         fig.savefig(out_dir + 'mas_undo.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
+    
+# =========================================================================
+# Everage number of connected cities       
     def rc_undo_mas_puzzle(self):
         out_dir = self.out_dir
 
@@ -1300,8 +1247,6 @@ class figure_plott:
         plt.show()
         fig.savefig(out_dir + 'nct_undo.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
-
-
 
     def rc_nct_undo_puzzle(self, n_bins=5):
         out_dir = self.out_dir
@@ -1533,6 +1478,8 @@ class figure_plott:
         fig.savefig(out_dir + 'nos_pundo_choicelevel' + str(n_bins) + '.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
 
+# ========================================================================
+# Number of undo as a function of number of optimal solutions  
     def rc_undo_nos_hist_puzzle(self,n_bins = 10):
         out_dir = self.out_dir
 
@@ -1579,7 +1526,6 @@ class figure_plott:
         plt.show()
         fig.savefig(out_dir + 'nos_undo_puzzle' + str(n_bins) + '.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
-
 
     def rc_undo_severity_of_errors_puzzle(self):
         out_dir = self.out_dir
@@ -1846,8 +1792,6 @@ class figure_plott:
         plt.xlim(.5, 2.5)
         fig.savefig(out_dir + 'mean_leftover_undo.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
-
-
 
     def rc_undo_leftover_puzzle(self):
         out_dir = self.out_dir
