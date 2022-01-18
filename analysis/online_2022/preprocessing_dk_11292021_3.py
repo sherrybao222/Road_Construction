@@ -5,10 +5,7 @@ import pandas as pd
 import numpy as np
 
 from tqdm import tqdm
-
-import fnmatch  # match file name
 import os
-
 from glob import glob
 from util.load_and_fit import *
 

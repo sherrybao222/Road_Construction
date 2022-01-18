@@ -13,7 +13,6 @@ from glob import glob
 from scipy.stats import wilcoxon
 
 class figure_plott:
-    # def __init__(self, home_dir='../', map_dir='../active_map', data_dir='../data/in-lab-pre-pilot'):
     def __init__(self, home_dir='./', map_dir='active_map/', data_dir='data/in-lab-pre-pilot/', out_dir = 'figures_prepilot/'):
         self.home_dir = home_dir
         self.map_dir = map_dir
@@ -173,6 +172,7 @@ class figure_plott:
 
             # self.data_choice_level = np.genfromtxt(R_out_dir +  'choicelevel_data.csv', delimiter=',', names=True)
             # self.data_undo_choice_level = np.genfromtxt(R_out_dir +  'choicelevel_undo_data.csv', delimiter=',', names=True)
+    
     def rc_severity_of_errors_hist(self, n_bins =5):
         out_dir = self.out_dir
 
@@ -558,6 +558,7 @@ class figure_plott:
         fig.savefig(self.out_dir + 'rc_undo_hist_all_across_subjects_abs_3plus.png', dpi=600, bbox_extra_artists=(lgd,),
                     bbox_inches='tight')
         fig.close()
+        
     def rc_undo_hist_all_across_subjects(self):
         data_all = self.data_all
 
