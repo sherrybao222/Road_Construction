@@ -1,15 +1,16 @@
 import json
+from glob import glob
+
+import pandas as pd
 import numpy as np
 from statistics import mean, stdev, median
 from operator import eq
-import seaborn as sns;
+import math
+
+import seaborn as sns
 sns.set()
 import matplotlib.pyplot as plt
-import math
 import matplotlib.lines as mlines
-from scipy.stats import wilcoxon
-import pandas as pd
-from glob import glob
 from scipy.stats import wilcoxon
 
 class figure_plott:
