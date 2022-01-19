@@ -8,9 +8,9 @@ import pandas as pd
 data_all = []
 
 # directories
-home_dir = './'
+home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
-data_dir  = 'data/'
+data_dir  = 'data/preprocessed'
 
 flist = glob(home_dir + data_dir + '/preprocess4_sub_*.csv')
 # import experiment data
@@ -22,9 +22,11 @@ for fname in flist:
 
 ## ==========================================================================
 # DATA SAVE FOR THE FURTHER ANALYSIS USING R
-R_out_dir = 'R_analysis/'
+R_out_dir = home_dir+'R_analysis_data/'
 
-# Puzzle level
+############### Puzzle level
+# reward on each trial
+reward = []
 # number of cities connected
 numCities = []
 # MAS
@@ -57,6 +59,7 @@ for i in range(len(data_all)):
     data_all[i].map_name[data_all[i].map_name == 'basic'] = 0
 
     # empty list to save per subject
+    temp_reward            = []        
     temp_numCities         = []
     temp_mas               = []
     temp_nos               = []
@@ -75,6 +78,8 @@ for i in range(len(data_all)):
         # if (prev_mapid != np.array(data_all[i].map_id)[ti]) or (prev_mapname != data_all[i].map_name[ti]):  # which means if the trial has changed
         #     single_trial = data_all[i][np.array(data_all[i].map_id) == np.array(data_all[i].map_id)[ti]]
             single_trial = data_all[i][np.array(data_all[i].trial_id) == np.array(data_all[i].trial_id)[ti]]
+            
+            temp_reward.append(pow(np.array(single_trial.n_city_all)[-1],2))
             temp_numCities.append(np.array(single_trial.n_city_all)[-1])
             temp_mas.append(np.array(single_trial.mas_all)[0])
             temp_nos.append(np.array(single_trial.n_opt_paths_all)[0])
@@ -93,6 +98,8 @@ for i in range(len(data_all)):
             prev_mapname = data_all[i].map_name[ti]
             prev_trial = np.array(data_all[i].trial_id)[ti]
         ti += 1
+    
+    reward.append(temp_reward)
     numCities.append(temp_numCities)
     mas.append(temp_mas)
     nos.append(temp_nos)
@@ -110,7 +117,7 @@ for i in range(len(data_all)):
     print(np.unique(temp_mas))
 
 
-
+np.savetxt(R_out_dir + 'reward.csv', np.array(reward).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
 np.savetxt(R_out_dir + 'numCities.csv', np.array(numCities).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
 np.savetxt(R_out_dir + 'mas.csv', np.array(mas).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
 np.savetxt(R_out_dir + 'nos.csv', np.array(nos).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
@@ -121,7 +128,9 @@ np.savetxt(R_out_dir + 'sumSeverityErrors.csv', np.array(sumSeverityErrors).asty
 np.savetxt(R_out_dir + 'numUNDO.csv', np.array(numUNDO).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
 np.savetxt(R_out_dir + 'TT.csv', np.array(TT).transpose(),fmt='%f',delimiter=',',encoding=None)
 np.savetxt(R_out_dir + 'puzzleID.csv', np.array(puzzleID).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
+
 ## ==========================================================================
+######## all puzzle-level data in one file
 subjects = []
 for i in range(len(data_all)):
     subjects.extend(((np.ones(len(np.unique(np.array(data_all[i].trial_id))))*(i+1)).astype(np.int16).tolist()))
@@ -141,18 +150,10 @@ headerList_ = [" ", *headerList]
 np.savetxt(R_out_dir + 'data.txt',data,delimiter=' ',fmt='%d %d %d %d %d %d %f %d %d %d %f',header=" ".join(headerList_),comments='')
 
 #######################################################################################################################################
-## glm data
-# choice-level
-
-
+##################### choice-level
 
 # import data
 data_all = []
-
-# directories
-home_dir = './'
-map_dir = 'active_map/'
-data_dir  = 'data/in-lab-pre-pilot/'
 
 flist = glob(home_dir + data_dir + '/preprocess4_sub_*.csv')
 # import experiment data
@@ -160,7 +161,6 @@ for fname in flist:
     with open(fname, 'r') as f:
         all_data = pd.read_csv(f)
         data_all.append(all_data)
-
 
 ## ==========================================================================
 # DATA SAVE FOR THE FURTHER ANALYSIS USING R
@@ -326,6 +326,7 @@ np.savetxt(R_out_dir + 'choicelevel_within_reach.csv', np.array(within_reach).as
 
 
 ## ==========================================================================
+######## all puzzle-level data in one file
 headerList = ['subjects', 'puzzleID','trialID','currNumCities','currMas','currNos',
               'undo','severityOfErrors', 'error','RT','undoRT','leftover','within_reach']
 dataList = [np.array(puzzleID).astype(np.int16), np.array(trialID).astype(np.int16),
