@@ -6,19 +6,21 @@ import numpy as np
 from statistics import mean, stdev, median
 from operator import eq
 import math
+from scipy.stats import wilcoxon
+from scipy import stats
 
 import seaborn as sns
 sns.set()
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-from scipy.stats import wilcoxon
 
 class figure_plott:
     def __init__(self, home_dir='./', map_dir='active_map/', data_dir='data/in-lab-pre-pilot/', out_dir = 'figures_prepilot/'):
         self.home_dir = home_dir
         self.map_dir = map_dir
         self.data_dir = data_dir
-        self.out_dir = out_dir
+        self.out_dir = home_dir + out_dir
+        R_out_dir = home_dir + 'R_analysis_data/'
 
         data_all = []
         flist = glob(self.home_dir + self.data_dir + '/preprocess4_sub_*.csv')
@@ -40,7 +42,7 @@ class figure_plott:
         ####################################
         # DATA loading
         # Puzzle-level data
-        R_out_dir = 'R_analysis/'
+        self.reward = np.genfromtxt(R_out_dir + 'reward.csv', delimiter=',')
         self.numCities = np.genfromtxt(R_out_dir + 'numCities.csv', delimiter=',')
         self.mas = np.genfromtxt(R_out_dir + 'mas.csv', delimiter=',')
         self.nos = np.genfromtxt(R_out_dir + 'nos.csv', delimiter=',')
@@ -52,7 +54,9 @@ class figure_plott:
         self.TT = np.genfromtxt(R_out_dir + 'TT.csv', delimiter=',')
         self.puzzleID = np.genfromtxt(R_out_dir + 'puzzleID.csv', delimiter=',')
 
-        self.data_puzzle_level = np.genfromtxt(R_out_dir +  'data.csv', delimiter=',', names=True)
+        # self.data_puzzle_level = np.genfromtxt(R_out_dir +  'data.csv', delimiter=',', names=True)
+        self.data_puzzle_level = pd.read_csv(R_out_dir +  'data.csv')
+        self.puzzleID_order_data = self.data_puzzle_level.sort_values(["subjects","puzzleID"])
 
         # Choice-level data
         self.choicelevel_undo_c = np.genfromtxt(R_out_dir + 'choicelevel_undo_c.csv')
@@ -622,6 +626,43 @@ class figure_plott:
                     bbox_inches='tight')
         plt.close(fig)
     
+# ========================================================================
+# Benefit of undo as number of undo usage increases
+    def rc_undobenefit_undonum(self):
+            benefit_undo = (np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['numCities']) 
+                    - np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==0]['numCities']))
+            undo_count = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['numUNDO'])
+            yerr = stats.binned_statistic(undo_count, benefit_undo, statistic=lambda y: np.std(y)/np.sqrt(len(y)), bins=[1,3,6,9,15])
+            bins = stats.binned_statistic(undo_count, benefit_undo, 'mean', bins=[1,3,6,9,15])
+            
+            fig, axs = plt.subplots()         
+            axs.plot(bins[1][:-1], bins[0], color = '#81b29a', linewidth=3)
+            plotline1, caplines1, barlinecols1 = axs.errorbar(bins[1][:-1], bins[0], yerr[0], capsize = 0, ls='None', color='k')
+            axs.set_xticks([1,3,6,9])
+            axs.set_xticklabels([1,3,6,'9+'])
+            axs.set_xlabel('number of undo usage')
+            axs.set_ylabel('benefit of undo (n_undo - n_basic)')
+            fig.savefig(self.out_dir + 'undobenefit_undonum.png', dpi=600, bbox_inches='tight')
+
+# ========================================================================
+# Proportion of Errors and number of optimal solutions
+    def rc_error_optimal(self):
+            error_basic = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==0]['numError']) 
+            error_undo = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['numError']) 
+            n_optimal = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['nos'])
+            bins1 = stats.binned_statistic(n_optimal, error_basic, 'mean', bins=[1,3,6,9,15])
+            bins2 = stats.binned_statistic(n_optimal, error_undo, 'mean', bins=[1,3,6,9,15])
+            
+            fig, axs = plt.subplots()         
+            axs.plot(bins1[1][:-1], bins1[0], color = '#81b29a', linewidth=3,label='basic')
+            axs.plot(bins2[1][:-1], bins2[0],linewidth=3,label='undo')
+            axs.set_xlabel('number of optimal solutions')
+            axs.set_ylabel('count of error')
+            axs.set_xticks([1,3,6,9])
+            axs.set_xticklabels([1,3,6,'9+'])
+            axs.legend()
+            fig.savefig(self.out_dir + 'error_optimal.png', dpi=600, bbox_inches='tight')
+            
     def rc_severe_error_undo(self):
         data_all = self.data_all
         out_dir = self.out_dir
@@ -859,8 +900,6 @@ class figure_plott:
         fig.savefig(out_dir + 'undo_once_series_p.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
     
-# =========================================================================
-# Number of undo as a function of MAS
     def rc_undo_x_mas(self):
         data_all = self.data_all
         N_UNDO_MAS_ALL = {'n_undo_mas': [], 'p_n_undo_mas': [], 'mas_ind': []}
@@ -928,6 +967,8 @@ class figure_plott:
         fig.savefig(self.out_dir + 'num_undo_X_MAS.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
   
+# =========================================================================
+# Average number of connected cities
     def rc_undo_c_numciti(self):
         out_dir = self.out_dir
         w_undo =[]
@@ -1154,7 +1195,7 @@ class figure_plott:
         plt.close(fig)
     
 # =========================================================================
-# Everage number of connected cities       
+# Number of undo as a function of MAS       
     def rc_undo_mas_puzzle(self):
         out_dir = self.out_dir
 
@@ -1202,6 +1243,43 @@ class figure_plott:
         plt.show()
         fig.savefig(out_dir + 'mas_undo_puzzle.png', dpi=600, bbox_inches='tight')
         plt.close(fig)
+
+# =========================================================================
+# Average reward       
+    def rc_undo_c_reward(self):
+        out_dir = self.out_dir
+        w_undo =[]
+        wo_undo = []
+        for i in range(self.reward.shape[1]):
+            ind_undo = np.where(self.undo_c[:,i]==1)
+            ind_wo_undo = np.where(self.undo_c[:,i]==0)
+            w_undo.append(self.reward[ind_undo,i])
+            wo_undo.append(self.reward[ind_wo_undo,i])
+        w_undo = np.array(w_undo).squeeze().transpose()
+        wo_undo = np.array(wo_undo).squeeze().transpose()               
+        mean_undo_ = np.mean([np.mean(w_undo,axis=0), np.mean(wo_undo,axis=0)],axis=1)
+        std_undo_ = np.std([np.mean(w_undo,axis=0), np.mean(wo_undo,axis=0)],axis=1) / np.sqrt(self.reward.shape[1])
+
+        stat1, p1 = wilcoxon(np.mean(w_undo,axis=0), np.mean(wo_undo,axis=0))
+        # ===================================================================
+        fig, axs = plt.subplots(1, 1)
+
+        axs.bar([1,2], mean_undo_, yerr=std_undo_,
+                   align='center', alpha=1, width=.8, ecolor='black', capsize=10)
+        
+        axs.set_xlabel('condition')
+        axs.set_ylabel('reward')
+        axs.set_xticks([1,2])
+        axs.set_xticklabels(['w undo','wo undo'])
+        # plt.ylim([8, 10])
+        axs.yaxis.grid(True)
+
+        axs.set_title('p='+str(p1))
+        fig.set_figwidth(4)
+        plt.show()
+        fig.savefig(out_dir + 'reward_condition.png', dpi=600, bbox_inches='tight')
+        plt.close(fig)
+    
 
     def rc_undo_nct_choice(self):
         out_dir = self.out_dir
