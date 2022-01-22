@@ -107,6 +107,7 @@ def main():
                     'suboptpath': TS.suboptpath }
         
         tree_list.append(tree_dict)
+        print(i)
         
         #rendered_tree = TS.render_out()
 
