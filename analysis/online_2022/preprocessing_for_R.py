@@ -19,7 +19,6 @@ for fname in flist:
         all_data = pd.read_csv(f)
         data_all.append(all_data)
 
-
 ## ==========================================================================
 # DATA SAVE FOR THE FURTHER ANALYSIS USING R
 R_out_dir = home_dir+'R_analysis_data/'
@@ -36,19 +35,22 @@ sumSeverityErrors = []# sum of severity of errors
 
 undo_c = []           # undo condition or not : 1 for with undo condition and 0 for without undo condition
 numUNDO = []          # number of undos
+fullPath = []         # how many time reaches the end
+allPath = []          # number of all branches. "real undo"
 
 TT = []               # total time taken for a trial
 
 puzzleID = []         # puzzle id
 trialID = []          # trial id
 
-for i in range(len(data_all)): # iterate over trials
+for i in range(len(data_all)): # iterate over subjects
+    data_all[i] = data_all[i].replace('undo',1)
+    data_all[i] = data_all[i].replace('basic',0)
+
     ti = 0
     prev_mapid = -1  # arbitrary number
     prev_mapname = -1
     prev_trial = -1
-    data_all[i].map_name[data_all[i].map_name == 'undo']  = 1
-    data_all[i].map_name[data_all[i].map_name == 'basic'] = 0
 
     # empty list to save per subject
     temp_reward            = []        
@@ -63,15 +65,18 @@ for i in range(len(data_all)): # iterate over trials
 
     temp_undo_c            = []
     temp_numUNDO           = []
+    temp_fullPath          = []
+    temp_allPath           = []
     
     temp_TT                = []
     
     temp_puzzleID          = []
     temp_trialID           = []
-
-    while ti < data_all[i].shape[0]: # iterate over move
+    
+    while ti < data_all[i].shape[0]: # iterate over moves
+                          
         if (prev_trial != np.array(data_all[i].trial_id)[ti]): # which means if the trial has changed / only save once per trial
-
+            
             single_trial = data_all[i][np.array(data_all[i].trial_id) == np.array(data_all[i].trial_id)[ti]]
             
             temp_puzzleID.append(np.array(single_trial.map_id)[0])
@@ -82,20 +87,28 @@ for i in range(len(data_all)): # iterate over trials
             temp_mas.append(np.array(single_trial.mas_all)[0])
             
             temp_nos.append(np.array(single_trial.n_opt_paths_all)[0])
-            temp_leftover.append(np.array(single_trial.budget_all)[-1])
+            temp_leftover.append(np.array(single_trial.currentBudget)[-1])
             
             mas_all_trial = np.array(single_trial.mas_all)
             errors_trial = (mas_all_trial[1:] - mas_all_trial[:-1])
             temp_numError.append(np.sum(errors_trial<0)) # how many errors?
             temp_sumSeverityErrors.append(np.sum(np.abs(errors_trial[errors_trial<0])))
             
-            temp_undo_c.append(np.double(np.array(single_trial.map_name)[0]).astype(np.int16))
-            temp_numUNDO.append(np.sum(np.array(single_trial.undo_all)))
+            temp_undo_c.append(np.double(np.array(single_trial.condition)[0]).astype(np.int16))
+            temp_numUNDO.append(np.sum(np.array(single_trial.undoIndicator & (single_trial.n_city_all != 1)) ))
+            temp_fullPath.append(np.sum(np.array(single_trial.checkEnd))-1) # remove redundent count from submit
+            
+            n_path = 1
+            if (np.array(single_trial.condition)[0]==1):
+                for ai in range(1,single_trial.shape[0]):
+                    if (np.array(single_trial.undoIndicator)[ai] == 1) and (np.array(single_trial.n_city_all)[ai] != 1) and (np.array(single_trial.undoIndicator)[ai-1] == 0):
+                        n_path = n_path + 1
+            temp_allPath.append(n_path)
             
             temp_TT.append(np.array(single_trial.time_all)[-1]/1000)
             
             prev_mapid = np.array(data_all[i].map_id)[ti]
-            prev_mapname = data_all[i].map_name[ti]
+            prev_mapname = data_all[i].condition[ti]
             prev_trial = np.array(data_all[i].trial_id)[ti]
         
         ti += 1
@@ -112,6 +125,8 @@ for i in range(len(data_all)): # iterate over trials
     
     numError.append(temp_numError)
     sumSeverityErrors.append(temp_sumSeverityErrors)
+    fullPath.append(temp_fullPath)
+    allPath.append(temp_allPath)
     
     undo_c.append(temp_undo_c)
     numUNDO.append(temp_numUNDO)
@@ -120,7 +135,7 @@ for i in range(len(data_all)): # iterate over trials
 
     print('*'*10)
     print(i)
-    print(np.unique(temp_mas))
+    # print(np.unique(temp_mas))
 
 np.savetxt(R_out_dir + 'puzzleID.csv', np.array(puzzleID).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
 
@@ -142,7 +157,7 @@ np.savetxt(R_out_dir + 'TT.csv', np.array(TT).transpose(),fmt='%f',delimiter=','
 headerList = ['subjects', 'puzzleID', 
               'reward', 'numCities', 'mas', 
               'nos', 'leftover', 
-              'numError', 'sumSeverityErrors', 
+              'numError', 'sumSeverityErrors', 'fullPath', 'allPath',
               'undo_c','numUNDO', 
               'TT']
 subjects = []
@@ -152,7 +167,7 @@ data = [subjects]
 dataList = [np.array(puzzleID).astype(np.int16), 
             np.array(reward).astype(np.int16), np.array(numCities).astype(np.int16), np.array(mas).astype(np.int16), 
             np.array(nos).astype(np.int16), np.array(leftover),
-            np.array(numError).astype(np.int16), np.array(sumSeverityErrors).astype(np.int16), 
+            np.array(numError).astype(np.int16), np.array(sumSeverityErrors).astype(np.int16), np.array(fullPath).astype(np.int16), np.array(allPath).astype(np.int16), 
             np.array(undo_c).astype(np.int16), np.array(numUNDO).astype(np.int16),
             np.array(TT)]
 for data_ in dataList:
@@ -165,6 +180,8 @@ np.savetxt(R_out_dir + 'data.csv',data,delimiter=',',fmt='%d,%d,%d,%d,%d,%d,%d,%
 headerList_ = [" ", *headerList]
 np.savetxt(R_out_dir + 'data.txt',data,delimiter=' ',fmt='%d %d %d %d %d %d %d %f %d %d %d %f',header=" ".join(headerList_),comments='')
 
+#######################################################################################################################################
+#######################################################################################################################################
 #######################################################################################################################################
 ##################### choice-level
 
@@ -206,8 +223,8 @@ for i in range(len(data_all)):
     prev_mapid = -1  # arbitrary number
     prev_mapname = -1
     prev_trial = -1
-    data_all[i].map_name[data_all[i].map_name == 'undo']  = 1
-    data_all[i].map_name[data_all[i].map_name == 'basic'] = 0
+    data_all[i].condition[data_all[i].condition == 'undo']  = 1
+    data_all[i].condition[data_all[i].condition == 'basic'] = 0
 
     # empty list to save per subject
     temp_subjects = []
@@ -242,8 +259,8 @@ for i in range(len(data_all)):
         temp_puzzleID.append(np.array(data_all[i].map_id)[ti])
         temp_trialID.append(np.array(data_all[i].trial_id)[ti])
         
-        temp_undo_c.append(np.array(data_all[i].map_name)[ti])
-        temp_undo.append(np.array(data_all[i].undo_all)[ti])
+        temp_undo_c.append(np.array(data_all[i].condition)[ti])
+        temp_undo.append(np.array(data_all[i].undoIndicator)[ti])
         
         temp_severityOfErrors.append(severe_error_trial[ti])
         temp_error.append(errors_trial[ti])
@@ -251,11 +268,11 @@ for i in range(len(data_all)):
         temp_currNumCities.append(np.array(data_all[i].n_city_all)[ti])
         temp_currMas.append(np.array(data_all[i].mas_all)[ti])
         temp_currNos.append(np.array(data_all[i].n_opt_paths_all)[ti])
-        temp_leftover.append(np.array(data_all[i].budget_all)[ti])
+        temp_leftover.append(np.array(data_all[i].currentBudget)[ti])
         temp_within_reach.append(np.array(data_all[i].n_within_reach)[ti])
 
         temp_RT.append(np.array(data_all[i].rt_all)[ti]) # can get undoRT using undo binary
-        if np.array(data_all[i].undo_all)[ti]==1:
+        if np.array(data_all[i].undoIndicator)[ti]==1:
             temp_undoRT.append(np.array(data_all[i].rt_all)[ti])
         else:
             temp_undoRT.append(-1) # if there is no undo
