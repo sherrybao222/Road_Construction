@@ -101,7 +101,7 @@ for i in range(len(data_all)): # iterate over subjects
             temp_numUNDO.append(np.sum(np.array(single_trial.undoIndicator )))
             temp_numEnd.append(np.sum(np.array(single_trial.checkEnd))-1) # remove redundent count from submit
             
-            n_path = 1
+            n_path = 0
             if (np.array(single_trial.condition)[0]==1):
                 for ai in range(1,single_trial.shape[0]):
                     if (np.array(single_trial.undoIndicator)[ai] == 1) and (np.array(single_trial.undoIndicator)[ai-1] == 0): 
