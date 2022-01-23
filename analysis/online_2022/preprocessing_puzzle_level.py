@@ -11,6 +11,9 @@ data_all = []
 home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
+# home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'
+# map_dir = 'active_map/'
+# data_dir  = 'data/preprocessed'
 R_out_dir = home_dir+'R_analysis_data/'
 
 
@@ -44,6 +47,9 @@ TT = []               # total time taken for a trial
 RT1= []               # first step RT
 RTsubmit=[]           # submit RT
 
+tortuosity = []       # tortuosity
+
+
 for i in range(len(data_all)): # iterate over subjects
     data_all[i] = data_all[i].replace('undo',1)
     data_all[i] = data_all[i].replace('basic',0)
@@ -74,7 +80,9 @@ for i in range(len(data_all)): # iterate over subjects
     temp_TT                = []
     temp_RT1               = []
     temp_RTsubmit          = []
-     
+
+    temp_tortuosity = []
+
     ti = 0
     while ti < data_all[i].shape[0]: # iterate over moves
                           
@@ -111,7 +119,9 @@ for i in range(len(data_all)): # iterate over subjects
             temp_TT.append(np.array(single_trial.time_all)[-1]/1000)
             temp_RT1.append(np.array(single_trial.rt_all)[1]/1000) 
             temp_RTsubmit.append(np.array(single_trial.rt_all)[-1]/1000)
-            
+
+            temp_tortuosity.append(np.array(single_trial.tortuosity_all)[-1])
+
             # prev_mapid = np.array(data_all[i].map_id)[ti]
             # prev_mapname = data_all[i].condition[ti]
             prev_trial = np.array(data_all[i].trial_id)[ti]
@@ -140,6 +150,8 @@ for i in range(len(data_all)): # iterate over subjects
     RT1.append(temp_RT1)             
     RTsubmit.append(temp_RTsubmit)   
 
+    tortuosity.append(temp_tortuosity)
+
     print('*'*10)
     print(i)
     # print(np.unique(temp_mas))
@@ -159,6 +171,8 @@ np.savetxt(R_out_dir + 'undo_c.csv', np.array(undo_c).astype(np.int16).transpose
 np.savetxt(R_out_dir + 'numUNDO.csv', np.array(numUNDO).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
 np.savetxt(R_out_dir + 'TT.csv', np.array(TT).transpose(),fmt='%f',delimiter=',',encoding=None)
 
+np.savetxt(R_out_dir + 'tortuosity.csv', np.array(tortuosity).transpose(),fmt='%f',delimiter=',',encoding=None)
+
 ## ==========================================================================
 ######## all puzzle-level data in one file
 headerList = ['subjects', 'puzzleID', 
@@ -166,7 +180,7 @@ headerList = ['subjects', 'puzzleID',
               'nos', 'leftover', 
               'numError', 'sumSeverityErrors', 
               'condition','numUNDO', 'numFullUndo', 'numEnd', 
-              'TT','RT1','RTsubmit']
+              'TT','RT1','RTsubmit','tortuosity']
 subjects = []
 for i in range(len(data_all)):
     subjects.extend(((np.ones(len(np.unique(np.array(data_all[i].trial_id))))*(i+1)).astype(np.int16).tolist()))
@@ -176,14 +190,14 @@ dataList = [np.array(puzzleID).astype(np.int16),
             np.array(nos).astype(np.int16), np.array(leftover),
             np.array(numError).astype(np.int16), np.array(sumSeverityErrors).astype(np.int16), 
             np.array(undo_c).astype(np.int16), np.array(numUNDO).astype(np.int16), np.array(numFullUndo).astype(np.int16), np.array(numEnd).astype(np.int16),
-            np.array(TT),np.array(RT1),np.array(RTsubmit)]
+            np.array(TT),np.array(RT1),np.array(RTsubmit),np.array(tortuosity)]
 for data_ in dataList:
     data.append(data_.reshape((-1)).tolist())
 
 data = np.array(data).transpose()
 
-np.savetxt(R_out_dir + 'data.csv',data,delimiter=',', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f', header=",".join(headerList),comments='') 
+np.savetxt(R_out_dir + 'data.csv',data,delimiter=',', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f', header=",".join(headerList),comments='')
 
 headerList_ = [" ", *headerList]
-np.savetxt(R_out_dir + 'data.txt',data,delimiter=' ', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f', header=" ".join(headerList_),comments='') 
+np.savetxt(R_out_dir + 'data.txt',data,delimiter=' ', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f', header=" ".join(headerList_),comments='')
 

@@ -8,6 +8,9 @@ import pandas as pd
 data_all = []
 
 # directories
+# home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'
+# map_dir = 'active_map/'
+# data_dir  = 'data/preprocessed'
 home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
@@ -48,6 +51,8 @@ within_reach = []        # ncities within reach
 RT = []                  # reaction time of moves (including undo)
 undoRT = []              # can get undoRT using undo binary
 
+tortuosity = []       # tortuosity
+
 for i in range(len(data_all)):
     # prev_mapid = -1  # arbitrary number
     # prev_mapname = -1
@@ -78,6 +83,8 @@ for i in range(len(data_all)):
 
     temp_RT = data_all[i].rt_all # can get undoRT using undo binary
     temp_undoRT = []
+
+    temp_tortuosity = data_all[i].tortuosity_all
 
     mas_all_trial = np.array(data_all[i].mas_all)
     errors_trial = np.array([0, *(mas_all_trial[1:] - mas_all_trial[:-1]).tolist()])
@@ -118,7 +125,7 @@ for i in range(len(data_all)):
             undoRT.append(np.array(data_all[i].rt_all)[ti])
         else:
             undoRT.append(-1) # if there is no undo
-            
+
     subjects.extend(temp_subjects)
     puzzleID.extend(temp_puzzleID)
     trialID.extend(temp_trialID)
@@ -141,7 +148,9 @@ for i in range(len(data_all)):
 
     RT.extend(temp_RT)
     undoRT.extend(temp_undoRT)
-    
+
+    tortuosity.extend(temp_tortuosity)
+
 np.savetxt(R_out_dir + 'choicelevel_subjects.csv', np.array(subjects).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
 np.savetxt(R_out_dir + 'choicelevel_puzzleID.csv', np.array(puzzleID).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
 np.savetxt(R_out_dir + 'choicelevel_trialID.csv', np.array(trialID).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
@@ -161,6 +170,8 @@ np.savetxt(R_out_dir + 'choicelevel_within_reach.csv', np.array(within_reach).as
 np.savetxt(R_out_dir + 'choicelevel_RT.csv', np.array(RT),fmt='%f',delimiter=',',encoding=None)
 np.savetxt(R_out_dir + 'choicelevel_undoRT.csv', np.array(undoRT),fmt='%f',delimiter=',',encoding=None)
 
+np.savetxt(R_out_dir + 'choicelevel_tortuosity.csv', np.array(tortuosity),fmt='%f',delimiter=',',encoding=None)
+
 
 ## ==========================================================================
 ######## all choice-level data in one file
@@ -169,23 +180,23 @@ headerList = ['subjects', 'puzzleID','trialID',
               'condition','undo','firstUndo','lastUndo',
               'submit','checkEnd',
               'severityOfErrors', 'error',
-              'RT','undoRT']
+              'RT','undoRT','tortuosity']
 
 dataList = [np.array(puzzleID).astype(np.int16), np.array(trialID).astype(np.int16),
             np.array(currNumCities).astype(np.int16), np.array(currMas).astype(np.int16), np.array(currNos).astype(np.int16),np.array(leftover),np.array(within_reach).astype(np.int16),
             np.array(undo_c).astype(np.int16),np.array(undo),np.array(firstUndo).astype(np.int16),np.array(lastUndo).astype(np.int16),
             np.array(submit).astype(np.int16),np.array(checkEnd).astype(np.int16),
             np.array(severityOfErrors).astype(np.int16),np.array(error).astype(np.int16),
-            np.array(RT),np.array(undoRT)]
+            np.array(RT),np.array(undoRT),np.array(tortuosity)]
 data = [subjects]
 for data_ in dataList:
     data.append(data_.reshape((-1)).tolist())
 
 data = np.array(data).transpose()
 
-np.savetxt(R_out_dir + 'choicelevel_data.csv',data, delimiter=',',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f', header=",".join(headerList),comments='')
+np.savetxt(R_out_dir + 'choicelevel_data.csv',data, delimiter=',',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=",".join(headerList),comments='')
 headerList_ = [" ", *headerList]
-np.savetxt(R_out_dir + 'choicelevel_data.txt',data, delimiter=' ',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f', header=" ".join(headerList_),comments='')
+np.savetxt(R_out_dir + 'choicelevel_data.txt',data, delimiter=' ',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=" ".join(headerList_),comments='')
 
 
 # undo data saving
@@ -194,9 +205,9 @@ data = [np.array(subjects)[ind_data]]
 for data_ in dataList:
     data.append(data_[ind_data])
 data = np.array(data).transpose()
-np.savetxt(R_out_dir + 'choicelevel_undo_data.csv',data, delimiter=',',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f',header=",".join(headerList),comments='')
+np.savetxt(R_out_dir + 'choicelevel_undo_data.csv',data, delimiter=',',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=",".join(headerList),comments='')
 headerList_ = [" ", *headerList]
-np.savetxt(R_out_dir + 'choicelevel_undo_data.txt',data, delimiter=' ',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f',header=" ".join(headerList_),comments='')
+np.savetxt(R_out_dir + 'choicelevel_undo_data.txt',data, delimiter=' ',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=" ".join(headerList_),comments='')
 
 
 

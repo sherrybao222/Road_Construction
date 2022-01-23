@@ -14,12 +14,15 @@ from ast import literal_eval
 # ============================================================================
 # directories
 home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
+# home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'
 map_dir = 'active_map/'
 data_dir  = 'data/'
 
-# load maps
+
+# load basic map
 with open(home_dir + map_dir + 'basicMap.json', 'r') as file:
     basic_map = json.load(file)
+# load undo map
 # with open(home_dir + map_dir + 'undoMap.json', 'r') as file:
 #     undo_map = json.load(file)
 with open(home_dir + map_dir + 'tree/map_tree', 'r') as file:
@@ -29,7 +32,7 @@ subCount = 0
 all_city = list(range(1, 30))  # all city names (excluding start)
 
 # find the list of subject files in the data directory
-target_expfile = 'FIN_*_2021-*_*.csv' # target_expfile = 'PARTICIPANT_RC-Phaser_*.csv'
+target_expfile = 'FIN_*.csv' # target_expfile = 'PARTICIPANT_RC-Phaser_*.csv'
 flist = glob(home_dir + data_dir + target_expfile)
 
 # ============================================================================
@@ -57,6 +60,8 @@ while subCount < len(flist):
     n_opt_paths_all = [] # n of optimal paths at the moment
     n_subopt_paths_all=[]# n of suboptimal (which has #ConnectableCities of opt - 1) paths at the moment.
     mas_all = []         # maximum achievable score
+
+    tortuosity_all = []  # tortuosity of the path
 
     ### load a file
     thefile = flist[subCount]
@@ -95,6 +100,7 @@ while subCount < len(flist):
                     currenMapID = int(single_trial['mapID'][0])
                     time = []
 
+                    tortuosity = []
                     # try:
                     #     for node_ in TS.nodes_bucket:
                     #         node_.parent=None
@@ -142,6 +148,21 @@ while subCount < len(flist):
                             
                             budget_all.append(single_trial['budgetHis'][i])
                             time.append(int(single_trial['time'][i]))
+
+                            # tortuosity
+                            mapid_temp = int(single_trial.mapID[0])
+                            xys = np.array(basic_map[mapid_temp]['xy'])
+                            if len(single_trial['choiceDyn'][i]) > 1: # for those connected at least 2
+                                if len(single_trial['choiceDyn'][i]) == 2: # it should be one when two cities are connected
+                                    tortuosity.append(1)
+                                else:
+                                    # xy_0 = xys[int(single_trial['choiceHis'][0]),:]
+                                    # xy_n = xys[int(single_trial['choiceHis'][i]),:]
+                                    tortuos_len = float(single_trial['budgetHis'][0]) - float(single_trial['budgetHis'][i])
+                                    distance_ = np.sqrt(np.sum((xys[int(single_trial['choiceHis'][i]),:] - xys[int(single_trial['choiceHis'][0]),:])**2))
+                                    tortuosity.append(tortuos_len/distance_)
+                            else:
+                                tortuosity.append(0)
                             
                             # get unconnected cities within reach for each step
                             remain_trial = [x for x in all_city if x not in chosen_trial]
@@ -193,6 +214,8 @@ while subCount < len(flist):
 
                     time_all.extend(time)
                     rt_all.extend([-1, *[a - time[j-1] for j, a in enumerate(time) if j > 0]])
+
+                    tortuosity_all.extend(tortuosity)
                     
         data = {
             'condition': map_name,
@@ -216,7 +239,9 @@ while subCount < len(flist):
             
             'n_opt_paths_all': n_opt_paths_all,
             'n_subopt_paths_all': n_subopt_paths_all,
-            'mas_all': mas_all}
+            'mas_all': mas_all,
+
+            'tortuosity_all':tortuosity_all}
         
         # Create DataFrame
         df = pd.DataFrame(data)
