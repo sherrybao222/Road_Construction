@@ -29,7 +29,7 @@ subCount = 0
 all_city = list(range(1, 30))  # all city names (excluding start)
 
 # find the list of subject files in the data directory
-target_expfile = 'FIN_*_2022-*_*.csv' # target_expfile = 'PARTICIPANT_RC-Phaser_*.csv'
+target_expfile = 'FIN_*_2021-*_*.csv' # target_expfile = 'PARTICIPANT_RC-Phaser_*.csv'
 flist = glob(home_dir + data_dir + target_expfile)
 
 # ============================================================================
