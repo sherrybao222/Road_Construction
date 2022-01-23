@@ -172,11 +172,11 @@ headerList = ['subjects', 'puzzleID','trialID',
               'RT','undoRT']
 
 dataList = [np.array(puzzleID).astype(np.int16), np.array(trialID).astype(np.int16),
-            np.array(currNumCities).astype(np.int16), np.array(currMas).astype(np.int16), np.array(currNos).astype(np.int16),np.array(leftover).astype(np.int16),np.array(within_reach).astype(np.int16),
+            np.array(currNumCities).astype(np.int16), np.array(currMas).astype(np.int16), np.array(currNos).astype(np.int16),np.array(leftover),np.array(within_reach).astype(np.int16),
             np.array(undo_c).astype(np.int16),np.array(undo),np.array(firstUndo).astype(np.int16),np.array(lastUndo).astype(np.int16),
             np.array(submit).astype(np.int16),np.array(checkEnd).astype(np.int16),
             np.array(severityOfErrors).astype(np.int16),np.array(error).astype(np.int16),
-            np.array(RT).astype(np.int16),np.array(undoRT).astype(np.int16)]
+            np.array(RT),np.array(undoRT)]
 data = [subjects]
 for data_ in dataList:
     data.append(data_.reshape((-1)).tolist())
