@@ -14,6 +14,7 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy import stats
 
 from scipy.stats import shapiro
 from scipy.stats import normaltest
@@ -176,6 +177,82 @@ axs.tick_params(axis='y', colors='k', direction='in',left = True) #, labelsize =
 axs.tick_params(axis='x', colors='k')
 # axs.set_title('S'+str(i+1), fontsize = 16)
 axs.set_ylabel('Response time (ms)') #,fontsize=18
+
+# fig.set_figwidth(26)
+# fig.set_figheight(12)
+
+plt.show()
+# fig.savefig(out_dir + 'action_t.png',dpi=600,bbox_inches='tight')
+# plt.close(fig)
+
+# +
+index_singleUndo = data_choice_level.index[(data_choice_level['firstUndo'] == 1)&(data_choice_level['lastUndo'] == 1)]
+RT_singleUndo = data_choice_level.loc[index_singleUndo,:]
+
+index_firstUndo = data_choice_level.index[(data_choice_level['firstUndo'] == 1) &(data_choice_level['lastUndo'] != 1)]
+RT_firstUndo = data_choice_level.loc[index_firstUndo,:]
+index_laterUndo = data_choice_level.index[(data_choice_level['firstUndo'] != 1) & (data_choice_level['undo'] == 1)]
+RT_laterUndo = data_choice_level.loc[index_laterUndo,:]
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+
+bx = axs.boxplot([RT_firstUndo['undoRT'],RT_laterUndo['undoRT'],RT_singleUndo['undoRT']],
+   positions =[1,2,3],widths = 0.3,showfliers=False,whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+axs.set_xticks([1,1.5,2,3])
+axs.set_xticklabels(labels = ['\nfirst undo','sequential','\nlater undo','single undo'])#,fontsize=18
+
+axs.set_facecolor('white')
+axs.spines['bottom'].set_color('k')
+axs.spines['left'].set_color('k')
+axs.tick_params(axis='y', colors='k', direction='in',left = True) #, labelsize = 16
+axs.tick_params(axis='x', colors='k')
+# axs.set_title('S'+str(i+1), fontsize = 16)
+axs.set_ylabel('Response time (ms)') #,fontsize=18
+
+# fig.set_figwidth(26)
+# fig.set_figheight(12)
+
+plt.show()
+# fig.savefig(out_dir + 'action_t.png',dpi=600,bbox_inches='tight')
+# plt.close(fig)
+
+# +
+index_first_undo =  data_choice_level.index[data_choice_level['firstUndo'] == 1]
+df_beforeUndo = data_choice_level.loc[index_first_undo-1,:]
+index_end_undo = df_beforeUndo.index[df_beforeUndo['checkEnd'] == 1]
+leftover_undo = df_beforeUndo.loc[index_end_undo,'leftover']
+
+
+index_notundo = data_choice_level.index[(data_choice_level['undo'] == 0)&(data_choice_level['RT'] != -1)]
+df_notbeforeUndo = data_choice_level.loc[index_notundo-1,:]
+index_end_notundo = df_notbeforeUndo.index[df_notbeforeUndo['checkEnd'] == 1]
+leftover_notundo = df_notbeforeUndo.loc[index_end_notundo,'leftover']
+
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+
+bx = axs.boxplot([leftover_undo,leftover_notundo],
+   positions =[1,2],widths = 0.3,showfliers=False,whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+axs.set_xticks([1,2])
+axs.set_xticklabels(labels = ['budget before undo','budget before submit'])#,fontsize=18
+
+axs.set_facecolor('white')
+axs.spines['bottom'].set_color('k')
+axs.spines['left'].set_color('k')
+axs.tick_params(axis='y', colors='k', direction='in',left = True) #, labelsize = 16
+axs.tick_params(axis='x', colors='k')
+# axs.set_title('S'+str(i+1), fontsize = 16)
+axs.set_ylabel('budget') #,fontsize=18
 
 # fig.set_figwidth(26)
 # fig.set_figheight(12)
