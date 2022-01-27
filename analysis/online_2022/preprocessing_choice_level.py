@@ -30,6 +30,7 @@ for fname in flist:
 subjects = []            # subject id
 puzzleID = []            # puzzle id
 trialID = []             # trial ID
+allMAS = []
 
 undo_c = []              # undo condition binary
 undo = []                # undo binary
@@ -61,9 +62,10 @@ for i in range(len(data_all)):
     data_all[i] = data_all[i].replace('basic',0)
 
     # empty list to save per subject
-    temp_subjects = []
+    # temp_subjects = []
     temp_puzzleID = data_all[i].map_id
     temp_trialID = data_all[i].trial_id
+    temp_allMAS = []
 
     temp_undo = data_all[i].undoIndicator
     temp_undo_c = data_all[i].condition
@@ -95,6 +97,7 @@ for i in range(len(data_all)):
     errors_trial = np.zeros(np.array(errors_trial).shape).astype(np.int16)
     errors_trial[severe_error_trial!=0] = 1
     
+    this_allMAS = np.nan
     for ti in range(data_all[i].shape[0]):
         subjects.append(i)
         # puzzleID.append(np.array(data_all[i].map_id)[ti])
@@ -102,9 +105,12 @@ for i in range(len(data_all)):
         
         # undo_c.append(np.array(data_all[i].condition)[ti])
         # undo.append(np.array(data_all[i].undoIndicator & (data_all[i].n_city_all != 1))[ti])
-                
-        severityOfErrors.append(severe_error_trial[ti])
-        error.append(errors_trial[ti])
+        if (data_all[i].n_city_all[ti]==1):
+            severityOfErrors.append(0)
+            error.append(0)
+        else:
+            severityOfErrors.append(severe_error_trial[ti])
+            error.append(errors_trial[ti])
         
 
         temp_firstUndo.append((np.array(data_all[i].undoIndicator)[ti] == 1) & (np.array(data_all[i].rt_all)[ti] != -1) & (np.array(data_all[i].undoIndicator)[ti-1] == 0))         # first undo in a sequence of undo
@@ -125,10 +131,15 @@ for i in range(len(data_all)):
             undoRT.append(np.array(data_all[i].rt_all)[ti])
         else:
             undoRT.append(-1) # if there is no undo
-
-    subjects.extend(temp_subjects)
+            
+        if (data_all[i].rt_all[ti] == -1): # which means if the trial has changed / only save once per trial
+            this_allMAS = data_all[i].mas_all[ti]
+        temp_allMAS.append(this_allMAS)
+            
+    # subjects.extend(temp_subjects)
     puzzleID.extend(temp_puzzleID)
     trialID.extend(temp_trialID)
+    allMAS.extend(temp_allMAS)
 
     undo_c.extend(temp_undo_c)
     undo.extend(temp_undo)
@@ -137,8 +148,8 @@ for i in range(len(data_all)):
     submit.extend(temp_submit)
     checkEnd.extend(temp_checkEnd)
     
-    severityOfErrors.extend(temp_severityOfErrors)
-    error.extend(temp_error)
+    # severityOfErrors.extend(temp_severityOfErrors)
+    # error.extend(temp_error)
     
     currNumCities.extend(temp_currNumCities)
     currMas.extend(temp_currMas)
@@ -175,14 +186,14 @@ np.savetxt(R_out_dir + 'choicelevel_tortuosity.csv', np.array(tortuosity),fmt='%
 
 ## ==========================================================================
 ######## all choice-level data in one file
-headerList = ['subjects', 'puzzleID','trialID',
+headerList = ['subjects', 'puzzleID','trialID','allMAS,'
               'currNumCities','currMas','currNos', 'leftover','within_reach',
               'condition','undo','firstUndo','lastUndo',
               'submit','checkEnd',
               'severityOfErrors', 'error',
               'RT','undoRT','tortuosity']
 
-dataList = [np.array(puzzleID).astype(np.int16), np.array(trialID).astype(np.int16),
+dataList = [np.array(puzzleID).astype(np.int16), np.array(trialID).astype(np.int16),np.array(allMAS).astype(np.int16),
             np.array(currNumCities).astype(np.int16), np.array(currMas).astype(np.int16), np.array(currNos).astype(np.int16),np.array(leftover),np.array(within_reach).astype(np.int16),
             np.array(undo_c).astype(np.int16),np.array(undo),np.array(firstUndo).astype(np.int16),np.array(lastUndo).astype(np.int16),
             np.array(submit).astype(np.int16),np.array(checkEnd).astype(np.int16),
@@ -194,9 +205,9 @@ for data_ in dataList:
 
 data = np.array(data).transpose()
 
-np.savetxt(R_out_dir + 'choicelevel_data.csv',data, delimiter=',',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=",".join(headerList),comments='')
+np.savetxt(R_out_dir + 'choicelevel_data.csv',data, delimiter=',',fmt='%d,%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=",".join(headerList),comments='')
 headerList_ = [" ", *headerList]
-np.savetxt(R_out_dir + 'choicelevel_data.txt',data, delimiter=' ',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=" ".join(headerList_),comments='')
+np.savetxt(R_out_dir + 'choicelevel_data.txt',data, delimiter=' ',fmt='%d,%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=" ".join(headerList_),comments='')
 
 
 # undo data saving
@@ -205,9 +216,9 @@ data = [np.array(subjects)[ind_data]]
 for data_ in dataList:
     data.append(data_[ind_data])
 data = np.array(data).transpose()
-np.savetxt(R_out_dir + 'choicelevel_undo_data.csv',data, delimiter=',',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=",".join(headerList),comments='')
+np.savetxt(R_out_dir + 'choicelevel_undo_data.csv',data, delimiter=',',fmt='%d,%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=",".join(headerList),comments='')
 headerList_ = [" ", *headerList]
-np.savetxt(R_out_dir + 'choicelevel_undo_data.txt',data, delimiter=' ',fmt='%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=" ".join(headerList_),comments='')
+np.savetxt(R_out_dir + 'choicelevel_undo_data.txt',data, delimiter=' ',fmt='%d,%d,%d,%d, %d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=" ".join(headerList_),comments='')
 
 
 
