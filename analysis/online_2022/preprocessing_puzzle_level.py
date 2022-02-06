@@ -45,6 +45,7 @@ numEnd  = []          # how many time reaches the end
 
 TT = []               # total time taken for a trial
 RT1= []               # first step RT
+RTlater = []          # later step RT
 RTsubmit=[]           # submit RT
 
 tortuosity = []       # tortuosity
@@ -79,6 +80,7 @@ for i in range(len(data_all)): # iterate over subjects
     
     temp_TT                = []
     temp_RT1               = []
+    temp_RTlater           = []
     temp_RTsubmit          = []
 
     temp_tortuosity = []
@@ -118,7 +120,10 @@ for i in range(len(data_all)): # iterate over subjects
             
             temp_TT.append(np.array(single_trial.time_all)[-1]/1000)
             temp_RT1.append(np.array(single_trial.rt_all)[1]/1000) 
-            temp_RTsubmit.append(np.array(single_trial.rt_all)[-1]/1000)
+            temp_RTsubmit.append(np.array(single_trial.rt_all)[-1]/1000)         
+            index_later = single_trial.index[(single_trial['rt_all'] != -1) & (single_trial['undoIndicator'] != 1)& (single_trial['submit'] != 1)]
+            RT_later = single_trial.loc[index_later,'rt_all']
+            temp_RTlater.append(np.mean(RT_later)/1000)         
 
             temp_tortuosity.append(np.array(single_trial.tortuosity_all)[-1])
 
@@ -147,7 +152,8 @@ for i in range(len(data_all)): # iterate over subjects
     numUNDO.append(temp_numUNDO)
     
     TT.append(temp_TT)
-    RT1.append(temp_RT1)             
+    RT1.append(temp_RT1)  
+    RTlater.append(temp_RTlater)             
     RTsubmit.append(temp_RTsubmit)   
 
     tortuosity.append(temp_tortuosity)
@@ -180,7 +186,8 @@ headerList = ['subjects', 'puzzleID',
               'nos', 'leftover', 
               'numError', 'sumSeverityErrors', 
               'condition','numUNDO', 'numFullUndo', 'numEnd', 
-              'TT','RT1','RTsubmit','tortuosity']
+              'TT','RT1','RTlater','RTsubmit',
+              'tortuosity']
 subjects = []
 for i in range(len(data_all)):
     subjects.extend(((np.ones(len(np.unique(np.array(data_all[i].trial_id))))*(i+1)).astype(np.int16).tolist()))
@@ -190,14 +197,15 @@ dataList = [np.array(puzzleID).astype(np.int16),
             np.array(nos).astype(np.int16), np.array(leftover),
             np.array(numError).astype(np.int16), np.array(sumSeverityErrors).astype(np.int16), 
             np.array(undo_c).astype(np.int16), np.array(numUNDO).astype(np.int16), np.array(numFullUndo).astype(np.int16), np.array(numEnd).astype(np.int16),
-            np.array(TT),np.array(RT1),np.array(RTsubmit),np.array(tortuosity)]
+            np.array(TT),np.array(RT1),np.array(RTlater),np.array(RTsubmit),
+            np.array(tortuosity)]
 for data_ in dataList:
     data.append(data_.reshape((-1)).tolist())
 
 data = np.array(data).transpose()
 
-np.savetxt(R_out_dir + 'data.csv',data,delimiter=',', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f', header=",".join(headerList),comments='')
+np.savetxt(R_out_dir + 'data.csv',data,delimiter=',', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f, %f', header=",".join(headerList),comments='')
 
 headerList_ = [" ", *headerList]
-np.savetxt(R_out_dir + 'data.txt',data,delimiter=' ', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f', header=" ".join(headerList_),comments='')
+np.savetxt(R_out_dir + 'data.txt',data,delimiter=' ', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f, %f', header=" ".join(headerList_),comments='')
 
