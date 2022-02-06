@@ -626,42 +626,42 @@ class figure_plott:
                     bbox_inches='tight')
         plt.close(fig)
     
-# ========================================================================
-# Benefit of undo as number of undo usage increases
-    def rc_undobenefit_undonum(self):
-            benefit_undo = (np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['numCities']) 
-                    - np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==0]['numCities']))
-            undo_count = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['numUNDO'])
-            yerr = stats.binned_statistic(undo_count, benefit_undo, statistic=lambda y: np.std(y)/np.sqrt(len(y)), bins=[1,3,6,9,15])
-            bins = stats.binned_statistic(undo_count, benefit_undo, 'mean', bins=[1,3,6,9,15])
+# # ========================================================================
+# # Benefit of undo as number of undo usage increases
+#     def rc_undobenefit_undonum(self):
+#             benefit_undo = (np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['numCities']) 
+#                     - np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==0]['numCities']))
+#             undo_count = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['numUNDO'])
+#             yerr = stats.binned_statistic(undo_count, benefit_undo, statistic=lambda y: np.std(y)/np.sqrt(len(y)), bins=[1,3,6,9,15])
+#             bins = stats.binned_statistic(undo_count, benefit_undo, 'mean', bins=[1,3,6,9,15])
             
-            fig, axs = plt.subplots()         
-            axs.plot(bins[1][:-1], bins[0], color = '#81b29a', linewidth=3)
-            plotline1, caplines1, barlinecols1 = axs.errorbar(bins[1][:-1], bins[0], yerr[0], capsize = 0, ls='None', color='k')
-            axs.set_xticks([1,3,6,9])
-            axs.set_xticklabels([1,3,6,'9+'])
-            axs.set_xlabel('number of undo usage')
-            axs.set_ylabel('benefit of undo (n_undo - n_basic)')
-            fig.savefig(self.out_dir + 'undobenefit_undonum.png', dpi=600, bbox_inches='tight')
+#             fig, axs = plt.subplots()         
+#             axs.plot(bins[1][:-1], bins[0], color = '#81b29a', linewidth=3)
+#             plotline1, caplines1, barlinecols1 = axs.errorbar(bins[1][:-1], bins[0], yerr[0], capsize = 0, ls='None', color='k')
+#             axs.set_xticks([1,3,6,9])
+#             axs.set_xticklabels([1,3,6,'9+'])
+#             axs.set_xlabel('number of undo usage')
+#             axs.set_ylabel('benefit of undo (n_undo - n_basic)')
+#             fig.savefig(self.out_dir + 'undobenefit_undonum.png', dpi=600, bbox_inches='tight')
 
-# ========================================================================
-# Proportion of Errors and number of optimal solutions
-    def rc_error_optimal(self):
-            error_basic = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==0]['numError']) 
-            error_undo = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['numError']) 
-            n_optimal = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['nos'])
-            bins1 = stats.binned_statistic(n_optimal, error_basic, 'mean', bins=[1,3,6,9,15])
-            bins2 = stats.binned_statistic(n_optimal, error_undo, 'mean', bins=[1,3,6,9,15])
+# # ========================================================================
+# # Proportion of Errors and number of optimal solutions
+#     def rc_error_optimal(self):
+#             error_basic = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==0]['numError']) 
+#             error_undo = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['numError']) 
+#             n_optimal = np.array(self.puzzleID_order_data[self.puzzleID_order_data['undo_c']==1]['nos'])
+#             bins1 = stats.binned_statistic(n_optimal, error_basic, 'mean', bins=[1,3,6,9,15])
+#             bins2 = stats.binned_statistic(n_optimal, error_undo, 'mean', bins=[1,3,6,9,15])
             
-            fig, axs = plt.subplots()         
-            axs.plot(bins1[1][:-1], bins1[0], color = '#81b29a', linewidth=3,label='basic')
-            axs.plot(bins2[1][:-1], bins2[0],linewidth=3,label='undo')
-            axs.set_xlabel('number of optimal solutions')
-            axs.set_ylabel('count of error')
-            axs.set_xticks([1,3,6,9])
-            axs.set_xticklabels([1,3,6,'9+'])
-            axs.legend()
-            fig.savefig(self.out_dir + 'error_optimal.png', dpi=600, bbox_inches='tight')
+#             fig, axs = plt.subplots()         
+#             axs.plot(bins1[1][:-1], bins1[0], color = '#81b29a', linewidth=3,label='basic')
+#             axs.plot(bins2[1][:-1], bins2[0],linewidth=3,label='undo')
+#             axs.set_xlabel('number of optimal solutions')
+#             axs.set_ylabel('count of error')
+#             axs.set_xticks([1,3,6,9])
+#             axs.set_xticklabels([1,3,6,'9+'])
+#             axs.legend()
+#             fig.savefig(self.out_dir + 'error_optimal.png', dpi=600, bbox_inches='tight')
             
     def rc_severe_error_undo(self):
         data_all = self.data_all
