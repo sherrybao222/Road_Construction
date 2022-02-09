@@ -31,9 +31,13 @@ data_dir  = 'data/preprocessed'
 out_dir = home_dir + 'figures/figures_all/'
 R_out_dir = home_dir + 'R_analysis_data/'
 
+# +
 data_puzzle_level = pd.read_csv(R_out_dir +  'data.csv')
 puzzleID_order_data = data_puzzle_level.sort_values(["subjects","puzzleID","condition"])
 data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data.csv')
+
+single_condition_data = puzzleID_order_data[puzzleID_order_data['condition']==1].copy()
+single_condition_data = single_condition_data.reset_index()
 
 
 # +
@@ -344,6 +348,8 @@ undo_count = np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['
 yerr = stats.binned_statistic(undo_count, benefit_undo, statistic=lambda y: np.std(y)/np.sqrt(len(y)), bins=[0,1,2,3,4,100])
 bins = stats.binned_statistic(undo_count, benefit_undo, 'mean', bins=[0,1,2,3,4,100])
 
+
+# +
 fig, axs = plt.subplots()         
 axs.plot(bins[1][:-1], bins[0], color = '#81b29a', linewidth=3)
 plotline1, caplines1, barlinecols1 = axs.errorbar(bins[1][:-1], bins[0], yerr[0], capsize = 0, ls='None', color='k')
@@ -367,9 +373,25 @@ axs.set_xticklabels([0,1,2,3,'4+'])
 axs.set_xlabel('number of full undoing')
 axs.set_ylabel('benefit of undo (n_undo - n_basic)')
 fig.savefig(out_dir + 'undobenefit_undonum.png', dpi=600, bbox_inches='tight')
-
 # -
 
+
+basic_score = puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities'].reset_index(drop=True)
+single_condition_data['undo_benefit'] = single_condition_data['numCities'] - basic_score
+undo_benefit_sub = single_condition_data.groupby(['subjects'])['undo_benefit'].mean()
+undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean()
+
+fig1, ax1 = plt.subplots()
+ax1.plot(undo_count_sub,undo_benefit_sub,'o')
+ax1.set_xlabel("count of undo")
+ax1.set_ylabel("benefit of undo")
+
+undo_benefit_puzzle = single_condition_data.groupby(['puzzleID'])['undo_benefit'].mean()
+undo_count_puzzle = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean()
+fig1, ax1 = plt.subplots()
+ax1.plot(undo_count_puzzle,undo_benefit_puzzle,'o')
+ax1.set_xlabel("count of undo")
+ax1.set_ylabel("benefit of undo")
 
 # ## count of error - number of optimal solutions
 
