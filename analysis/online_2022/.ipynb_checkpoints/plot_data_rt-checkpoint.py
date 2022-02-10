@@ -397,34 +397,36 @@ single_condition_data['undo_benefit'] = single_condition_data['numCities'] - bas
 undo_benefit_sub = single_condition_data.groupby(['subjects'])['undo_benefit'].mean()
 undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean()
 
+#TODO: with a caption stating that each point is a subject, the Spearman rho, and the p-value
 fig1, ax1 = plt.subplots()
 ax1.plot(undo_count_sub,undo_benefit_sub,'o')
-ax1.set_xlabel("count of undo")
+ax1.set_xlabel("average number of undo")
 ax1.set_ylabel("benefit of undo")
 
 undo_benefit_puzzle = single_condition_data.groupby(['puzzleID'])['undo_benefit'].mean()
 undo_count_puzzle = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean()
 fig1, ax1 = plt.subplots()
 ax1.plot(undo_count_puzzle,undo_benefit_puzzle,'o')
-ax1.set_xlabel("count of undo")
+ax1.set_xlabel("average number of undo")
 ax1.set_ylabel("benefit of undo")
 
 # + magic_args="-i single_condition_data" language="R"
 #
 # single_condition_data$subjects <- factor(single_condition_data$subjects)
 # single_condition_data$puzzleID <- factor(single_condition_data$puzzleID)
-# single_condition_data$numFullUndo[single_condition_data$numFullUndo >4] <- 4
-# single_condition_data$numFullUndo <- factor(single_condition_data$numFullUndo)
+# # single_condition_data$numFullUndo[single_condition_data$numFullUndo >4] <- 4
+# # single_condition_data$numFullUndo <- factor(single_condition_data$numFullUndo)
 #
 # str(single_condition_data)
 
-# +
-model = lmer(undo_benefit ~ numFullUndo + (numFullUndo|subjects) + (numFullUndo|puzzleID),
-                                  data=single_condition_data , control=lmerControl(optimizer="optimx",
-                                                                   optCtrl=list(method="nlminb")))
-
-# get the coefficients for the best fitting model
-summary(model)
+# + language="R"
+#
+# model = lmer(undo_benefit ~ numFullUndo + (numFullUndo|subjects) + (numFullUndo|puzzleID),
+#                                   data=single_condition_data , control=lmerControl(optimizer="optimx",
+#                                                                    optCtrl=list(method="nlminb")))
+#
+# # get the coefficients for the best fitting model
+# summary(model)
 
 # + language="R"
 # anova(model)
