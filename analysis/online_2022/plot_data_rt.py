@@ -26,6 +26,21 @@ from scipy.stats import shapiro
 from scipy.stats import normaltest
 from scipy.stats import ttest_rel,ttest_ind
 
+# +
+# %load_ext rpy2.ipython
+
+from rpy2.robjects.packages import importr
+# import R's "base" package
+lme4 = importr('lme4')
+optimx = importr('optimx')
+pbkrtest = importr('pbkrtest')
+lmerTest = importr('lmerTest')
+ggplot = importr('ggplot2')
+dplyr = importr('dplyr')
+sjplot = importr('sjPlot')
+car = importr('car')
+# -
+
 home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
@@ -382,17 +397,49 @@ single_condition_data['undo_benefit'] = single_condition_data['numCities'] - bas
 undo_benefit_sub = single_condition_data.groupby(['subjects'])['undo_benefit'].mean()
 undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean()
 
+#TODO: with a caption stating that each point is a subject, the Spearman rho, and the p-value
 fig1, ax1 = plt.subplots()
 ax1.plot(undo_count_sub,undo_benefit_sub,'o')
-ax1.set_xlabel("count of undo")
+ax1.set_xlabel("average number of undo")
 ax1.set_ylabel("benefit of undo")
 
 undo_benefit_puzzle = single_condition_data.groupby(['puzzleID'])['undo_benefit'].mean()
 undo_count_puzzle = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean()
 fig1, ax1 = plt.subplots()
 ax1.plot(undo_count_puzzle,undo_benefit_puzzle,'o')
-ax1.set_xlabel("count of undo")
+ax1.set_xlabel("average number of undo")
 ax1.set_ylabel("benefit of undo")
+
+# + magic_args="-i single_condition_data" language="R"
+#
+# single_condition_data$subjects <- factor(single_condition_data$subjects)
+# single_condition_data$puzzleID <- factor(single_condition_data$puzzleID)
+# # single_condition_data$numFullUndo[single_condition_data$numFullUndo >4] <- 4
+# # single_condition_data$numFullUndo <- factor(single_condition_data$numFullUndo)
+#
+# str(single_condition_data)
+
+# + language="R"
+#
+# model = lmer(undo_benefit ~ numFullUndo + (numFullUndo|subjects) + (numFullUndo|puzzleID),
+#                                   data=single_condition_data , control=lmerControl(optimizer="optimx",
+#                                                                    optCtrl=list(method="nlminb")))
+#
+# # get the coefficients for the best fitting model
+# summary(model)
+
+# + language="R"
+# anova(model)
+# plot(model)
+#
+# ranef(model)
+# ## QQ-plots:
+# # par(mfrow = c(1, 2))
+# # qqnorm(ranef(model)$subjects[, 1], main = "Random effects of subjects")
+# # qqnorm(resid(model), main = "Residuals")
+#
+# qqPlot(resid(model), distribution = "norm")
+# -
 
 # ## count of error - number of optimal solutions
 

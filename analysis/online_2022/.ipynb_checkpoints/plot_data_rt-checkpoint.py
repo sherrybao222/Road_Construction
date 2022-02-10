@@ -1,6 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
+#     formats: ipynb,py
 #     text_representation:
 #       extension: .py
 #       format_name: light
@@ -24,6 +25,21 @@ from scipy import stats
 from scipy.stats import shapiro
 from scipy.stats import normaltest
 from scipy.stats import ttest_rel,ttest_ind
+
+# +
+# %load_ext rpy2.ipython
+
+from rpy2.robjects.packages import importr
+# import R's "base" package
+lme4 = importr('lme4')
+optimx = importr('optimx')
+pbkrtest = importr('pbkrtest')
+lmerTest = importr('lmerTest')
+ggplot = importr('ggplot2')
+dplyr = importr('dplyr')
+sjplot = importr('sjPlot')
+car = importr('car')
+# -
 
 home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
@@ -392,6 +408,36 @@ fig1, ax1 = plt.subplots()
 ax1.plot(undo_count_puzzle,undo_benefit_puzzle,'o')
 ax1.set_xlabel("count of undo")
 ax1.set_ylabel("benefit of undo")
+
+# + magic_args="-i single_condition_data" language="R"
+#
+# single_condition_data$subjects <- factor(single_condition_data$subjects)
+# single_condition_data$puzzleID <- factor(single_condition_data$puzzleID)
+# single_condition_data$numFullUndo[single_condition_data$numFullUndo >4] <- 4
+# single_condition_data$numFullUndo <- factor(single_condition_data$numFullUndo)
+#
+# str(single_condition_data)
+
+# +
+model = lmer(undo_benefit ~ numFullUndo + (numFullUndo|subjects) + (numFullUndo|puzzleID),
+                                  data=single_condition_data , control=lmerControl(optimizer="optimx",
+                                                                   optCtrl=list(method="nlminb")))
+
+# get the coefficients for the best fitting model
+summary(model)
+
+# + language="R"
+# anova(model)
+# plot(model)
+#
+# ranef(model)
+# ## QQ-plots:
+# # par(mfrow = c(1, 2))
+# # qqnorm(ranef(model)$subjects[, 1], main = "Random effects of subjects")
+# # qqnorm(resid(model), main = "Residuals")
+#
+# qqPlot(resid(model), distribution = "norm")
+# -
 
 # ## count of error - number of optimal solutions
 
