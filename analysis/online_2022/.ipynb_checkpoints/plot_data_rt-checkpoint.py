@@ -356,10 +356,21 @@ print(groupby_error)
 # ## benefit of undo - number of full undoing
 
 # +
-benefit_undo = (np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numCities']) 
-        - np.array(puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities']))
+basic_score = puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities'].reset_index(drop=True)
+basic_score_z = basic_score/puzzleID_order_data[puzzleID_order_data['condition']==0]['mas'].reset_index(drop=True)
+single_condition_data['numCities_z'] = single_condition_data['numCities']/single_condition_data['mas']
 
-undo_count = np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numFullUndo'])
+single_condition_data['undo_benefit'] = single_condition_data['numCities'] - basic_score
+single_condition_data['undo_benefit_z'] = single_condition_data['numCities_z'] - basic_score_z
+
+undo_benefit_sub = single_condition_data.groupby(['subjects'])['undo_benefit'].mean()
+undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean()
+
+# +
+# benefit_undo = (np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numCities']) 
+#         - np.array(puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities']))
+
+# undo_count = np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numFullUndo'])
 
 yerr = stats.binned_statistic(undo_count, benefit_undo, statistic=lambda y: np.std(y)/np.sqrt(len(y)), bins=[0,1,2,3,4,100])
 bins = stats.binned_statistic(undo_count, benefit_undo, 'mean', bins=[0,1,2,3,4,100])
@@ -392,10 +403,37 @@ fig.savefig(out_dir + 'undobenefit_undonum.png', dpi=600, bbox_inches='tight')
 # -
 
 
-basic_score = puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities'].reset_index(drop=True)
-single_condition_data['undo_benefit'] = single_condition_data['numCities'] - basic_score
-undo_benefit_sub = single_condition_data.groupby(['subjects'])['undo_benefit'].mean()
-undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean()
+scatter_data = single_condition_data.groupby(['undo_benefit','numFullUndo'])['index'].size().to_frame(name = 'count').reset_index()
+
+# %matplotlib notebook
+fig1, ax1 = plt.subplots()
+sns.scatterplot(x='numFullUndo', y='undo_benefit', size = scatter_data['count'], sizes = (3,100), data=scatter_data) 
+ax1.set_xlabel("number of undo")
+ax1.set_ylabel("benefit of undo")
+
+undo_puzzle = single_condition_data[single_condition_data['numUNDO']>0].groupby(['subjects']).size()
+count = [len(single_condition_data.groupby(['subjects']).size())]
+for i in range(1,47):
+    count.append(sum(undo_puzzle>=i))
+
+# +
+fig, axs = plt.subplots()
+
+plt.bar(list(range(0,47)),count)
+axs.set_xlabel("undo in >= number of puzzles")
+axs.set_ylabel("number of subjects")
+# axs.plot(bins[1][:-1], bins[0], color = '#81b29a', linewidth=3)
+
+# +
+order = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean().to_frame()
+sort_order = order.sort_values('numFullUndo')
+
+# %matplotlib notebook
+fig, axs = plt.subplots(1, 1)
+
+bx = sns.barplot(x='puzzleID', y='numFullUndo', data = single_condition_data, color = '#ccd5ae',order=sort_order.index) 
+
+# -
 
 #TODO: with a caption stating that each point is a subject, the Spearman rho, and the p-value
 fig1, ax1 = plt.subplots()
@@ -421,7 +459,7 @@ ax1.set_ylabel("benefit of undo")
 
 # + language="R"
 #
-# model = lmer(undo_benefit ~ numFullUndo + (numFullUndo|subjects) + (numFullUndo|puzzleID),
+# model = lmer(undo_benefit_z ~ numFullUndo + (numFullUndo|subjects) + (numFullUndo|puzzleID),
 #                                   data=single_condition_data , control=lmerControl(optimizer="optimx",
 #                                                                    optCtrl=list(method="nlminb")))
 #
