@@ -55,7 +55,7 @@ ax0.legend()
 # fig0.suptitle('Relative change of count of defer in group condition compared to self condition')
 # print('the mean of relative change in group level is:'+ str(statistics.mean(groupDeferRate)))
 plt.show()
-fig0.savefig(out_dir + 'connected_individual.png', dpi=600, bbox_inches='tight')
+fig0.savefig(out_dir + 'connected_individual.pdf', dpi=600, bbox_inches='tight')
 # -
 
 # ## individual counts of undoing
@@ -70,7 +70,7 @@ fig0, ax0 = plt.subplots()
 subInd = [x+1 for x in sorted(range(len(num_undo)),key=lambda k:list(num_undo)[k])]
 ax0.bar(list(range(1,n_sub+1)),sorted(num_undo),color = "#dda15e")
 ax0.set_xlabel("subjects")
-ax0.set_ylabel("average counts of undo usage")
+ax0.set_ylabel("average number of undo usage")
 ax0.invert_xaxis()
 ax0.set_xticks([])
 # -
@@ -87,10 +87,10 @@ fig0, ax0 = plt.subplots()
 subInd = [x+1 for x in sorted(range(len(numFullUndo)),key=lambda k:list(numFullUndo)[k])]
 ax0.bar(list(range(1,n_sub+1)),sorted(numFullUndo),color = "#dda15e")
 ax0.set_xlabel("subjects")
-ax0.set_ylabel("average counts of full undoing")
+ax0.set_ylabel("average number of full undoing")
 ax0.invert_xaxis()
 ax0.set_xticks([])
-fig0.savefig(out_dir + 'full_undoing_individual.png', dpi=600, bbox_inches='tight')
+fig0.savefig(out_dir + 'full_undoing_individual.pdf', dpi=600, bbox_inches='tight')
 # -
 
 
