@@ -344,12 +344,36 @@ df_beforeUndo = data_choice_level.loc[index_first_undo-1,:]
 MAS_trial = df_beforeUndo['allMAS']
 accu_severity_error = MAS_trial - df_beforeUndo['currMas']
 groupby_error = accu_severity_error.value_counts()
+print(groupby_error/sum(groupby_error))
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+axs.bar(groupby_error.index,groupby_error/sum(groupby_error))
+axs.set_ylabel('proportion of first undo')
+axs.set_xlabel('accumulated error before first undo action')
+plt.show()
+fig.savefig(out_dir + 'undo_accumulated_error.pdf', dpi=600, bbox_inches='tight')
+
+
+# +
+index_first_undo =  data_choice_level.index[data_choice_level['firstUndo'] == 1]
+df_beforeUndo = data_choice_level.loc[index_first_undo-1,:]
+
+instant_severity_error = df_beforeUndo['severityOfErrors']
+groupby_error_instant = instant_severity_error.value_counts()
 print(groupby_error)
 
 # +
-# # %matplotlib notebook
+# %matplotlib notebook
 
-# fig, axs = plt.subplots(1, 1)
+fig, axs = plt.subplots(1, 1)
+axs.bar(groupby_error.index,groupby_error_instant/sum(groupby_error))
+axs.set_ylabel('proportion of first undo')
+axs.set_xlabel('instant error before first undo action')
+plt.show()
+fig.savefig(out_dir + 'undo_instant_error.pdf', dpi=600, bbox_inches='tight')
 
 
 # -
@@ -363,7 +387,7 @@ single_condition_data['numCities_z'] = single_condition_data['numCities']/single
 single_condition_data['undo_benefit'] = single_condition_data['numCities'] - basic_score
 single_condition_data['undo_benefit_z'] = single_condition_data['numCities_z'] - basic_score_z
 
-undo_benefit_sub = single_condition_data.groupby(['subjects'])['undo_benefit'].mean()
+undo_benefit_z_sub = single_condition_data.groupby(['subjects'])['undo_benefit_z'].mean()
 undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean()
 
 # +
@@ -403,11 +427,11 @@ fig.savefig(out_dir + 'undobenefit_undonum.png', dpi=600, bbox_inches='tight')
 # -
 
 
-scatter_data = single_condition_data.groupby(['undo_benefit','numFullUndo'])['index'].size().to_frame(name = 'count').reset_index()
+scatter_data = single_condition_data.groupby(['undo_benefit_z','numFullUndo'])['index'].size().to_frame(name = 'count').reset_index()
 
 # %matplotlib notebook
 fig1, ax1 = plt.subplots()
-sns.scatterplot(x='numFullUndo', y='undo_benefit', size = scatter_data['count'], sizes = (3,100), data=scatter_data) 
+sns.scatterplot(x='numFullUndo', y='undo_benefit_z', size = scatter_data['count'], sizes = (3,100), data=scatter_data) 
 ax1.set_xlabel("number of undo")
 ax1.set_ylabel("benefit of undo")
 
@@ -436,10 +460,13 @@ bx = sns.barplot(x='puzzleID', y='numFullUndo', data = single_condition_data, co
 # -
 
 #TODO: with a caption stating that each point is a subject, the Spearman rho, and the p-value
-fig1, ax1 = plt.subplots()
-ax1.plot(undo_count_sub,undo_benefit_sub,'o')
+stats.spearmanr(undo_count_sub,undo_benefit_z_sub)
+
+fig11, ax1 = plt.subplots()
+ax1.plot(undo_count_sub,undo_benefit_z_sub,'o')
 ax1.set_xlabel("average number of undo")
 ax1.set_ylabel("benefit of undo")
+fig11.savefig(out_dir + 'undobenefit_individual.pdf', dpi=600, bbox_inches='tight')
 
 undo_benefit_puzzle = single_condition_data.groupby(['puzzleID'])['undo_benefit'].mean()
 undo_count_puzzle = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean()
@@ -452,6 +479,7 @@ ax1.set_ylabel("benefit of undo")
 #
 # single_condition_data$subjects <- factor(single_condition_data$subjects)
 # single_condition_data$puzzleID <- factor(single_condition_data$puzzleID)
+# single_condition_data$mas <- factor(single_condition_data$mas)
 # # single_condition_data$numFullUndo[single_condition_data$numFullUndo >4] <- 4
 # # single_condition_data$numFullUndo <- factor(single_condition_data$numFullUndo)
 #
@@ -459,7 +487,7 @@ ax1.set_ylabel("benefit of undo")
 
 # + language="R"
 #
-# model = lmer(undo_benefit_z ~ numFullUndo + (numFullUndo|subjects) + (numFullUndo|puzzleID),
+# model = lmer(undo_benefit_z ~ numFullUndo + (numFullUndo|subjects),
 #                                   data=single_condition_data , control=lmerControl(optimizer="optimx",
 #                                                                    optCtrl=list(method="nlminb")))
 #
@@ -467,8 +495,8 @@ ax1.set_ylabel("benefit of undo")
 # summary(model)
 
 # + language="R"
-# anova(model)
-# plot(model)
+# # anova(model)
+# # plot(model)
 #
 # ranef(model)
 # ## QQ-plots:
