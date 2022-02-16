@@ -363,17 +363,93 @@ df_beforeUndo = data_choice_level.loc[index_first_undo-1,:]
 
 instant_severity_error = df_beforeUndo['severityOfErrors']
 groupby_error_instant = instant_severity_error.value_counts()
-print(groupby_error)
+print(groupby_error_instant)
 
 # +
 # %matplotlib notebook
 
 fig, axs = plt.subplots(1, 1)
-axs.bar(groupby_error.index,groupby_error_instant/sum(groupby_error))
+axs.bar(groupby_error.index,groupby_error_instant/sum(groupby_error_instant))
 axs.set_ylabel('proportion of first undo')
 axs.set_xlabel('instant error before first undo action')
 plt.show()
 fig.savefig(out_dir + 'undo_instant_error.pdf', dpi=600, bbox_inches='tight')
+
+
+# +
+# groupby_error_single = single_severity_error.value_counts()
+# groupby_error_series = series_severity_error.value_counts()
+
+# groupby_error_series.at[4] = 0
+# groupby_error_series.at[6] = 0
+
+# +
+index_single_undo =  data_choice_level.index[(data_choice_level['firstUndo'] == 1)&(data_choice_level['lastUndo'] == 1)]
+df_beforeSingleUndo = data_choice_level.loc[index_single_undo-1,:]
+
+single_severity_error = df_beforeSingleUndo['severityOfErrors']
+df_beforeSingleUndo['accumulatedError'] = df_beforeSingleUndo['allMAS'] - df_beforeSingleUndo['currMas']
+groupby_error_single = df_beforeSingleUndo.groupby(['severityOfErrors','accumulatedError'])['subjects'].count()
+groupby_error_single = groupby_error_single.reset_index()
+
+groupby_error_single.loc[groupby_error_single['accumulatedError']>groupby_error_single['severityOfErrors'],'accumulatedError']= 'noninstant'
+groupby_error_single = groupby_error_single.groupby(['severityOfErrors','accumulatedError']).sum()
+groupby_error_single = groupby_error_single.reset_index()
+
+groupby_error_single['undoType'] = 'single'
+
+
+
+index_series_undo =  data_choice_level.index[(data_choice_level['firstUndo'] == 1)&(data_choice_level['lastUndo'] != 1)]
+df_beforeSeriesUndo = data_choice_level.loc[index_series_undo-1,:]
+
+series_severity_error = df_beforeSeriesUndo['severityOfErrors']
+df_beforeSeriesUndo['accumulatedError'] = df_beforeSeriesUndo['allMAS'] - df_beforeSeriesUndo['currMas']
+groupby_error_series = df_beforeSeriesUndo.groupby(['severityOfErrors','accumulatedError'])['subjects'].count()
+groupby_error_series = groupby_error_series.reset_index()
+
+groupby_error_series.loc[groupby_error_series['accumulatedError']>groupby_error_series['severityOfErrors'],'accumulatedError']= 'noninstant'
+groupby_error_series = groupby_error_series.groupby(['severityOfErrors','accumulatedError']).sum()
+groupby_error_series = groupby_error_series.reset_index()
+
+groupby_error_series['undoType'] = 'serial'
+
+groupby_error = pd.concat([groupby_error_single,groupby_error_series])
+
+# add empty entries
+d = {'severityOfErrors': [4,4,4,6,6,6], 'accumulatedError': [4,'noninstant','noninstant', 6,'noninstant','noninstant'],'subjects': [0,0,0,0,0,0],'undoType': ['serial','serial','single', 'serial','serial','single',]}
+df = pd.DataFrame(data=d)
+groupby_error = pd.concat([groupby_error,df]).reset_index()
+print(groupby_error)
+
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+single_index1 = (groupby_error['accumulatedError']!='noninstant')&(groupby_error['undoType']=='single')
+single_index2 = (groupby_error['accumulatedError']=='noninstant')&(groupby_error['undoType']=='single')
+single_proportion = groupby_error.loc[single_index1 ,'subjects']/sum(groupby_error['subjects'])
+single_proportion2 = groupby_error.loc[single_index2 ,'subjects']/sum(groupby_error['subjects'])
+
+serial_index1 = (groupby_error['accumulatedError']!='noninstant')&(groupby_error['undoType']=='serial')
+serial_index2 = (groupby_error['accumulatedError']=='noninstant')&(groupby_error['undoType']=='serial')
+
+x = groupby_error.loc[single_index1 ,'severityOfErrors']
+width = 0.35  # the width of the bars
+
+axs.bar(x - width/2, single_proportion, width, label='single undo-only instant error',hatch='//',color='#d4a373',edgecolor='black')
+axs.bar(x + width/2, single_proportion2, width, label='single undo-with accumulated error',hatch='//',color='#ccd5ae',edgecolor='black')
+axs.bar(x - width/2, groupby_error.loc[serial_index1 ,'subjects']/sum(groupby_error['subjects']),width, bottom=single_proportion,
+       label='serial undo-only instant error',color='#d4a373',edgecolor='black')
+axs.bar(x + width/2, groupby_error.loc[serial_index2 ,'subjects']/sum(groupby_error['subjects']),width, bottom=single_proportion2,
+       label='serial undo-with accumulated error',color='#ccd5ae',edgecolor='black')
+
+axs.set_ylabel('proportion of first undo')
+axs.set_xlabel('instant error before undo action')
+axs.legend()
+plt.show()
+fig.savefig(out_dir + 'undotype_errortype.pdf', dpi=600, bbox_inches='tight')
 
 
 # -
