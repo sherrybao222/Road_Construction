@@ -465,6 +465,8 @@ single_condition_data['undo_benefit_z'] = single_condition_data['numCities_z'] -
 
 undo_benefit_z_sub = single_condition_data.groupby(['subjects'])['undo_benefit_z'].mean()
 undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean()
+print(undo_benefit_z_sub)
+print(undo_count_sub)
 
 # +
 # benefit_undo = (np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numCities']) 

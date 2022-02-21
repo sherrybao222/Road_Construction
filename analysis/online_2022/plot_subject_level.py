@@ -44,7 +44,7 @@ fig0, ax0 = plt.subplots()
 subInd = [x+1 for x in sorted(range(len(numCity_basic)),key=lambda k:list(numCity_basic)[k])]
 sorted_numCity_undo = [numCity_undo[x] for x in subInd]
 ax0.bar(list(range(1,n_sub+1)),sorted(numCity_basic),color = "#dda15e",alpha=0.5,label='basic')
-ax0.bar(list(range(1,n_sub+1)),sorted(sorted_numCity_undo),alpha=0.5,label='undo')
+ax0.bar(list(range(1,n_sub+1)),sorted_numCity_undo,alpha=0.5,label='undo')
 ax0.axhline(mas)
 ax0.invert_xaxis()
 ax0.set_xticks([])
@@ -55,7 +55,8 @@ ax0.legend()
 # fig0.suptitle('Relative change of count of defer in group condition compared to self condition')
 # print('the mean of relative change in group level is:'+ str(statistics.mean(groupDeferRate)))
 plt.show()
-fig0.savefig(out_dir + 'connected_individual.pdf', dpi=600, bbox_inches='tight')
+#fig0.savefig(out_dir + 'connected_individual.pdf', dpi=600, bbox_inches='tight')
+
 # -
 
 # ## individual counts of undoing
