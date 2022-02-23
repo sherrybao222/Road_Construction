@@ -453,6 +453,124 @@ fig.savefig(out_dir + 'undotype_errortype.pdf', dpi=600, bbox_inches='tight')
 
 
 # -
+# ### conditional probability of undo
+
+# +
+# FROM EACH SUBJECT
+dat_subjects = []
+for i in np.unique(np.array(data_choice_level['subjects'])):
+    temp_data = []
+    index_subjects =  data_choice_level.index[data_choice_level['subjects'] == i]
+    
+    puzzle_error = data_choice_level['allMAS'] - data_choice_level['currMas']
+    
+    # no error
+    index_error = puzzle_error.index[puzzle_error == 0]
+    index_error = np.array(index_error)
+    index_error = np.intersect1d(index_error, index_subjects)
+    index_error += 1
+    if np.any(index_error>(data_choice_level.shape[0]-1)):
+        index_error = np.delete(index_error, np.where(index_error>(data_choice_level.shape[0]-1)))
+#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+    temp_data.append(np.mean(data_choice_level['firstUndo'][index_error]))
+
+
+    # YES error
+    index_error = puzzle_error.index[puzzle_error != 0]
+    index_error = np.array(index_error)
+    index_error = np.intersect1d(index_error, index_subjects)
+    index_error += 1
+    if np.any(index_error>(data_choice_level.shape[0]-1)):
+        index_error = np.delete(index_error, np.where(index_error>(data_choice_level.shape[0]-1)))
+#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+    temp_data.append(np.mean(data_choice_level['firstUndo'][index_error]))
+    
+    dat_subjects.append(temp_data)
+
+dat_subjects = np.array(dat_subjects)
+print(np.mean(dat_subjects,axis=0))
+print(np.unique(np.array(data_choice_level['subjects'])))
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+axs.bar([1,2],np.mean(dat_subjects,axis = 0),color=[.7,.7,.7], edgecolor = 'k', yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+axs.set_ylabel('P (undo)')
+axs.set_xticks([1,2])
+axs.set_yticks(np.linspace(0,0.16,5))
+axs.set_xticklabels(labels = ['No error', 'Error'])#,fontsize=18
+fig.set_figheight(4)
+fig.set_figwidth(3)
+axs.set_xlabel('puzzle-level')
+plt.show()
+# fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+
+from scipy.stats import ttest_ind
+stat1, p1 = ttest_ind(dat_subjects[:,0], dat_subjects[:,1])
+print(stat1)
+print(p1)
+axs.set_title('p=' + str(p1))
+
+
+# +
+# FROM EACH SUBJECT
+dat_subjects = []
+for i in np.unique(np.array(data_choice_level['subjects'])):
+    temp_data = []
+    index_subjects =  data_choice_level.index[data_choice_level['subjects'] == i]
+    
+    # no error
+    index_error = data_choice_level['severityOfErrors'].index[data_choice_level['severityOfErrors'] == 0]
+    index_error = np.array(index_error)
+    index_error = np.intersect1d(index_error, index_subjects)
+    index_error += 1
+    if np.any(index_error>(data_choice_level.shape[0]-1)):
+        index_error = np.delete(index_error, np.where(index_error>(data_choice_level.shape[0]-1)))
+#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+    temp_data.append(np.mean(data_choice_level['firstUndo'][index_error]))
+
+
+    # YES error
+    index_error = data_choice_level['severityOfErrors'].index[data_choice_level['severityOfErrors'] != 0]
+    index_error = np.array(index_error)
+    index_error = np.intersect1d(index_error, index_subjects)
+    index_error += 1
+    if np.any(index_error>(data_choice_level.shape[0]-1)):
+        index_error = np.delete(index_error, np.where(index_error>(data_choice_level.shape[0]-1)))
+#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+    temp_data.append(np.mean(data_choice_level['firstUndo'][index_error]))
+    
+    dat_subjects.append(temp_data)
+
+dat_subjects = np.array(dat_subjects)
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+axs.bar([1,2],np.mean(dat_subjects,axis = 0),color=[.7,.7,.7], edgecolor = 'k', yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+axs.set_ylabel('P (undo)')
+axs.set_xticks([1,2])
+axs.set_xticklabels(labels = ['No error', 'Error'])#,fontsize=18
+fig.set_figheight(4)
+fig.set_figwidth(3)
+axs.set_xlabel('move-level')
+plt.show()
+# fig.savefig(out_dir + 'conditional_pundo_givenError.pdf', dpi=600, bbox_inches='tight')
+
+# -
+
+ttest_ind
+stat1, p1 = ttest_ind(dat_subjects[:,0], dat_subjects[:,1])
+print(stat1)
+print(p1)
+import statsmodels.api as sm
+import pylab as py
+# sm.qqplot(stats.zscore(dat_subjects[:,0]), line ='45')
+sm.qqplot_2samples(dat_subjects[:,0],dat_subjects[:,1],line ='45')
+py.show()
+
 # ## benefit of undo - number of full undoing
 
 # +
