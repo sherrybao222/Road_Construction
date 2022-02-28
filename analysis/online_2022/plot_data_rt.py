@@ -279,6 +279,68 @@ axs.set_ylabel('Response time (s)') #,fontsize=18
 
 plt.show()
 fig.savefig(out_dir + 'undo_RT.png', dpi=600, bbox_inches='tight')
+
+# +
+index_branchingFirst = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['RT'] == -1)]
+RT_branchingFirst = data_choice_level.loc[index_branchingFirst + 1,:]
+
+print(RT_branchingFirst)
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+
+bx = axs.boxplot([RT_branchingFirst['RT']/1000, puzzleID_order_data[puzzleID_order_data['condition']==1]['RT1']],
+   positions =[1,2],widths = 0.3,showfliers=False,whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+# # run 2-independent-sample t test
+# stat1, p1 = ttest_ind(RT_firstUndo['undoRT']/1000,RT_laterUndo['undoRT']/1000,equal_var=False)
+# x1, x2 = 1,2  
+# if bx['caps'][1]._y[0] > bx['caps'][3]._y[0]:
+#     y, h, col = bx['caps'][1]._y[0] + 2, 0.5, 'k'
+# else:
+#     y, h, col = bx['caps'][3]._y[0] + 2, 0.5, 'k'
+
+# axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+# text(p1)
+
+# #--------------------------------------
+# stat2, p2 = ttest_ind(RT_laterUndo['undoRT']/1000,RT_singleUndo['undoRT']/1000,equal_var=False)
+
+# x1, x2 = 2,3 
+# y, h, col = bx['caps'][5]._y[0] + 2, 0.5, 'k'
+# axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+# text(p2)
+
+# #--------------------------------------
+# stat3, p3 = ttest_ind(RT_firstUndo['undoRT']/1000,RT_singleUndo['undoRT']/1000,equal_var=False)
+
+# x1, x2 = 1,3
+# if bx['caps'][1]._y[0] > bx['caps'][3]._y[0]:
+#     y, h, col = bx['caps'][1]._y[0] + 3.5, 0.5, 'k'
+# else:
+#     y, h, col = bx['caps'][3]._y[0] + 3.5, 0.5, 'k'
+# axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+# text(p3)
+
+#--------------------------------------
+axs.set_xticks([1,2])
+axs.set_xticklabels(labels = ['branching-node choice','all first choice'])#,fontsize=18
+axs.set_facecolor('white')
+axs.spines['bottom'].set_color('k')
+axs.spines['left'].set_color('k')
+axs.tick_params(axis='y', colors='k', direction='in',left = True) #, labelsize = 16
+axs.tick_params(axis='x', colors='k')
+# axs.set_title('S'+str(i+1), fontsize = 16)
+axs.set_ylabel('Response time (s)') #,fontsize=18
+
+# fig.set_figwidth(26)
+# fig.set_figheight(12)
+
+plt.show()
+#fig.savefig(out_dir + 'undo_RT.png', dpi=600, bbox_inches='tight')
 # -
 
 # ## budget before submit/undo at the end of trial
