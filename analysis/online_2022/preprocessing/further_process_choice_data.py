@@ -1,0 +1,43 @@
+import json
+from anytree.importer import JsonImporter
+from anytree import Node, RenderTree, AsciiStyle, PreOrderIter
+
+import pandas as pd
+
+
+home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
+map_dir = 'active_map/'
+data_dir  = 'data/preprocessed'
+out_dir = home_dir + 'figures/figures_all/'
+R_out_dir = home_dir + 'R_analysis_data/'
+
+with open(home_dir +'tree_data/basic_tree', 'r') as file:
+    basic_tree = json.load(file)
+with open(home_dir +'tree_data/undo_tree', 'r') as file:
+    undo_tree = json.load(file)
+
+data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data.csv')
+
+importer = JsonImporter()
+
+for ti in range(len(undo_tree)): # loop through trials
+    root = importer.import_(undo_tree[ti])
+    
+    for node in PreOrderIter(root): # loop through the tree
+        n_child = len(node.children)
+        
+        if (n_child > 1): # if it is a branching node
+            
+            city = node.name
+            mapID = node.mapID
+            subID = node.subID
+            trialID = node.trialID
+        
+            get_ind = data_choice_level.index[(data_choice_level['subjects'] == subID)&(data_choice_level['puzzleID'] == mapID)&
+                                              (data_choice_level['trialID'] == trialID)&(data_choice_level['choice'] == city)].tolist()
+            
+            
+            data_choice_level.loc[get_ind,'branching'] = True
+            data_choice_level.loc[get_ind[0],'branchingFirst'] = True
+
+data_choice_level.to_csv(R_out_dir +  'choice_level/choicelevel_data.csv')  
