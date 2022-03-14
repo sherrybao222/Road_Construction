@@ -22,6 +22,7 @@ import seaborn as sns
 # -
 
 from scipy import stats
+from scipy.stats import sem
 from scipy.stats import shapiro
 from scipy.stats import normaltest
 from scipy.stats import ttest_rel,ttest_ind
@@ -76,18 +77,27 @@ def text(p):
         axs.text((x1+x2)*.5, y+h, r"$p = {:.3f}$".format(p), ha='center', va='bottom', color=col, fontsize = 8)
     else:
         axs.text((x1+x2)*.5, y+h, r"$p = {:.4f}$".format(p), ha='center', va='bottom', color=col, fontsize = 8)
+
+
 # -
 
 # ## action RT
 
 # +
-# choice-level all action RT
-# index_start = data_choice_level.index[data_choice_level['RT'] == -1]
-# RT_first_move = data_choice_level.loc[index_start+1,:]
-# index_later = data_choice_level.index[(data_choice_level['RT'] != -1) & (data_choice_level['submit'] != 1)& (data_choice_level['undo'] != 1)]
-# RT_later_move = data_choice_level.loc[index_later,:]
-# index_submit = data_choice_level.index[data_choice_level['submit'] == 1]
-# RT_submit = data_choice_level.loc[index_submit,:]
+def get_RT_cond(cond,RTtype):
+    RT = puzzleID_order_data[puzzleID_order_data['condition']==cond]
+    RT_sub = RT.groupby(['subjects'])[RTtype].mean()
+    RT_sub_sem = sem(RT_sub)
+    return [RT_sub,RT_sub_sem]
+
+RT1_basic = get_RT_cond(0,'RT1')
+RT1_undo = get_RT_cond(1,'RT1')
+
+RTlater_basic = get_RT_cond(0,'RTlater')
+RTlater_undo = get_RT_cond(1,'RTlater')
+
+RTsubmit_basic = get_RT_cond(0,'RTsubmit')
+RTsubmit_undo = get_RT_cond(1,'RTsubmit')
 
 
 # +
@@ -95,54 +105,86 @@ def text(p):
 
 fig, axs = plt.subplots(1, 1)
 
-# df_part = df.loc[df['sub'] == subs[i],['f_t_rc','f_t_undo',
-#                  'm_t_everyact_rc','m_t_everyc_undo',
-#                  't_s_rc','t_s_undo']]
+bx = axs.bar([1,2, 3.5,4.5, 6,7],
+             
+             [np.mean(RT1_basic[0]),np.mean(RT1_undo[0]),
+              np.mean(RTlater_basic[0]),np.mean(RTlater_undo[0]),
+              np.mean(RTsubmit_basic[0]),np.mean(RTsubmit_undo[0])],
+             
+             color = (.7,.7,.7), 
+             
+             edgecolor = 'k',
+             
+             yerr=[RT1_basic[1],RT1_undo[1],
+              RTlater_basic[1],RTlater_undo[1],
+              RTsubmit_basic[1],RTsubmit_undo[1]])
 
-# undobox = []
-# for x in t_everyundo[48*i:48*(i+1)]:
-#     try: 
-#         undobox.append(median(x))
-#     except:  pass
+axs.set_xticks([1,1.5,2, 3.5,4,4.5, 6,6.5,7])
+axs.set_xticklabels(labels = ['\nwithout \nundo','first choice','\nwith \nundo',
+                              '\nwithout \nundo','later choices','\nwith \nundo', 
+                              '\nwithout \nundo','submit','\nwith \nundo'])#,fontsize=18
+axs.set_ylabel('Response time (s)')
 
-# axs[i].plot([1,2],[f_t_rc[48*i:48*(i+1)], f_t_undo[48*i:48*(i+1)]],c = '#6a6763',linewidth=0.3) 
-# axs[i].plot([2.5,3.5],[[median(x) for x in t_everyact_rc[48*i:48*(i+1)]], [median(x) for x in t_everyc_undo[48*i:48*(i+1)]]],c = '#6a6763',linewidth=0.3) 
-# axs[i].plot([4,5],[t_s_rc[48*i:48*(i+1)],t_s_undo[48*i:48*(i+1)]],c = '#6a6763',linewidth=0.3) 
+# run 2-independent-sample t test
+stat1, p1 = ttest_ind(RT1_basic[0], RT1_undo[0], equal_var=False)
+x1, x2 = 1,2  
+if bx[0].get_height() > bx[1].get_height():
+    y, h, col = bx[0].get_height() + 0.5, 0.2, 'k'
+else:
+    y, h, col = bx[1].get_height() + 0.5, 0.2, 'k'
+
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p1)
+
+#--------------------------------------
+stat2, p2 = ttest_ind(RTlater_basic[0],RTlater_undo[0],equal_var=False)
+
+x1, x2 = 3.5,4.5
+y, h, col = bx[2].get_height() + 1, 0.2, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p2)
+
+#--------------------------------------
+stat3, p3 = ttest_ind(RTsubmit_basic[0],RTsubmit_undo[0],equal_var=False)
+
+x1, x2 = 6,7
+y, h, col = bx[5].get_height() + 1, 0.2, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p3)
+
+#--------------------------------------
+stat4, p4 = ttest_ind(RT1_basic[0],RTlater_basic[0],equal_var=False)
+
+x1, x2 = 1,3.5
+y, h, col = bx[0].get_height() + 1, 0.2, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p4)
+
+#--------------------------------------
+stat5, p5 = ttest_ind(RT1_undo[0],RTlater_undo[0],equal_var=False)
+
+x1, x2 = 2,4.5
+y, h, col = bx[1].get_height() + 0.5, 0.2, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p5)
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+# fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
 
 # plot with puzzle-level RT
-bx = axs.boxplot([puzzleID_order_data[puzzleID_order_data['condition']==0]['RT1'],puzzleID_order_data[puzzleID_order_data['condition']==1]['RT1'],
+bx = axs.boxplot([,puzzleID_order_data[puzzleID_order_data['condition']==1]['RT1'],
     puzzleID_order_data[puzzleID_order_data['condition']==0]['RTlater'],puzzleID_order_data[puzzleID_order_data['condition']==1]['RTlater'],
     puzzleID_order_data[puzzleID_order_data['condition']==0]['RTsubmit'],puzzleID_order_data[puzzleID_order_data['condition']==1]['RTsubmit']],
    positions =[1,2,3.5,4.5,6,7],widths = 0.3,showfliers=False,whis = 1.5,
-   medianprops = dict(color = 'k'))  #
-    
-# normality test
-# Shapiro-Wilk Test
-    
-# stats = [np.nan]*6
-# ps = [np.nan]*6
-# for s in range(len(stats)):
-#     stats[s],ps[s]  = shapiro([math.log2(x) for x in df_part.iloc[:,s]])
-#     print('Statistics=%.3f, p=%.3f' % (stats[s], ps[s]))
-#     # interpret
-#     alpha = 0.05
-#     if ps[s] > alpha:
-#         print('Sample looks Gaussian (fail to reject H0)')
-#     else:
-#         print('Sample does not look Gaussian (reject H0)')   
-    
-#     from scipy.stats import anderson
-#     result = [np.nan]*6
-#     for s in range(len(result)):
-#         result[s]= anderson([math.log2(x) for x in df_part.iloc[:,s]])
-#         print('Statistic: %.3f' % result[s].statistic)
-#         p = 0
-#         for i in range(len(result[s].critical_values)):
-#         	sl, cv = result[s].significance_level[i], result[s].critical_values[i]
-#         	if result[s].statistic < result[s].critical_values[i]:
-#         		print('%.3f: %.3f, data looks normal (fail to reject H0)' % (sl, cv))
-#         	else:
-#         		print('%.3f: %.3f, data does not look normal (reject H0)' % (sl, cv))
+   medianprops = dict(color = 'k')) 
     
 # run paired-sample t test
 stat1, p1 = ttest_rel(puzzleID_order_data[puzzleID_order_data['condition']==0]['RT1'],puzzleID_order_data[puzzleID_order_data['condition']==1]['RT1'])
@@ -210,7 +252,7 @@ axs.set_ylabel('Response time (s)') #,fontsize=18
 # fig.set_figheight(12)
 
 plt.show()
-fig.savefig(out_dir + 'action_RT.png', dpi=600, bbox_inches='tight')
+# fig.savefig(out_dir + 'action_RT.png', dpi=600, bbox_inches='tight')
 # -
 
 # ## different types of undoing RT
@@ -279,55 +321,90 @@ axs.set_ylabel('Response time (s)') #,fontsize=18
 
 plt.show()
 fig.savefig(out_dir + 'undo_RT.png', dpi=600, bbox_inches='tight')
+# -
+
+# ## branching node RT
 
 # +
-index_branchingFirst = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['RT'] == -1)]
-RT_branchingFirst = data_choice_level.loc[index_branchingFirst + 1,:]
+# the first visit of a branching node, and it is the start city
+index_start = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['RT'] == -1)]
+RT_start = data_choice_level.loc[index_start + 1,:]
+RT_start_sub = RT_start.groupby(['subjects'])['RT'].mean()/1000
+RT_start_sub_sem = sem(RT_start_sub)
 
-print(RT_branchingFirst)
+index_start_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['RT'] == -1)&(data_choice_level['condition']==1)]
+RT_start_nobranch = data_choice_level.loc[index_start_nobranch + 1,:]
+RT_start_nobranch_sub = RT_start_nobranch.groupby(['subjects'])['RT'].mean()/1000
+RT_start_nobranch_sub_sem = sem(RT_start_nobranch_sub)
+
+# the first visit of a branching node, and it is not a start city
+index_notstart = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['RT'] != -1)]
+RT_notstart = data_choice_level.loc[index_notstart + 1,:]
+RT_notstart_sub = RT_notstart.groupby(['subjects'])['RT'].mean()/1000
+RT_notstart_sub_sem = sem(RT_notstart_sub)
+
+index_notstart_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['RT'] != -1)&(data_choice_level['condition']==1)&(data_choice_level['submit']!=1)&(data_choice_level['undo']!=1)]
+RT_notstart_nobranch = data_choice_level.loc[index_notstart_nobranch + 1,:]
+RT_notstart_nobranch_sub = RT_notstart_nobranch.groupby(['subjects'])['RT'].mean()/1000
+RT_notstart_nobranch_sub_sem = sem(RT_notstart_nobranch_sub)
+
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+bx = axs.bar([1,2,3,4],
+             [np.mean(RT_start_sub),np.mean(RT_start_nobranch_sub),
+              np.mean(RT_notstart_sub),np.mean(RT_notstart_nobranch_sub)],
+             color=(.7,.7,.7), edgecolor = 'k', 
+             yerr=[RT_start_sub_sem,RT_start_nobranch_sub_sem,
+                   RT_notstart_sub_sem,RT_notstart_nobranch_sub_sem])
+
+axs.set_xticks([1,2,3,4])
+# axs.set_yticks(np.linspace(0,0.16,5))
+axs.set_xticklabels(labels = ['branching-node \nfirst choice','all first choice','branching-node \nlater choice','all later choice'])#,fontsize=18
+axs.set_ylabel('Response time (s)')
+
+
+
+# run 2-independent-sample t test
+stat1, p1 = ttest_ind(RT_start_sub, RT_start_nobranch_sub,equal_var=False)
+x1, x2 = 1,2  
+if bx[0].get_height() > bx[1].get_height():
+    y, h, col = bx[0].get_height() + 1, 0.3, 'k'
+else:
+    y, h, col = bx[1].get_height() + 1, 0.3, 'k'
+
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p1)
+
+#--------------------------------------
+stat2, p2 = ttest_ind(RT_notstart_sub,RT_notstart_nobranch_sub,equal_var=False)
+
+x1, x2 = 3,4 
+y, h, col = bx[2].get_height() + 1, 0.3, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p2)
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+# fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+
 
 # +
 # %matplotlib notebook
 
 fig, axs = plt.subplots(1, 1)
 
-bx = axs.boxplot([RT_branchingFirst['RT']/1000, puzzleID_order_data[puzzleID_order_data['condition']==1]['RT1']],
-   positions =[1,2],widths = 0.3,showfliers=False,whis = 1.5,
+bx = axs.boxplot([RT_start_sub/1000, RT_start_nobranch_sub/1000,
+                 RT_notstart['RT']/1000, RT_notstart_nobranch['RT']/1000],
+                 
+   positions =[1,2,3,4],widths = 0.3,showfliers=False,whis = 1.5,
    medianprops = dict(color = 'k'))  #
-
-# # run 2-independent-sample t test
-# stat1, p1 = ttest_ind(RT_firstUndo['undoRT']/1000,RT_laterUndo['undoRT']/1000,equal_var=False)
-# x1, x2 = 1,2  
-# if bx['caps'][1]._y[0] > bx['caps'][3]._y[0]:
-#     y, h, col = bx['caps'][1]._y[0] + 2, 0.5, 'k'
-# else:
-#     y, h, col = bx['caps'][3]._y[0] + 2, 0.5, 'k'
-
-# axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-# text(p1)
-
-# #--------------------------------------
-# stat2, p2 = ttest_ind(RT_laterUndo['undoRT']/1000,RT_singleUndo['undoRT']/1000,equal_var=False)
-
-# x1, x2 = 2,3 
-# y, h, col = bx['caps'][5]._y[0] + 2, 0.5, 'k'
-# axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-# text(p2)
-
-# #--------------------------------------
-# stat3, p3 = ttest_ind(RT_firstUndo['undoRT']/1000,RT_singleUndo['undoRT']/1000,equal_var=False)
-
-# x1, x2 = 1,3
-# if bx['caps'][1]._y[0] > bx['caps'][3]._y[0]:
-#     y, h, col = bx['caps'][1]._y[0] + 3.5, 0.5, 'k'
-# else:
-#     y, h, col = bx['caps'][3]._y[0] + 3.5, 0.5, 'k'
-# axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-# text(p3)
-
 #--------------------------------------
-axs.set_xticks([1,2])
-axs.set_xticklabels(labels = ['branching-node choice','all first choice'])#,fontsize=18
+axs.set_xticks([1,2,3,4])
+axs.set_xticklabels(labels = ['branching-node \nfirst choice','all first choice','branching-node \nlater choice','all later choice'])#,fontsize=18
 axs.set_facecolor('white')
 axs.spines['bottom'].set_color('k')
 axs.spines['left'].set_color('k')
@@ -341,6 +418,20 @@ axs.set_ylabel('Response time (s)') #,fontsize=18
 
 plt.show()
 #fig.savefig(out_dir + 'undo_RT.png', dpi=600, bbox_inches='tight')
+# -
+
+# ## where are the branching node
+
+# +
+pos_branching = data_choice_level[data_choice_level['branchingFirst']==True]['currNumCities']
+
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+plt.hist(pos_branching)
+axs.set_ylabel('counts') 
+axs.set_xlabel('the postion of branching node') 
+plt.show()
 # -
 
 # ## budget before submit/undo at the end of trial
@@ -397,7 +488,7 @@ plt.show()
 fig.savefig(out_dir + 'budget_before_submit_undo.png', dpi=600, bbox_inches='tight')
 # -
 
-# ### counts of errors before undo (by accumulated severity)
+# ## counts of errors before undo (by accumulated severity)
 
 # +
 index_first_undo =  data_choice_level.index[data_choice_level['firstUndo'] == 1]
@@ -515,7 +606,7 @@ fig.savefig(out_dir + 'undotype_errortype.pdf', dpi=600, bbox_inches='tight')
 
 
 # -
-# ### conditional probability of undo
+# ## conditional probability of undo
 
 # +
 # FROM EACH SUBJECT
