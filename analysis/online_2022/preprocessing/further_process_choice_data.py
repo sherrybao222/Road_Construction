@@ -38,6 +38,6 @@ for ti in range(len(undo_tree)): # loop through trials
             
             
             data_choice_level.loc[get_ind,'branching'] = True
-            data_choice_level.loc[get_ind[0],'branchingFirst'] = True
+            data_choice_level.loc[get_ind[0],'branchingFirst'] = True # the first visit of a branching node
 
 data_choice_level.to_csv(R_out_dir +  'choice_level/choicelevel_data.csv')  
