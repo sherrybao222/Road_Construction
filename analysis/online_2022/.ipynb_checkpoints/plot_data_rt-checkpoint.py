@@ -347,7 +347,7 @@ index_notstart_nobranch = data_choice_level.index[(data_choice_level['branching'
 RT_notstart_nobranch = data_choice_level.loc[index_notstart_nobranch + 1,:]
 RT_notstart_nobranch_sub = RT_notstart_nobranch.groupby(['subjects'])['RT'].mean()/1000
 RT_notstart_nobranch_sub_sem = sem(RT_notstart_nobranch_sub)
-                  
+
 
 # +
 # %matplotlib notebook
@@ -420,7 +420,7 @@ plt.show()
 #fig.savefig(out_dir + 'undo_RT.png', dpi=600, bbox_inches='tight')
 # -
 
-# ### where are the branching node
+# ## where are the branching node
 
 # +
 pos_branching = data_choice_level[data_choice_level['branchingFirst']==True]['currNumCities']
@@ -488,7 +488,7 @@ plt.show()
 fig.savefig(out_dir + 'budget_before_submit_undo.png', dpi=600, bbox_inches='tight')
 # -
 
-# ### counts of errors before undo (by accumulated severity)
+# ## counts of errors before undo (by accumulated severity)
 
 # +
 index_first_undo =  data_choice_level.index[data_choice_level['firstUndo'] == 1]
@@ -606,7 +606,7 @@ fig.savefig(out_dir + 'undotype_errortype.pdf', dpi=600, bbox_inches='tight')
 
 
 # -
-# ### conditional probability of undo
+# ## conditional probability of undo
 
 # +
 # FROM EACH SUBJECT
