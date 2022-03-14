@@ -48,7 +48,7 @@ for i in range(len(data_all)): # per subjects
 
         if ti == 0: # start of subject data
 
-            start_node = Node(0, budget = 300, RT= - 1, subID=subID, trialID=current_trialID, mapID = current_mapID)
+            start_node = Node(0, budget = 300, RT= - 1, subID=subID, trialID=current_trialID, mapID = current_mapID,visit=1)
             current_node = start_node
         
         elif (trialID!=current_trialID)|(mapID!=current_mapID)|(condition!=current_condition): # start of trial
@@ -65,7 +65,7 @@ for i in range(len(data_all)): # per subjects
             current_mapID = mapID
             current_condition = condition
             
-            start_node = Node(0, budget = 300, RT= - 1, subID=subID, trialID=current_trialID, mapID = current_mapID)
+            start_node = Node(0, budget = 300, RT= - 1, subID=subID, trialID=current_trialID, mapID = current_mapID,visit=1)
             current_node = start_node
             
         elif not data_all[i]['undoIndicator'][ti]:
@@ -73,8 +73,16 @@ for i in range(len(data_all)): # per subjects
             RT = int(data_all[i]['rt_all'][ti])
             city = int(data_all[i]['currentChoice'][ti])  
             
-            new_node = Node(city, budget = budget, RT= RT, subID=subID, trialID=current_trialID, mapID = current_mapID, parent = current_node)
-            current_node = new_node
+            indicator = 0
+
+            for child in current_node.children:
+                if (child.name == city)&(child.budget == budget):
+                    child.visit = child.visit+1
+                    current_node = child
+                    indicator = 1      
+            if not indicator:     
+                new_node = Node(city, budget = budget, RT= RT, subID=subID, trialID=current_trialID, mapID = current_mapID, parent = current_node,visit=1)
+                current_node = new_node
             
         elif data_all[i]['undoIndicator'][ti]:
             current_node = current_node.parent

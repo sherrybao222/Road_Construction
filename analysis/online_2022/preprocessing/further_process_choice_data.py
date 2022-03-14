@@ -19,13 +19,13 @@ with open(home_dir +'tree_data/undo_tree', 'r') as file:
 data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data.csv')
 
 importer = JsonImporter()
-
+visit = []
 for ti in range(len(undo_tree)): # loop through trials
     root = importer.import_(undo_tree[ti])
     
     for node in PreOrderIter(root): # loop through the tree
         n_child = len(node.children)
-        
+        visit.append(node.visit)
         if (n_child > 1): # if it is a branching node
             
             city = node.name
