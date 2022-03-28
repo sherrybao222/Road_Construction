@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # ---
 # jupyter:
 #   jupytext:
@@ -16,6 +17,7 @@
 # +
 import pandas as pd
 import numpy as np
+import math
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -122,6 +124,7 @@ plt.show()
 
 # ## number of visits to a state (not undo target)
 
+# +
 importer = JsonImporter()
 visit = []
 for ti in range(len(undo_tree)): # loop through trials
@@ -130,7 +133,9 @@ for ti in range(len(undo_tree)): # loop through trials
     for node in PreOrderIter(root): # loop through the tree
         n_child = len(node.children)
         visit.append(node.visit)
-visit.count(1)
+
+visit.count(2)
+# -
 
 # ## number of visits to undo target
 
@@ -443,6 +448,35 @@ import pylab as py
 sm.qqplot_2samples(dat_subjects[:,0],dat_subjects[:,1],line ='45')
 py.show()
 
+# ## number of undo - subjects
+
+undo_puzzle = single_condition_data[single_condition_data['numUNDO']>0].groupby(['subjects']).size()
+count = [len(single_condition_data.groupby(['subjects']).size())]
+for i in range(1,47):
+    count.append(sum(undo_puzzle>=i))
+
+# +
+fig, axs = plt.subplots()
+
+plt.bar(list(range(0,47)),count)
+axs.set_xlabel("undo in >= number of puzzles")
+axs.set_ylabel("number of subjects")
+# axs.plot(bins[1][:-1], bins[0], color = '#81b29a', linewidth=3)
+# -
+
+# ## number of undo - puzzles
+
+# +
+order = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean().to_frame()
+sort_order = order.sort_values('numFullUndo')
+
+# %matplotlib notebook
+fig, axs = plt.subplots(1, 1)
+
+bx = sns.barplot(x='puzzleID', y='numFullUndo', data = single_condition_data, color = '#ccd5ae',order=sort_order.index) 
+
+# -
+
 # ## benefit of undo - number of full undoing
 
 # +
@@ -455,8 +489,7 @@ single_condition_data['undo_benefit_z'] = single_condition_data['numCities_z'] -
 
 undo_benefit_z_sub = single_condition_data.groupby(['subjects'])['undo_benefit_z'].mean()
 undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean()
-print(undo_benefit_z_sub)
-print(undo_count_sub)
+
 
 # +
 # benefit_undo = (np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numCities']) 
@@ -503,38 +536,14 @@ sns.scatterplot(x='numFullUndo', y='undo_benefit_z', size = scatter_data['count'
 ax1.set_xlabel("number of undo")
 ax1.set_ylabel("benefit of undo")
 
-undo_puzzle = single_condition_data[single_condition_data['numUNDO']>0].groupby(['subjects']).size()
-count = [len(single_condition_data.groupby(['subjects']).size())]
-for i in range(1,47):
-    count.append(sum(undo_puzzle>=i))
-
-# +
-fig, axs = plt.subplots()
-
-plt.bar(list(range(0,47)),count)
-axs.set_xlabel("undo in >= number of puzzles")
-axs.set_ylabel("number of subjects")
-# axs.plot(bins[1][:-1], bins[0], color = '#81b29a', linewidth=3)
-
-# +
-order = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean().to_frame()
-sort_order = order.sort_values('numFullUndo')
-
-# %matplotlib notebook
-fig, axs = plt.subplots(1, 1)
-
-bx = sns.barplot(x='puzzleID', y='numFullUndo', data = single_condition_data, color = '#ccd5ae',order=sort_order.index) 
-
-# -
-
-#TODO: with a caption stating that each point is a subject, the Spearman rho, and the p-value
-stats.spearmanr(undo_count_sub,undo_benefit_z_sub)
-
 fig11, ax1 = plt.subplots()
 ax1.plot(undo_count_sub,undo_benefit_z_sub,'o')
 ax1.set_xlabel("average number of undo")
 ax1.set_ylabel("benefit of undo")
 fig11.savefig(out_dir + 'undobenefit_individual.pdf', dpi=600, bbox_inches='tight')
+
+#TODO: with a caption stating that each point is a subject, the Spearman rho, and the p-value
+stats.spearmanr(undo_count_sub,undo_benefit_z_sub)
 
 undo_benefit_puzzle = single_condition_data.groupby(['puzzleID'])['undo_benefit'].mean()
 undo_count_puzzle = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean()
@@ -542,6 +551,19 @@ fig1, ax1 = plt.subplots()
 ax1.plot(undo_count_puzzle,undo_benefit_puzzle,'o')
 ax1.set_xlabel("average number of undo")
 ax1.set_ylabel("benefit of undo")
+
+# ## GLMM benefit of undo - number of undo
+
+# +
+basic_score = puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities'].reset_index(drop=True)
+basic_score_z = basic_score/puzzleID_order_data[puzzleID_order_data['condition']==0]['mas'].reset_index(drop=True)
+single_condition_data['numCities_z'] = single_condition_data['numCities']/single_condition_data['mas']
+
+single_condition_data['undo_benefit'] = single_condition_data['numCities'] - basic_score
+single_condition_data['undo_benefit_z'] = single_condition_data['numCities_z'] - basic_score_z
+
+undo_benefit_z_sub = single_condition_data.groupby(['subjects'])['undo_benefit_z'].mean()
+undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean()
 
 # + magic_args="-i single_condition_data" language="R"
 #
@@ -573,6 +595,52 @@ ax1.set_ylabel("benefit of undo")
 # # qqnorm(resid(model), main = "Residuals")
 #
 # qqPlot(resid(model), distribution = "norm")
+# -
+
+# ## glmm：missed points - number of undo
+
+puzzleID_order_data['missed_points'] = puzzleID_order_data['mas'] - puzzleID_order_data['numCities']
+puzzleID_order_data = puzzleID_order_data[puzzleID_order_data['missed_points'] >= 0]
+
+# + magic_args="-i puzzleID_order_data" language="R"
+#
+# puzzleID_order_data$subjects <- factor(puzzleID_order_data$subjects)
+# puzzleID_order_data$puzzleID <- factor(puzzleID_order_data$puzzleID)
+# puzzleID_order_data$condition <- factor(puzzleID_order_data$condition)
+# puzzleID_order_data$missed_points_sqrt <- sqrt(puzzleID_order_data$missed_points)
+# str(puzzleID_order_data)
+
+# + language="R"
+#
+# model0 = lme4::glmer(missed_points ~ condition + numFullUndo + (1|subjects) + (1|puzzleID) + (condition + 0 | subjects),
+#                                   data = puzzleID_order_data, family = "poisson")
+#
+# # get the coefficients for the best fitting model
+# summary(model0)
+
+# + language="R"
+# # anova(model)
+# # plot(model)
+#
+# # ranef(model)
+# ## QQ-plots:
+# # par(mfrow = c(1, 2))
+# # qqnorm(ranef(model)$subjects[, 1], main = "Random effects of subjects")
+# # qqnorm(resid(model), main = "Residuals")
+#
+# qqPlot(resid(model0), distribution = "norm")
+
+# + language="R"
+#
+# model1 = lme4::glmer(missed_points ~ condition + numFullUndo + (1|subjects) + (1|puzzleID),
+#                                   data = puzzleID_order_data, family = "poisson")
+#
+# # get the coefficients for the best fitting model
+# summary(model1)
+
+# + language="R"
+#
+# anova(model0,model1)
 # -
 
 # ## count of error - number of optimal solutions
