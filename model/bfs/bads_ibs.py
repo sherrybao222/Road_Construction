@@ -7,10 +7,11 @@ import numpy as np
 
 # hpc directories
 home_dir = '/home/db4058/road_construction/data/'
-input_dir = 'data_pilot_preprocessed/'
+home_dir = '../'
+# input_dir = 'data_pilot_preprocessed/'
 map_dir = 'active_map/'
 
-with open(home_dir + map_dir + 'basic_map_48_all4','r') as file:
+with open(home_dir + map_dir + 'basicMap','r') as file:
     basic_map = json.load(file) 
 
 # general repeats
