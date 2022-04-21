@@ -17,6 +17,7 @@
 # +
 import pandas as pd
 import numpy as np
+import math
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -45,6 +46,8 @@ ggplot = importr('ggplot2')
 dplyr = importr('dplyr')
 sjplot = importr('sjPlot')
 car = importr('car')
+# fitdistrplus = importr('fitdistrplus')
+boot = importr('boot')
 # -
 
 home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
@@ -565,7 +568,7 @@ undo_benefit_z_sub = single_condition_data.groupby(['subjects'])['undo_benefit_z
 undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean()
 
 # + magic_args="-i single_condition_data" language="R"
-#
+# #https://stats.stackexchange.com/questions/29781/when-conducting-multiple-regression-when-should-you-center-your-predictor-varia
 # single_condition_data$subjects <- factor(single_condition_data$subjects)
 # single_condition_data$puzzleID <- factor(single_condition_data$puzzleID)
 # single_condition_data$mas <- factor(single_condition_data$mas)
@@ -600,34 +603,36 @@ undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean
 
 puzzleID_order_data['missed_points'] = puzzleID_order_data['mas'] - puzzleID_order_data['numCities']
 puzzleID_order_data = puzzleID_order_data[puzzleID_order_data['missed_points'] >= 0]
-puzzleID_order_data['missed_points_log'] = log(puzzleID_order_data['missed_points'])
 
 # + magic_args="-i puzzleID_order_data" language="R"
 #
 # puzzleID_order_data$subjects <- factor(puzzleID_order_data$subjects)
 # puzzleID_order_data$puzzleID <- factor(puzzleID_order_data$puzzleID)
 # puzzleID_order_data$condition <- factor(puzzleID_order_data$condition)
+# puzzleID_order_data$missed_points_sqrt <- sqrt(puzzleID_order_data$missed_points)
 # str(puzzleID_order_data)
 
 # + language="R"
-#
-# model0 = lme4::glmer(missed_points ~ condition + numFullUndo + (1|subjects) + (1|puzzleID) + (condition + 0 | subjects),
+#  #
+# model0 = lme4::glmer(missed_points ~  numFullUndo + (1|subjects) + (1|puzzleID) ,#+ (condition + 0 | subjects)
 #                                   data = puzzleID_order_data, family = "poisson")
 #
 # # get the coefficients for the best fitting model
 # summary(model0)
 
 # + language="R"
-# # anova(model)
-# # plot(model)
-#
-# # ranef(model)
+# # plot(model0) # https://stat.ethz.ch/R-manual/R-devel/library/nlme/html/plot.lme.html
+# ranef(model0)
 # ## QQ-plots:
 # # par(mfrow = c(1, 2))
-# # qqnorm(ranef(model)$subjects[, 1], main = "Random effects of subjects")
-# # qqnorm(resid(model), main = "Residuals")
+# # qqnorm(ranef(model0)$subjects[, 1], main = "Random effects of subjects")
+# # qqnorm(resid(model0), main = "Residuals")
 #
-# qqPlot(resid(model0), distribution = "norm")
+# # qqPlot(resid(model0), distribution = "norm")
+#
+# # https://stats.stackexchange.com/questions/295340/what-to-do-with-glm-gamma-when-residuals-are-not-normally-distributed/302413#302413
+# # model0.diag <- glm.diag(model0)
+# # glm.diag.plots(model0, model0.diag)
 
 # + language="R"
 #
