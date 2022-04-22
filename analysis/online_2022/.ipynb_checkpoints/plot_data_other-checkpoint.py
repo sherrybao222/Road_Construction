@@ -92,22 +92,6 @@ def text(p):
 
 # -
 
-# ### histogram of the position of branching node
-
-# +
-pos_branching = data_choice_level[data_choice_level['branchingFirst']==True]['currNumCities']
-
-# %matplotlib notebook
-
-fig, axs = plt.subplots(1, 1)
-axs.hist(pos_branching,
-        color = (.7,.7,.7), 
-        edgecolor = 'k',)
-axs.set_ylabel('counts') 
-axs.set_xlabel('the postion of branching node') 
-plt.show()
-# -
-
 # ## histogram of number of cities within reach
 
 # +
@@ -121,42 +105,6 @@ axs.hist(n_reach,
         edgecolor = 'k',)
 axs.set_ylabel('counts') 
 axs.set_xlabel('number of cities within reach') 
-plt.show()
-# -
-
-# ## number of visits to a state (not undo target)
-
-# +
-importer = JsonImporter()
-visit = []
-for ti in range(len(undo_tree)): # loop through trials
-    root = importer.import_(undo_tree[ti])
-    
-    for node in PreOrderIter(root): # loop through the tree
-        n_child = len(node.children)
-        visit.append(node.visit)
-
-visit.count(2)
-# -
-
-# ## number of visits to undo target
-
-# +
-each_trial = data_choice_level[data_choice_level['condition']==1].groupby(["subjects","puzzleID"])
-n_undotarget_visit = each_trial["branching"].count()
-n_undotarget_visit
-
-# %matplotlib notebook
-
-fig, axs = plt.subplots(1, 1)
-axs.hist(n_undotarget_visit,
-        color = (.7,.7,.7), 
-        bins = [2,3,4,5,6,7,8,9],
-        edgecolor = 'k',)
-axs.set_ylabel('counts') 
-axs.set_xlabel('number of undo target visit') 
-axs.set_xticks([2,3,4,5,6,7,8])
-axs.set_xticklabels(["1","2","3","4","5","6","7+"])
 plt.show()
 # -
 
@@ -332,7 +280,7 @@ fig.savefig(out_dir + 'undotype_errortype.pdf', dpi=600, bbox_inches='tight')
 
 
 # -
-# ## conditional probability of undo
+# ## probability of undo -- conditional on error
 
 # +
 # FROM EACH SUBJECT
@@ -678,5 +626,477 @@ axs.set_xticklabels([1,3,6,'9+'])
 fig.savefig(out_dir + 'error_optimal.png', dpi=600, bbox_inches='tight')
 
 # -
+# ## When people started undo and stopped
+
+
+# ### 1. avarage across puzzle for each subject
+
+sc_data_choice_level = data_choice_level[data_choice_level['condition']==1].reset_index()
+
+
+# +
+# # Fixing random state for reproducibility
+# np.random.seed(19680801)
+
+# # # some random data
+# # x = np.random.randn(1000)
+# # y = np.random.randn(1000)
+
+def scatter_hist(x, y, ax, ax_histx, ax_histy):
+    # no labels
+    ax_histx.tick_params(axis="x", labelbottom=False)
+    ax_histy.tick_params(axis="y", labelleft=False)
+
+    # the scatter plot:
+    ax.scatter(x, y, color=[0,0,0])
+    ax.set_xlabel('normalized number of cities connected (undo start)')
+    ax.set_ylabel('normalized number of cities connected (undo target)')
+
+    # now determine nice limits by hand:
+    binwidth = 0.03
+    xymax = max(np.max(np.abs(x)), np.max(np.abs(y)))
+    lim = (int(xymax/binwidth) + 1) * binwidth
+
+    bins = np.arange(-lim, lim + binwidth, binwidth)
+    ax_histx.hist(x, bins=bins, color=[.7,.7,.7])
+    ax_histy.hist(y, bins=bins, orientation='horizontal', color=[.7,.7,.7])
+
+
+# +
+mas_map = [sc_data_choice_level.allMAS[sc_data_choice_level["puzzleID"]==i].tolist()[0] for i in np.unique(sc_data_choice_level['puzzleID'])]
+str_ct = []
+end_ct = []
+str_ct_mean = []
+end_ct_mean = []
+
+for sub in range(100):
+    str_ct_sbj = []
+    end_ct_sbj = []
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()
+        str_ct_pz = []
+        end_ct_pz = []
+        
+        for index in range(len(dat_sbj_pzi)):# or mas_map[pzi
+#             print(dat_sbj_pzi.currNumCities[index])
+            # -1: so that it can be ranged from 0 to 1
+            if dat_sbj_pzi.firstUndo[index] == 1:
+#                 if dat_sbj_pzi.currNumCities[index]+1-1 <= 0:
+#                     print(dat_sbj_pzi.currNumCities[index])
+                str_ct_pz.append((dat_sbj_pzi.currNumCities[index]+1-1)/(mas_map[pzi]-1)) # or datum.currMas
+                # because the dataset is counting startcity as 1
+
+            if dat_sbj_pzi.lastUndo[index] == 1:
+#                 if dat_sbj_pzi.currNumCities[index]-1 <= 0:
+#                     print(dat_sbj_pzi.currNumCities[index])
+                end_ct_pz.append((dat_sbj_pzi.currNumCities[index]-1)/(mas_map[pzi]-1))
+      
+        str_ct_sbj.extend(str_ct_pz)
+        end_ct_sbj.extend(end_ct_pz)
+        
+    str_ct.extend(str_ct_sbj)
+    end_ct.extend(end_ct_sbj)
+    str_ct_mean.append(np.mean(str_ct_sbj))
+    end_ct_mean.append(np.mean(end_ct_sbj))
+
+
+# +
+end_ct_mean = np.array(end_ct_mean)
+str_ct_mean = np.array(str_ct_mean)
+
+str_ct_  = str_ct_mean[~np.isnan(str_ct_mean)]
+end_ct_  = end_ct_mean[~np.isnan(end_ct_mean)]
+
+# ind = np.argsort(str_ct_-end_ct_ )
+ind = np.argsort(end_ct_ )
+
+# +
+# %matplotlib notebook
+left, width = 0.1, 0.65
+bottom, height = 0.1, 0.65
+spacing = 0.005
+
+
+rect_scatter = [left, bottom, width, height]
+rect_histx = [left, bottom + height + spacing, width, 0.2]
+rect_histy = [left + width + spacing, bottom, 0.2, height]
+
+# start with a square Figure
+fig = plt.figure(figsize=(6, 6)) #
+
+ax = fig.add_axes(rect_scatter)
+ax_histx = fig.add_axes(rect_histx, sharex=ax)
+ax_histy = fig.add_axes(rect_histy, sharey=ax)
+offset_ = .05# offset for better visualization
+ax.set_xlim(0,1+offset_)
+ax.set_ylim(0,1+offset_)
+ax_histx.set_xlim(0-offset_,1+offset_)
+ax_histy.set_ylim(0-offset_,1+offset_)
+# use the previously defined function
+scatter_hist(str_ct_, end_ct_, ax, ax_histx, ax_histy)
+
+# +
+# only scatter plot
+# %matplotlib notebook
+
+fig, ax = plt.subplots(figsize=(6, 6))
+offset_ = .05# offset for better visualization
+ax.set_xlim(0-offset_,1+offset_)
+ax.set_ylim(0-offset_,1+offset_)
+plt.scatter(str_ct_, end_ct_,color=[0,0,0])
+plt.xlabel('normalized number of cities connected (undo start)')
+plt.ylabel('normalized number of cities connected (undo target)')
+# -
+
+# ### 2. Scatter plot (every data points)
+
+# +
+end_ct = np.array(end_ct)
+str_ct = np.array(str_ct)
+
+str_ct = str_ct[~np.isnan(str_ct)]
+end_ct = end_ct[~np.isnan(end_ct)]
+
+# ind = np.argsort(str_ct - end_ct)
+# ind = np.argsort(str_ct)
+ind = np.argsort(end_ct)
+#     plt.plot([str_ct[ind[i]], end_ct[ind[i]]], [i,i], 'k.--', linewidth=.1)
+
+# +
+# %matplotlib notebook
+left, width = 0.1, 0.65
+bottom, height = 0.1, 0.65
+spacing = 0.005
+
+
+rect_scatter = [left, bottom, width, height]
+rect_histx = [left, bottom + height + spacing, width, 0.2]
+rect_histy = [left + width + spacing, bottom, 0.2, height]
+
+# start with a square Figure
+fig = plt.figure(figsize=(6, 6))
+
+ax = fig.add_axes(rect_scatter)
+ax_histx = fig.add_axes(rect_histx, sharex=ax)
+ax_histy = fig.add_axes(rect_histy, sharey=ax)
+offset_ = .05# offset for better visualization
+ax.set_xlim(0,1+offset_)
+ax.set_ylim(0,1+offset_)
+ax_histx.set_xlim(0-offset_,1+offset_)
+ax_histy.set_ylim(0-offset_,1+offset_)
+# use the previously defined function
+scatter_hist(str_ct, end_ct, ax, ax_histx, ax_histy)
+# -
+# ### 3. histogram of the position of branching node (similar to undo target, but not counting every visit)
+
+# +
+pos_branching = data_choice_level[data_choice_level['branchingFirst']==True]['currNumCities']
+
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+axs.hist(pos_branching,
+        color = (.7,.7,.7), 
+        edgecolor = 'k',)
+axs.set_ylabel('counts') 
+axs.set_xlabel('the postion of branching node') 
+plt.show()
+# -
+
+
+# ### 4. number of visits to undo target
+
+# +
+each_trial = data_choice_level[data_choice_level['condition']==1].groupby(["subjects","puzzleID"])
+n_undotarget_visit = each_trial["branching"].count()
+n_undotarget_visit
+
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+axs.hist(n_undotarget_visit,
+        color = (.7,.7,.7), 
+        bins = [2,3,4,5,6,7,8,9],
+        edgecolor = 'k',)
+axs.set_ylabel('counts') 
+axs.set_xlabel('number of undo target visit') 
+axs.set_xticks([2,3,4,5,6,7,8])
+axs.set_xticklabels(["1","2","3","4","5","6","7+"])
+plt.show()
+# -
+
+# ## Undoing results in a different path?
+
+# ### 1. Resulting in the same city?
+
+# +
+undo_same_diff = []
+
+for sub in range(100):
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    undo_same_diff_puzzle = []
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
+        same_puzzle = 0
+        diff_puzzle = 0
+        
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
+
+        firstUndo_idx = dat_sbj_pzi[dat_sbj_pzi["firstUndo"]==1].index
+        path_bf_undo = dat_sbj_pzi["currMas"][firstUndo_idx-1]
+        
+        lastUndo_idx = dat_sbj_pzi[dat_sbj_pzi["lastUndo"]==1].index
+        path_af_undo = dat_sbj_pzi["currMas"][lastUndo_idx+1]
+        
+        idxx = np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])
+        diff_puzzle += np.sum(idxx)
+    
+        idxx = np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) == np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])
+        same_puzzle += np.sum(idxx)
+        
+        undo_same_diff_puzzle.append([same_puzzle, diff_puzzle])
+    undo_same_diff_puzzle =  np.array(undo_same_diff_puzzle)
+    undo_same_diff_puzzle =  np.sum(undo_same_diff_puzzle,axis=0)
+
+    undo_same_diff.append(undo_same_diff_puzzle)
+    
+undo_same_diff = np.array(undo_same_diff)
+# -
+
+# exclude some never undoing subjects
+undo_same_diff = undo_same_diff[np.where(np.sum(np.array(undo_same_diff),axis=1)!=0),:]
+undo_same_diff = undo_same_diff.squeeze()
+undo_same_diff_p = undo_same_diff/ np.sum(undo_same_diff,axis = 1)[:,None]
+
+# +
+# %matplotlib notebook
+
+plt.figure()
+plt.bar(range(2), np.mean(undo_same_diff_p,axis=0),
+        color=[.7,.7,.7], edgecolor = 'k', 
+        yerr=np.std(undo_same_diff_p,axis = 0)/np.sqrt(undo_same_diff_p.shape[0]))
+plt.xticks([0,1], ['different','same'])
+plt.xlabel('Next city after undoing')
+# -
+
+# ### 2. Results in same path (overlap in path, the undo is unnecessary)?
+
+# +
+undo_for_better = []
+
+for sub in range(100):
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    undo_for_puzzle = []
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()           
+
+        firstUndo_idx_ = dat_sbj_pzi[dat_sbj_pzi["firstUndo"]==1].index
+        firstUndo_idx_ = firstUndo_idx_.to_list()
+#         firstUndo_idx_ = (firstUndo_idx_ - 1).to_list()
+
+        lastUndo_idx = dat_sbj_pzi[dat_sbj_pzi["lastUndo"]==1].index
+        lastUndo_idx = lastUndo_idx.to_list()
+
+        submit_idx = dat_sbj_pzi[dat_sbj_pzi["submit"]==1].index
+        submit_idx = submit_idx.to_list()
+
+        lastUndo_idx_ = [0]
+        lastUndo_idx_.extend(lastUndo_idx) # put 0 at the beginning
+        firstUndo_idx = submit_idx.copy()
+        firstUndo_idx_.extend(firstUndo_idx) # put submit at the end
+        
+        for tr in range(len(firstUndo_idx_)-1):
+            Prev_seq = dat_sbj_pzi['choice'][lastUndo_idx_[tr]:firstUndo_idx_[tr]].to_list()
+            Curr_seq = dat_sbj_pzi['choice'][lastUndo_idx_[tr+1]:firstUndo_idx_[tr+1]].to_list()
+#             print('*'*10)
+#             print(tr)
+#             print(Prev_seq)
+#             print(Curr_seq)
+#             print('*'*10)
+#             print(Prev_seq)
+#             print(Curr_seq)
+#             undo_target = Curr_seq[0]
+#             print(undo_target)
+            # if a participant undid more than the length of the previous undoing sequence
+            if dat_sbj_pzi['currNumCities'][lastUndo_idx_[tr]]>dat_sbj_pzi['currNumCities'][lastUndo_idx_[tr+1]]: 
+                # then it is simply whether the previous undoing sequence is in the current undoing sequence
+                if np.all(np.isin(Prev_seq, Curr_seq)):
+                    undo_for_puzzle.append(1)
+                else:
+                    undo_for_puzzle.append(0)
+            else:
+                # first find undo target
+                undo_target = Curr_seq[0]
+                Prev_seq_temp = Prev_seq[np.argwhere(np.array(Prev_seq)==undo_target).squeeze():]
+                len_frag = min(len(Prev_seq_temp), len(Curr_seq))
+                Prev_seq_temp = Prev_seq_temp[:len_frag]
+                Curr_seq_temp = Curr_seq[:len_frag]
+
+                if np.all(Prev_seq_temp==Curr_seq_temp):
+                    undo_for_puzzle.append(1)
+                else:
+                    undo_for_puzzle.append(0)
+#             print('hup')
+    undo_for_puzzle =  np.array(undo_for_puzzle)
+    undo_for_better.append([np.sum(undo_for_puzzle==0), np.sum(undo_for_puzzle==1)])
+undo_for_better = np.array(undo_for_better)
+# -
+
+# exclude some never undoing subjects
+undo_for_better = undo_for_better[np.where(np.sum(np.array(undo_for_better),axis=1)!=0),:]
+undo_for_better = undo_for_better.squeeze()
+undo_for_better_p = undo_for_better/ np.sum(undo_for_better,axis = 1)[:,None]
+
+# %matplotlib notebook
+plt.figure()
+plt.bar(range(2), np.mean(undo_for_better_p,axis=0),
+        color=[.7,.7,.7], edgecolor = 'k', 
+        yerr=np.std(undo_for_better_p,axis = 0)/np.sqrt(undo_for_better_p.shape[0]))
+plt.xticks([0,1], ['different','same'])
+plt.xlabel('Next path after undoing')
+
+# ### 3. number of visits to a state (not undo target)
+
+# +
+importer = JsonImporter()
+visit = []
+for ti in range(len(undo_tree)): # loop through trials
+    root = importer.import_(undo_tree[ti])
+    
+    for node in PreOrderIter(root): # loop through the tree
+        n_child = len(node.children)
+        visit.append(node.visit)
+
+visit.count(2)
+# -
+
+# ## After an undo or sequence of undos, how often do people actually choose a better move?! 
+
+# ### 1. for different paths 
+
+# +
+undo_for_better = []
+
+for sub in range(100):
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    undo_for_puzzle = []
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
+
+        firstUndo_idx = dat_sbj_pzi[dat_sbj_pzi["firstUndo"]==1].index
+        path_bf_undo = dat_sbj_pzi["currMas"][firstUndo_idx-1] # the mas of the state before undo
+        
+        lastUndo_idx = dat_sbj_pzi[dat_sbj_pzi["lastUndo"]==1].index
+        path_af_undo = dat_sbj_pzi["currMas"][lastUndo_idx+1] # the mas of the state after undo
+        
+        if np.any(np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])):
+            
+            idxx = np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])
+            undo_for_puzzle.extend(np.sign(np.array(path_af_undo[idxx]) - np.array(path_bf_undo[idxx])))
+#         else:
+#             print('hup')
+    undo_for_puzzle =  np.array(undo_for_puzzle)
+    undo_for_better.append([np.sum(undo_for_puzzle<0), np.sum(undo_for_puzzle==0) ,np.sum(undo_for_puzzle>0)])
+undo_for_better = np.array(undo_for_better)
+# -
+
+# exclude some never undoing subjects
+undo_for_better = undo_for_better[np.where(np.sum(np.array(undo_for_better),axis=1)!=0),:]
+undo_for_better = undo_for_better.squeeze()
+undo_for_better_p = undo_for_better/ np.sum(undo_for_better,axis = 1)[:,None]
+
+# %matplotlib notebook
+plt.figure()
+plt.bar(range(3), np.mean(undo_for_better_p,axis=0),
+        color=[.7,.7,.7], edgecolor = 'k', 
+        yerr=np.std(undo_for_better_p,axis = 0)/np.sqrt(undo_for_better_p.shape[0]))
+plt.xticks([0,1,2], ['worse','no_diff','better'])
+plt.xlabel('After undoing')
+
+# ### 2.including undoing to the same paths
+
+# +
+undo_for_better = []
+
+for sub in range(101):
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    undo_for_puzzle = []
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
+
+        firstUndo_idx = dat_sbj_pzi[dat_sbj_pzi["firstUndo"]==1].index
+        path_bf_undo = dat_sbj_pzi["currMas"][firstUndo_idx-1]
+        
+        lastUndo_idx = dat_sbj_pzi[dat_sbj_pzi["lastUndo"]==1].index
+        path_af_undo = dat_sbj_pzi["currMas"][lastUndo_idx+1]
+        
+        # only after undoing to a different path 
+#         if np.any(np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])):
+#             idxx = np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])
+        undo_for_puzzle.extend(np.sign(np.array(path_af_undo) - np.array(path_bf_undo)))
+#         else:
+#             print('hup')
+    undo_for_puzzle =  np.array(undo_for_puzzle)
+    undo_for_better.append([np.sum(undo_for_puzzle<0), np.sum(undo_for_puzzle==0) ,np.sum(undo_for_puzzle>0)])
+undo_for_better = np.array(undo_for_better)
+# -
+
+# exclude some never undoing subjects
+undo_for_better = undo_for_better[np.where(np.sum(np.array(undo_for_better),axis=1)!=0),:]
+undo_for_better = undo_for_better.squeeze()
+undo_for_better_p = undo_for_better/ np.sum(undo_for_better,axis = 1)[:,None]
+
+# %matplotlib notebook
+plt.figure()
+plt.bar(range(3), np.mean(undo_for_better_p,axis=0),
+        color=[.7,.7,.7], edgecolor = 'k', 
+        yerr=np.std(undo_for_better_p,axis = 0)/np.sqrt(undo_for_better_p.shape[0]))
+plt.xticks([0,1,2], ['worse','no_diff','better'])
+plt.xlabel('After undoing')
+
+# ## leaf node bf/af undoing (After an undo or sequence of undos, how often do people actually choose a better path)?!
+
+# ### 1. Including going to the same path
+
+# +
+undo_for_better = []
+
+for sub in range(101):
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    undo_for_puzzle = []
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
+
+        firstUndo_idx = dat_sbj_pzi[dat_sbj_pzi["firstUndo"]==1].index
+        path_bf_undo = dat_sbj_pzi["currMas"][firstUndo_idx-1]
+        firstUndo_idx = firstUndo_idx.to_list()
+        
+        submit_idx = dat_sbj_pzi[dat_sbj_pzi["submit"]==1].index
+        submit_idx = submit_idx.to_list()
+        
+        firstUndo_idx.extend(submit_idx) 
+        
+        for i in range(len(firstUndo_idx)-1):
+            undo_for_puzzle.append(dat_sbj_pzi["currMas"][firstUndo_idx[i+1]-1] - dat_sbj_pzi["currMas"][firstUndo_idx[i]-1])
+    
+#             print('hup')
+    undo_for_puzzle =  np.array(undo_for_puzzle)
+    undo_for_better.append([np.sum(undo_for_puzzle<0), np.sum(undo_for_puzzle==0) ,np.sum(undo_for_puzzle>0)])
+undo_for_better = np.array(undo_for_better)
+# -
+
+# exclude some never undoing subjects
+undo_for_better = undo_for_better[np.where(np.sum(np.array(undo_for_better),axis=1)!=0),:]
+undo_for_better = undo_for_better.squeeze()
+undo_for_better_p = undo_for_better/ np.sum(undo_for_better,axis = 1)[:,None]
+
+# %matplotlib notebook
+plt.figure()
+plt.bar(range(3), np.mean(undo_for_better_p,axis=0),
+        color=[.7,.7,.7], edgecolor = 'k', 
+        yerr=np.std(undo_for_better_p,axis = 0)/np.sqrt(undo_for_better_p.shape[0]))
+plt.xticks([0,1,2], ['worse','no_diff','better'])
+plt.xlabel('After undoing')
 
 
