@@ -43,6 +43,7 @@ checkEnd = []
 severityOfErrors = []    # severity of errors
 error = []               # error binary
 
+path = [] 
 choice = []
 currNumCities = []       # current number of connected cities
 currMas = []             # current MAS
@@ -78,6 +79,7 @@ for i in range(len(data_all)):
     temp_severityOfErrors = []
     temp_error = []
     
+    temp_path = data_all[i].chosen_all
     temp_choice = data_all[i].currentChoice
     temp_currNumCities = data_all[i].n_city_all
     temp_currMas = data_all[i].mas_all
@@ -154,6 +156,7 @@ for i in range(len(data_all)):
     # severityOfErrors.extend(temp_severityOfErrors)
     # error.extend(temp_error)
     
+    path.extend(temp_path)
     choice.extend(temp_choice)
     currNumCities.extend(temp_currNumCities)
     currMas.extend(temp_currMas)
@@ -190,15 +193,15 @@ np.savetxt(R_out_dir + 'choicelevel_tortuosity.csv', np.array(tortuosity),fmt='%
 
 ## ==========================================================================
 ######## all choice-level data in one file
-headerList = ['subjects', 'puzzleID','trialID','allMAS,'
-              'choice','currNumCities','currMas','currNos', 'leftover','within_reach',
+headerList = ['subjects', 'puzzleID','trialID','allMAS',
+              'path','choice','currNumCities','currMas','currNos', 'leftover','within_reach',
               'condition','undo','firstUndo','lastUndo',
               'submit','checkEnd',
               'severityOfErrors', 'error',
               'RT','undoRT','tortuosity']
 
 dataList = [np.array(puzzleID).astype(np.int16), np.array(trialID).astype(np.int16),np.array(allMAS).astype(np.int16),
-            np.array(choice),np.array(currNumCities).astype(np.int16), np.array(currMas).astype(np.int16), np.array(currNos).astype(np.int16),np.array(leftover),np.array(within_reach).astype(np.int16),
+            np.array(path),np.array(choice),np.array(currNumCities).astype(np.int16), np.array(currMas).astype(np.int16), np.array(currNos).astype(np.int16),np.array(leftover),np.array(within_reach).astype(np.int16),
             np.array(undo_c).astype(np.int16),np.array(undo),np.array(firstUndo).astype(np.int16),np.array(lastUndo).astype(np.int16),
             np.array(submit).astype(np.int16),np.array(checkEnd).astype(np.int16),
             np.array(severityOfErrors).astype(np.int16),np.array(error).astype(np.int16),
@@ -206,23 +209,27 @@ dataList = [np.array(puzzleID).astype(np.int16), np.array(trialID).astype(np.int
 data = [subjects]
 for data_ in dataList:
     data.append(data_.reshape((-1)).tolist())
-
+    
 data = np.array(data).transpose()
 
-np.savetxt(R_out_dir + 'choicelevel_data.csv',data, delimiter=',',fmt='%d,%d,%d,%d, %d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=",".join(headerList),comments='')
-headerList_ = [" ", *headerList]
-np.savetxt(R_out_dir + 'choicelevel_data.txt',data, delimiter=' ',fmt='%d,%d,%d,%d, %d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=" ".join(headerList_),comments='')
+df = pd.DataFrame(data)
+df.columns = headerList
+df.to_csv(R_out_dir + 'choicelevel_data.csv', index=False)
+
+# np.savetxt(R_out_dir + 'choicelevel_data.csv',data, delimiter=',',fmt='%d,%d,%d,%d, %s,%d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=",".join(headerList),comments='')
+# headerList_ = [" ", *headerList]
+# np.savetxt(R_out_dir + 'choicelevel_data.txt',data, delimiter=' ',fmt='%d,%d,%d,%d, %s,%d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=" ".join(headerList_),comments='')
 
 
-# undo data saving
-ind_data = np.where(np.array(undoRT) != -1)
-data = [np.array(subjects)[ind_data]]
-for data_ in dataList:
-    data.append(data_[ind_data])
-data = np.array(data).transpose()
-np.savetxt(R_out_dir + 'choicelevel_undo_data.csv',data, delimiter=',',fmt='%d,%d,%d,%d, %d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=",".join(headerList),comments='')
-headerList_ = [" ", *headerList]
-np.savetxt(R_out_dir + 'choicelevel_undo_data.txt',data, delimiter=' ',fmt='%d,%d,%d,%d, %d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=" ".join(headerList_),comments='')
+# # undo data saving
+# ind_data = np.where(np.array(undoRT) != -1)
+# data = [np.array(subjects)[ind_data]]
+# for data_ in dataList:
+#     data.append(data_[ind_data])
+# data = np.array(data).transpose()
+# np.savetxt(R_out_dir + 'choicelevel_undo_data.csv',data, delimiter=',',fmt='%d,%d,%d,%d, %s,%d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=",".join(headerList),comments='')
+# headerList_ = [" ", *headerList]
+# np.savetxt(R_out_dir + 'choicelevel_undo_data.txt',data, delimiter=' ',fmt='%d,%d,%d,%d, %s,%d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=" ".join(headerList_),comments='')
 
 
 
