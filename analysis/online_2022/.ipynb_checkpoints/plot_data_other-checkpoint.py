@@ -63,6 +63,7 @@ data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data.csv'
 
 single_condition_data = puzzleID_order_data[puzzleID_order_data['condition']==1].copy()
 single_condition_data = single_condition_data.reset_index()
+sc_data_choice_level = data_choice_level[data_choice_level['condition']==1].reset_index()
 
 with open(home_dir +'tree_data/undo_tree', 'r') as file:
     undo_tree = json.load(file)
@@ -631,9 +632,6 @@ fig.savefig(out_dir + 'error_optimal.png', dpi=600, bbox_inches='tight')
 
 # ### 1. avarage across puzzle for each subject
 
-sc_data_choice_level = data_choice_level[data_choice_level['condition']==1].reset_index()
-
-
 # +
 # # Fixing random state for reproducibility
 # np.random.seed(19680801)
@@ -781,7 +779,7 @@ fig = plt.figure(figsize=(6, 6))
 ax = fig.add_axes(rect_scatter)
 ax_histx = fig.add_axes(rect_histx, sharex=ax)
 ax_histy = fig.add_axes(rect_histy, sharey=ax)
-offset_ = .05# offset for better visualization
+offset_ = .05 # offset for better visualization
 ax.set_xlim(0,1+offset_)
 ax.set_ylim(0,1+offset_)
 ax_histx.set_xlim(0-offset_,1+offset_)
@@ -842,16 +840,11 @@ for sub in range(100):
         diff_puzzle = 0
         
         dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
-
-        firstUndo_idx = dat_sbj_pzi[dat_sbj_pzi["firstUndo"]==1].index
-        path_bf_undo = dat_sbj_pzi["currMas"][firstUndo_idx-1]
-        
+     
         lastUndo_idx = dat_sbj_pzi[dat_sbj_pzi["lastUndo"]==1].index
-        path_af_undo = dat_sbj_pzi["currMas"][lastUndo_idx+1]
         
         idxx = np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])
         diff_puzzle += np.sum(idxx)
-    
         idxx = np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) == np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])
         same_puzzle += np.sum(idxx)
         
@@ -876,7 +869,75 @@ plt.figure()
 plt.bar(range(2), np.mean(undo_same_diff_p,axis=0),
         color=[.7,.7,.7], edgecolor = 'k', 
         yerr=np.std(undo_same_diff_p,axis = 0)/np.sqrt(undo_same_diff_p.shape[0]))
-plt.xticks([0,1], ['different','same'])
+plt.xticks([0,1], ['same','different'])
+plt.xlabel('Next city after undoing')
+# -
+
+# ### 1.1 Result in the same city (separate for undo target is start city or not)
+
+# +
+undo_same_diff_start = [] # whether it is a start city
+undo_same_diff_nostart = []
+
+for sub in range(100):
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    
+    undo_same_diff_puzzle_start = []
+    undo_same_diff_puzzle_nostart = []
+    
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):        
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
+    
+        lastUndo_idx_start = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)&(dat_sbj_pzi["choice"]==0)].index  
+        lastUndo_idx_nostart = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)&(dat_sbj_pzi["choice"]!=0)].index
+        
+        idxx_start = np.array(dat_sbj_pzi["choice"][lastUndo_idx_start-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx_start+1])
+        diff_puzzle_start = np.sum(idxx_start)
+        idxx_start = np.array(dat_sbj_pzi["choice"][lastUndo_idx_start-1]) == np.array(dat_sbj_pzi["choice"][lastUndo_idx_start+1])
+        same_puzzle_start = np.sum(idxx_start)
+        
+        idxx_nostart = np.array(dat_sbj_pzi["choice"][lastUndo_idx_nostart-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx_nostart+1])
+        diff_puzzle_nostart = np.sum(idxx_nostart)
+        idxx_nostart = np.array(dat_sbj_pzi["choice"][lastUndo_idx_nostart-1]) == np.array(dat_sbj_pzi["choice"][lastUndo_idx_nostart+1])
+        same_puzzle_nostart = np.sum(idxx_nostart)
+        
+        undo_same_diff_puzzle_start.append([same_puzzle_start, diff_puzzle_start]) # one number for each puzzle
+        undo_same_diff_puzzle_nostart.append([same_puzzle_nostart, diff_puzzle_nostart])
+        
+    undo_same_diff_puzzle_start =  np.array(undo_same_diff_puzzle_start) # one number for each subject
+    undo_same_diff_puzzle_start =  np.sum(undo_same_diff_puzzle_start,axis=0) 
+    undo_same_diff_puzzle_nostart =  np.array(undo_same_diff_puzzle_nostart)
+    undo_same_diff_puzzle_nostart =  np.sum(undo_same_diff_puzzle_nostart,axis=0)
+    
+    undo_same_diff_start.append(undo_same_diff_puzzle_start)
+    undo_same_diff_nostart.append(undo_same_diff_puzzle_nostart)
+    
+undo_same_diff_start = np.array(undo_same_diff_start)
+undo_same_diff_nostart = np.array(undo_same_diff_nostart)
+
+# +
+# exclude some never undoing subjects
+undo_same_diff_start = undo_same_diff_start[np.where(np.sum(np.array(undo_same_diff_start),axis=1)!=0),:]
+undo_same_diff_start = undo_same_diff_start.squeeze()
+undo_same_diff_start_p = undo_same_diff_start/ np.sum(undo_same_diff_start,axis = 1)[:,None]
+
+undo_same_diff_nostart = undo_same_diff_nostart[np.where(np.sum(np.array(undo_same_diff_nostart),axis=1)!=0),:]
+undo_same_diff_nostart = undo_same_diff_nostart.squeeze()
+undo_same_diff_nostart_p = undo_same_diff_nostart/ np.sum(undo_same_diff_nostart,axis = 1)[:,None]
+
+undo_same_diff_p_mean = np.concatenate((np.mean(undo_same_diff_start_p,axis=0), np.mean(undo_same_diff_nostart_p,axis=0)), axis=None)
+undo_same_diff_p_yerr = np.concatenate((np.std(undo_same_diff_start_p,axis = 0)/np.sqrt(undo_same_diff_start_p.shape[0]), 
+                                        np.std(undo_same_diff_nostart_p,axis = 0)/np.sqrt(undo_same_diff_nostart_p.shape[0])), axis=None)
+
+# +
+# %matplotlib notebook
+
+plt.figure()
+plt.bar([0,1,2,3], undo_same_diff_p_mean,
+        color=[.7,.7,.7], edgecolor = 'k',
+        yerr=undo_same_diff_p_yerr
+       )
+plt.xticks([0,0.5,1, 2,2.5,3], ['same','\n start city','different','same','\nnot start city','different'])
 plt.xlabel('Next city after undoing')
 # -
 
@@ -970,6 +1031,106 @@ for ti in range(len(undo_tree)): # loop through trials
 
 visit.count(2)
 # -
+
+# ## Whether the undo target is start city may be dependent on the accumulated error
+
+# +
+accu_error = []
+
+for sub in range(100):
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    accu_error_puzzle = []
+    
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
+        
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
+     
+        lastUndo_idx_start = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)&(dat_sbj_pzi["choice"]==0)].index
+        lastUndo_idx_nostart = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)&(dat_sbj_pzi["choice"]!=0)].index
+        lastUndo_idx = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)].index
+        
+        start_idx = np.where(np.isin(lastUndo_idx,lastUndo_idx_start))
+        firstUndo_idx_start = dat_sbj_pzi[dat_sbj_pzi["firstUndo"]==1].index[start_idx]
+        nostart_idx = np.where(np.isin(lastUndo_idx,lastUndo_idx_nostart))
+        firstUndo_idx_nostart = dat_sbj_pzi[dat_sbj_pzi["firstUndo"]==1].index[nostart_idx]
+        
+        df_beforeUndo_start = dat_sbj_pzi.loc[firstUndo_idx_start-1,:]
+        accu_severity_error_start = df_beforeUndo_start['allMAS'] - df_beforeUndo_start['currMas']
+        
+        df_beforeUndo_nostart = dat_sbj_pzi.loc[firstUndo_idx_nostart-1,:]
+        accu_severity_error_nostart = df_beforeUndo_nostart['allMAS'] - df_beforeUndo_nostart['currMas']
+        
+        accu_error_puzzle.append([np.nanmean(accu_severity_error_start),np.nanmean(accu_severity_error_nostart)])
+        
+    accu_error_puzzle =  np.array(accu_error_puzzle)
+    accu_error_puzzle =  np.nanmean(accu_error_puzzle,axis=0)
+
+    accu_error.append(accu_error_puzzle)
+    
+accu_error = np.array(accu_error)
+# -
+
+# %matplotlib notebook
+plt.figure()
+plt.bar(range(2), np.nanmean(accu_error,axis=0),
+        color=[.7,.7,.7], edgecolor = 'k', 
+        yerr=np.nanstd(accu_error,axis = 0)/np.sqrt(accu_error.shape[0]))
+plt.xticks([0,1], ['start city','not start city'])
+plt.ylabel('accumulated error')
+
+# ## compare 3 states: before-undo target state, undo target state and after-undo target state if undo target is not the start city
+
+# +
+accu_error_3 = []
+
+for sub in range(100):
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    accu_error_puzzle = []
+    
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
+        
+        accu_severity_error_after = []
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
+     
+        lastUndo_idx_nostart = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)&(dat_sbj_pzi["choice"]!=0)].index
+        lastUndo_idx = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)].index
+        nostart_idx = np.where(np.isin(lastUndo_idx,lastUndo_idx_nostart))
+        firstUndo_idx_nostart = dat_sbj_pzi[dat_sbj_pzi["firstUndo"]==1].index[nostart_idx]
+        
+        df_undoTarget = dat_sbj_pzi.loc[lastUndo_idx_nostart,:]
+        accu_severity_error = df_undoTarget['allMAS'] - df_undoTarget['currMas']
+        
+        df_undoTarget_before = dat_sbj_pzi.loc[lastUndo_idx_nostart-1,:]
+        accu_severity_error_before = df_undoTarget_before['allMAS'] - df_undoTarget_before['currMas']
+        
+        undoTarget_after_choice = [eval(path)[:-1] for path in list(df_undoTarget['path'])]
+        try: 
+            if len(undoTarget_after_choice)!=0:
+                for item in undoTarget_after_choice:
+                    after_path = str(item)
+                    df_after = dat_sbj_pzi[dat_sbj_pzi["path"]==after_path].iloc[0]
+                    accu_severity_error_after.append((df_after['allMAS'] - df_after['currMas']))
+        except: 
+            accu_severity_error_after.append(None)
+        
+        accu_error_puzzle.append([np.nanmean(accu_severity_error_before),np.nanmean(accu_severity_error),np.nanmean(accu_severity_error_after)])
+
+    accu_error_puzzle =  np.array(accu_error_puzzle)
+    accu_error_puzzle =  np.nanmean(accu_error_puzzle,axis=0)
+
+    accu_error_3.append(accu_error_puzzle)
+    
+accu_error_3 = np.array(accu_error_3)
+
+# -
+
+# %matplotlib notebook
+plt.figure()
+plt.bar(range(3), np.nanmean(accu_error_3,axis=0),
+        color=[.7,.7,.7], edgecolor = 'k', 
+        yerr=np.nanstd(accu_error_3,axis = 0)/np.sqrt(accu_error.shape[0]))
+plt.xticks([0,1,2], ['before target','at target','after target'])
+plt.ylabel('accumulated error')
 
 # ## After an undo or sequence of undos, how often do people actually choose a better move?! 
 
