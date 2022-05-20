@@ -93,7 +93,7 @@ def text(p):
 
 # -
 
-# ## histogram of number of cities within reach
+# # histogram of number of cities within reach
 
 # +
 n_reach = data_choice_level[data_choice_level['condition']==0]['within_reach'] # only basic condition
@@ -109,7 +109,9 @@ axs.set_xlabel('number of cities within reach')
 plt.show()
 # -
 
-# ## budget before submit/undo at the end of trial
+# # Undo initial state
+
+# ## 1. budget before submit/undo at the end of trial
 
 # +
 # only undo condition
@@ -163,7 +165,7 @@ plt.show()
 fig.savefig(out_dir + 'budget_before_submit_undo.png', dpi=600, bbox_inches='tight')
 # -
 
-# ## counts of errors before undo (by accumulated severity)
+# ## 2.1 counts of errors before undo (by accumulated severity)
 
 # +
 index_first_undo =  data_choice_level.index[data_choice_level['firstUndo'] == 1]
@@ -197,11 +199,11 @@ print(groupby_error_instant)
 # %matplotlib notebook
 
 fig, axs = plt.subplots(1, 1)
-axs.bar(groupby_error.index,groupby_error_instant/sum(groupby_error_instant))
+axs.bar(groupby_error_instant.index,groupby_error_instant/sum(groupby_error_instant))
 axs.set_ylabel('proportion of first undo')
 axs.set_xlabel('instant error before first undo action')
 plt.show()
-fig.savefig(out_dir + 'undo_instant_error.pdf', dpi=600, bbox_inches='tight')
+# fig.savefig(out_dir + 'undo_instant_error.pdf', dpi=600, bbox_inches='tight')
 
 
 # +
@@ -249,7 +251,10 @@ d = {'severityOfErrors': [4,4,4,6,6,6], 'accumulatedError': [4,'noninstant','non
 df = pd.DataFrame(data=d)
 groupby_error = pd.concat([groupby_error,df]).reset_index()
 print(groupby_error)
+# -
 
+
+# ## 2.1.1 different errors lead to different types of undo?
 
 # +
 # %matplotlib notebook
@@ -281,7 +286,7 @@ fig.savefig(out_dir + 'undotype_errortype.pdf', dpi=600, bbox_inches='tight')
 
 
 # -
-# ## probability of undo -- conditional on error
+# ## 2.2 probability of undo -- conditional on error
 
 # +
 # FROM EACH SUBJECT
@@ -399,7 +404,9 @@ import pylab as py
 sm.qqplot_2samples(dat_subjects[:,0],dat_subjects[:,1],line ='45')
 py.show()
 
-# ## number of undo - subjects
+# # benefit of undo
+
+# ## 1.1 number of undo - subjects
 
 undo_puzzle = single_condition_data[single_condition_data['numUNDO']>0].groupby(['subjects']).size()
 count = [len(single_condition_data.groupby(['subjects']).size())]
@@ -415,7 +422,7 @@ axs.set_ylabel("number of subjects")
 # axs.plot(bins[1][:-1], bins[0], color = '#81b29a', linewidth=3)
 # -
 
-# ## number of undo - puzzles
+# ## 1.2 number of undo - puzzles
 
 # +
 order = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean().to_frame()
@@ -428,7 +435,7 @@ bx = sns.barplot(x='puzzleID', y='numFullUndo', data = single_condition_data, co
 
 # -
 
-# ## benefit of undo - number of full undoing
+# ## 1.3.1 benefits of undo - num of full undoing
 
 # +
 basic_score = puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities'].reset_index(drop=True)
@@ -443,10 +450,10 @@ undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean
 
 
 # +
-# benefit_undo = (np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numCities']) 
-#         - np.array(puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities']))
+benefit_undo = (np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numCities']) 
+        - np.array(puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities']))
 
-# undo_count = np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numFullUndo'])
+undo_count = np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numFullUndo'])
 
 yerr = stats.binned_statistic(undo_count, benefit_undo, statistic=lambda y: np.std(y)/np.sqrt(len(y)), bins=[0,1,2,3,4,100])
 bins = stats.binned_statistic(undo_count, benefit_undo, 'mean', bins=[0,1,2,3,4,100])
@@ -479,6 +486,8 @@ fig.savefig(out_dir + 'undobenefit_undonum.png', dpi=600, bbox_inches='tight')
 # -
 
 
+# ## 1.3.2 benefits of undo - num of full undoing (scatter plot)
+
 scatter_data = single_condition_data.groupby(['undo_benefit_z','numFullUndo'])['index'].size().to_frame(name = 'count').reset_index()
 
 # %matplotlib notebook
@@ -486,6 +495,8 @@ fig1, ax1 = plt.subplots()
 sns.scatterplot(x='numFullUndo', y='undo_benefit_z', size = scatter_data['count'], sizes = (3,100), data=scatter_data) 
 ax1.set_xlabel("number of undo")
 ax1.set_ylabel("benefit of undo")
+
+# ## 1.3.3 benefits of undo - num of full undoing (subject-level correlation)
 
 fig11, ax1 = plt.subplots()
 ax1.plot(undo_count_sub,undo_benefit_z_sub,'o')
@@ -496,6 +507,8 @@ fig11.savefig(out_dir + 'undobenefit_individual.pdf', dpi=600, bbox_inches='tigh
 #TODO: with a caption stating that each point is a subject, the Spearman rho, and the p-value
 stats.spearmanr(undo_count_sub,undo_benefit_z_sub)
 
+# ## 1.3.4 benefits of undo - num of full undoing (puzzle-level correlation)
+
 undo_benefit_puzzle = single_condition_data.groupby(['puzzleID'])['undo_benefit'].mean()
 undo_count_puzzle = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean()
 fig1, ax1 = plt.subplots()
@@ -503,7 +516,7 @@ ax1.plot(undo_count_puzzle,undo_benefit_puzzle,'o')
 ax1.set_xlabel("average number of undo")
 ax1.set_ylabel("benefit of undo")
 
-# ## GLMM benefit of undo - number of undo
+# ## 1.4 GLMM benefit of undo - number of undo
 
 # +
 basic_score = puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities'].reset_index(drop=True)
@@ -548,7 +561,7 @@ undo_count_sub = single_condition_data.groupby(['subjects'])['numFullUndo'].mean
 # qqPlot(resid(model), distribution = "norm")
 # -
 
-# ## glmm：missed points - number of undo
+# ## 1.5 GLMM：missed points - number of undo
 
 puzzleID_order_data['missed_points'] = puzzleID_order_data['mas'] - puzzleID_order_data['numCities']
 puzzleID_order_data = puzzleID_order_data[puzzleID_order_data['missed_points'] >= 0]
@@ -596,7 +609,9 @@ puzzleID_order_data = puzzleID_order_data[puzzleID_order_data['missed_points'] >
 # anova(model0,model1)
 # -
 
-# ## count of error - number of optimal solutions
+# # count of error 
+
+# ## 1. number of optimal solutions
 
 # +
 error_basic = np.array(puzzleID_order_data[puzzleID_order_data['condition']==0]['numError']) 
@@ -627,10 +642,10 @@ axs.set_xticklabels([1,3,6,'9+'])
 fig.savefig(out_dir + 'error_optimal.png', dpi=600, bbox_inches='tight')
 
 # -
-# ## When people started undo and stopped
+# # When people started undo and stopped
 
 
-# ### 1. avarage across puzzle for each subject
+# ## 1.1 avarage across puzzle for each subject
 
 # +
 # # Fixing random state for reproducibility
@@ -640,13 +655,13 @@ fig.savefig(out_dir + 'error_optimal.png', dpi=600, bbox_inches='tight')
 # # x = np.random.randn(1000)
 # # y = np.random.randn(1000)
 
-def scatter_hist(x, y, ax, ax_histx, ax_histy):
+def scatter_hist(x, y, ax, ax_histx, ax_histy, alpha=1):
     # no labels
     ax_histx.tick_params(axis="x", labelbottom=False)
     ax_histy.tick_params(axis="y", labelleft=False)
 
     # the scatter plot:
-    ax.scatter(x, y, color=[0,0,0])
+    ax.scatter(x, y, alpha=alpha, color=[0,0,0])
     ax.set_xlabel('normalized number of cities connected (undo start)')
     ax.set_ylabel('normalized number of cities connected (undo target)')
 
@@ -748,7 +763,7 @@ plt.xlabel('normalized number of cities connected (undo start)')
 plt.ylabel('normalized number of cities connected (undo target)')
 # -
 
-# ### 2. Scatter plot (every data points)
+# ## 1.2 Scatter plot (every data points)
 
 # +
 end_ct = np.array(end_ct)
@@ -785,9 +800,9 @@ ax.set_ylim(0,1+offset_)
 ax_histx.set_xlim(0-offset_,1+offset_)
 ax_histy.set_ylim(0-offset_,1+offset_)
 # use the previously defined function
-scatter_hist(str_ct, end_ct, ax, ax_histx, ax_histy)
+scatter_hist(str_ct, end_ct, ax, ax_histx, ax_histy, alpha=0.05)
 # -
-# ### 3. histogram of the position of branching node (similar to undo target, but not counting every visit)
+# ## 2. histogram of the position of branching node (similar to undo target, but not counting every visit)
 
 # +
 pos_branching = data_choice_level[data_choice_level['branchingFirst']==True]['currNumCities']
@@ -804,7 +819,7 @@ plt.show()
 # -
 
 
-# ### 4. number of visits to undo target
+# ## 3. number of visits to branching node
 
 # +
 each_trial = data_choice_level[data_choice_level['condition']==1].groupby(["subjects","puzzleID"])
@@ -819,7 +834,7 @@ axs.hist(n_undotarget_visit,
         bins = [2,3,4,5,6,7,8,9],
         edgecolor = 'k',)
 axs.set_ylabel('counts') 
-axs.set_xlabel('number of undo target visit') 
+axs.set_xlabel('number of branching node visit') 
 axs.set_xticks([2,3,4,5,6,7,8])
 axs.set_xticklabels(["1","2","3","4","5","6","7+"])
 plt.show()
@@ -890,7 +905,7 @@ for sub in range(100):
     
         lastUndo_idx_start = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)&(dat_sbj_pzi["choice"]==0)].index  
         lastUndo_idx_nostart = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)&(dat_sbj_pzi["choice"]!=0)].index
-        
+
         idxx_start = np.array(dat_sbj_pzi["choice"][lastUndo_idx_start-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx_start+1])
         diff_puzzle_start = np.sum(idxx_start)
         idxx_start = np.array(dat_sbj_pzi["choice"][lastUndo_idx_start-1]) == np.array(dat_sbj_pzi["choice"][lastUndo_idx_start+1])
@@ -941,7 +956,7 @@ plt.xticks([0,0.5,1, 2,2.5,3], ['same','\n start city','different','same','\nnot
 plt.xlabel('Next city after undoing')
 # -
 
-# ### 2. Results in same path (overlap in path, the undo is unnecessary)?
+# ### 2. Results in same path (total overlap in path, the undo is unnecessary)?
 
 # +
 undo_for_better = []
@@ -1017,7 +1032,7 @@ plt.bar(range(2), np.mean(undo_for_better_p,axis=0),
 plt.xticks([0,1], ['different','same'])
 plt.xlabel('Next path after undoing')
 
-# ### 3. number of visits to a state (not undo target)
+# ### 3. count number of visits to a state (not undo target)
 
 # +
 importer = JsonImporter()
@@ -1032,7 +1047,9 @@ for ti in range(len(undo_tree)): # loop through trials
 visit.count(2)
 # -
 
-# ## Whether the undo target is start city may be dependent on the accumulated error
+# # Undo target
+
+# ## 1. Whether the undo target is start city may be dependent on the accumulated error
 
 # +
 accu_error = []
@@ -1078,7 +1095,7 @@ plt.bar(range(2), np.nanmean(accu_error,axis=0),
 plt.xticks([0,1], ['start city','not start city'])
 plt.ylabel('accumulated error')
 
-# ## compare 3 states: before-undo target state, undo target state and after-undo target state if undo target is not the start city
+# ## 2. compare 3 states: before-undo target state, undo target state and after-undo target state if undo target is not the start city
 
 # +
 accu_error_3 = []
@@ -1093,9 +1110,6 @@ for sub in range(100):
         dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
      
         lastUndo_idx_nostart = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)&(dat_sbj_pzi["choice"]!=0)].index
-        lastUndo_idx = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)].index
-        nostart_idx = np.where(np.isin(lastUndo_idx,lastUndo_idx_nostart))
-        firstUndo_idx_nostart = dat_sbj_pzi[dat_sbj_pzi["firstUndo"]==1].index[nostart_idx]
         
         df_undoTarget = dat_sbj_pzi.loc[lastUndo_idx_nostart,:]
         accu_severity_error = df_undoTarget['allMAS'] - df_undoTarget['currMas']
@@ -1129,12 +1143,118 @@ plt.figure()
 plt.bar(range(3), np.nanmean(accu_error_3,axis=0),
         color=[.7,.7,.7], edgecolor = 'k', 
         yerr=np.nanstd(accu_error_3,axis = 0)/np.sqrt(accu_error.shape[0]))
-plt.xticks([0,1,2], ['before target','at target','after target'])
+plt.xticks([0,1,2], ['before target undo one less','at target','after target undo one more'])
 plt.ylabel('accumulated error')
 
-# ## After an undo or sequence of undos, how often do people actually choose a better move?! 
+# ## Check the position where they "first" made errors, and whether undo target is that
+#
 
-# ### 1. for different paths 
+# ### 1. undo target is not the start
+
+# +
+accu_error_3 = []
+
+for sub in range(101):
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    accu_error_puzzle = []
+    
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
+        
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
+     
+        lastUndo_idx_nostart = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)&(dat_sbj_pzi["choice"]!=0)].index
+        
+        df_undoTarget = dat_sbj_pzi.loc[lastUndo_idx_nostart,:]
+        accu_severity_error = list(df_undoTarget['allMAS'] - df_undoTarget['currMas'])
+        
+        df_undoTarget_before = dat_sbj_pzi.loc[lastUndo_idx_nostart-1,:]
+        accu_severity_error_before = list(df_undoTarget_before['allMAS'] - df_undoTarget_before['currMas'])
+        
+        category = [np.nan]*len(accu_severity_error)
+        
+        for i in range(len(accu_severity_error)): 
+            if accu_severity_error_before[i]==0:
+                category[i] = 0
+            elif (accu_severity_error[i]==0)&(accu_severity_error_before[i]>0):
+                category[i] = 1
+            elif accu_severity_error[i] > 0:
+                category[i] = 2
+        
+        accu_error_puzzle.extend(category)
+    accu_error_puzzle =  np.array(accu_error_puzzle)
+    accu_error_3.append([np.sum(accu_error_puzzle==0), np.sum(accu_error_puzzle==1) ,np.sum(accu_error_puzzle==2)])
+    
+accu_error_3 = np.array(accu_error_3)
+
+# -
+
+# exclude some never undoing subjects
+accu_error_3 = accu_error_3[np.where(np.sum(np.array(accu_error_3),axis=1)!=0),:]
+accu_error_3 = accu_error_3.squeeze()
+accu_error_3_p = accu_error_3/ np.sum(accu_error_3,axis = 1)[:,None]
+
+# %matplotlib notebook
+plt.figure()
+plt.bar(range(3), np.mean(accu_error_3_p,axis=0),
+        color=[.7,.7,.7], edgecolor = 'k', 
+        yerr=np.std(accu_error_3_p,axis = 0)/np.sqrt(accu_error_3_p.shape[0]))
+plt.xticks([0,1,2], ['undo too many','undo right','undo too few'])
+plt.ylabel('probability')
+
+# ### 1.2 When undo target is the start 
+
+# +
+accu_error_2 = []
+
+for sub in range(101):
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    accu_error_puzzle = []
+    
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
+        
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
+     
+        lastUndo_idx_start = dat_sbj_pzi[(dat_sbj_pzi["lastUndo"]==1)&(dat_sbj_pzi["choice"]==0)].index
+
+        df_undoTarget = dat_sbj_pzi.loc[lastUndo_idx_start,:]
+        accu_severity_error = list(df_undoTarget['allMAS'] - df_undoTarget['currMas'])
+        
+        df_undoTarget_before = dat_sbj_pzi.loc[lastUndo_idx_start-1,:]
+        accu_severity_error_before = list(df_undoTarget_before['allMAS'] - df_undoTarget_before['currMas'])
+        
+        category = [np.nan]*len(accu_severity_error)
+        
+        for i in range(len(accu_severity_error)): 
+            if accu_severity_error_before[i]==0:
+                category[i] = 0
+            elif (accu_severity_error[i]==0)&(accu_severity_error_before[i]>0):
+                category[i] = 1
+        
+        accu_error_puzzle.extend(category)
+
+        
+    accu_error_puzzle =  np.array(accu_error_puzzle)
+    accu_error_2.append([np.sum(accu_error_puzzle==0), np.sum(accu_error_puzzle==1)])
+    
+accu_error_2 = np.array(accu_error_2)
+# -
+
+# exclude some never undoing subjects
+accu_error_2 = accu_error_2[np.where(np.sum(np.array(accu_error_2),axis=1)!=0),:]
+accu_error_2 = accu_error_2.squeeze()
+accu_error_2_p = accu_error_2/ np.sum(accu_error_2,axis = 1)[:,None]
+
+# %matplotlib notebook
+plt.figure()
+plt.bar(range(2), np.mean(accu_error_2_p,axis=0),
+        color=[.7,.7,.7], edgecolor = 'k', 
+        yerr=np.std(accu_error_2_p,axis = 0)/np.sqrt(accu_error_2_p.shape[0]))
+plt.xticks([0,1], ['undo too many','undo right'])
+plt.ylabel('probability')
+
+# # After an undo or sequence of undos, how often do people actually choose a better [move]?! 
+
+# ### 1. TODO: only if they choose different paths
 
 # +
 undo_for_better = []
@@ -1151,6 +1271,7 @@ for sub in range(100):
         lastUndo_idx = dat_sbj_pzi[dat_sbj_pzi["lastUndo"]==1].index
         path_af_undo = dat_sbj_pzi["currMas"][lastUndo_idx+1] # the mas of the state after undo
         
+        # I think it doesn't mean it choose different path, it means at least once the chosen city is different after undo
         if np.any(np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])):
             
             idxx = np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])
@@ -1175,7 +1296,7 @@ plt.bar(range(3), np.mean(undo_for_better_p,axis=0),
 plt.xticks([0,1,2], ['worse','no_diff','better'])
 plt.xlabel('After undoing')
 
-# ### 2.including undoing to the same paths
+# ### 2. all cases (including undoing to the same paths)
 
 # +
 undo_for_better = []
@@ -1183,6 +1304,7 @@ undo_for_better = []
 for sub in range(101):
     dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
     undo_for_puzzle = []
+    
     for pzi in np.unique(sc_data_choice_level['puzzleID']):
         dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
 
@@ -1192,14 +1314,26 @@ for sub in range(101):
         lastUndo_idx = dat_sbj_pzi[dat_sbj_pzi["lastUndo"]==1].index
         path_af_undo = dat_sbj_pzi["currMas"][lastUndo_idx+1]
         
+        change = np.sign(np.array(path_af_undo) - np.array(path_bf_undo))
+        category = [np.nan]*len(change)
+        
+        for i in range(len(change)): 
+            if change[i] < 0:
+                category[i] = 0
+            elif (change[i] == 0)& (dat_sbj_pzi["choice"][firstUndo_idx[i]-1]) == np.array(dat_sbj_pzi["choice"][lastUndo_idx[i]+1]):
+                category[i] = 1
+            elif (change[i] == 0)& (dat_sbj_pzi["allMAS"][firstUndo_idx[i]-1] == dat_sbj_pzi["currMas"][firstUndo_idx[i]-1]):
+                category[i] = 2
+            elif change[i] > 0:
+                category[i] = 3
         # only after undoing to a different path 
 #         if np.any(np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])):
 #             idxx = np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])
-        undo_for_puzzle.extend(np.sign(np.array(path_af_undo) - np.array(path_bf_undo)))
+        undo_for_puzzle.extend(category)
 #         else:
 #             print('hup')
     undo_for_puzzle =  np.array(undo_for_puzzle)
-    undo_for_better.append([np.sum(undo_for_puzzle<0), np.sum(undo_for_puzzle==0) ,np.sum(undo_for_puzzle>0)])
+    undo_for_better.append([np.sum(undo_for_puzzle==0), np.sum(undo_for_puzzle==1) ,np.sum(undo_for_puzzle==2), np.sum(undo_for_puzzle==3)])
 undo_for_better = np.array(undo_for_better)
 # -
 
@@ -1210,13 +1344,13 @@ undo_for_better_p = undo_for_better/ np.sum(undo_for_better,axis = 1)[:,None]
 
 # %matplotlib notebook
 plt.figure()
-plt.bar(range(3), np.mean(undo_for_better_p,axis=0),
+plt.bar(range(4), np.mean(undo_for_better_p,axis=0),
         color=[.7,.7,.7], edgecolor = 'k', 
         yerr=np.std(undo_for_better_p,axis = 0)/np.sqrt(undo_for_better_p.shape[0]))
-plt.xticks([0,1,2], ['worse','no_diff','better'])
+plt.xticks([0,1,2,3], ['worse','no_diff_same','no_diff_best','better'])
 plt.xlabel('After undoing')
 
-# ## leaf node bf/af undoing (After an undo or sequence of undos, how often do people actually choose a better path)?!
+# ## leaf node bf/af undoing (After an undo or sequence of undos, how often do people actually choose a better [path])?!
 
 # ### 1. Including going to the same path
 
@@ -1259,5 +1393,57 @@ plt.bar(range(3), np.mean(undo_for_better_p,axis=0),
         yerr=np.std(undo_for_better_p,axis = 0)/np.sqrt(undo_for_better_p.shape[0]))
 plt.xticks([0,1,2], ['worse','no_diff','better'])
 plt.xlabel('After undoing')
+
+# ## before undo or after undo, are they in a optimal path?
+
+# +
+optimal_before_all = []
+optimal_after_all = []
+
+for sub in range(101):
+    dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
+    optimal_before = []
+    optimal_after = []
+    
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
+        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
+
+        firstUndo_idx = dat_sbj_pzi[dat_sbj_pzi["firstUndo"]==1].index
+        path_bf_undo = (dat_sbj_pzi["allMAS"][firstUndo_idx-1] - dat_sbj_pzi["currMas"][firstUndo_idx-1])
+        
+        lastUndo_idx = dat_sbj_pzi[dat_sbj_pzi["lastUndo"]==1].index
+        path_af_undo = (dat_sbj_pzi["allMAS"][lastUndo_idx+1] - dat_sbj_pzi["currMas"][lastUndo_idx+1])
+        
+        optimal_before.extend(path_bf_undo)
+        optimal_after.extend(path_af_undo)
+
+    optimal_before = np.array(optimal_before)
+    optimal_after = np.array(optimal_after)
+    
+    optimal_before_all.append([np.sum(optimal_before>0), np.sum(optimal_before==0)])
+    optimal_after_all.append([np.sum(optimal_after>0), np.sum(optimal_after==0)])
+    
+optimal_before_all = np.array(optimal_before_all)
+optimal_after_all = np.array(optimal_after_all)
+
+# +
+# exclude some never undoing subjects
+optimal_before_all = optimal_before_all[np.where(np.sum(np.array(optimal_before_all),axis=1)!=0),:]
+optimal_before_all = optimal_before_all.squeeze()
+optimal_before_all_p = optimal_before_all/ np.sum(optimal_before_all,axis = 1)[:,None]
+
+optimal_after_all = optimal_after_all[np.where(np.sum(np.array(optimal_after_all),axis=1)!=0),:]
+optimal_after_all = optimal_after_all.squeeze()
+optimal_after_all_p = optimal_after_all/ np.sum(optimal_after_all,axis = 1)[:,None]
+# -
+
+# %matplotlib notebook
+plt.figure()
+plt.bar(range(2), [np.mean(optimal_before_all_p,axis=0)[1],np.mean(optimal_after_all_p,axis=0)[1]],
+        color=[.7,.7,.7], edgecolor = 'k',
+        yerr=[np.std(optimal_before_all_p,axis = 0)[1]/np.sqrt(optimal_before_all_p.shape[0]),
+              np.std(optimal_after_all_p,axis = 0)[1]/np.sqrt(optimal_after_all_p.shape[0])])
+plt.xticks([0,1], ['before undo','after undo'])
+plt.ylabel('probability of in optimal path')
 
 

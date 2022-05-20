@@ -403,30 +403,44 @@ RT_start_nobranch = data_choice_level.loc[index_start_nobranch + 1,:]
 RT_start_nobranch_sub = RT_start_nobranch.groupby(['subjects'])['RT'].mean()/1000
 RT_start_nobranch_sub_sem = sem(RT_start_nobranch_sub)
 
+index_start_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['RT'] == -1)&(data_choice_level['condition']==1)]
+RT_start_laterbranch = data_choice_level.loc[index_start_laterbranch + 1,:]
+RT_start_laterbranch_sub = RT_start_laterbranch.groupby(['subjects'])['RT'].mean()/1000
+RT_start_laterbranch_sub_sem = sem(RT_start_laterbranch_sub)
+
 # the first visit of a branching node, and it is not a start city
 index_notstart = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['RT'] != -1)]
 RT_notstart = data_choice_level.loc[index_notstart + 1,:]
 RT_notstart_sub = RT_notstart.groupby(['subjects'])['RT'].mean()/1000
 RT_notstart_sub_sem = sem(RT_notstart_sub)
 
-index_notstart_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['RT'] != -1)&(data_choice_level['condition']==1)&(data_choice_level['submit']!=1)&(data_choice_level['undo']!=1)]
+index_notstart_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['RT'] != -1)&(data_choice_level['condition']==1)&(data_choice_level['submit']!=1)] # &(data_choice_level['undo']!=1)
 RT_notstart_nobranch = data_choice_level.loc[index_notstart_nobranch + 1,:]
 RT_notstart_nobranch_sub = RT_notstart_nobranch.groupby(['subjects'])['RT'].mean()/1000
 RT_notstart_nobranch_sub_sem = sem(RT_notstart_nobranch_sub)
 
+index_nostart_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['RT'] != -1)&(data_choice_level['condition']==1)&(data_choice_level['submit']!=1)]
+RT_nostart_laterbranch = data_choice_level.loc[index_nostart_laterbranch + 1,:]
+RT_nostart_laterbranch_sub = RT_nostart_laterbranch.groupby(['subjects'])['RT'].mean()/1000
+RT_nostart_laterbranch_sub_sem = sem(RT_nostart_laterbranch_sub)
+
+# -
+
+
+(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['RT'] == -1)&(data_choice_level['condition']==1)
 
 # +
 # %matplotlib notebook
 
 fig, axs = plt.subplots(1, 1)
-bx = axs.bar([1,2,3,4],
-             [np.mean(RT_start_sub),np.mean(RT_start_nobranch_sub),
-              np.mean(RT_notstart_sub),np.mean(RT_notstart_nobranch_sub)],
+bx = axs.bar([1,2,3,4,5,6],
+             [np.mean(RT_start_sub),np.mean(RT_start_nobranch_sub),np.mean(RT_start_laterbranch_sub),
+              np.mean(RT_notstart_sub),np.mean(RT_notstart_nobranch_sub),np.mean(RT_nostart_laterbranch_sub)],
              color=(.7,.7,.7), edgecolor = 'k', 
-             yerr=[RT_start_sub_sem,RT_start_nobranch_sub_sem,
-                   RT_notstart_sub_sem,RT_notstart_nobranch_sub_sem])
+             yerr=[RT_start_sub_sem,RT_start_nobranch_sub_sem,RT_start_laterbranch_sub_sem,
+                   RT_notstart_sub_sem,RT_notstart_nobranch_sub_sem,RT_nostart_laterbranch_sub_sem])
 
-axs.set_xticks([1,2,3,4])
+axs.set_xticks([1,2,3,4,5,6])
 # axs.set_yticks(np.linspace(0,0.16,5))
 axs.set_xticklabels(labels = ['branching-node \nfirst choice','all first choice','branching-node \nlater choice','all later choice'])#,fontsize=18
 axs.set_ylabel('Response time (s)')
