@@ -93,24 +93,6 @@ def text(p):
 
 # -
 
-# # Basic counts
-
-# ## histogram of number of cities within reach
-
-# +
-n_reach = data_choice_level[data_choice_level['condition']==0]['within_reach'] # only basic condition
-
-# %matplotlib notebook
-
-fig, axs = plt.subplots(1, 1)
-axs.hist(n_reach,
-        color = (.7,.7,.7), 
-        edgecolor = 'k',)
-axs.set_ylabel('counts') 
-axs.set_xlabel('number of cities within reach') 
-plt.show()
-# -
-
 # # When does error happen?
 
 # ## number of optimal solutions
