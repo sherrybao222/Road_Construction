@@ -8,10 +8,14 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.13.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
+
+# + [markdown] toc=true
+# <h1>Table of Contents<span class="tocSkip"></span></h1>
+# <div class="toc"><ul class="toc-item"><li><span><a href="#action-RT" data-toc-modified-id="action-RT-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>action RT</a></span><ul class="toc-item"><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-1.1"><span class="toc-item-num">1.1&nbsp;&nbsp;</span>average within subject</a></span></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-1.2"><span class="toc-item-num">1.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#different-types-of-undoing-RT" data-toc-modified-id="different-types-of-undoing-RT-2"><span class="toc-item-num">2&nbsp;&nbsp;</span>different types of undoing RT</a></span><ul class="toc-item"><li><span><a href="#averaged-within-subject" data-toc-modified-id="averaged-within-subject-2.1"><span class="toc-item-num">2.1&nbsp;&nbsp;</span>averaged within subject</a></span></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-2.2"><span class="toc-item-num">2.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#branching-node-RT" data-toc-modified-id="branching-node-RT-3"><span class="toc-item-num">3&nbsp;&nbsp;</span>branching node RT</a></span></li></ul></div>
 
 # +
 import pandas as pd
@@ -81,7 +85,9 @@ def text(p):
 
 # -
 
-# ## action RT
+# # action RT
+
+# ## average within subject
 
 # +
 def get_RT_cond(cond,RTtype):
@@ -172,7 +178,10 @@ text(p5)
 # fig.set_figwidth(3)
 plt.show()
 fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+# -
 
+
+# ## [discarded] average all data points 
 
 # +
 # %matplotlib notebook
@@ -255,7 +264,9 @@ plt.show()
 # fig.savefig(out_dir + 'action_RT.png', dpi=600, bbox_inches='tight')
 # -
 
-# ## different types of undoing RT
+# # different types of undoing RT
+
+# ## averaged within subject
 
 # +
 def get_undoRT(index):
@@ -331,6 +342,9 @@ text(p3)
 
 plt.show()
 # fig.savefig(out_dir + 'undo_RT.png', dpi=600, bbox_inches='tight')
+# -
+
+# ## [discarded] average all data points 
 
 # +
 # %matplotlib notebook
@@ -389,7 +403,7 @@ plt.show()
 fig.savefig(out_dir + 'undo_RT.png', dpi=600, bbox_inches='tight')
 # -
 
-# ## branching node RT
+# # branching node RT
 
 # +
 # the first visit of a branching node, and it is the start city
@@ -403,30 +417,44 @@ RT_start_nobranch = data_choice_level.loc[index_start_nobranch + 1,:]
 RT_start_nobranch_sub = RT_start_nobranch.groupby(['subjects'])['RT'].mean()/1000
 RT_start_nobranch_sub_sem = sem(RT_start_nobranch_sub)
 
+index_start_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['RT'] == -1)&(data_choice_level['condition']==1)]
+RT_start_laterbranch = data_choice_level.loc[index_start_laterbranch + 1,:]
+RT_start_laterbranch_sub = RT_start_laterbranch.groupby(['subjects'])['RT'].mean()/1000
+RT_start_laterbranch_sub_sem = sem(RT_start_laterbranch_sub)
+
 # the first visit of a branching node, and it is not a start city
 index_notstart = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['RT'] != -1)]
 RT_notstart = data_choice_level.loc[index_notstart + 1,:]
 RT_notstart_sub = RT_notstart.groupby(['subjects'])['RT'].mean()/1000
 RT_notstart_sub_sem = sem(RT_notstart_sub)
 
-index_notstart_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['RT'] != -1)&(data_choice_level['condition']==1)&(data_choice_level['submit']!=1)&(data_choice_level['undo']!=1)]
+index_notstart_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['RT'] != -1)&(data_choice_level['condition']==1)&(data_choice_level['submit']!=1)] # &(data_choice_level['undo']!=1)
 RT_notstart_nobranch = data_choice_level.loc[index_notstart_nobranch + 1,:]
 RT_notstart_nobranch_sub = RT_notstart_nobranch.groupby(['subjects'])['RT'].mean()/1000
 RT_notstart_nobranch_sub_sem = sem(RT_notstart_nobranch_sub)
 
+index_nostart_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['RT'] != -1)&(data_choice_level['condition']==1)&(data_choice_level['submit']!=1)]
+RT_nostart_laterbranch = data_choice_level.loc[index_nostart_laterbranch + 1,:]
+RT_nostart_laterbranch_sub = RT_nostart_laterbranch.groupby(['subjects'])['RT'].mean()/1000
+RT_nostart_laterbranch_sub_sem = sem(RT_nostart_laterbranch_sub)
+
+# -
+
+
+(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['RT'] == -1)&(data_choice_level['condition']==1)
 
 # +
 # %matplotlib notebook
 
 fig, axs = plt.subplots(1, 1)
-bx = axs.bar([1,2,3,4],
-             [np.mean(RT_start_sub),np.mean(RT_start_nobranch_sub),
-              np.mean(RT_notstart_sub),np.mean(RT_notstart_nobranch_sub)],
+bx = axs.bar([1,2,3,4,5,6],
+             [np.mean(RT_start_sub),np.mean(RT_start_nobranch_sub),np.mean(RT_start_laterbranch_sub),
+              np.mean(RT_notstart_sub),np.mean(RT_notstart_nobranch_sub),np.mean(RT_nostart_laterbranch_sub)],
              color=(.7,.7,.7), edgecolor = 'k', 
-             yerr=[RT_start_sub_sem,RT_start_nobranch_sub_sem,
-                   RT_notstart_sub_sem,RT_notstart_nobranch_sub_sem])
+             yerr=[RT_start_sub_sem,RT_start_nobranch_sub_sem,RT_start_laterbranch_sub_sem,
+                   RT_notstart_sub_sem,RT_notstart_nobranch_sub_sem,RT_nostart_laterbranch_sub_sem])
 
-axs.set_xticks([1,2,3,4])
+axs.set_xticks([1,2,3,4,5,6])
 # axs.set_yticks(np.linspace(0,0.16,5))
 axs.set_xticklabels(labels = ['branching-node \nfirst choice','all first choice','branching-node \nlater choice','all later choice'])#,fontsize=18
 axs.set_ylabel('Response time (s)')
