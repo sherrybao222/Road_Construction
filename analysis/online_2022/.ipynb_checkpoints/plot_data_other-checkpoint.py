@@ -126,6 +126,14 @@ axs.set_xticklabels([1,3,6,'9+'])
 fig.savefig(out_dir + 'error_optimal.png', dpi=600, bbox_inches='tight')
 
 # -
+# ## [TODO] choice-level
+
+# # [TODO] what kind of puzzle do people undo more?
+
+# ## MAS
+
+# ## optimal solutions
+
 # # Benefit of undo
 
 # ## Number of undo
