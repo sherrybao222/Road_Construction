@@ -15,7 +15,7 @@
 
 # + [markdown] toc=true
 # <h1>Table of Contents<span class="tocSkip"></span></h1>
-# <div class="toc"><ul class="toc-item"><li><span><a href="#action-RT" data-toc-modified-id="action-RT-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>action RT</a></span><ul class="toc-item"><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-1.1"><span class="toc-item-num">1.1&nbsp;&nbsp;</span>average within subject</a></span></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-1.2"><span class="toc-item-num">1.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#different-types-of-undoing-RT" data-toc-modified-id="different-types-of-undoing-RT-2"><span class="toc-item-num">2&nbsp;&nbsp;</span>different types of undoing RT</a></span><ul class="toc-item"><li><span><a href="#averaged-within-subject" data-toc-modified-id="averaged-within-subject-2.1"><span class="toc-item-num">2.1&nbsp;&nbsp;</span>averaged within subject</a></span></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-2.2"><span class="toc-item-num">2.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#branching-node-RT" data-toc-modified-id="branching-node-RT-3"><span class="toc-item-num">3&nbsp;&nbsp;</span>branching node RT</a></span></li></ul></div>
+# <div class="toc"><ul class="toc-item"><li><span><a href="#action-RT" data-toc-modified-id="action-RT-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>action RT</a></span><ul class="toc-item"><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-1.1"><span class="toc-item-num">1.1&nbsp;&nbsp;</span>average within subject</a></span><ul class="toc-item"><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-1.1.1"><span class="toc-item-num">1.1.1&nbsp;&nbsp;</span>bar plot</a></span></li><li><span><a href="#box-and-whisker-plot" data-toc-modified-id="box-and-whisker-plot-1.1.2"><span class="toc-item-num">1.1.2&nbsp;&nbsp;</span>box and whisker plot</a></span></li></ul></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-1.2"><span class="toc-item-num">1.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#different-types-of-undoing-RT" data-toc-modified-id="different-types-of-undoing-RT-2"><span class="toc-item-num">2&nbsp;&nbsp;</span>different types of undoing RT</a></span><ul class="toc-item"><li><span><a href="#averaged-within-subject" data-toc-modified-id="averaged-within-subject-2.1"><span class="toc-item-num">2.1&nbsp;&nbsp;</span>averaged within subject</a></span><ul class="toc-item"><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-2.1.1"><span class="toc-item-num">2.1.1&nbsp;&nbsp;</span>bar plot</a></span></li><li><span><a href="#box-plot" data-toc-modified-id="box-plot-2.1.2"><span class="toc-item-num">2.1.2&nbsp;&nbsp;</span>box plot</a></span></li></ul></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-2.2"><span class="toc-item-num">2.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#branching-node-RT" data-toc-modified-id="branching-node-RT-3"><span class="toc-item-num">3&nbsp;&nbsp;</span>branching node RT</a></span><ul class="toc-item"><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-3.1"><span class="toc-item-num">3.1&nbsp;&nbsp;</span>average within subject</a></span><ul class="toc-item"><li><span><a href="#box-plot" data-toc-modified-id="box-plot-3.1.1"><span class="toc-item-num">3.1.1&nbsp;&nbsp;</span>box plot</a></span></li><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-3.1.2"><span class="toc-item-num">3.1.2&nbsp;&nbsp;</span>bar plot</a></span></li></ul></li><li><span><a href="#average-within-puzzle" data-toc-modified-id="average-within-puzzle-3.2"><span class="toc-item-num">3.2&nbsp;&nbsp;</span>average within puzzle</a></span><ul class="toc-item"><li><span><a href="#box-plot" data-toc-modified-id="box-plot-3.2.1"><span class="toc-item-num">3.2.1&nbsp;&nbsp;</span>box plot</a></span></li><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-3.2.2"><span class="toc-item-num">3.2.2&nbsp;&nbsp;</span>bar plot</a></span></li></ul></li></ul></li></ul></div>
 
 # +
 import pandas as pd
@@ -104,7 +104,10 @@ RTlater_undo = get_RT_cond(1,'RTlater')
 
 RTsubmit_basic = get_RT_cond(0,'RTsubmit')
 RTsubmit_undo = get_RT_cond(1,'RTsubmit')
+# -
 
+
+# ### bar plot
 
 # +
 # %matplotlib notebook
@@ -171,6 +174,104 @@ stat5, p5 = ttest_ind(RT1_undo[0],RTlater_undo[0],equal_var=False)
 
 x1, x2 = 2,4.5
 y, h, col = bx[1].get_height() + 0.5, 0.2, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p5)
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+# -
+
+
+# ### box and whisker plot
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+
+# bx = axs.bar([1,2, 3.5,4.5, 6,7],
+             
+#              [np.mean(RT1_basic[0]),np.mean(RT1_undo[0]),
+#               np.mean(RTlater_basic[0]),np.mean(RTlater_undo[0]),
+#               np.mean(RTsubmit_basic[0]),np.mean(RTsubmit_undo[0])],
+             
+#              color = (.7,.7,.7), 
+             
+#              edgecolor = 'k',
+             
+#              yerr=[RT1_basic[1],RT1_undo[1],
+#               RTlater_basic[1],RTlater_undo[1],
+#               RTsubmit_basic[1],RTsubmit_undo[1]])
+
+# plot with puzzle-level RT
+bx = axs.boxplot(
+                
+                [RT1_basic[0],RT1_undo[0],
+                 RTlater_basic[0],RTlater_undo[0],
+                 RTsubmit_basic[0],RTsubmit_undo[0]],
+    
+                 positions =[1,2, 3.5,4.5, 6,7],
+                 widths = 0.3,
+                 showfliers=False,
+                 whis = 1.5,
+                 medianprops = dict(color = 'k')) 
+
+axs.set_xticks([1,1.5,2, 3.5,4,4.5, 6,6.5,7])
+axs.set_xticklabels(labels = ['\nwithout \nundo','first choice','\nwith \nundo',
+                              '\nwithout \nundo','later choices','\nwith \nundo', 
+                              '\nwithout \nundo','submit','\nwith \nundo'])#,fontsize=18
+axs.set_ylabel('Response time (s)')
+
+# run 2-independent-sample t test
+stat1, p1 = ttest_ind(RT1_basic[0], RT1_undo[0], equal_var=False)
+x1, x2 = 1,2  
+if bx['caps'][1]._y[0] > bx['caps'][3]._y[0]:
+    y, h, col = bx['caps'][1]._y[0] + 2, 0.5, 'k'
+else:
+    y, h, col = bx['caps'][3]._y[0] + 2, 0.5, 'k'
+
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p1)
+
+#--------------------------------------
+stat2, p2 = ttest_ind(RTlater_basic[0],RTlater_undo[0],equal_var=False)
+
+x1, x2 = 3.5,4.5  
+y, h, col = bx['caps'][5]._y[0] + 2, 0.5, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p2)
+
+#--------------------------------------
+stat3, p3 = ttest_ind(RTsubmit_basic[0],RTsubmit_undo[0],equal_var=False)
+
+x1, x2 = 6,7
+y, h, col = bx['caps'][11]._y[0] + 2, 0.5, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p3)
+
+#--------------------------------------
+stat4, p4 = ttest_ind(RT1_basic[0],RTlater_basic[0],equal_var=False)
+
+x1, x2 = 1,3.5
+if bx['caps'][1]._y[0] > bx['caps'][3]._y[0]:
+    y, h, col = bx['caps'][1]._y[0] + 3.5, 0.5, 'k'
+else:
+    y, h, col = bx['caps'][3]._y[0] + 3.5, 0.5, 'k'
+
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p4)
+
+#--------------------------------------
+stat5, p5 = ttest_ind(RT1_undo[0],RTlater_undo[0],equal_var=False)
+
+x1, x2 = 2,4.5
+if bx['caps'][1]._y[0] > bx['caps'][3]._y[0]:
+    y, h, col = bx['caps'][1]._y[0] + 5, 0.5, 'k'
+else:
+    y, h, col = bx['caps'][3]._y[0] + 5, 0.5, 'k'
+
 axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
 text(p5)
 
@@ -283,6 +384,9 @@ RT_firstUndo = get_undoRT(index_firstUndo)
 
 index_laterUndo = data_choice_level.index[(data_choice_level['firstUndo'] != 1) & (data_choice_level['undo'] == 1)]
 RT_laterUndo = get_undoRT(index_laterUndo)
+# -
+
+# ### bar plot
 
 # +
 # %matplotlib notebook
@@ -335,6 +439,66 @@ stat3, p3 = ttest_ind(RT_firstUndo[0],RT_singleUndo[0],equal_var=False)
 
 x1, x2 = 1,3.2
 y, h, col = bx[0].get_height() + 1, 0.1, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p3)
+# fig.set_figwidth(26)
+# fig.set_figheight(12)
+
+plt.show()
+# fig.savefig(out_dir + 'undo_RT.png', dpi=600, bbox_inches='tight')
+# -
+
+# ### box plot
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+
+
+bx = axs.boxplot(
+    [
+        RT_singleUndo[0],
+        RT_firstUndo[0],
+        RT_laterUndo[0]
+    ],
+    positions =[1,2.2,3.2],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+axs.set_xticks([1,2.2,2.7,3.2])
+axs.set_xticklabels(labels = ['single undo','\nfirst undo','sequential','\nlater undo'])#,fontsize=18
+axs.set_facecolor('white')
+axs.spines['bottom'].set_color('k')
+axs.spines['left'].set_color('k')
+axs.tick_params(axis='y', colors='k', direction='in',left = True) #, labelsize = 16
+axs.tick_params(axis='x', colors='k')
+# axs.set_title('S'+str(i+1), fontsize = 16)
+axs.set_ylabel('Response time (s)') #,fontsize=18
+
+#--------------------------------------
+# run 2-independent-sample t test
+stat1, p1 = ttest_ind(RT_firstUndo[0],RT_laterUndo[0],equal_var=False)
+x1, x2 = 2.2,3.2  
+y, h, col = bx['caps'][3]._y[0] + 0.5, 0.1, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p1)
+
+#--------------------------------------
+stat2, p2 = ttest_ind(RT_laterUndo[0],RT_singleUndo[0],equal_var=False)
+
+x1, x2 = 1,3.2 
+y, h, col = bx['caps'][3]._y[0] + 1, 0.1, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p2)
+
+#--------------------------------------
+stat3, p3 = ttest_ind(RT_firstUndo[0],RT_singleUndo[0],equal_var=False)
+
+x1, x2 = 1,2.2
+y, h, col = bx['caps'][3]._y[0] + 0.5, 0.1, 'k'
 axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
 text(p3)
 # fig.set_figwidth(26)
@@ -401,47 +565,148 @@ axs.set_ylabel('Response time (s)') #,fontsize=18
 
 plt.show()
 fig.savefig(out_dir + 'undo_RT.png', dpi=600, bbox_inches='tight')
+
+
 # -
 
 # # branching node RT
 
+# ## average within subject
+
 # +
-# the first visit of a branching node, and it is the start city
-index_start = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['RT'] == -1)]
-RT_start = data_choice_level.loc[index_start + 1,:]
-RT_start_sub = RT_start.groupby(['subjects'])['RT'].mean()/1000
-RT_start_sub_sem = sem(RT_start_sub)
+def get_branchRT(index,groupby_cat):
+    RT = data_choice_level.loc[index + 1,:]
+    RT_sub = RT.groupby([groupby_cat])['RT'].mean()/1000
+    RT_sub_sem = sem(RT_sub)
+    return [RT_sub,RT_sub_sem]
 
-index_start_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['RT'] == -1)&(data_choice_level['condition']==1)]
-RT_start_nobranch = data_choice_level.loc[index_start_nobranch + 1,:]
-RT_start_nobranch_sub = RT_start_nobranch.groupby(['subjects'])['RT'].mean()/1000
-RT_start_nobranch_sub_sem = sem(RT_start_nobranch_sub)
+index_start = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['currNumCities'] == 1)]
+RT_start_sub = get_branchRT(index_start,'subjects')
 
-index_start_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['RT'] == -1)&(data_choice_level['condition']==1)]
-RT_start_laterbranch = data_choice_level.loc[index_start_laterbranch + 1,:]
-RT_start_laterbranch_sub = RT_start_laterbranch.groupby(['subjects'])['RT'].mean()/1000
-RT_start_laterbranch_sub_sem = sem(RT_start_laterbranch_sub)
+index_start_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['currNumCities'] == 1)&(data_choice_level['condition']==1)]
+RT_start_nobranch_sub = get_branchRT(index_start_nobranch,'subjects')
 
+index_start_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['currNumCities'] == 1)]
+RT_start_laterbranch_sub = get_branchRT(index_start_laterbranch,'subjects')
+                                                  
+
+# +
 # the first visit of a branching node, and it is not a start city
-index_notstart = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['RT'] != -1)]
-RT_notstart = data_choice_level.loc[index_notstart + 1,:]
-RT_notstart_sub = RT_notstart.groupby(['subjects'])['RT'].mean()/1000
-RT_notstart_sub_sem = sem(RT_notstart_sub)
+index_notstart = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['currNumCities'] != 1)]
+RT_notstart_sub = get_branchRT(index_notstart,'subjects')
 
-index_notstart_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['RT'] != -1)&(data_choice_level['condition']==1)&(data_choice_level['submit']!=1)] # &(data_choice_level['undo']!=1)
-RT_notstart_nobranch = data_choice_level.loc[index_notstart_nobranch + 1,:]
-RT_notstart_nobranch_sub = RT_notstart_nobranch.groupby(['subjects'])['RT'].mean()/1000
-RT_notstart_nobranch_sub_sem = sem(RT_notstart_nobranch_sub)
+index_notstart_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['currNumCities'] != 1)&(data_choice_level['condition']==1)&(data_choice_level['checkEnd'] != 1)&(data_choice_level['submit'] != 1)] 
+RT_notstart_nobranch_sub = get_branchRT(index_notstart_nobranch,'subjects')
 
-index_nostart_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['RT'] != -1)&(data_choice_level['condition']==1)&(data_choice_level['submit']!=1)]
-RT_nostart_laterbranch = data_choice_level.loc[index_nostart_laterbranch + 1,:]
-RT_nostart_laterbranch_sub = RT_nostart_laterbranch.groupby(['subjects'])['RT'].mean()/1000
-RT_nostart_laterbranch_sub_sem = sem(RT_nostart_laterbranch_sub)
-
+index_nostart_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['currNumCities'] != 1)&(data_choice_level['checkEnd'] != 1)&(data_choice_level['submit']!=1)]
+RT_nostart_laterbranch_sub = get_branchRT(index_nostart_laterbranch,'subjects')
 # -
 
 
-(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['RT'] == -1)&(data_choice_level['condition']==1)
+# ### box plot
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+
+bx = axs.boxplot(
+    [
+        RT_start_nobranch_sub[0],
+        RT_start_sub[0],
+        RT_start_laterbranch_sub[0]
+    ],
+    positions =[1,2,3],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+axs.set_xticks([1,2,2.5,3])
+# axs.set_yticks(np.linspace(0,0.16,5))
+axs.set_xticklabels(labels = ['not branching',
+                              '\n first visit',
+                              'branching',
+                              '\n later visit'])#,fontsize=18
+axs.set_ylabel('Response time (s)')
+
+
+
+# run 2-independent-sample t test
+stat1, p1 = ttest_ind(RT_start_nobranch_sub[0], RT_start_sub[0], equal_var=False)
+x1, x2 = 1,2  
+y, h, col = bx['caps'][3]._y[0] + 1, 0.3, 'k'
+
+
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p1)
+
+#--------------------------------------
+stat2, p2 = ttest_ind(RT_start_sub[0],RT_start_laterbranch_sub[0], equal_var=False)
+
+x1, x2 = 2,3 
+y, h, col = bx['caps'][3]._y[0] + 1, 0.3, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p2)
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+# fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+
+bx = axs.boxplot(
+    [
+        RT_notstart_nobranch_sub[0],
+        RT_notstart_sub[0],
+        RT_nostart_laterbranch_sub[0]
+    ],
+    positions =[1,2,3],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+axs.set_xticks([1,2,2.5,3])
+# axs.set_yticks(np.linspace(0,0.16,5))
+axs.set_xticklabels(labels = ['not branching',
+                              '\n first visit',
+                              'branching',
+                              '\n later visit'])#,fontsize=18
+axs.set_ylabel('Response time (s)')
+
+
+
+# run 2-independent-sample t test
+stat1, p1 = ttest_ind(RT_notstart_nobranch_sub[0], RT_notstart_sub[0], equal_var=False)
+x1, x2 = 1,2  
+y, h, col = bx['caps'][3]._y[0] + 0.3, 0.1, 'k'
+
+
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p1)
+
+#--------------------------------------
+stat2, p2 = ttest_ind(RT_notstart_sub[0],RT_nostart_laterbranch_sub[0], equal_var=False)
+
+x1, x2 = 2,3 
+y, h, col = bx['caps'][3]._y[0] + 0.3, 0.1, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p2)
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+# fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+# -
+
+
+# ### bar plot
 
 # +
 # %matplotlib notebook
@@ -456,7 +721,13 @@ bx = axs.bar([1,2,3,4,5,6],
 
 axs.set_xticks([1,2,3,4,5,6])
 # axs.set_yticks(np.linspace(0,0.16,5))
-axs.set_xticklabels(labels = ['branching-node \nfirst choice','all first choice','branching-node \nlater choice','all later choice'])#,fontsize=18
+axs.set_xticklabels(labels = ['start',
+                              'start_nobranch',
+                              'start_laterbranch',
+                              
+                              'notstart',
+                              'notstart_nobranch',
+                              'nostart_laterbranch'])#,fontsize=18
 axs.set_ylabel('Response time (s)')
 
 
@@ -475,8 +746,89 @@ text(p1)
 #--------------------------------------
 stat2, p2 = ttest_ind(RT_notstart_sub,RT_notstart_nobranch_sub,equal_var=False)
 
-x1, x2 = 3,4 
+x1, x2 = 4,5 
 y, h, col = bx[2].get_height() + 1, 0.3, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p2)
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+# fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+# -
+
+
+# ## average within puzzle
+
+# +
+# the first visit of a branching node, and it is the start city
+index_start = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['currNumCities'] == 1)]
+RT_start_puzzle = get_branchRT(index_start,'puzzleID')
+
+index_start_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['currNumCities'] == 1)&(data_choice_level['condition']==1)]
+RT_start_nobranch_puzzle = get_branchRT(index_start_nobranch,'puzzleID')
+
+index_start_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['currNumCities'] == 1)]
+RT_start_laterbranch_puzzle = get_branchRT(index_start_laterbranch,'puzzleID')
+
+
+# +
+# the first visit of a branching node, and it is not a start city
+index_notstart = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['currNumCities'] != 1)]
+RT_nostart_puzzle = get_branchRT(index_notstart,'puzzleID')
+
+index_notstart_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['currNumCities'] != 1)&(data_choice_level['condition']==1)&(data_choice_level['checkEnd'] != 1)&(data_choice_level['submit'] != 1)] 
+RT_nostart_nobranch_puzzle = get_branchRT(index_notstart_nobranch,'puzzleID')
+
+index_nostart_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['currNumCities'] != 1)&(data_choice_level['checkEnd'] != 1)&(data_choice_level['submit']!=1)]
+RT_nostart_laterbranch_puzzle = get_branchRT(index_nostart_laterbranch,'puzzleID')
+
+# -
+
+
+# ### box plot
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+
+bx = axs.boxplot(
+    [
+        RT_start_nobranch_puzzle[0],
+        RT_start_puzzle[0],
+        RT_start_laterbranch_puzzle[0]
+    ],
+    positions =[1,2,3],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+axs.set_xticks([1,2,2.5,3])
+# axs.set_yticks(np.linspace(0,0.16,5))
+axs.set_xticklabels(labels = ['not branching',
+                              '\n first visit',
+                              'branching',
+                              '\n later visit'])#,fontsize=18
+axs.set_ylabel('Response time (s)')
+
+
+
+# run 2-independent-sample t test
+stat1, p1 = ttest_ind(RT_start_nobranch_puzzle[0], RT_start_puzzle[0], equal_var=False)
+x1, x2 = 1,2  
+y, h, col = bx['caps'][3]._y[0] + 1, 0.3, 'k'
+
+
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p1)
+
+#--------------------------------------
+stat2, p2 = ttest_ind(RT_start_puzzle[0],RT_start_laterbranch_puzzle[0], equal_var=False)
+
+x1, x2 = 2,3 
+y, h, col = bx['caps'][3]._y[0] + 1, 0.3, 'k'
 axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
 text(p2)
 
@@ -491,24 +843,105 @@ plt.show()
 
 fig, axs = plt.subplots(1, 1)
 
-bx = axs.boxplot([RT_start_sub/1000, RT_start_nobranch_sub/1000,
-                 RT_notstart['RT']/1000, RT_notstart_nobranch['RT']/1000],
-                 
-   positions =[1,2,3,4],widths = 0.3,showfliers=False,whis = 1.5,
+bx = axs.boxplot(
+    [
+        RT_nostart_nobranch_puzzle[0],
+        RT_nostart_puzzle[0],
+        RT_nostart_laterbranch_puzzle[0]
+    ],
+    positions =[1,2,3],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
    medianprops = dict(color = 'k'))  #
+
+axs.set_xticks([1,2,2.5,3])
+# axs.set_yticks(np.linspace(0,0.16,5))
+axs.set_xticklabels(labels = ['not branching',
+                              '\n first visit',
+                              'branching',
+                              '\n later visit'])#,fontsize=18
+axs.set_ylabel('Response time (s)')
+
+
+
+# run 2-independent-sample t test
+stat1, p1 = ttest_ind(RT_nostart_nobranch_puzzle[0], RT_nostart_puzzle[0], equal_var=False)
+x1, x2 = 1,2  
+y, h, col = bx['caps'][3]._y[0] + 0.1, 0.1, 'k'
+
+
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p1)
+
 #--------------------------------------
-axs.set_xticks([1,2,3,4])
-axs.set_xticklabels(labels = ['branching-node \nfirst choice','all first choice','branching-node \nlater choice','all later choice'])#,fontsize=18
-axs.set_facecolor('white')
-axs.spines['bottom'].set_color('k')
-axs.spines['left'].set_color('k')
-axs.tick_params(axis='y', colors='k', direction='in',left = True) #, labelsize = 16
-axs.tick_params(axis='x', colors='k')
-# axs.set_title('S'+str(i+1), fontsize = 16)
-axs.set_ylabel('Response time (s)') #,fontsize=18
+stat2, p2 = ttest_ind(RT_nostart_puzzle[0],RT_nostart_laterbranch_puzzle[0], equal_var=False)
 
-# fig.set_figwidth(26)
-# fig.set_figheight(12)
+x1, x2 = 2,3 
+y, h, col = bx['caps'][3]._y[0] + 0.1, 0.1, 'k'
+axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+text(p2)
 
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
 plt.show()
-#fig.savefig(out_dir + 'undo_RT.png', dpi=600, bbox_inches='tight')
+# fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+# -
+
+
+# ### bar plot
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+bx = axs.bar([1,2,3],
+             [
+              np.mean(RT_start_puzzle),np.mean(RT_start_nobranch_puzzle),np.mean(RT_start_laterbranch_puzzle),
+#               np.mean(RT_notstart_sub),np.mean(RT_notstart_nobranch_sub),np.mean(RT_nostart_laterbranch_sub)
+             ],
+             color=(.7,.7,.7), edgecolor = 'k', 
+             yerr=[RT_start_puzzle_sem,RT_start_nobranch_puzzle_sem,RT_start_laterbranch_puzzle_sem,
+#                    RT_notstart_sub_sem,RT_notstart_nobranch_sub_sem,RT_nostart_laterbranch_sub_sem
+                  ])
+
+axs.set_xticks([1,2,3])
+# axs.set_yticks(np.linspace(0,0.16,5))
+axs.set_xticklabels(labels = ['start',
+                              'start_nobranch',
+                              'start_laterbranch',
+                              
+#                               'notstart',
+#                               'notstart_nobranch',
+#                               'nostart_laterbranch'
+                             ])#,fontsize=18
+axs.set_ylabel('Response time (s)')
+
+
+
+# # run 2-independent-sample t test
+# stat1, p1 = ttest_ind(RT_start_sub, RT_start_nobranch_sub,equal_var=False)
+# x1, x2 = 1,2  
+# if bx[0].get_height() > bx[1].get_height():
+#     y, h, col = bx[0].get_height() + 1, 0.3, 'k'
+# else:
+#     y, h, col = bx[1].get_height() + 1, 0.3, 'k'
+
+# axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+# text(p1)
+
+# #--------------------------------------
+# stat2, p2 = ttest_ind(RT_notstart_sub,RT_notstart_nobranch_sub,equal_var=False)
+
+# x1, x2 = 4,5 
+# y, h, col = bx[2].get_height() + 1, 0.3, 'k'
+# axs.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+# text(p2)
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+# fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+# -
+
+
