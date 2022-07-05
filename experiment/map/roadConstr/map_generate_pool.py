@@ -1,3 +1,7 @@
+'''
+generate a large number of maps as a pool to choose later. 
+(we only choose maps with a diffence == 4 of greedy solution and optimal solution. See map_filterDiff4.py)
+'''
 import random
 from scipy.spatial import distance_matrix
 from itertools import combinations, permutations
@@ -24,7 +28,7 @@ def remove_nest(l,output):
         else: 
             output.append(i) 
             
-# different maps
+# different kinds of maps (we use circle_maps in the end)
 # =============================================================================
 class uniform_map:
     def __init__(self): 
@@ -38,6 +42,7 @@ class uniform_map:
    
         self.city_start = self.xy[0] # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000) # city distance matrix
+
 #------------------------------------------------------------------------------
 class gaussian_map:
     def __init__(self):
@@ -73,9 +78,9 @@ class circle_map:
         self.city_start = self.xy[0]    # start city
         self.distance = distance_matrix(self.xy, self.xy, p=2, threshold=10000)     # city distance matrix
 
-# different paths
+# algorithms for calculating different path solutions
 # =============================================================================         
-# optimal within budget: calculate all possible paths
+# optimal algorithm 1: calculate all possible paths
 def optimal_(mmap):
     for i in reversed(range(1,mmap.N)):
         pool = combinations(range(1,mmap.N), i)
@@ -104,8 +109,9 @@ def optimal_(mmap):
     optimal_index = (0,) + optimal_index_wozero   
     
     return n_optimal, optimal_index, sorted_path
+
 #------------------------------------------------------------------------------
-# breath first search with budget
+# optimal algorithm 2: use tree search (we use this method in the end)
 def optimal(mmap,now):
     all_ = list(range(0, mmap.N))
     for j in now.path:
@@ -143,7 +149,7 @@ def greedy(mmap):
             
     return n_greedy, greedy_index.tolist()
 
-# main
+# main function to run
 # =============================================================================   
 n_map = 500 # number of maps needed
 map_list = []
@@ -154,22 +160,27 @@ optimal_number = []
 greedy_number = []
 diff_list = []
 exporter = DictExporter()
-index = 2500
+index = 2500 # index for labeling maps
+
 while True:
     mmap = circle_map()
     
     distance_copy = mmap.distance.copy()
     distance_copy = chain.from_iterable(zip(*distance_copy))
     
-    if any(i < 10 and i != 0 for i in list(distance_copy)):
+    if any(i < 10 and i != 0 for i in list(distance_copy)): # exclude the map if cities are too close. 
         continue
+
+    # get optimal solution
     root_ = Node(0, budget = mmap.total)
     optimal(mmap,root_) 
-    
+    # get greedy solution
     n_greedy, greedy_index = greedy(mmap)
+    # calculate difference
     diff =  abs(root_.height - n_greedy)
     
-    if diff >= 1:
+    if diff >= 1: # also exclude maps which have no difference at all
+
         # make mmap json serializable
         mmap.distance = mmap.distance.tolist()
         mmap = mmap.__dict__ 
@@ -184,18 +195,23 @@ while True:
 #        plt.savefig('path_length/path_length_' + str(index) + '.png')
 #        plt.clf()
         index = index + 1
-    
+
+        # get optimal path
         w = Walker()
         path = w.walk(root_, leaves[depth.index(max(depth))])
         optimal_index = [0]
         for item in path[2]:
             optimal_index.append(item.name)
 
+        # save
         breath_first_tree.append(exporter.export(root_))
+
         optimal_list.append(optimal_index)
         greedy_list.append(greedy_index)
+
         optimal_number.append(root_.height)
         greedy_number.append(n_greedy)
+
         diff_list.append(diff)
         
         print(index)
