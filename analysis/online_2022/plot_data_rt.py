@@ -49,7 +49,7 @@ car = importr('car')
 home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
-out_dir = home_dir + 'figures/figures_all/'
+out_dir = home_dir + 'figures/cogsci_2022/'
 R_out_dir = home_dir + 'R_analysis_data/'
 
 # +
@@ -806,7 +806,7 @@ bx = axs.boxplot(
    medianprops = dict(color = 'k'))  #
 
 axs.set_xticks([1,2,2.5,3])
-# axs.set_yticks(np.linspace(0,0.16,5))
+axs.set_ylim([0,13])
 axs.set_xticklabels(labels = ['not branching',
                               '\n first visit',
                               'branching',
@@ -835,7 +835,7 @@ text(p2)
 # fig.set_figheight(4)
 # fig.set_figwidth(3)
 plt.show()
-# fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+fig.savefig(out_dir + 'branching_RT_puzzle.png', dpi=600, bbox_inches='tight')
 
 
 # +
@@ -856,7 +856,7 @@ bx = axs.boxplot(
    medianprops = dict(color = 'k'))  #
 
 axs.set_xticks([1,2,2.5,3])
-# axs.set_yticks(np.linspace(0,0.16,5))
+axs.set_yticks(np.linspace(0,3,7))
 axs.set_xticklabels(labels = ['not branching',
                               '\n first visit',
                               'branching',

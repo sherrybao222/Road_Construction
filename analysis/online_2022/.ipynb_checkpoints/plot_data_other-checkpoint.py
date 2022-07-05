@@ -56,7 +56,7 @@ boot = importr('boot')
 home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
-out_dir = home_dir + 'figures/figures_all/'
+out_dir = home_dir + 'figures/cogsci_2022/'
 R_out_dir = home_dir + 'R_analysis_data/'
 
 # +
@@ -361,8 +361,8 @@ def scatter_hist(x, y, ax, ax_histx, ax_histy, alpha=1):
 
     # the scatter plot:
     ax.scatter(x, y, alpha=alpha, color=[0,0,0])
-    ax.set_xlabel('normalized number of cities connected (undo start)')
-    ax.set_ylabel('normalized number of cities connected (undo target)')
+    ax.set_xlabel('Normalized number of cities connected (undo start)')
+    ax.set_ylabel('Normalized number of cities connected (undo target)')
 
     # now determine nice limits by hand:
     binwidth = 0.03
@@ -574,6 +574,7 @@ ax_histx.set_xlim(0-offset_,1+offset_)
 ax_histy.set_ylim(0-offset_,1+offset_)
 # use the previously defined function
 scatter_hist(str_ct, end_ct, ax, ax_histx, ax_histy, alpha=0.05)
+fig.savefig(out_dir + 'undo_initial_target_dist.png', dpi=600, bbox_inches='tight')
 # -
 # # Undo initial state
 
@@ -818,7 +819,7 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
     
     puzzle_error = data_choice_level_df['allMAS'] - data_choice_level_df['currMas']
     
-    # no error --------------------------------------------------
+    # no error -----------------------------------------------------------
     index_error = puzzle_error.index[puzzle_error == 0]
     index_error = np.array(index_error)
     index_error = np.intersect1d(index_error, index_subjects)
@@ -833,7 +834,7 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
 #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
     temp_data.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
 
-    # YES error --------------------------------------------------
+    # YES error -----------------------------------------------------------
     index_error = puzzle_error.index[puzzle_error != 0]
     index_error = np.array(index_error)
     index_error = np.intersect1d(index_error, index_subjects)
@@ -856,14 +857,25 @@ print(np.mean(dat_subjects,axis=0))
 
 fig, axs = plt.subplots(1, 1)
 
-axs.bar([1,2],
-        np.mean(dat_subjects,axis = 0),
-        color=[.7,.7,.7], 
-        edgecolor = 'k', 
-        yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+# axs.bar([1,2],
+#         np.mean(dat_subjects,axis = 0),
+#         color=[.7,.7,.7], 
+#         edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+
+bx = axs.boxplot(
+    [
+        dat_subjects[:,0],
+        dat_subjects[:,1]
+    ],
+    positions =[1,2],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
 
 axs.set_xticks([1,2])
-axs.set_yticks(np.linspace(0,0.06,4))
+axs.set_yticks(np.linspace(0,0.18,7))
 axs.set_xticklabels(labels = ['No error', 'Error'])#,fontsize=18
 
 axs.set_xlabel('accumulated error')
@@ -932,30 +944,43 @@ dat_subjects = np.array(dat_subjects)
 # %matplotlib notebook
 
 fig, axs = plt.subplots(1, 1)
-axs.bar([1,2],
-        np.mean(dat_subjects,axis = 0),
-        color=[.7,.7,.7], 
-        edgecolor = 'k', 
-        yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+# axs.bar([1,2],
+#         np.mean(dat_subjects,axis = 0),
+#         color=[.7,.7,.7], 
+#         edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
 
+bx = axs.boxplot(
+    [
+        dat_subjects[:,0],
+        dat_subjects[:,1]
+    ],
+    positions =[1,2],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
 
 axs.set_xticks([1,2])
-axs.set_yticks(np.linspace(0,0.06,4))
-axs.set_xticklabels(labels = ['No error', 'Error'])#,fontsize=18
+axs.set_yticks(np.linspace(0,0.14,8))
+axs.set_xticklabels(labels = ['no error', 'error'])#,fontsize=18
 
-axs.set_xlabel('instant error')
-axs.set_ylabel('probability of undo')
+axs.set_xlabel('Instant error')
+axs.set_ylabel('Probability of undo')
 
-# fig.set_figheight(4)
-# fig.set_figwidth(3)
 
-plt.show()
-# fig.savefig(out_dir + 'conditional_pundo_givenError.pdf', dpi=600, bbox_inches='tight')
 
 stat1, p1 = ttest_ind(dat_subjects[:,0], dat_subjects[:,1])
 print(stat1)
 print(p1)
 axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+fig.savefig(out_dir + 'undo_prob_instant_error.png', dpi=600, bbox_inches='tight')
+
+
 
 # +
 # The paired t–test assumes that the differences between pairs are normally distributed
@@ -976,24 +1001,19 @@ dat_subjects = []
 for i in np.unique(np.array(data_choice_level['subjects'])):
     df_subjects =  data_choice_level[data_choice_level['subjects'] == i]
     
-    puzzle_error = data_choice_level_df['allMAS'] - data_choice_level_df['currMas']
-    
+    allundo = (df_subjects.firstUndo == 1)
+    undo_index = df_subjects[allundo].index - 1
     # end --------------------------------------------------
-    notoptimal = (df_subjects.firstUndo == 1)&(df_subjects.allMAS != df_subjects.currMas)
-    end_notoptimal = (df_subjects.loc[df_subjects.loc[notoptimal,:].index-1,:].checkEnd==1)
+    end_notoptimal = (df_subjects.loc[undo_index,'allMAS']!= df_subjects.loc[undo_index,'currMas'])&(df_subjects.loc[undo_index,'checkEnd']==1)
     
-    optimal = (df_subjects.firstUndo == 1)&(df_subjects.allMAS == df_subjects.currMas)
-    end_optimal = (df_subjects.loc[df_subjects.loc[optimal,:].index-1,:].checkEnd==1)
+    end_optimal = (df_subjects.loc[undo_index,'allMAS']== df_subjects.loc[undo_index,'currMas'])&(df_subjects.loc[undo_index,'checkEnd']==1)
 
     # not end  --------------------------------------------------
-    notoptimal = (df_subjects.firstUndo == 1)&(df_subjects.allMAS != df_subjects.currMas)
-    notend_notoptimal = (df_subjects.loc[df_subjects.loc[notoptimal,:].index-1,:].checkEnd!=1)
+    notend_notoptimal = (df_subjects.loc[undo_index,'allMAS']!= df_subjects.loc[undo_index,'currMas'])&(df_subjects.loc[undo_index,'checkEnd']!=1)
     
-    optimal = (df_subjects.firstUndo == 1)&(df_subjects.allMAS == df_subjects.currMas)
-    notend_optimal = (df_subjects.loc[df_subjects.loc[optimal,:].index-1,:].checkEnd!=1)
+    notend_optimal = (df_subjects.loc[undo_index,'allMAS']== df_subjects.loc[undo_index,'currMas'])&(df_subjects.loc[undo_index,'checkEnd']!=1)
     
     # get prop --------------------------------------------------
-    allundo = (df_subjects.firstUndo == 1)
     if (sum(allundo) != 0):
         end_notoptimal_freq = sum(end_notoptimal)/sum(allundo)
         end_optimal_freq = sum(end_optimal)/sum(allundo)
@@ -1015,24 +1035,19 @@ dat_subjects = []
 for i in np.unique(np.array(data_choice_level['subjects'])):
     df_subjects =  data_choice_level[data_choice_level['subjects'] == i]
     
-    puzzle_error = data_choice_level_df['allMAS'] - data_choice_level_df['currMas']
-    
+    allundo = (df_subjects.firstUndo == 1)&(df_subjects.lastUndo != 1)
+    undo_index = df_subjects[allundo].index - 1
     # end --------------------------------------------------
-    notoptimal = (df_subjects.firstUndo == 1)&(df_subjects.allMAS != df_subjects.currMas)&(df_subjects.lastUndo != 1)
-    end_notoptimal = (df_subjects.loc[df_subjects.loc[notoptimal,:].index-1,:].checkEnd==1)
+    end_notoptimal = (df_subjects.loc[undo_index,'allMAS']!= df_subjects.loc[undo_index,'currMas'])&(df_subjects.loc[undo_index,'checkEnd']==1)
     
-    optimal = (df_subjects.firstUndo == 1)&(df_subjects.allMAS == df_subjects.currMas)&(df_subjects.lastUndo != 1)
-    end_optimal = (df_subjects.loc[df_subjects.loc[optimal,:].index-1,:].checkEnd==1)
+    end_optimal = (df_subjects.loc[undo_index,'allMAS']== df_subjects.loc[undo_index,'currMas'])&(df_subjects.loc[undo_index,'checkEnd']==1)
 
     # not end  --------------------------------------------------
-    notoptimal = (df_subjects.firstUndo == 1)&(df_subjects.allMAS != df_subjects.currMas)&(df_subjects.lastUndo != 1)
-    notend_notoptimal = (df_subjects.loc[df_subjects.loc[notoptimal,:].index-1,:].checkEnd!=1)
+    notend_notoptimal = (df_subjects.loc[undo_index,'allMAS']!= df_subjects.loc[undo_index,'currMas'])&(df_subjects.loc[undo_index,'checkEnd']!=1)
     
-    optimal = (df_subjects.firstUndo == 1)&(df_subjects.allMAS == df_subjects.currMas)&(df_subjects.lastUndo != 1)
-    notend_optimal = (df_subjects.loc[df_subjects.loc[optimal,:].index-1,:].checkEnd!=1)
+    notend_optimal = (df_subjects.loc[undo_index,'allMAS']== df_subjects.loc[undo_index,'currMas'])&(df_subjects.loc[undo_index,'checkEnd']!=1)
     
     # get prop --------------------------------------------------
-    allundo = (df_subjects.firstUndo == 1)&(df_subjects.lastUndo != 1)
     if (sum(allundo) != 0):
         end_notoptimal_freq = sum(end_notoptimal)/sum(allundo)
         end_optimal_freq = sum(end_optimal)/sum(allundo)
@@ -1068,21 +1083,6 @@ axs.set_xlabel('state before undo')
 # fig.set_figheight(4)
 # fig.set_figwidth(3)
 
-plt.show()
-# fig.savefig(out_dir + 'conditional_pundo_givenError.pdf', dpi=600, bbox_inches='tight')
-
-# +
-# %matplotlib notebook
-
-fig, axs = plt.subplots(1, 1)
-axs.bar([1,2,3,4],np.mean(dat_subjects,axis = 0),color=['#ccd5ae','#ccd5ae','#fefae0','#fefae0'],
-        hatch=['//','','//',''],edgecolor = 'k', yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
-axs.set_ylabel('P (undo)')
-axs.set_xticks([1,2,3,4])
-axs.set_xticklabels(labels = [])#,fontsize=18
-fig.set_figheight(4)
-fig.set_figwidth(3)
-# axs.set_xlabel('instant')
 plt.show()
 # fig.savefig(out_dir + 'conditional_pundo_givenError.pdf', dpi=600, bbox_inches='tight')
 # -
@@ -1122,6 +1122,180 @@ axs.set_ylabel('proportion of first undo')
 axs.legend()
 plt.show()
 # fig.savefig(out_dir + 'undotype_errortype.pdf', dpi=600, bbox_inches='tight')
+# -
+
+# ## probability of undo depending on end/optima
+
+# +
+dat_subjects = []
+for i in np.unique(np.array(data_choice_level_df['subjects'])):
+    temp_data = []
+    
+    df_subjects =  data_choice_level_df[data_choice_level_df['subjects'] == i]
+    
+    # end notoptimal--------------------------------------------------
+    end_notoptimal = (df_subjects.checkEnd == 1)&(df_subjects.submit != 1)&(df_subjects.allMAS != df_subjects.currMas)
+    index_undo = df_subjects.loc[end_notoptimal,:].index+1
+    
+    if np.any(index_undo>(max(df_subjects.index))):
+        index_undo = np.delete(index_undo, np.where(index_undo>max(df_subjects.index)))
+#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+    temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
+    
+    # end optimal--------------------------------------------------
+    end_optimal = (df_subjects.checkEnd == 1)&(df_subjects.submit != 1)&(df_subjects.allMAS == df_subjects.currMas)
+    index_undo = df_subjects.loc[end_optimal,:].index+1
+
+    if np.isnan(np.nanmean(df_subjects['firstUndo'][index_undo])):
+        temp_data.append(0)
+    else:
+#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+        temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
+
+    # notend notoptimal--------------------------------------------------
+    notend_notoptimal = (df_subjects.checkEnd != 1)&(df_subjects.submit != 1)&(df_subjects.allMAS != df_subjects.currMas)
+    index_undo = df_subjects.loc[notend_notoptimal,:].index+1
+
+#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+    temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
+    
+    # notend optimal--------------------------------------------------
+    notend_optimal = (df_subjects.checkEnd != 1)&(df_subjects.submit != 1)&(df_subjects.allMAS == df_subjects.currMas)
+    index_undo = df_subjects.loc[notend_optimal,:].index+1
+
+#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+    temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
+    
+    # end/not end ----------------------------------------------------------
+    end = (df_subjects.checkEnd == 1)&(df_subjects.submit != 1)
+    index_undo = df_subjects.loc[end,:].index+1
+    
+    if np.any(index_undo>(max(df_subjects.index))):
+        index_undo = np.delete(index_undo, np.where(index_undo>max(df_subjects.index)))
+        
+    if np.isnan(np.nanmean(df_subjects['firstUndo'][index_undo])):
+        temp_data.append(0)
+    else:
+#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+        temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
+    
+    notend = (df_subjects.checkEnd != 1)&(df_subjects.submit != 1)
+    index_undo = df_subjects.loc[notend,:].index+1
+
+    if np.isnan(np.nanmean(df_subjects['firstUndo'][index_undo])):
+        temp_data.append(0)
+    else:
+#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+        temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
+    
+    dat_subjects.append(temp_data)
+
+dat_subjects = np.array(dat_subjects)
+# print(dat_subjects)
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+# axs.bar([1,2,3,4],np.nanmean(dat_subjects,axis = 0),
+#         color=['#ccd5ae','#ccd5ae','#fefae0','#fefae0'],
+#         hatch=['//','','//',''],edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+
+bx = axs.boxplot(
+    [
+        dat_subjects[:,4],
+        dat_subjects[:,5],
+    ],
+    positions =[1,2],
+    widths = 0.3,
+    showfliers=False,
+    patch_artist=True,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+colors = ['#ccd5ae','#fefae0']
+for patch, color in zip(bx['boxes'], colors):
+    patch.set_facecolor(color)
+
+axs.set_xticks([1,2])
+axs.set_xticklabels(labels = ['end state',
+                              'non-end state'])#,fontsize=18
+
+axs.set_ylabel('Probability of undo')
+axs.set_xlabel('State before undo')
+
+stat1, p1 = ttest_ind(dat_subjects[:,4], dat_subjects[:,5])
+print(stat1)
+print(p1)
+axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+fig.savefig(out_dir + 'undo_prob_end_state.png', dpi=600, bbox_inches='tight')
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 2)
+# axs.bar([1,2,3,4],np.nanmean(dat_subjects,axis = 0),
+#         color=['#ccd5ae','#ccd5ae','#fefae0','#fefae0'],
+#         hatch=['//','','//',''],edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+
+bx1 = axs[0].boxplot(
+    [
+        dat_subjects[:,0],
+        dat_subjects[:,1]
+    ],
+    positions =[1,2],
+    widths = 0.3,
+    showfliers=False,
+    patch_artist=True,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+bx2 = axs[1].boxplot(
+    [
+        dat_subjects[:,2],
+        dat_subjects[:,3]
+    ],
+    positions =[1,2],
+    widths = 0.3,
+    showfliers=False,
+    patch_artist=True,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+colors_1 = ['#ccd5ae','#ccd5ae']
+colors_2 = ['#fefae0','#fefae0']
+for patch, color in zip(bx1['boxes'], colors_1):
+    patch.set_facecolor(color)
+for patch, color in zip(bx2['boxes'], colors_2):
+    patch.set_facecolor(color)
+    
+hatches = ['//', '']
+for bx in [bx1,bx2]:
+    for i in range(len(bx['boxes'])):
+        bx['boxes'][i].set(hatch = hatches[i])
+
+axs[0].set_xticks([1,1.5,2])
+axs[1].set_xticks([1,1.5,2])
+axs[1].set_yticks(np.linspace(0,0.04,5))
+axs[0].set_xticklabels(labels = ['not optimal',
+                              '\n end state',
+                              'optimal'])
+axs[1].set_xticklabels(labels = ['not optimal',
+                              '\n non-end state',
+                              'optimal'])#,fontsize=18
+
+axs[0].set_ylabel('probability of undo')
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+
+plt.show()
+fig.savefig(out_dir + 'undo_prob_end_optimal_state.png', dpi=600, bbox_inches='tight')
 # -
 
 # ## Proportion of single/sequential undo depending on end
@@ -1668,11 +1842,11 @@ plt.xlabel('After undoing')
 # ### all cases (including undoing to the same paths)
 
 # +
-undo_for_better = []
+undo_better = []
 
 for sub in range(101):
     dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub].sort_values(["puzzleID","index"])
-    undo_for_puzzle = []
+    undo_puzzle = []
     
     for pzi in np.unique(sc_data_choice_level['puzzleID']):
         dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()        
@@ -1684,43 +1858,62 @@ for sub in range(101):
         path_af_undo = dat_sbj_pzi["currMas"][lastUndo_idx+1]
         
         change = np.sign(np.array(path_af_undo) - np.array(path_bf_undo))
-        category = [np.nan]*len(change)
+        category = [np.nan]*len(change) #initialize
         
         for i in range(len(change)): 
-            if change[i] < 0:
+            if change[i] < 0: # worse
                 category[i] = 0
-            elif (change[i] == 0)& (dat_sbj_pzi["choice"][firstUndo_idx[i]-1]) == np.array(dat_sbj_pzi["choice"][lastUndo_idx[i]+1]):
+            elif (change[i] == 0)& (dat_sbj_pzi["allMAS"][firstUndo_idx[i]-1] != dat_sbj_pzi["currMas"][firstUndo_idx[i]-1]):#(dat_sbj_pzi["choice"][firstUndo_idx[i]-1]) == np.array(dat_sbj_pzi["choice"][lastUndo_idx[i]+1]):
                 category[i] = 1
             elif (change[i] == 0)& (dat_sbj_pzi["allMAS"][firstUndo_idx[i]-1] == dat_sbj_pzi["currMas"][firstUndo_idx[i]-1]):
                 category[i] = 2
-            elif change[i] > 0:
+            elif change[i] > 0: # better
                 category[i] = 3
         # only after undoing to a different path 
 #         if np.any(np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])):
 #             idxx = np.array(dat_sbj_pzi["choice"][lastUndo_idx-1]) != np.array(dat_sbj_pzi["choice"][lastUndo_idx+1])
-        undo_for_puzzle.extend(category)
+        undo_puzzle.extend(category)
 #         else:
 #             print('hup')
-    undo_for_puzzle =  np.array(undo_for_puzzle)
-    undo_for_better.append([np.sum(undo_for_puzzle==0), np.sum(undo_for_puzzle==1) ,np.sum(undo_for_puzzle==2), np.sum(undo_for_puzzle==3)])
-undo_for_better = np.array(undo_for_better)
+    undo_puzzle =  np.array(undo_puzzle)
+    undo_better.append([np.sum(undo_puzzle==0), np.sum(undo_puzzle==1) ,np.sum(undo_puzzle==2), np.sum(undo_puzzle==3)])
+undo_better = np.array(undo_better)
+
 # -
 
 # exclude some never undoing subjects
-undo_for_better = undo_for_better[np.where(np.sum(np.array(undo_for_better),axis=1)!=0),:]
-undo_for_better = undo_for_better.squeeze()
-undo_for_better_p = undo_for_better/ np.sum(undo_for_better,axis = 1)[:,None]
+undo_better = undo_better[np.where(np.sum(np.array(undo_better),axis=1)!=0),:]
+undo_better = undo_better.squeeze()
+undo_better_p = undo_better/ np.sum(undo_better,axis = 1)[:,None]
 
+# +
 # %matplotlib notebook
 plt.figure()
-plt.bar(range(4), 
-        np.mean(undo_for_better_p,axis=0),
-        color=[.7,.7,.7], edgecolor = 'k', 
-        yerr=np.std(undo_for_better_p,axis = 0)/np.sqrt(undo_for_better_p.shape[0]))
+# plt.bar(range(4), 
+#         np.mean(undo_for_better_p,axis=0),
+#         color=[.7,.7,.7], edgecolor = 'k', 
+#         yerr=np.std(undo_for_better_p,axis = 0)/np.sqrt(undo_for_better_p.shape[0]))
+
+bx = plt.boxplot(
+    [
+        undo_better_p[:,0],
+        undo_better_p[:,1],
+        undo_better_p[:,2],
+        undo_better_p[:,3]
+    ],
+    positions =[0,1,2,3],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
 plt.xticks([0,1,2,3], 
            ['worse','no difference \n (not optimal)',
             'no difference \n (optimal)','better'])
-plt.xlabel('Move after undo')
+# plt.xlabel('Move after undo')
+plt.ylabel('Probability of move after undo')
+plt.savefig(out_dir + 'move_after_undo_prob.png', dpi=600, bbox_inches='tight')
+# -
 
 # ## better path
 

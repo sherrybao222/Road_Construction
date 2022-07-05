@@ -28,7 +28,7 @@ from scipy.stats import normaltest
 home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
-out_dir = home_dir + 'figures/figures_all/'
+out_dir = home_dir + 'figures/cogsci_2022/'
 R_out_dir = home_dir + 'R_analysis_data/'
 
 # +
@@ -190,20 +190,27 @@ ax0.set_xticks([])
 
 # ### undo sequences
 
-numFullUndo = data_puzzle_level[data_puzzle_level['condition']==1].groupby(['subjects'])['numFullUndo'].mean()
-
 # +
-# %matplotlib notebook
+sub_mean = single_condition_data.groupby(['subjects'])['numFullUndo'].mean().to_frame()
+sub_sem = single_condition_data.groupby(['subjects'])['numFullUndo'].sem().to_frame()
+sort_sub_mean = sub_mean.sort_values('numFullUndo')
+sort_sub_sem = sub_sem.reindex(sort_sub_mean.index)
 
-n_sub = len(numFullUndo)
-fig0, ax0 = plt.subplots()
-subInd = [x+1 for x in sorted(range(len(numFullUndo)),key=lambda k:list(numFullUndo)[k])]
-ax0.bar(list(range(1,n_sub+1)),sorted(numFullUndo),color = "#dda15e")
-ax0.set_xlabel("subjects")
-ax0.set_ylabel("average number of undo sequences")
-ax0.invert_xaxis()
-ax0.set_xticks([])
-# fig0.savefig(out_dir + 'full_undoing_individual.pdf', dpi=600, bbox_inches='tight')
+# %matplotlib notebook
+fig, axs = plt.subplots(1, 1)
+
+n_sub = len(sub_mean)
+axs.bar(list(range(1,n_sub+1)),sort_sub_mean['numFullUndo'],
+        yerr = sort_sub_sem['numFullUndo'],
+        color = "#d4a373")
+
+axs.set_xticks([])
+axs.set_xlabel("Subjects")
+axs.set_ylabel("Average number of undo sequences")
+# axs.invert_xaxis()
+
+
+fig.savefig(out_dir + 'undo_sequence_subject.png', dpi=600, bbox_inches='tight')
 # -
 # ### correlation of undoing presses and sequences 
 
@@ -252,7 +259,7 @@ fig1.set_figheight(4)
 
 ax1.set_xlabel('Average number of undo presses')
 ax1.set_ylabel('Average number of undo sequences')
-# fig1.savefig(out_dir + 'undo_num_seq.png', dpi=600, bbox_inches='tight')
+fig1.savefig(out_dir + 'undo_seq_presses_scatter.png', dpi=600, bbox_inches='tight')
 # fig1.savefig(out_dir + 'undo_num_seq.pdf', dpi=600, bbox_inches='tight')
 
 # -
@@ -260,21 +267,29 @@ ax1.set_ylabel('Average number of undo sequences')
 # ## puzzle-level
 
 # +
-order = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean().to_frame()
-sort_order = order.sort_values('numFullUndo')
+puzzle_mean = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean().to_frame()
+puzzle_sem = single_condition_data.groupby(['puzzleID'])['numFullUndo'].sem().to_frame()
+sort_puzzle_mean = puzzle_mean.sort_values('numFullUndo')
+sort_puzzle_sem = puzzle_sem.reindex(sort_puzzle_mean.index)
 
 # %matplotlib notebook
 fig, axs = plt.subplots(1, 1)
 
-bx = sns.barplot(x='puzzleID', y='numFullUndo', 
-                 data = single_condition_data, 
-                 color = '#ccd5ae',
-                 order=sort_order.index) 
+n_puzzle = len(puzzle_mean)
+axs.bar(list(range(1,n_puzzle+1)),sort_puzzle_mean['numFullUndo'],
+        yerr = sort_puzzle_sem['numFullUndo'],
+        color = "#ccd5ae")
+
+# bx = sns.barplot(x='puzzleID', y='numFullUndo', 
+#                  data = single_condition_data, 
+#                  color = '#ccd5ae',
+#                  order=sort_order.index) 
 
 axs.xaxis.set_ticks([])
 axs.set_xlabel('Puzzles')
 axs.set_ylabel('Average number of undo sequences')
 
+fig.savefig(out_dir + 'undo_sequence_puzzle.png', dpi=600, bbox_inches='tight')
 # -
 
 #
