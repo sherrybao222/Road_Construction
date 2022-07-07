@@ -167,6 +167,46 @@ bx = sns.barplot(x='mas', y='numFullUndo', data = single_condition_data, color =
 
 # ## benefits of undo - num of full undoing
 
+# +
+numFullUndo_bin = np.array(puzzleID_order_data[puzzleID_order_data.condition == 1]['numFullUndo'])
+numFullUndo_bin[(numFullUndo_bin >= 4)] = 4
+
+benefit_undo = (np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numCities']) 
+        - np.array(puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities']))
+
+subjectID = np.array(puzzleID_order_data[puzzleID_order_data.condition == 1]['subjects'])
+puzzleID = np.array(puzzleID_order_data.loc[puzzleID_order_data.condition == 1,'puzzleID'])
+
+dat = pd.DataFrame({'subjects':subjectID, 'puzzleID':puzzleID,
+                    'numFullUndo_bin':numFullUndo_bin, 
+                    'benefit_undo':benefit_undo})
+# -
+
+benefit_sub = dat.groupby(['puzzleID','numFullUndo_bin'])['benefit_undo'].mean().groupby(['numFullUndo_bin'])
+benefit_sub.count()
+
+# +
+# %matplotlib notebook
+fig, axs = plt.subplots()
+
+y1 = benefit_sub.mean()
+c1 = benefit_sub.std()/np.sqrt(len(np.unique(dat.subjects)))
+
+x=range(0,5)
+axs.set_xticks([0,1,2,3,4])
+axs.set_xticklabels([0,1,2,3,'4+'])
+
+axs.plot(x,y1 , color = '#81b29a', linewidth=3)
+axs.fill_between(x, (y1-c1), (y1+c1), color='#81b29a', alpha=.2)
+
+axs.set_yticks(np.linspace(0,0.35,8))
+axs.set_xticks([0,1,2,3,4])
+axs.set_xticklabels([0,1,2,3,'4+'])
+axs.set_xlabel('Number of undo sequences')
+axs.set_ylabel('Benefit of undo (undo condition - basic condition)')
+
+# -
+
 # ### all data point, average within each number of undo category
 
 # +
@@ -1911,7 +1951,7 @@ plt.xticks([0,1,2,3],
            ['worse','no difference \n (not optimal)',
             'no difference \n (optimal)','better'])
 # plt.xlabel('Move after undo')
-plt.ylabel('Probability of move after undo')
+plt.ylabel('Proportion of move after undo')
 plt.savefig(out_dir + 'move_after_undo_prob.png', dpi=600, bbox_inches='tight')
 # -
 
