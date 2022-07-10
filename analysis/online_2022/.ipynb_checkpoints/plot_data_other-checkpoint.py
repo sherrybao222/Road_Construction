@@ -167,6 +167,46 @@ bx = sns.barplot(x='mas', y='numFullUndo', data = single_condition_data, color =
 
 # ## benefits of undo - num of full undoing
 
+# +
+numFullUndo_bin = np.array(puzzleID_order_data[puzzleID_order_data.condition == 1]['numFullUndo'])
+numFullUndo_bin[(numFullUndo_bin >= 4)] = 4
+
+benefit_undo = (np.array(puzzleID_order_data[puzzleID_order_data['condition']==1]['numCities']) 
+        - np.array(puzzleID_order_data[puzzleID_order_data['condition']==0]['numCities']))
+
+subjectID = np.array(puzzleID_order_data[puzzleID_order_data.condition == 1]['subjects'])
+puzzleID = np.array(puzzleID_order_data.loc[puzzleID_order_data.condition == 1,'puzzleID'])
+
+dat = pd.DataFrame({'subjects':subjectID, 'puzzleID':puzzleID,
+                    'numFullUndo_bin':numFullUndo_bin, 
+                    'benefit_undo':benefit_undo})
+# -
+
+benefit_sub = dat.groupby(['puzzleID','numFullUndo_bin'])['benefit_undo'].mean().groupby(['numFullUndo_bin'])
+benefit_sub.count()
+
+# +
+# %matplotlib notebook
+fig, axs = plt.subplots()
+
+y1 = benefit_sub.mean()
+c1 = benefit_sub.std()/np.sqrt(len(np.unique(dat.subjects)))
+
+x=range(0,5)
+axs.set_xticks([0,1,2,3,4])
+axs.set_xticklabels([0,1,2,3,'4+'])
+
+axs.plot(x,y1 , color = '#81b29a', linewidth=3)
+axs.fill_between(x, (y1-c1), (y1+c1), color='#81b29a', alpha=.2)
+
+axs.set_yticks(np.linspace(0,0.35,8))
+axs.set_xticks([0,1,2,3,4])
+axs.set_xticklabels([0,1,2,3,'4+'])
+axs.set_xlabel('Number of undo sequences')
+axs.set_ylabel('Benefit of undo (undo condition - basic condition)')
+
+# -
+
 # ### all data point, average within each number of undo category
 
 # +
@@ -806,7 +846,7 @@ plt.show()
 # ### probability of undo -- conditional on error
 
 # FROM EACH SUBJECT
-data_choice_level_df = data_choice_level[(data_choice_level['undo'] == 0)|(data_choice_level['firstUndo'] == 1)]
+data_choice_level_df = sc_data_choice_level[((sc_data_choice_level['undo'] == 0)|(sc_data_choice_level['firstUndo'] == 1))&(sc_data_choice_level['RT'] != -1)&(sc_data_choice_level['submit'] != 1)]
 data_choice_level_df = data_choice_level_df.reset_index()
 
 # #### accumulated error
@@ -828,8 +868,6 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
     
     if np.any(index_error>(data_choice_level_df.shape[0]-1)):
         index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
-    index_error = np.delete(index_error, np.where(data_choice_level_df.loc[index_error,'RT']==-1)) # remove submit action
-    index_error = np.delete(index_error, np.where(data_choice_level_df.loc[index_error-1,'RT']==-1)) # remove start city
 
 #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
     temp_data.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
@@ -841,9 +879,7 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
     index_error += 1
     if np.any(index_error>(data_choice_level_df.shape[0]-1)):
         index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
-    index_error = np.delete(index_error, np.where(data_choice_level_df.loc[index_error,'RT']==-1)) # remove submit action
-    index_error = np.delete(index_error, np.where(data_choice_level_df.loc[index_error-1,'RT']==-1)) # remove start city
-
+   
     #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
     temp_data.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
     
@@ -916,9 +952,7 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
     index_error += 1
     if np.any(index_error>(data_choice_level_df.shape[0]-1)):
         index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
-    index_error = np.delete(index_error, np.where(data_choice_level_df.loc[index_error,'RT']==-1)) # remove submit action
-    index_error = np.delete(index_error, np.where(data_choice_level_df.loc[index_error-1,'RT']==-1)) # remove start city
-
+    
     #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
     temp_data.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
 
@@ -930,9 +964,7 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
     index_error += 1
     if np.any(index_error>(data_choice_level_df.shape[0]-1)):
         index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
-
-    index_error = np.delete(index_error, np.where(data_choice_level_df.loc[index_error,'RT']==-1)) # remove submit action
-    index_error = np.delete(index_error, np.where(data_choice_level_df.loc[index_error-1,'RT']==-1)) # remove start city
+    
     #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
     temp_data.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
     
@@ -962,7 +994,7 @@ bx = axs.boxplot(
    medianprops = dict(color = 'k'))  #
 
 axs.set_xticks([1,2])
-axs.set_yticks(np.linspace(0,0.14,8))
+axs.set_yticks(np.linspace(0,0.2,6))
 axs.set_xticklabels(labels = ['no error', 'error'])#,fontsize=18
 
 axs.set_xlabel('Instant error')
@@ -990,7 +1022,696 @@ sm.qqplot(stats.zscore(dat_subjects[:,0]-dat_subjects[:,1]), line ='45')
 py.show()
 # -
 
-# ## Proportion of first undo depending on end/optimal
+# ### probability of undo -- conditional on error - undo target
+
+# FROM EACH SUBJECT
+data_choice_level_df_2 = sc_data_choice_level[((sc_data_choice_level['undo'] == 0)|(sc_data_choice_level['firstUndo'] == 1)|(sc_data_choice_level['lastUndo'] == 1))&
+                                              (sc_data_choice_level['RT'] != -1)&
+                                            (sc_data_choice_level['submit'] != 1)]
+data_choice_level_df_2 = data_choice_level_df_2.reset_index()
+
+# #### accumulated error
+
+# +
+dat_subjects = []
+for i in np.unique(np.array(data_choice_level_df_2['subjects'])):
+
+    no_undo = 0
+    undo_start = 0
+    undo_nostart = 0
+    
+    index_subjects =  data_choice_level_df_2.index[data_choice_level_df_2['subjects'] == i]
+    
+    puzzle_error = data_choice_level_df_2['allMAS'] - data_choice_level_df_2['currMas']
+    
+#     # no error -----------------------------------------------------------
+#     index_error = puzzle_error.index[puzzle_error == 0]
+#     index_error = np.array(index_error)
+#     index_error = np.intersect1d(index_error, index_subjects)
+
+#     index_error += 1 # the next index
+    
+#     if np.any(index_error>(data_choice_level_df.shape[0]-1)):
+#         index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
+
+# #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+#     temp_data.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
+
+    # YES error -----------------------------------------------------------
+    index_error = puzzle_error.index[puzzle_error != 0]
+    index_error = np.array(index_error)
+    index_error = np.intersect1d(index_error, index_subjects)
+    index_error += 1
+    if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
+        index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
+   
+    n_move = len(index_error) # number of all moves
+    for ind in index_error:
+        run = 1
+        if data_choice_level_df_2['firstUndo'][ind] == 0:
+            no_undo = no_undo + 1
+        elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+            n_move = n_move - 1
+        elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+            while run == 1:
+                ind = ind + 1
+                if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
+                    undo_start = undo_start + 1
+                    run = 0
+                elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
+                    undo_nostart = undo_nostart + 1
+                    run = 0
+    
+    if n_move == 0:
+        print(i)
+    else:
+        temp_data = [no_undo/n_move,undo_start/n_move,undo_nostart/n_move]
+    
+    dat_subjects.append(temp_data)
+
+dat_subjects = np.array(dat_subjects)
+print(np.mean(dat_subjects,axis=0))
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+# axs.bar([1,2],
+#         np.mean(dat_subjects,axis = 0),
+#         color=[.7,.7,.7], 
+#         edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+
+bx = axs.boxplot(
+    [
+        dat_subjects[:,1],
+        dat_subjects[:,2]
+    ],
+    positions =[1,2],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+axs.set_xticks([1,2])
+axs.set_yticks(np.linspace(0,0.12,5))
+axs.set_xticklabels(labels = ['start city', 'non-start city'])#,fontsize=18
+
+axs.set_xlabel('Accumulated error')
+axs.set_ylabel('Probability of undo')
+
+
+
+stat1, p1 = ttest_ind(dat_subjects[:,1], dat_subjects[:,2])
+print(stat1)
+print(p1)
+axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+fig.savefig(out_dir + 'undo_prob_accumulated_error_target.png', dpi=600, bbox_inches='tight')
+
+
+
+# +
+dat_subjects = []
+for i in np.unique(np.array(data_choice_level_df_2['subjects'])):
+    no_undo = 0
+    undo_start = 0
+    undo_nostart = 0
+    
+    index_subjects =  data_choice_level_df_2.index[data_choice_level_df_2['subjects'] == i]
+    
+    puzzle_error = data_choice_level_df_2['allMAS'] - data_choice_level_df_2['currMas']
+    
+    # no error -----------------------------------------------------------
+    index_error = puzzle_error.index[puzzle_error == 0]
+    index_error = np.array(index_error)
+    index_error = np.intersect1d(index_error, index_subjects)
+
+    index_error += 1 # the next index
+    
+    if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
+        index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
+
+    n_move = len(index_error) # number of all moves
+    for ind in index_error:
+        run = 1
+        if data_choice_level_df_2['firstUndo'][ind] == 0:
+            no_undo = no_undo + 1
+        elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+            n_move = n_move - 1
+        elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+            while run == 1:
+                ind = ind + 1
+                if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
+                    undo_start = undo_start + 1
+                    run = 0
+                elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
+                    undo_nostart = undo_nostart + 1
+                    run = 0
+
+#     # YES error -----------------------------------------------------------
+#     index_error = puzzle_error.index[puzzle_error != 0]
+#     index_error = np.array(index_error)
+#     index_error = np.intersect1d(index_error, index_subjects)
+#     index_error += 1
+#     if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
+#         index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
+   
+#     n_move = len(index_error) # number of all moves
+#     for ind in index_error:
+#         if data_choice_level_df_2['firstUndo'][ind] == 0:
+#             no_undo = no_undo + 1
+#         elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+#             n_move = n_move - 1
+#         elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+#             while run == 1:
+#                 ind = ind + 1
+#                 if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
+#                     undo_start = undo_start + 1
+#                     run = 0
+#                 elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
+#                     undo_nostart = undo_nostart + 1
+#                     run = 0
+    
+    if n_move == 0:
+        print(i)
+    else:
+        temp_data = [no_undo/n_move,undo_start/n_move,undo_nostart/n_move]
+    
+    dat_subjects.append(temp_data)
+
+dat_subjects = np.array(dat_subjects)
+# print(np.mean(dat_subjects,axis=0))
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+# axs.bar([1,2],
+#         np.mean(dat_subjects,axis = 0),
+#         color=[.7,.7,.7], 
+#         edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+
+bx = axs.boxplot(
+    [
+        dat_subjects[:,1],
+        dat_subjects[:,2]
+    ],
+    positions =[1,2],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+axs.set_xticks([1,2])
+axs.set_yticks(np.linspace(0,0.024,7))
+axs.set_xticklabels(labels = ['start city', 'non-start city'])#,fontsize=18
+
+axs.set_xlabel('No accumulated error')
+axs.set_ylabel('Probability of undo')
+
+
+
+stat1, p1 = ttest_ind(dat_subjects[:,1], dat_subjects[:,2])
+print(stat1)
+print(p1)
+axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+fig.savefig(out_dir + 'undo_prob_no_accumulated_error_target.png', dpi=600, bbox_inches='tight')
+
+
+
+# +
+dat_subjects = []
+
+no_undo = 0
+undo_start = 0
+undo_nostart = 0
+
+
+puzzle_error = data_choice_level_df_2['allMAS'] - data_choice_level_df_2['currMas']
+
+# no error -----------------------------------------------------------
+index_error = puzzle_error.index[puzzle_error == 0]
+index_error = np.array(index_error)
+
+
+index_error += 1 # the next index
+
+if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
+    index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
+
+n_move = len(index_error) # number of all moves
+for ind in index_error:
+    run = 1
+    if data_choice_level_df_2['firstUndo'][ind] == 0:
+        no_undo = no_undo + 1
+    elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+        n_move = n_move - 1
+    elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+        while run == 1:
+            ind = ind + 1
+            if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
+                undo_start = undo_start + 1
+                run = 0
+            elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
+                undo_nostart = undo_nostart + 1
+                run = 0
+
+if n_move == 0:
+    print(i)
+else:
+    dat_subjects = [no_undo/n_move,undo_start/n_move,undo_nostart/n_move]
+
+# dat_subjects.append(temp_data)
+
+dat_subjects = np.array(dat_subjects)
+# print(np.mean(dat_subjects,axis=0))
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+# axs.bar([1,2],
+#         np.mean(dat_subjects,axis = 0),
+#         color=[.7,.7,.7], 
+#         edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+
+bx = axs.bar(
+    [1,2],
+    [
+        dat_subjects[1],
+        dat_subjects[2]
+    ])  #
+
+axs.set_xticks([1,2])
+axs.set_yticks(np.linspace(0,0.024,7))
+axs.set_xticklabels(labels = ['start city', 'non-start city'])#,fontsize=18
+
+axs.set_xlabel('No accumulated error')
+axs.set_ylabel('Probability of undo')
+
+
+
+stat1, p1 = ttest_ind(dat_subjects[:,1], dat_subjects[:,2])
+print(stat1)
+print(p1)
+axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+# fig.savefig(out_dir + 'undo_prob_no_accumulated_error_target.png', dpi=600, bbox_inches='tight')
+
+# -
+
+
+# #### instant error
+
+# +
+# FROM EACH SUBJECT
+dat_subjects = []
+for i in np.unique(np.array(data_choice_level_df_2['subjects'])):
+    
+
+    no_undo = 0
+    undo_start = 0
+    undo_nostart = 0
+    
+    index_subjects =  data_choice_level_df_2.index[data_choice_level_df_2['subjects'] == i]
+    
+#     # no error --------------------------------------------------
+#     index_error = data_choice_level_df['severityOfErrors'].index[data_choice_level_df['severityOfErrors'] == 0]
+#     index_error = np.array(index_error)
+#     index_error = np.intersect1d(index_error, index_subjects)
+#     index_error += 1
+#     if np.any(index_error>(data_choice_level_df.shape[0]-1)):
+#         index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
+    
+#     #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+#     temp_data.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
+
+
+    # YES error --------------------------------------------------
+    index_error = data_choice_level_df_2['severityOfErrors'].index[data_choice_level_df_2['severityOfErrors'] != 0]
+    index_error = np.array(index_error)
+    index_error = np.intersect1d(index_error, index_subjects)
+    index_error += 1
+    if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
+        index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
+    
+    n_move = len(index_error) # number of all moves
+    for ind in index_error:
+        run = 1
+        if data_choice_level_df_2['firstUndo'][ind] == 0:
+            no_undo = no_undo + 1
+        elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+            n_move = n_move - 1
+        elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+            while run == 1:
+                ind = ind + 1
+                if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
+                    undo_start = undo_start + 1
+                    run = 0
+                elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
+                    undo_nostart = undo_nostart + 1
+                    run = 0
+    
+    if n_move == 0:
+        print(i)
+    else:
+        temp_data = [no_undo/n_move,undo_start/n_move,undo_nostart/n_move]
+    
+    dat_subjects.append(temp_data)
+
+dat_subjects = np.array(dat_subjects)
+# -
+
+dat_subjects
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+# axs.bar([1,2],
+#         np.mean(dat_subjects,axis = 0),
+#         color=[.7,.7,.7], 
+#         edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+
+bx = axs.boxplot(
+    [
+        dat_subjects[:,1],
+        dat_subjects[:,2]
+    ],
+    positions =[1,2],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+axs.set_xticks([1,2])
+axs.set_yticks(np.linspace(0,0.08,5))
+axs.set_xticklabels(labels = ['start city', 'non-start city'])#,fontsize=18
+
+axs.set_xlabel('Instant error')
+axs.set_ylabel('Probability of undo')
+
+
+
+stat1, p1 = ttest_ind(dat_subjects[:,1], dat_subjects[:,2])
+print(stat1)
+print(p1)
+axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+fig.savefig(out_dir + 'undo_prob_instant_error_target.png', dpi=600, bbox_inches='tight')
+
+
+
+# +
+
+dat_subjects = []
+
+no_undo = 0
+undo_start = 0
+undo_nostart = 0
+
+# YES error --------------------------------------------------
+index_error = data_choice_level_df_2['severityOfErrors'].index[data_choice_level_df_2['severityOfErrors'] != 0]
+index_error = np.array(index_error)
+index_error += 1
+if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
+    index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
+
+n_move = len(index_error) # number of all moves
+for ind in index_error:
+    run = 1
+    if data_choice_level_df_2['firstUndo'][ind] == 0:
+        no_undo = no_undo + 1
+    elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+        n_move = n_move - 1
+    elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+        while run == 1:
+            ind = ind + 1
+            if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
+                undo_start = undo_start + 1
+                run = 0
+            elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
+                undo_nostart = undo_nostart + 1
+                run = 0
+
+if n_move == 0:
+    print(i)
+else:
+    dat_subjects = [no_undo/n_move,undo_start/n_move,undo_nostart/n_move]
+
+# dat_subjects.append(temp_data)
+
+dat_subjects = np.array(dat_subjects)
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+# axs.bar([1,2],
+#         np.mean(dat_subjects,axis = 0),
+#         color=[.7,.7,.7], 
+#         edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+
+bx = axs.bar(
+    [1,2],
+    [
+        dat_subjects[1],
+        dat_subjects[2]
+    ])  #
+
+axs.set_xticks([1,2])
+axs.set_yticks(np.linspace(0,0.08,5))
+axs.set_xticklabels(labels = ['start city', 'non-start city'])#,fontsize=18
+
+axs.set_xlabel('Instant error')
+axs.set_ylabel('Probability of undo')
+
+
+
+# stat1, p1 = ttest_ind(dat_subjects[:,1], dat_subjects[:,2])
+# print(stat1)
+# print(p1)
+# axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+# fig.savefig(out_dir + 'undo_prob_instant_error_target.png', dpi=600, bbox_inches='tight')
+
+
+
+# +
+# FROM EACH SUBJECT
+dat_subjects = []
+for i in np.unique(np.array(data_choice_level_df_2['subjects'])):
+
+    no_undo = 0
+    undo_start = 0
+    undo_nostart = 0
+    
+    index_subjects =  data_choice_level_df_2.index[data_choice_level_df_2['subjects'] == i]
+    
+    # no error --------------------------------------------------
+    index_error = data_choice_level_df_2['severityOfErrors'].index[data_choice_level_df_2['severityOfErrors'] == 0]
+    index_error = np.array(index_error)
+    index_error = np.intersect1d(index_error, index_subjects)
+    index_error += 1
+    if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
+        index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
+    
+    n_move = len(index_error) # number of all moves
+    for ind in index_error:
+        run = 1
+        if data_choice_level_df_2['firstUndo'][ind] == 0:
+            no_undo = no_undo + 1
+        elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+            n_move = n_move - 1
+        elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+            while run == 1:
+                ind = ind + 1
+                if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
+                    undo_start = undo_start + 1
+                    run = 0
+                elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
+                    undo_nostart = undo_nostart + 1
+                    run = 0
+
+
+#     # YES error --------------------------------------------------
+#     index_error = data_choice_level_df_2['severityOfErrors'].index[data_choice_level_df_2['severityOfErrors'] != 0]
+#     index_error = np.array(index_error)
+#     index_error = np.intersect1d(index_error, index_subjects)
+#     index_error += 1
+#     if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
+#         index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
+    
+#     n_move = len(index_error) # number of all moves
+#     for ind in index_error:
+#         if data_choice_level_df_2['firstUndo'][ind] == 0:
+#             no_undo = no_undo + 1
+#         elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+#             n_move = n_move - 1
+#         elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+#             while run == 1:
+#                 ind = ind + 1
+#                 if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
+#                     undo_start = undo_start + 1
+#                     run = 0
+#                 elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
+#                     undo_nostart = undo_nostart + 1
+#                     run = 0
+    
+    if n_move == 0:
+        print(i)
+    else:
+        temp_data = [no_undo/n_move,undo_start/n_move,undo_nostart/n_move]
+    
+    dat_subjects.append(temp_data)
+
+dat_subjects = np.array(dat_subjects)
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+# axs.bar([1,2],
+#         np.mean(dat_subjects,axis = 0),
+#         color=[.7,.7,.7], 
+#         edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+
+bx = axs.boxplot(
+    [
+        dat_subjects[:,1],
+        dat_subjects[:,2]
+    ],
+    positions =[1,2],
+    widths = 0.3,
+    showfliers=False,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+axs.set_xticks([1,2])
+axs.set_yticks(np.linspace(0,0.08,9))
+axs.set_xticklabels(labels = ['start city', 'non-start city'])#,fontsize=18
+
+axs.set_xlabel('No instant error')
+axs.set_ylabel('Probability of undo')
+
+
+
+stat1, p1 = ttest_ind(dat_subjects[:,1], dat_subjects[:,2])
+print(stat1)
+print(p1)
+axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+fig.savefig(out_dir + 'undo_prob_no_instant_error_target.png', dpi=600, bbox_inches='tight')
+
+
+
+# +
+# FROM EACH SUBJECT
+dat_subjects = []
+
+
+no_undo = 0
+undo_start = 0
+undo_nostart = 0
+
+# no error --------------------------------------------------
+index_error = data_choice_level_df_2['severityOfErrors'].index[data_choice_level_df_2['severityOfErrors'] == 0]
+index_error = np.array(index_error)
+index_error += 1
+if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
+    index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
+
+n_move = len(index_error) # number of all moves
+for ind in index_error:
+    run = 1
+    if data_choice_level_df_2['firstUndo'][ind] == 0:
+        no_undo = no_undo + 1
+    elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+        n_move = n_move - 1
+    elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+        while run == 1:
+            ind = ind + 1
+            if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
+                undo_start = undo_start + 1
+                run = 0
+            elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
+                undo_nostart = undo_nostart + 1
+                run = 0
+    
+if n_move == 0:
+    print(i)
+else:
+    dat_subjects = [no_undo/n_move,undo_start/n_move,undo_nostart/n_move]
+
+# dat_subjects.append(temp_data)
+
+dat_subjects = np.array(dat_subjects)
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+# axs.bar([1,2],
+#         np.mean(dat_subjects,axis = 0),
+#         color=[.7,.7,.7], 
+#         edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+
+bx = axs.bar(
+    [1,2],
+    [
+        dat_subjects[1],
+        dat_subjects[2]
+    ])  #
+
+axs.set_xticks([1,2])
+axs.set_yticks(np.linspace(0,0.08,5))
+axs.set_xticklabels(labels = ['start city', 'non-start city'])#,fontsize=18
+
+axs.set_xlabel('No instant error')
+axs.set_ylabel('Probability of undo')
+
+
+
+# stat1, p1 = ttest_ind(dat_subjects[:,1], dat_subjects[:,2])
+# print(stat1)
+# print(p1)
+# axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+# fig.savefig(out_dir + 'undo_prob_instant_error_target.png', dpi=600, bbox_inches='tight')
+
+# -
+
+
+# ## proportion of first undo depending on end/optimal
 
 # ### separate bar plot
 
@@ -1139,31 +1860,33 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
     
     if np.any(index_undo>(max(df_subjects.index))):
         index_undo = np.delete(index_undo, np.where(index_undo>max(df_subjects.index)))
-#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
     temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
     
     # end optimal--------------------------------------------------
     end_optimal = (df_subjects.checkEnd == 1)&(df_subjects.submit != 1)&(df_subjects.allMAS == df_subjects.currMas)
     index_undo = df_subjects.loc[end_optimal,:].index+1
 
+    if np.any(index_undo>(max(df_subjects.index))):
+        index_undo = np.delete(index_undo, np.where(index_undo>max(df_subjects.index)))
     if np.isnan(np.nanmean(df_subjects['firstUndo'][index_undo])):
         temp_data.append(0)
     else:
-#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
         temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
 
     # notend notoptimal--------------------------------------------------
     notend_notoptimal = (df_subjects.checkEnd != 1)&(df_subjects.submit != 1)&(df_subjects.allMAS != df_subjects.currMas)
     index_undo = df_subjects.loc[notend_notoptimal,:].index+1
 
-#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+    if np.any(index_undo>(max(df_subjects.index))):
+        index_undo = np.delete(index_undo, np.where(index_undo>max(df_subjects.index)))
     temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
     
     # notend optimal--------------------------------------------------
     notend_optimal = (df_subjects.checkEnd != 1)&(df_subjects.submit != 1)&(df_subjects.allMAS == df_subjects.currMas)
     index_undo = df_subjects.loc[notend_optimal,:].index+1
 
-#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
+    if np.any(index_undo>(max(df_subjects.index))):
+        index_undo = np.delete(index_undo, np.where(index_undo>max(df_subjects.index)))
     temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
     
     # end/not end ----------------------------------------------------------
@@ -1171,23 +1894,44 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
     index_undo = df_subjects.loc[end,:].index+1
     
     if np.any(index_undo>(max(df_subjects.index))):
-        index_undo = np.delete(index_undo, np.where(index_undo>max(df_subjects.index)))
-        
+        index_undo = np.delete(index_undo, np.where(index_undo>max(df_subjects.index)))   
     if np.isnan(np.nanmean(df_subjects['firstUndo'][index_undo])):
         temp_data.append(0)
     else:
-#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
         temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
     
     notend = (df_subjects.checkEnd != 1)&(df_subjects.submit != 1)
     index_undo = df_subjects.loc[notend,:].index+1
 
+    if np.any(index_undo>(max(df_subjects.index))):
+        index_undo = np.delete(index_undo, np.where(index_undo>max(df_subjects.index)))
     if np.isnan(np.nanmean(df_subjects['firstUndo'][index_undo])):
         temp_data.append(0)
     else:
-#     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
         temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
     
+    # optimal/not optimal ----------------------------------------------------------
+    optimal = (df_subjects.allMAS == df_subjects.currMas)
+    index_undo = df_subjects.loc[optimal,:].index+1
+    
+    if np.any(index_undo>(max(df_subjects.index))):
+        index_undo = np.delete(index_undo, np.where(index_undo>max(df_subjects.index)))        
+    if np.isnan(np.nanmean(df_subjects['firstUndo'][index_undo])):
+        temp_data.append(0)
+    else:
+        temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
+    
+    notoptimal = (df_subjects.allMAS != df_subjects.currMas)
+    index_undo = df_subjects.loc[notoptimal,:].index+1
+
+    if np.any(index_undo>(max(df_subjects.index))):
+        index_undo = np.delete(index_undo, np.where(index_undo>max(df_subjects.index)))
+    if np.isnan(np.nanmean(df_subjects['firstUndo'][index_undo])):
+        temp_data.append(0)
+    else:
+        temp_data.append(np.nanmean(df_subjects['firstUndo'][index_undo]))
+    
+    # --------------------------------------------------------------------------
     dat_subjects.append(temp_data)
 
 dat_subjects = np.array(dat_subjects)
@@ -1214,7 +1958,7 @@ bx = axs.boxplot(
     whis = 1.5,
    medianprops = dict(color = 'k'))  #
 
-colors = ['#ccd5ae','#fefae0']
+colors = ['#ccd5ae','#ccd5ae']
 for patch, color in zip(bx['boxes'], colors):
     patch.set_facecolor(color)
 
@@ -1234,6 +1978,48 @@ axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
 # fig.set_figwidth(3)
 plt.show()
 fig.savefig(out_dir + 'undo_prob_end_state.png', dpi=600, bbox_inches='tight')
+
+# +
+# %matplotlib notebook
+
+fig, axs = plt.subplots(1, 1)
+# axs.bar([1,2,3,4],np.nanmean(dat_subjects,axis = 0),
+#         color=['#ccd5ae','#ccd5ae','#fefae0','#fefae0'],
+#         hatch=['//','','//',''],edgecolor = 'k', 
+#         yerr=np.std(dat_subjects,axis = 0)/np.sqrt(dat_subjects.shape[0]))
+
+bx = axs.boxplot(
+    [
+        dat_subjects[:,6],
+        dat_subjects[:,7],
+    ],
+    positions =[1,2],
+    widths = 0.3,
+    showfliers=False,
+    patch_artist=True,
+    whis = 1.5,
+   medianprops = dict(color = 'k'))  #
+
+colors = ['#fefae0','#fefae0']
+for patch, color in zip(bx['boxes'], colors):
+    patch.set_facecolor(color)
+
+axs.set_xticks([1,2])
+axs.set_xticklabels(labels = ['optimal',
+                              'not optimal'])#,fontsize=18
+
+axs.set_ylabel('Probability of undo')
+axs.set_xlabel('State before undo')
+
+stat1, p1 = ttest_ind(dat_subjects[:,6], dat_subjects[:,7])
+print(stat1)
+print(p1)
+axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
+
+# fig.set_figheight(4)
+# fig.set_figwidth(3)
+plt.show()
+fig.savefig(out_dir + 'undo_prob_optimal.png', dpi=600, bbox_inches='tight')
 
 # +
 # %matplotlib notebook
@@ -1282,7 +2068,7 @@ for bx in [bx1,bx2]:
 
 axs[0].set_xticks([1,1.5,2])
 axs[1].set_xticks([1,1.5,2])
-axs[1].set_yticks(np.linspace(0,0.04,5))
+axs[1].set_yticks(np.linspace(0,0.05,6))
 axs[0].set_xticklabels(labels = ['not optimal',
                               '\n end state',
                               'optimal'])
@@ -1911,7 +2697,7 @@ plt.xticks([0,1,2,3],
            ['worse','no difference \n (not optimal)',
             'no difference \n (optimal)','better'])
 # plt.xlabel('Move after undo')
-plt.ylabel('Probability of move after undo')
+plt.ylabel('Proportion of move after undo')
 plt.savefig(out_dir + 'move_after_undo_prob.png', dpi=600, bbox_inches='tight')
 # -
 

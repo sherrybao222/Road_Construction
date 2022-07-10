@@ -15,7 +15,7 @@
 
 # + [markdown] toc=true
 # <h1>Table of Contents<span class="tocSkip"></span></h1>
-# <div class="toc"><ul class="toc-item"><li><span><a href="#action-RT" data-toc-modified-id="action-RT-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>action RT</a></span><ul class="toc-item"><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-1.1"><span class="toc-item-num">1.1&nbsp;&nbsp;</span>average within subject</a></span><ul class="toc-item"><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-1.1.1"><span class="toc-item-num">1.1.1&nbsp;&nbsp;</span>bar plot</a></span></li><li><span><a href="#box-and-whisker-plot" data-toc-modified-id="box-and-whisker-plot-1.1.2"><span class="toc-item-num">1.1.2&nbsp;&nbsp;</span>box and whisker plot</a></span></li></ul></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-1.2"><span class="toc-item-num">1.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#different-types-of-undoing-RT" data-toc-modified-id="different-types-of-undoing-RT-2"><span class="toc-item-num">2&nbsp;&nbsp;</span>different types of undoing RT</a></span><ul class="toc-item"><li><span><a href="#averaged-within-subject" data-toc-modified-id="averaged-within-subject-2.1"><span class="toc-item-num">2.1&nbsp;&nbsp;</span>averaged within subject</a></span><ul class="toc-item"><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-2.1.1"><span class="toc-item-num">2.1.1&nbsp;&nbsp;</span>bar plot</a></span></li><li><span><a href="#box-plot" data-toc-modified-id="box-plot-2.1.2"><span class="toc-item-num">2.1.2&nbsp;&nbsp;</span>box plot</a></span></li></ul></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-2.2"><span class="toc-item-num">2.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#branching-node-RT" data-toc-modified-id="branching-node-RT-3"><span class="toc-item-num">3&nbsp;&nbsp;</span>branching node RT</a></span><ul class="toc-item"><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-3.1"><span class="toc-item-num">3.1&nbsp;&nbsp;</span>average within subject</a></span><ul class="toc-item"><li><span><a href="#box-plot" data-toc-modified-id="box-plot-3.1.1"><span class="toc-item-num">3.1.1&nbsp;&nbsp;</span>box plot</a></span></li><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-3.1.2"><span class="toc-item-num">3.1.2&nbsp;&nbsp;</span>bar plot</a></span></li></ul></li><li><span><a href="#average-within-puzzle" data-toc-modified-id="average-within-puzzle-3.2"><span class="toc-item-num">3.2&nbsp;&nbsp;</span>average within puzzle</a></span><ul class="toc-item"><li><span><a href="#box-plot" data-toc-modified-id="box-plot-3.2.1"><span class="toc-item-num">3.2.1&nbsp;&nbsp;</span>box plot</a></span></li><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-3.2.2"><span class="toc-item-num">3.2.2&nbsp;&nbsp;</span>bar plot</a></span></li></ul></li></ul></li></ul></div>
+# <div class="toc"><ul class="toc-item"><li><span><a href="#action-RT" data-toc-modified-id="action-RT-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>action RT</a></span><ul class="toc-item"><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-1.1"><span class="toc-item-num">1.1&nbsp;&nbsp;</span>average within subject</a></span><ul class="toc-item"><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-1.1.1"><span class="toc-item-num">1.1.1&nbsp;&nbsp;</span>bar plot</a></span></li><li><span><a href="#box-and-whisker-plot" data-toc-modified-id="box-and-whisker-plot-1.1.2"><span class="toc-item-num">1.1.2&nbsp;&nbsp;</span>box and whisker plot</a></span></li></ul></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-1.2"><span class="toc-item-num">1.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#different-types-of-undoing-RT" data-toc-modified-id="different-types-of-undoing-RT-2"><span class="toc-item-num">2&nbsp;&nbsp;</span>different types of undoing RT</a></span><ul class="toc-item"><li><span><a href="#averaged-within-subject" data-toc-modified-id="averaged-within-subject-2.1"><span class="toc-item-num">2.1&nbsp;&nbsp;</span>averaged within subject</a></span><ul class="toc-item"><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-2.1.1"><span class="toc-item-num">2.1.1&nbsp;&nbsp;</span>bar plot</a></span></li><li><span><a href="#box-plot" data-toc-modified-id="box-plot-2.1.2"><span class="toc-item-num">2.1.2&nbsp;&nbsp;</span>box plot</a></span></li></ul></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-2.2"><span class="toc-item-num">2.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#branching-node-RT" data-toc-modified-id="branching-node-RT-3"><span class="toc-item-num">3&nbsp;&nbsp;</span>branching node RT</a></span><ul class="toc-item"><li><span><a href="#GLMM" data-toc-modified-id="GLMM-3.1"><span class="toc-item-num">3.1&nbsp;&nbsp;</span>GLMM</a></span></li><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-3.2"><span class="toc-item-num">3.2&nbsp;&nbsp;</span>average within subject</a></span><ul class="toc-item"><li><span><a href="#box-plot" data-toc-modified-id="box-plot-3.2.1"><span class="toc-item-num">3.2.1&nbsp;&nbsp;</span>box plot</a></span></li><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-3.2.2"><span class="toc-item-num">3.2.2&nbsp;&nbsp;</span>bar plot</a></span></li></ul></li><li><span><a href="#average-within-puzzle" data-toc-modified-id="average-within-puzzle-3.3"><span class="toc-item-num">3.3&nbsp;&nbsp;</span>average within puzzle</a></span><ul class="toc-item"><li><span><a href="#box-plot" data-toc-modified-id="box-plot-3.3.1"><span class="toc-item-num">3.3.1&nbsp;&nbsp;</span>box plot</a></span></li><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-3.3.2"><span class="toc-item-num">3.3.2&nbsp;&nbsp;</span>bar plot</a></span></li></ul></li></ul></li></ul></div>
 
 # +
 import pandas as pd
@@ -44,6 +44,9 @@ ggplot = importr('ggplot2')
 dplyr = importr('dplyr')
 sjplot = importr('sjPlot')
 car = importr('car')
+
+# + language="R"
+# sessionInfo()
 # -
 
 home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
@@ -565,13 +568,95 @@ axs.set_ylabel('Response time (s)') #,fontsize=18
 
 plt.show()
 fig.savefig(out_dir + 'undo_RT.png', dpi=600, bbox_inches='tight')
-
-
 # -
 
 # # branching node RT
 
+# +
+index_start = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['currNumCities'] == 1)]
+index_start_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['currNumCities'] == 1)&(data_choice_level['condition']==1)]
+index_start_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['currNumCities'] == 1)]
+
+# the first visit of a branching node, and it is not a start city
+index_notstart = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['currNumCities'] != 1)]
+index_notstart_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['currNumCities'] != 1)&(data_choice_level['condition']==1)&(data_choice_level['checkEnd'] != 1)&(data_choice_level['submit'] != 1)] 
+index_nostart_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['currNumCities'] != 1)&(data_choice_level['checkEnd'] != 1)&(data_choice_level['submit']!=1)]
+# -
+
+# ## GLMM
+
+RT_start = data_choice_level.loc[index_start + 1,:]
+RT_start_nobranch = data_choice_level.loc[index_start_nobranch + 1,:]
+RT_start_laterbranch = data_choice_level.loc[index_start_laterbranch + 1,:]
+
+# +
+RT_start_df = RT_start[['subjects', 'puzzleID', 'currNos','RT']].copy()
+RT_start_df['type'] = 'start'
+RT_start_nobranch_df = RT_start_nobranch[['subjects', 'puzzleID', 'currNos','RT']].copy()
+RT_start_nobranch_df['type'] = 'start_nobranch'
+RT_start_laterbranch_df = RT_start_laterbranch[['subjects', 'puzzleID', 'currNos','RT']].copy()
+RT_start_laterbranch_df['type'] = 'start_laterbranch'
+
+RT_df = pd.concat([RT_start_df, RT_start_nobranch_df,RT_start_laterbranch_df])
+
+# + magic_args="-i RT_df" language="R"
+#
+# RT_df$subject <- factor(RT_df$subject)
+# RT_df$puzzleID <- factor(RT_df$puzzleID)
+# RT_df$currNos_z <- scale(RT_df$currNos)
+# RT_df$logRT <- log(RT_df$RT/1000)
+
+# + language="R"
+# model0 = glmer(logRT ~ type + currNos_z + (1|puzzleID) + (1|subject)
+#                , data=RT_df)
+# summary(model0)
+
+# + language="R"
+# model1 = glmer(logRT ~ type + currNos_z + (type|puzzleID) + (1|subject)
+#                , data=RT_df)
+# summary(model1)
+
+# + language="R"
+# model2 = glmer(logRT ~ type + currNos_z + (type|puzzleID) + (type|subject)
+#                , data=RT_df)
+# summary(model2)
+
+# + language="R"
+# ## Estimating DFs and p-values
+#
+# # get the coefficients for the best fitting model
+# coefs <- data.frame(coef(summary(model2)))
+#
+# # Use the Kenward-Roger approximation to get approximate degrees of freedom
+# df.KR <- get_Lb_ddf(model2, fixef(model2))
+# coefs$df.KR <-(rep(df.KR, each=4))
+#
+# # Calculate confidence intervals from the estimates and the standard errors
+# coefs$semax <- coefs$Estimate + (coefs$Std..Error)
+# coefs$semin <- coefs$Estimate - (coefs$Std..Error)
+#
+# # get p-values from the t-distribution using the t-values and approximated
+# # degrees of freedom
+# coefs$p.KR <- 2 * (1 - pt(abs(coefs$t.value), df.KR))
+#
+# # use normal distribution to approximate p-value (tends to be anti-conservative with small sample sizes)
+# coefs$p.z <- 2 * (1 - pnorm(abs(coefs$t.value)))
+
+# + language="R"
+# coefs
+
+# + language="R"
+# anova(model0, model1)
+
+# + language="R"
+# anova(model1, model2)
+
+# + language="R"
+# anova(model0, model2)
+# -
+
 # ## average within subject
+
 
 # +
 def get_branchRT(index,groupby_cat):
@@ -580,25 +665,16 @@ def get_branchRT(index,groupby_cat):
     RT_sub_sem = sem(RT_sub)
     return [RT_sub,RT_sub_sem]
 
-index_start = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['currNumCities'] == 1)]
 RT_start_sub = get_branchRT(index_start,'subjects')
 
-index_start_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['currNumCities'] == 1)&(data_choice_level['condition']==1)]
 RT_start_nobranch_sub = get_branchRT(index_start_nobranch,'subjects')
 
-index_start_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['currNumCities'] == 1)]
 RT_start_laterbranch_sub = get_branchRT(index_start_laterbranch,'subjects')
-                                                  
 
-# +
-# the first visit of a branching node, and it is not a start city
-index_notstart = data_choice_level.index[(data_choice_level['branchingFirst'] == True)&(data_choice_level['currNumCities'] != 1)]
 RT_notstart_sub = get_branchRT(index_notstart,'subjects')
 
-index_notstart_nobranch = data_choice_level.index[(data_choice_level['branching'] != True)&(data_choice_level['currNumCities'] != 1)&(data_choice_level['condition']==1)&(data_choice_level['checkEnd'] != 1)&(data_choice_level['submit'] != 1)] 
 RT_notstart_nobranch_sub = get_branchRT(index_notstart_nobranch,'subjects')
 
-index_nostart_laterbranch = data_choice_level.index[(data_choice_level['branchingFirst'] != True)&(data_choice_level['branching'] == True)&(data_choice_level['currNumCities'] != 1)&(data_choice_level['checkEnd'] != 1)&(data_choice_level['submit']!=1)]
 RT_nostart_laterbranch_sub = get_branchRT(index_nostart_laterbranch,'subjects')
 # -
 
