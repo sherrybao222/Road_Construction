@@ -96,9 +96,9 @@ def text(p):
 
 # -
 
-# # What kind of puzzle has more error?
+# # error distribution
 
-# ## MAS
+# ## puzzle: MAS
 
 # +
 undo_mas = puzzleID_order_data[puzzleID_order_data['condition']==0].groupby(['mas'])['sumSeverityErrors'].mean().to_frame()
@@ -113,7 +113,7 @@ bx = sns.barplot(x='mas', y='numError', data = puzzleID_order_data[puzzleID_orde
 
 # -
 
-# ## number of optimal solutions
+# ## puzzle: optimal solutions
 
 # +
 error_basic = np.array(puzzleID_order_data[puzzleID_order_data['condition']==0]['numError']) 
@@ -143,7 +143,7 @@ axs.set_xticklabels([1,3,6,'9+'])
 # axs.legend()
 fig.savefig(out_dir + 'error_optimal.png', dpi=600, bbox_inches='tight')
 # -
-# ## choice-level
+# ## choice: connected cities
 
 # +
 error_step = data_choice_level[data_choice_level['condition']==0].groupby(['currNumCities'])['error'].mean().to_frame()
@@ -166,9 +166,9 @@ bx = sns.barplot(x='currNumCities', y='error', data = data_choice_level[data_cho
 
 # -
 
-# # In what kind of puzzle people undo more?
+# # numUndo distribution
 
-# ## MAS
+# ## puzzle: MAS
 
 # +
 undo_mas = single_condition_data.groupby(['mas'])['numFullUndo'].mean().to_frame()
@@ -182,11 +182,13 @@ fig, axs = plt.subplots(1, 1)
 bx = sns.barplot(x='mas', y='numFullUndo', data = single_condition_data, color = '#ccd5ae') 
 # -
 
-# ## [TODO] optimal solutions
+# ## [TODO] puzzle: optimal solutions
 
-# # Benefit of undo
+# # benefit of undo
 
 # ## benefits of undo - num of full undoing
+
+# ### averaged within subject, average within each number of undo category
 
 # +
 numFullUndo_bin = np.array(puzzleID_order_data[puzzleID_order_data.condition == 1]['numFullUndo'])
@@ -203,7 +205,7 @@ dat = pd.DataFrame({'subjects':subjectID, 'puzzleID':puzzleID,
                     'benefit_undo':benefit_undo})
 # -
 
-benefit_sub = dat.groupby(['puzzleID','subjects','numFullUndo_bin'])['benefit_undo'].mean().groupby(['subjects','numFullUndo_bin']).mean().groupby(['numFullUndo_bin'])
+benefit_sub = dat.groupby(['subjects','numFullUndo_bin'])['benefit_undo'].mean().groupby(['numFullUndo_bin'])
 benefit_sub.count()
 
 # +
@@ -306,18 +308,6 @@ undo_benefit_puzzle = single_condition_data.groupby(['puzzleID'])['undo_benefit'
 undo_count_puzzle = single_condition_data.groupby(['puzzleID'])['numFullUndo'].mean()
 fig1, ax1 = plt.subplots()
 ax1.plot(undo_count_puzzle,undo_benefit_puzzle,'o')
-ax1.set_xlabel("average number of undo")
-ax1.set_ylabel("benefit of undo")
-
-# ### average within puzzle and subject. correlation
-
-undo_benefit_puzzle = single_condition_data.groupby(['puzzleID','subjects'])['undo_benefit'].mean().groupby(['subjects']).mean()
-undo_count_puzzle = single_condition_data.groupby(['puzzleID','subjects'])['numFullUndo'].mean().groupby(['subjects']).mean()
-
-fig1, ax1 = plt.subplots()
-ax1.plot(undo_count_puzzle,
-         undo_benefit_puzzle,
-         'o')
 ax1.set_xlabel("average number of undo")
 ax1.set_ylabel("benefit of undo")
 
@@ -1027,11 +1017,13 @@ data_choice_level_df = data_choice_level_df.reset_index(drop=True)
 dat_subjects = []
 for i in np.unique(np.array(data_choice_level_df['subjects'])):
     
-    temp_data = []
+#     temp_data = []
+    undo_list_no = []
+    undo_list_yes = []
     
     for j in np.unique(sc_data_choice_level['puzzleID']):
         
-        temp_data_puz =[]
+#         temp_data_puz =[]
         dat_sbj_pzi =  data_choice_level_df[(data_choice_level_df.subjects == i)&(data_choice_level_df.puzzleID == j)].reset_index()
         puzzle_error = dat_sbj_pzi['allMAS'] - dat_sbj_pzi['currMas']
         # no error --------------------------------------------------
@@ -1041,14 +1033,14 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
         if np.any(index_error>(dat_sbj_pzi.shape[0]-1)):
             index_error = np.delete(index_error, np.where(index_error>(dat_sbj_pzi.shape[0]-1)))
         
-        undo_list_no = []
+#         undo_list_no = []
         for ind in index_error:    
             if (dat_sbj_pzi.firstUndo[ind] == 0)&(dat_sbj_pzi.lastUndo[ind] == 0)&(dat_sbj_pzi.currNumCities[ind-1] > 1):
                 undo_list_no.append(0)
             elif (dat_sbj_pzi['firstUndo'][ind] == 1):
                 undo_list_no.append(1)
 
-        temp_data_puz.append(np.mean(undo_list_no))
+#         temp_data_puz.append(np.mean(undo_list_no))
         
         # YES error --------------------------------------------------
         index_error = puzzle_error.index[puzzle_error != 0]
@@ -1057,18 +1049,19 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
         if np.any(index_error>(dat_sbj_pzi.shape[0]-1)):
             index_error = np.delete(index_error, np.where(index_error>(dat_sbj_pzi.shape[0]-1)))
         
-        undo_list_yes = []
+#         undo_list_yes = []
         for ind in index_error:    
             if (dat_sbj_pzi.firstUndo[ind] == 0)&(dat_sbj_pzi.lastUndo[ind] == 0)&(dat_sbj_pzi.currNumCities[ind-1] > 1):
                 undo_list_yes.append(0)
             elif (dat_sbj_pzi['firstUndo'][ind] == 1):
                 undo_list_yes.append(1)
 
-        temp_data_puz.append(np.mean(undo_list_yes))
+#         temp_data_puz.append(np.mean(undo_list_yes))
     
-        temp_data.append(temp_data_puz)
+#         temp_data.append(temp_data_puz)
     
-    dat_subjects.append(np.nanmean(temp_data,axis=0))
+#     dat_subjects.append(np.nanmean(temp_data,axis=0))
+    dat_subjects.append([np.nanmean(undo_list_no),np.nanmean(undo_list_yes)])
 
 dat_subjects = np.array(dat_subjects)
 
@@ -1107,7 +1100,7 @@ axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
 # fig.set_figheight(4)
 # fig.set_figwidth(2)
 plt.show()
-# fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
 
 
 
@@ -1127,11 +1120,13 @@ py.show()
 dat_subjects = []
 for i in np.unique(np.array(data_choice_level_df['subjects'])):
     
-    temp_data = []
+#     temp_data = []
+    undo_list_no = []
+    undo_list_yes = []
     
     for j in np.unique(sc_data_choice_level['puzzleID']):
         
-        temp_data_puz =[]
+#         temp_data_puz =[]
         dat_sbj_pzi =  data_choice_level_df[(data_choice_level_df.subjects == i)&(data_choice_level_df.puzzleID == j)].reset_index()
 
         # no error --------------------------------------------------
@@ -1141,14 +1136,14 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
         if np.any(index_error>(dat_sbj_pzi.shape[0]-1)):
             index_error = np.delete(index_error, np.where(index_error>(dat_sbj_pzi.shape[0]-1)))
         
-        undo_list_no = []
+#         undo_list_no = []
         for ind in index_error:    
             if (dat_sbj_pzi.firstUndo[ind] == 0)&(dat_sbj_pzi.lastUndo[ind] == 0)&(dat_sbj_pzi.currNumCities[ind-1] > 1):
                 undo_list_no.append(0)
             elif (dat_sbj_pzi['firstUndo'][ind] == 1):
                 undo_list_no.append(1)
 
-        temp_data_puz.append(np.mean(undo_list_no))
+#         temp_data_puz.append(np.mean(undo_list_no))
         
         # YES error --------------------------------------------------
         index_error = dat_sbj_pzi['severityOfErrors'].index[(dat_sbj_pzi['severityOfErrors'] != 0)&(dat_sbj_pzi['submit'] != 1)]
@@ -1157,18 +1152,19 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
         if np.any(index_error>(dat_sbj_pzi.shape[0]-1)):
             index_error = np.delete(index_error, np.where(index_error>(dat_sbj_pzi.shape[0]-1)))
         
-        undo_list_yes = []
+#         undo_list_yes = []
         for ind in index_error:    
             if (dat_sbj_pzi.firstUndo[ind] == 0)&(dat_sbj_pzi.lastUndo[ind] == 0)&(dat_sbj_pzi.currNumCities[ind-1] > 1):
                 undo_list_yes.append(0)
             elif (dat_sbj_pzi['firstUndo'][ind] == 1):
                 undo_list_yes.append(1)
 
-        temp_data_puz.append(np.mean(undo_list_yes))
+#         temp_data_puz.append(np.mean(undo_list_yes))
     
-        temp_data.append(temp_data_puz)
+#         temp_data.append(temp_data_puz)
     
-    dat_subjects.append(np.nanmean(temp_data,axis=0))
+#     dat_subjects.append(np.nanmean(temp_data,axis=0))
+    dat_subjects.append([np.nanmean(undo_list_no),np.nanmean(undo_list_yes)])
 
 dat_subjects = np.array(dat_subjects)
 
