@@ -1016,49 +1016,56 @@ plt.show()
 # -
 # ### probability of undo -- conditional on error
 
-# FROM EACH SUBJECT
-data_choice_level_df = sc_data_choice_level[((sc_data_choice_level['undo'] == 0)|(sc_data_choice_level['firstUndo'] == 1))&(sc_data_choice_level['RT'] != -1)&(sc_data_choice_level['submit'] != 1)]
-data_choice_level_df = data_choice_level_df.reset_index()
+data_choice_level_df = sc_data_choice_level[((sc_data_choice_level['undo'] == 0)|(sc_data_choice_level['firstUndo'] == 1)|(sc_data_choice_level['lastUndo'] == 1))]#
+data_choice_level_df = data_choice_level_df.reset_index(drop=True)
+
 
 # #### accumulated error
 
 # +
+# FROM EACH SUBJECT
 dat_subjects = []
-
 for i in np.unique(np.array(data_choice_level_df['subjects'])):
     
     temp_data = []
     
     for j in np.unique(sc_data_choice_level['puzzleID']):
         
-        temp_data_puz = []
-        
-        index_sub_puz =  data_choice_level_df.index[(data_choice_level_df.subjects == i)&(data_choice_level_df.puzzleID == j)]
-        puzzle_error = data_choice_level_df['allMAS'] - data_choice_level_df['currMas']
-
-        # no error -----------------------------------------------------------
+        temp_data_puz =[]
+        dat_sbj_pzi =  data_choice_level_df[(data_choice_level_df.subjects == i)&(data_choice_level_df.puzzleID == j)].reset_index()
+        puzzle_error = dat_sbj_pzi['allMAS'] - dat_sbj_pzi['currMas']
+        # no error --------------------------------------------------
         index_error = puzzle_error.index[puzzle_error == 0]
         index_error = np.array(index_error)
-        index_error = np.intersect1d(index_error, index_sub_puz)
-        index_error += 1 # the next index
+        index_error += 1
+        if np.any(index_error>(dat_sbj_pzi.shape[0]-1)):
+            index_error = np.delete(index_error, np.where(index_error>(dat_sbj_pzi.shape[0]-1)))
+        
+        undo_list_no = []
+        for ind in index_error:    
+            if (dat_sbj_pzi.firstUndo[ind] == 0)&(dat_sbj_pzi.lastUndo[ind] == 0)&(dat_sbj_pzi.currNumCities[ind-1] > 1):
+                undo_list_no.append(0)
+            elif (dat_sbj_pzi['firstUndo'][ind] == 1):
+                undo_list_no.append(1)
 
-        if np.any(index_error>(data_choice_level_df.shape[0]-1)):
-            index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
-
-    #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
-        temp_data_puz.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
-
-        # YES error -----------------------------------------------------------
+        temp_data_puz.append(np.mean(undo_list_no))
+        
+        # YES error --------------------------------------------------
         index_error = puzzle_error.index[puzzle_error != 0]
         index_error = np.array(index_error)
-        index_error = np.intersect1d(index_error, index_sub_puz)
         index_error += 1
-        if np.any(index_error>(data_choice_level_df.shape[0]-1)):
-            index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
-
-        #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
-        temp_data_puz.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
+        if np.any(index_error>(dat_sbj_pzi.shape[0]-1)):
+            index_error = np.delete(index_error, np.where(index_error>(dat_sbj_pzi.shape[0]-1)))
         
+        undo_list_yes = []
+        for ind in index_error:    
+            if (dat_sbj_pzi.firstUndo[ind] == 0)&(dat_sbj_pzi.lastUndo[ind] == 0)&(dat_sbj_pzi.currNumCities[ind-1] > 1):
+                undo_list_yes.append(0)
+            elif (dat_sbj_pzi['firstUndo'][ind] == 1):
+                undo_list_yes.append(1)
+
+        temp_data_puz.append(np.mean(undo_list_yes))
+    
         temp_data.append(temp_data_puz)
     
     dat_subjects.append(np.nanmean(temp_data,axis=0))
@@ -1125,30 +1132,39 @@ for i in np.unique(np.array(data_choice_level_df['subjects'])):
     for j in np.unique(sc_data_choice_level['puzzleID']):
         
         temp_data_puz =[]
-        index_sub_puz =  data_choice_level_df.index[(data_choice_level_df.subjects == i)&(data_choice_level_df.puzzleID == j)]
+        dat_sbj_pzi =  data_choice_level_df[(data_choice_level_df.subjects == i)&(data_choice_level_df.puzzleID == j)].reset_index()
 
         # no error --------------------------------------------------
-        index_error = data_choice_level_df['severityOfErrors'].index[data_choice_level_df['severityOfErrors'] == 0]
+        index_error = dat_sbj_pzi['severityOfErrors'].index[(dat_sbj_pzi['severityOfErrors'] == 0)&(dat_sbj_pzi['submit'] != 1)]
         index_error = np.array(index_error)
-        index_error = np.intersect1d(index_error, index_sub_puz)
         index_error += 1
-        if np.any(index_error>(data_choice_level_df.shape[0]-1)):
-            index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
+        if np.any(index_error>(dat_sbj_pzi.shape[0]-1)):
+            index_error = np.delete(index_error, np.where(index_error>(dat_sbj_pzi.shape[0]-1)))
+        
+        undo_list_no = []
+        for ind in index_error:    
+            if (dat_sbj_pzi.firstUndo[ind] == 0)&(dat_sbj_pzi.lastUndo[ind] == 0)&(dat_sbj_pzi.currNumCities[ind-1] > 1):
+                undo_list_no.append(0)
+            elif (dat_sbj_pzi['firstUndo'][ind] == 1):
+                undo_list_no.append(1)
 
-        #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
-        temp_data_puz.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
-
-
+        temp_data_puz.append(np.mean(undo_list_no))
+        
         # YES error --------------------------------------------------
-        index_error = data_choice_level_df['severityOfErrors'].index[data_choice_level_df['severityOfErrors'] != 0]
+        index_error = dat_sbj_pzi['severityOfErrors'].index[(dat_sbj_pzi['severityOfErrors'] != 0)&(dat_sbj_pzi['submit'] != 1)]
         index_error = np.array(index_error)
-        index_error = np.intersect1d(index_error, index_sub_puz)
         index_error += 1
-        if np.any(index_error>(data_choice_level_df.shape[0]-1)):
-            index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
+        if np.any(index_error>(dat_sbj_pzi.shape[0]-1)):
+            index_error = np.delete(index_error, np.where(index_error>(dat_sbj_pzi.shape[0]-1)))
+        
+        undo_list_yes = []
+        for ind in index_error:    
+            if (dat_sbj_pzi.firstUndo[ind] == 0)&(dat_sbj_pzi.lastUndo[ind] == 0)&(dat_sbj_pzi.currNumCities[ind-1] > 1):
+                undo_list_yes.append(0)
+            elif (dat_sbj_pzi['firstUndo'][ind] == 1):
+                undo_list_yes.append(1)
 
-        #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
-        temp_data_puz.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
+        temp_data_puz.append(np.mean(undo_list_yes))
     
         temp_data.append(temp_data_puz)
     
@@ -1208,11 +1224,15 @@ py.show()
 
 # ### probability of undo -- conditional on error - undo target
 
+# +
 # FROM EACH SUBJECT
-data_choice_level_df_2 = sc_data_choice_level[((sc_data_choice_level['undo'] == 0)|(sc_data_choice_level['firstUndo'] == 1)|(sc_data_choice_level['lastUndo'] == 1))&
-                                              (sc_data_choice_level['RT'] != -1)&
-                                            (sc_data_choice_level['submit'] != 1)]
+data_choice_level_df_2 = sc_data_choice_level[((sc_data_choice_level['undo'] == 0)|(sc_data_choice_level['firstUndo'] == 1)|(sc_data_choice_level['lastUndo'] == 1))]#
 data_choice_level_df_2 = data_choice_level_df_2.reset_index(drop=True)
+
+print(len(sc_data_choice_level))
+print(len(data_choice_level_df_2))
+
+# -
 
 
 # #### accumulated error
@@ -1231,19 +1251,6 @@ for i in np.unique(np.array(data_choice_level_df_2['subjects'])):
     
     puzzle_error = data_choice_level_df_2['allMAS'] - data_choice_level_df_2['currMas']
     
-#     # no error -----------------------------------------------------------
-#     index_error = puzzle_error.index[puzzle_error == 0]
-#     index_error = np.array(index_error)
-#     index_error = np.intersect1d(index_error, index_subjects)
-
-#     index_error += 1 # the next index
-    
-#     if np.any(index_error>(data_choice_level_df.shape[0]-1)):
-#         index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
-
-# #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
-#     temp_data.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
-
     # YES error -----------------------------------------------------------
     index_error = puzzle_error.index[puzzle_error != 0]
     index_error = np.array(index_error)
@@ -1252,14 +1259,14 @@ for i in np.unique(np.array(data_choice_level_df_2['subjects'])):
     if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
         index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
    
-    n_move = len(index_error) # number of all moves
+    n_move = len(index_error)
     for ind in index_error:
         run = 1
         if data_choice_level_df_2['firstUndo'][ind] == 0:
             no_undo = no_undo + 1
-        elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+        elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['firstUndo'][ind] == 1):
             n_move = n_move - 1
-        elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+        elif (data_choice_level_df_2['lastUndo'][ind] != 1)&(data_choice_level_df_2['firstUndo'][ind] == 1):
             while run == 1:
                 ind = ind + 1
                 if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
@@ -1268,6 +1275,7 @@ for i in np.unique(np.array(data_choice_level_df_2['subjects'])):
                 elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
                     undo_nostart = undo_nostart + 1
                     run = 0
+        
     
     if n_move == 0:
         print(i)
@@ -1317,7 +1325,7 @@ axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
 # fig.set_figheight(4)
 # fig.set_figwidth(3)
 plt.show()
-fig.savefig(out_dir + 'undo_prob_accumulated_error_target.png', dpi=600, bbox_inches='tight')
+# fig.savefig(out_dir + 'undo_prob_accumulated_error_target.png', dpi=600, bbox_inches='tight')
 
 # -
 
@@ -1616,61 +1624,35 @@ plt.show()
 # ##### all data
 
 # +
-data_choice_level_df_2 = sc_data_choice_level
-
 # FROM EACH SUBJECT
 list_start = []
 list_nostart = []
-
 for i in np.unique(np.array(data_choice_level_df_2['subjects'])):
-    
 
-#     no_undo = 0
-#     undo_start = 0
-#     undo_nostart = 0
-    
-    index_subjects =  data_choice_level_df_2.index[data_choice_level_df_2['subjects'] == i]
-    
-#     # no error --------------------------------------------------
-#     index_error = data_choice_level_df['severityOfErrors'].index[data_choice_level_df['severityOfErrors'] == 0]
-#     index_error = np.array(index_error)
-#     index_error = np.intersect1d(index_error, index_subjects)
-#     index_error += 1
-#     if np.any(index_error>(data_choice_level_df.shape[0]-1)):
-#         index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df.shape[0]-1)))
-    
-#     #     temp_data.append(np.mean(data_choice_level['undo'][index_error]))
-#     temp_data.append(np.mean(data_choice_level_df['firstUndo'][index_error]))
+    for j in np.unique(data_choice_level_df_2['puzzleID']):
 
+        dat_sbj_pzi =  data_choice_level_df_2[(data_choice_level_df_2.subjects == i)&(data_choice_level_df_2.puzzleID == j)].reset_index()
 
-    # YES error --------------------------------------------------
-    index_error = data_choice_level_df_2['severityOfErrors'].index[data_choice_level_df_2['severityOfErrors'] != 0]
-    index_error = np.array(index_error)
-    index_error = np.intersect1d(index_error, index_subjects)
-    index_error += 1
-    if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
-        index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
-    
-#     n_move = len(index_error) # number of all moves
-    for ind in index_error:
-        run = 1
-        
-        if data_choice_level_df_2['firstUndo'][ind] == 0:
-            list_start.append(0)
-            list_nostart.append(0)
-        elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
-            n_move = n_move - 1
-        elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
-            while run == 1:
-                ind = ind + 1
-                if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
+        # NO error --------------------------------------------------
+        index_error = dat_sbj_pzi['severityOfErrors'].index[(dat_sbj_pzi['severityOfErrors'] != 0)&(dat_sbj_pzi['submit'] != 1)]
+        index_error = np.array(index_error)
+        index_error += 1
+        if np.any(index_error>(dat_sbj_pzi.shape[0]-1)):
+            index_error = np.delete(index_error, np.where(index_error>(dat_sbj_pzi.shape[0]-1)))
+
+        for ind in index_error:    
+            if (dat_sbj_pzi.firstUndo[ind] == 0)&(dat_sbj_pzi.lastUndo[ind] == 0)&(dat_sbj_pzi.currNumCities[ind-1] > 1):
+                list_start.append(0)
+                list_nostart.append(0)
+            elif (dat_sbj_pzi['firstUndo'][ind] == 1)&(dat_sbj_pzi['lastUndo'][ind] != 1):
+                while dat_sbj_pzi.lastUndo[ind] != 1:
+                    ind = ind + 1
+                if (dat_sbj_pzi['currNumCities'][ind] == 1):
                     list_start.append(1)
                     list_nostart.append(0)
-                    run = 0
-                elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
+                elif (dat_sbj_pzi['currNumCities'][ind] > 1):
                     list_start.append(0)
                     list_nostart.append(1)
-                    run = 0
     
 count_start = sum(list_start)
 count_nostart = sum(list_nostart)
@@ -1678,8 +1660,6 @@ print([count_start/len(list_start),count_nostart/len(list_nostart)])
 
 
 # -
-
-len(np.unique(np.array(data_choice_level_df_2['subjects'])))
 
 stat, pval = proportions_ztest([count_start,count_nostart], [len(list_start),len(list_nostart)])
 print('{0:0.3f}'.format(pval))
@@ -1689,26 +1669,29 @@ print(len(list_nostart))
 
 # #### no instant error
 
+# ##### all data - dk
+
 # +
-mas_map = [data_choice_level_df_2.allMAS[data_choice_level_df_2["puzzleID"]==i].tolist()[0] for i in np.unique(data_choice_level_df_2['puzzleID'])]
+mas_map = [sc_data_choice_level.allMAS[sc_data_choice_level["puzzleID"]==i].tolist()[0] for i in np.unique(sc_data_choice_level['puzzleID'])]
 
 no_error_mat = []
 error_mat = []
 
-no_error_ct_sbj = []
-error_ct_sbj = []
+# no_error_ct_sbj = []
+# error_ct_sbj = []
 
-for sub in np.unique(np.array(data_choice_level_df_2['subjects'])):
-    dat_sbj  = data_choice_level_df_2[data_choice_level_df_2['subjects']==sub].sort_values(["puzzleID","index"])
+for sub in np.unique(np.array(sc_data_choice_level['subjects'])):
+    
+#     dat_sbj  = data_choice_level_df_3[data_choice_level_df_3['subjects']==sub].sort_values(["puzzleID","index"])
         
     error_ct_pz = [] # to start 1 # to non-start 2
     no_error_ct_pz = [] # to start 1 # to non-start 2
     
-    for pzi in np.unique(data_choice_level_df_2['puzzleID']):
-        dat_sbj_pzi = dat_sbj[dat_sbj['puzzleID'] == pzi].reset_index()
+    for pzi in np.unique(sc_data_choice_level['puzzleID']):
         
-        index=1
+        dat_sbj_pzi = sc_data_choice_level[(sc_data_choice_level['puzzleID'] == pzi)&(sc_data_choice_level['subjects']==sub)].reset_index()
         
+        index = 1 
         while index < len(dat_sbj_pzi):
 #             print('*'*40)
 #             print( len(dat_sbj_pzi))
@@ -1723,7 +1706,7 @@ for sub in np.unique(np.array(data_choice_level_df_2['subjects'])):
                 index_temp = index
                 
                 while dat_sbj_pzi.lastUndo[index] != 1:
-                    index +=1
+                    index +=1 # exclude laterUndo automatically
                     
                 pend = np.double((dat_sbj_pzi.currNumCities[index]-1)/(mas_map[pzi]-1)!=0)    
                 if dat_sbj_pzi.severityOfErrors[index_temp-1]==0: # if no error
@@ -1732,7 +1715,8 @@ for sub in np.unique(np.array(data_choice_level_df_2['subjects'])):
                     error_ct_pz.append(pend+1)# to start 1 # to non-start 2
                     
             # ==================== no undo
-            else: 
+#             else:
+            elif (dat_sbj_pzi.firstUndo[index] == 0)&(dat_sbj_pzi.currNumCities[index-1] > 1): 
                 pend = 0 
                 if dat_sbj_pzi.severityOfErrors[index-1]==0:
                     no_error_ct_pz.append(pend)# did not undo 0 # to start 1 # to non-start 2
@@ -1756,12 +1740,134 @@ print((np.array(error_mat)==2).mean())
 print((np.array(no_error_mat)==1).mean())
 print((np.array(no_error_mat)==2).mean())
 
-np.array(error_mat)==1
-
 print(len(np.array(error_mat)==1))
 print(len(np.array(error_mat)==2))
-print(len(np.array(no_error_mat)==1))
 print(len(np.array(no_error_mat)==2))
+print(len(np.array(no_error_mat)))
+print(skip_count)
+
+# +
+dat1 = np.double(np.array(no_error_mat)==1)
+dat2 = np.double(np.array(no_error_mat)==2)
+n1 = dat1.shape[0]
+p1 = np.sum(dat1)/n1
+n2 = dat2.shape[0]
+p2 = np.sum(dat2)/n2
+
+p = (n1*p1 + n2*p2) / (n1+n2)
+
+z = (p1-p2)/np.sqrt(p*(1-p) *(1/n1+1/n2))
+
+stats.norm.sf(abs(z))*2
+
+# +
+dat1 = np.double(np.array(error_mat)==1)
+dat2 = np.double(np.array(error_mat)==2)
+n1 = dat1.shape[0]
+p1 = np.sum(dat1)/n1
+n2 = dat2.shape[0]
+p2 = np.sum(dat2)/n2
+
+p = (n1*p1 + n2*p2) / (n1+n2)
+
+z = (p1-p2)/np.sqrt(p*(1-p) *(1/n1+1/n2))
+
+stats.norm.sf(abs(z))*2
+# -
+
+# ##### all data - dq
+
+# +
+# FROM EACH SUBJECT
+list_start = []
+list_nostart = []
+for i in np.unique(np.array(data_choice_level_df_2['subjects'])):
+
+    for j in np.unique(data_choice_level_df_2['puzzleID']):
+
+        dat_sbj_pzi =  data_choice_level_df_2[(data_choice_level_df_2.subjects == i)&(data_choice_level_df_2.puzzleID == j)].reset_index()
+
+        # NO error --------------------------------------------------
+        index_error = dat_sbj_pzi['severityOfErrors'].index[(dat_sbj_pzi['severityOfErrors'] == 0)&(dat_sbj_pzi['submit'] != 1)]
+        index_error = np.array(index_error)
+        index_error += 1
+        if np.any(index_error>(dat_sbj_pzi.shape[0]-1)):
+            index_error = np.delete(index_error, np.where(index_error>(dat_sbj_pzi.shape[0]-1)))
+
+        for ind in index_error:    
+            if (dat_sbj_pzi.firstUndo[ind] == 0)&(dat_sbj_pzi.lastUndo[ind] == 0)&(dat_sbj_pzi.currNumCities[ind-1] > 1):
+                list_start.append(0)
+                list_nostart.append(0)
+            elif (dat_sbj_pzi['firstUndo'][ind] == 1)&(dat_sbj_pzi['lastUndo'][ind] != 1):
+                while dat_sbj_pzi.lastUndo[ind] != 1:
+                    ind = ind + 1
+                if (dat_sbj_pzi['currNumCities'][ind] == 1):
+                    list_start.append(1)
+                    list_nostart.append(0)
+                elif (dat_sbj_pzi['currNumCities'][ind] > 1):
+                    list_start.append(0)
+                    list_nostart.append(1)
+    
+count_start = sum(list_start)
+count_nostart = sum(list_nostart)
+print([count_start/len(list_start),count_nostart/len(list_nostart)])
+
+
+# -
+
+stat, pval = proportions_ztest([count_start,count_nostart], [len(list_start),len(list_nostart)])
+print('{0:0.3f}'.format(pval))
+
+# ##### averaged within subject
+
+# +
+# FROM EACH SUBJECT
+dat_subjects = []
+for i in np.unique(np.array(data_choice_level_df_2['subjects'])):
+    
+    temp_data = []
+    for j in np.unique(sc_data_choice_level['puzzleID']):
+        
+        no_undo = 0
+        undo_start = 0
+        undo_nostart = 0
+    
+        index_sub_puz =  data_choice_level_df_2.index[(data_choice_level_df_2.subjects == i)&(data_choice_level_df_2.puzzleID == j)]
+
+        # NO error --------------------------------------------------
+        index_error = data_choice_level_df_2['severityOfErrors'].index[data_choice_level_df_2['severityOfErrors'] == 0]
+        index_error = np.array(index_error)
+        index_error = np.intersect1d(index_error, index_sub_puz)
+        index_error += 1
+        if np.any(index_error>(data_choice_level_df_2.shape[0]-1)):
+            index_error = np.delete(index_error, np.where(index_error>(data_choice_level_df_2.shape[0]-1)))
+
+        n_move = len(index_error) # number of all moves
+        for ind in index_error:
+            run = 1
+            if data_choice_level_df_2['firstUndo'][ind] == 0:
+                no_undo = no_undo + 1
+            elif (data_choice_level_df_2['firstUndo'][ind] == data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+                n_move = n_move - 1
+            elif (data_choice_level_df_2['firstUndo'][ind] != data_choice_level_df_2['lastUndo'][ind])&(data_choice_level_df_2['firstUndo'][ind] == 1):
+                while run == 1:
+                    ind = ind + 1
+                    if (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] == 1):
+                        undo_start = undo_start + 1
+                        run = 0
+                    elif (data_choice_level_df_2['lastUndo'][ind] == 1)&(data_choice_level_df_2['currNumCities'][ind] > 1):
+                        undo_nostart = undo_nostart + 1
+                        run = 0
+
+        if n_move == 0:
+            continue
+        else:
+            temp_data_puz = [no_undo/n_move,undo_start/n_move,undo_nostart/n_move]
+        temp_data.append(temp_data_puz)
+        
+    dat_subjects.append(np.nanmean(temp_data,axis=0))
+
+dat_subjects = np.array(dat_subjects)
 
 # +
 # %matplotlib notebook
@@ -1801,7 +1907,7 @@ axs.set_title(r"$p = {0:s}$".format(as_si(p1,1)))
 # fig.set_figheight(4)
 # fig.set_figwidth(3)
 plt.show()
-fig.savefig(out_dir + 'undo_prob_no_instant_error_target.png', dpi=600, bbox_inches='tight')
+# fig.savefig(out_dir + 'undo_prob_no_instant_error_target.png', dpi=600, bbox_inches='tight')
 
 # -
 
