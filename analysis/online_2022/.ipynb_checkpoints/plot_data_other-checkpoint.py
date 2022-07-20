@@ -188,7 +188,7 @@ bx = sns.barplot(x='mas', y='numFullUndo', data = single_condition_data, color =
 
 # ## benefits of undo - num of full undoing
 
-# ### averaged within puzzle, subject, average within each number of undo category
+# ### averaged within subject, average within each number of undo category
 
 # +
 numFullUndo_bin = np.array(puzzleID_order_data[puzzleID_order_data.condition == 1]['numFullUndo'])
@@ -205,7 +205,7 @@ dat = pd.DataFrame({'subjects':subjectID, 'puzzleID':puzzleID,
                     'benefit_undo':benefit_undo})
 # -
 
-benefit_sub = dat.groupby(['puzzleID','subjects','numFullUndo_bin'])['benefit_undo'].mean().groupby(['subjects','numFullUndo_bin']).mean().groupby(['numFullUndo_bin'])
+benefit_sub = dat.groupby(['subjects','numFullUndo_bin'])['benefit_undo'].mean().groupby(['numFullUndo_bin'])
 benefit_sub.count()
 
 # +

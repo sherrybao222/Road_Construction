@@ -15,7 +15,7 @@
 
 # + [markdown] toc=true
 # <h1>Table of Contents<span class="tocSkip"></span></h1>
-# <div class="toc"><ul class="toc-item"><li><span><a href="#action-RT" data-toc-modified-id="action-RT-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>action RT</a></span><ul class="toc-item"><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-1.1"><span class="toc-item-num">1.1&nbsp;&nbsp;</span>average within subject</a></span><ul class="toc-item"><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-1.1.1"><span class="toc-item-num">1.1.1&nbsp;&nbsp;</span>bar plot</a></span></li><li><span><a href="#box-and-whisker-plot" data-toc-modified-id="box-and-whisker-plot-1.1.2"><span class="toc-item-num">1.1.2&nbsp;&nbsp;</span>box and whisker plot</a></span></li></ul></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-1.2"><span class="toc-item-num">1.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#different-types-of-undoing-RT" data-toc-modified-id="different-types-of-undoing-RT-2"><span class="toc-item-num">2&nbsp;&nbsp;</span>different types of undoing RT</a></span><ul class="toc-item"><li><span><a href="#averaged-within-subject" data-toc-modified-id="averaged-within-subject-2.1"><span class="toc-item-num">2.1&nbsp;&nbsp;</span>averaged within subject</a></span><ul class="toc-item"><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-2.1.1"><span class="toc-item-num">2.1.1&nbsp;&nbsp;</span>bar plot</a></span></li><li><span><a href="#box-plot" data-toc-modified-id="box-plot-2.1.2"><span class="toc-item-num">2.1.2&nbsp;&nbsp;</span>box plot</a></span></li></ul></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-2.2"><span class="toc-item-num">2.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#branching-node-RT" data-toc-modified-id="branching-node-RT-3"><span class="toc-item-num">3&nbsp;&nbsp;</span>branching node RT</a></span><ul class="toc-item"><li><span><a href="#GLMM" data-toc-modified-id="GLMM-3.1"><span class="toc-item-num">3.1&nbsp;&nbsp;</span>GLMM</a></span></li><li><span><a href="#average-within-puzzle-and-subject" data-toc-modified-id="average-within-puzzle-and-subject-3.2"><span class="toc-item-num">3.2&nbsp;&nbsp;</span>average within puzzle and subject</a></span></li><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-3.3"><span class="toc-item-num">3.3&nbsp;&nbsp;</span>average within subject</a></span><ul class="toc-item"><li><span><a href="#box-plot" data-toc-modified-id="box-plot-3.3.1"><span class="toc-item-num">3.3.1&nbsp;&nbsp;</span>box plot</a></span></li><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-3.3.2"><span class="toc-item-num">3.3.2&nbsp;&nbsp;</span>bar plot</a></span></li></ul></li><li><span><a href="#average-within-puzzle" data-toc-modified-id="average-within-puzzle-3.4"><span class="toc-item-num">3.4&nbsp;&nbsp;</span>average within puzzle</a></span><ul class="toc-item"><li><span><a href="#box-plot" data-toc-modified-id="box-plot-3.4.1"><span class="toc-item-num">3.4.1&nbsp;&nbsp;</span>box plot</a></span></li><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-3.4.2"><span class="toc-item-num">3.4.2&nbsp;&nbsp;</span>bar plot</a></span></li></ul></li></ul></li></ul></div>
+# <div class="toc"><ul class="toc-item"><li><span><a href="#action-RT" data-toc-modified-id="action-RT-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>action RT</a></span><ul class="toc-item"><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-1.1"><span class="toc-item-num">1.1&nbsp;&nbsp;</span>average within subject</a></span><ul class="toc-item"><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-1.1.1"><span class="toc-item-num">1.1.1&nbsp;&nbsp;</span>bar plot</a></span></li><li><span><a href="#box-and-whisker-plot" data-toc-modified-id="box-and-whisker-plot-1.1.2"><span class="toc-item-num">1.1.2&nbsp;&nbsp;</span>box and whisker plot</a></span></li></ul></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-1.2"><span class="toc-item-num">1.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#different-types-of-undoing-RT" data-toc-modified-id="different-types-of-undoing-RT-2"><span class="toc-item-num">2&nbsp;&nbsp;</span>different types of undoing RT</a></span><ul class="toc-item"><li><span><a href="#averaged-within-subject" data-toc-modified-id="averaged-within-subject-2.1"><span class="toc-item-num">2.1&nbsp;&nbsp;</span>averaged within subject</a></span><ul class="toc-item"><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-2.1.1"><span class="toc-item-num">2.1.1&nbsp;&nbsp;</span>bar plot</a></span></li><li><span><a href="#box-plot" data-toc-modified-id="box-plot-2.1.2"><span class="toc-item-num">2.1.2&nbsp;&nbsp;</span>box plot</a></span></li></ul></li><li><span><a href="#[discarded]-average-all-data-points" data-toc-modified-id="[discarded]-average-all-data-points-2.2"><span class="toc-item-num">2.2&nbsp;&nbsp;</span>[discarded] average all data points</a></span></li></ul></li><li><span><a href="#branching-node-RT" data-toc-modified-id="branching-node-RT-3"><span class="toc-item-num">3&nbsp;&nbsp;</span>branching node RT</a></span><ul class="toc-item"><li><span><a href="#GLMM" data-toc-modified-id="GLMM-3.1"><span class="toc-item-num">3.1&nbsp;&nbsp;</span>GLMM</a></span></li><li><span><a href="#average-within-puzzle-and-subject" data-toc-modified-id="average-within-puzzle-and-subject-3.2"><span class="toc-item-num">3.2&nbsp;&nbsp;</span>average within puzzle and subject</a></span></li><li><span><a href="#average-within-subject" data-toc-modified-id="average-within-subject-3.3"><span class="toc-item-num">3.3&nbsp;&nbsp;</span>average within subject</a></span><ul class="toc-item"><li><span><a href="#box-plot" data-toc-modified-id="box-plot-3.3.1"><span class="toc-item-num">3.3.1&nbsp;&nbsp;</span>box plot</a></span></li><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-3.3.2"><span class="toc-item-num">3.3.2&nbsp;&nbsp;</span>bar plot</a></span></li></ul></li><li><span><a href="#average-within-puzzle" data-toc-modified-id="average-within-puzzle-3.4"><span class="toc-item-num">3.4&nbsp;&nbsp;</span>average within puzzle</a></span><ul class="toc-item"><li><span><a href="#box-plot" data-toc-modified-id="box-plot-3.4.1"><span class="toc-item-num">3.4.1&nbsp;&nbsp;</span>box plot</a></span></li><li><span><a href="#bar-plot" data-toc-modified-id="bar-plot-3.4.2"><span class="toc-item-num">3.4.2&nbsp;&nbsp;</span>bar plot</a></span></li></ul></li></ul></li><li><span><a href="#first-RT-and-numUndo" data-toc-modified-id="first-RT-and-numUndo-4"><span class="toc-item-num">4&nbsp;&nbsp;</span>first RT and numUndo</a></span></li></ul></div>
 
 # +
 import pandas as pd
@@ -60,8 +60,10 @@ data_puzzle_level = pd.read_csv(R_out_dir +  'data.csv')
 puzzleID_order_data = data_puzzle_level.sort_values(["subjects","puzzleID","condition"])
 data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data.csv')
 
-single_condition_data = puzzleID_order_data[puzzleID_order_data['condition']==1].copy()
-single_condition_data = single_condition_data.reset_index()
+basic_condition_data = puzzleID_order_data[puzzleID_order_data['condition']==0].copy()
+basic_condition_data = basic_condition_data.reset_index()
+undo_condition_data = puzzleID_order_data[puzzleID_order_data['condition']==1].copy()
+undo_condition_data = undo_condition_data.reset_index()
 
 
 # +
@@ -1095,6 +1097,49 @@ axs.set_ylabel('Response time (s)')
 # fig.set_figwidth(3)
 plt.show()
 # fig.savefig(out_dir + 'conditional_undo_masError.pdf', dpi=600, bbox_inches='tight')
+# -
+# # first RT and numUndo
+
+# +
+RT1_undo = undo_condition_data.groupby(['puzzleID'])['RT1'].mean()
+RT1_basic = basic_condition_data.groupby(['puzzleID'])['RT1'].mean()
+numFullUndo_sub = undo_condition_data.groupby(['puzzleID'])['numFullUndo'].mean()
+
+# %matplotlib notebook
+plt.xlabel("first-move RT")
+plt.ylabel("average number of undo")
+
+plt.scatter(RT1_undo,numFullUndo_sub, label='undo condition')
+plt.scatter(RT1_basic,numFullUndo_sub, label='basic condition')
+
+plt.legend()
+
+print(stats.spearmanr(numFullUndo_sub,RT1_undo))
+print(stats.spearmanr(numFullUndo_sub,RT1_basic))
+
+
+# +
+RT1_basic = basic_condition_data.groupby(['puzzleID'])['RT1'].mean()
+numError_sub = basic_condition_data.groupby(['puzzleID'])['numError'].mean()
+
+# %matplotlib notebook
+plt.xlabel("first-move RT")
+plt.ylabel("average number of error")
+
+plt.scatter(RT1_basic,numError_sub,label='basic condition')
+
+plt.legend()
+
+stats.spearmanr(RT1_basic,numError_sub)
+
+
+# +
+RT1_basic = basic_condition_data.groupby(['puzzleID'])['RT1'].mean()
+sumSeverityErrors_sub = basic_condition_data.groupby(['puzzleID'])['sumSeverityErrors'].mean()
+
+# %matplotlib notebook
+plt.scatter(RT1_basic,sumSeverityErrors_sub)
+stats.spearmanr(RT1_basic,sumSeverityErrors_sub)
 # -
 
 
