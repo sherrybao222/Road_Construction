@@ -962,10 +962,10 @@ if __name__ == "__main__":
     inparams_all = []
     for i in range(int(1e2)):
         inparams_ = inparams.copy()
-        inparams_[6] = np.random.choice(np.linspace(1,4 , 10000))
-        inparams_[7] = np.random.choice(np.linspace(0.1, 4, 10000))
-        inparams_[8] = np.random.choice(np.linspace(0.1, 1, 10000))
-        inparams_[9] = np.random.choice(np.linspace(-5, 0, 10000))
+        inparams_[5] = np.random.choice(np.linspace(1,4 , 10000))
+        inparams_[6] = np.random.choice(np.linspace(0.1, 4, 10000))
+        inparams_[7] = np.random.choice(np.linspace(0.1, 1, 10000))
+        inparams_[8] = np.random.choice(np.linspace(-5, 0, 10000))
         inparams_all.append(inparams_)
 
     params_name = ['stopping_probability', 'pruning_threshold', 'lapse_rate',
