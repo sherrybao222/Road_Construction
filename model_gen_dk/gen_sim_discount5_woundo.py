@@ -74,7 +74,7 @@ def gen_trials_based_on_trials(para, LL_lower, subject_data, basic_map, value_fu
     done = False
     idx = 0
     keys_to_append = subject_data.keys().to_list()
-    keys_to_append.append('value')
+    keys_to_append.append('value') # current node value
     try:
         keys_to_append.pop(keys_to_append.index('index'))
     except:
@@ -89,7 +89,7 @@ def gen_trials_based_on_trials(para, LL_lower, subject_data, basic_map, value_fu
 
 
     from contextlib import nullcontext
-    if save_total:
+    if save_total: # make videos
         vidir = dir_param + '/vid_{0:02d}'.format(save_count)
         if not os.path.exists(vidir):
             os.makedirs(vidir)
@@ -113,7 +113,7 @@ def gen_trials_based_on_trials(para, LL_lower, subject_data, basic_map, value_fu
         tots = nullcontext()
 
     with tots:
-        while not done:
+        while not done: # done for all maps
             if save_total:
                 writer = FFMpegWriter(fps=frame_rate, metadata=metadata)
                 tot = writer.saving(fig, vidir + "/gen_trial{0:02d}.mp4".format(idx), 100)
@@ -122,7 +122,7 @@ def gen_trials_based_on_trials(para, LL_lower, subject_data, basic_map, value_fu
 
             with tot:
 
-                if max_stopping:
+                if max_stopping: # for looping
                     if out_sub.shape[0] > max_trial:
                         break
                 if save_total:
@@ -162,7 +162,7 @@ def gen_trials_based_on_trials(para, LL_lower, subject_data, basic_map, value_fu
                 # print(curr_trial_id
 
                 done_trial = False
-                idff = 0
+                idff = 0 #sherry: time step
 
                 # visits_ = np.ones(30)*1e-3
                 # visits_ = np.zeros(30)
@@ -515,7 +515,7 @@ def generate_sim(t_param, save_total = False):
 
     print('###### IBS grepeats time lapse ' + str( (time.time() - start_time) *10))
 
-def generate_sim_paramsets(inparams, save_total = False,
+def generate_sim_paramsets(inparams, save_total = False, # save with video or not
                              save_dir_name = '05042022_',
                              name_model = 'power_law_free',
                              save_filename='gen',
@@ -538,13 +538,13 @@ def generate_sim_paramsets(inparams, save_total = False,
         map_tree = json.load(file)
 
     # sub_data = pd.read_csv(home_dir + input_dir + 'preprocess4_sub_unidentifiedID2_RC-Phaser_2022-01-04_11h42.26.779_REWARD426.csv')
-    sub_data = pd.read_csv(home_dir + input_dir + 'preprocess4_sub_60da65c630ff4389c297b03c_RC-phaser6_2022-01-20_21h02.32.215.csv')
+    sub_data = pd.read_csv(home_dir + input_dir + 'preprocess4_sub_60da65c630ff4389c297b03c_RC-phaser6_2022-01-20_21h02.32.215.csv') #sherry: just use it as a data structure
 
     # use only basic trials
     sub_data = sub_data.iloc[sub_data.index[sub_data.condition=='basic']]
     sub_data.reset_index()
 
-    LL_lower = np.sum([np.log(1.0 / n) for n in list(sub_data['n_within_reach']) if n != 0]) # n is 0 when it is terminal. then it would be just undo or submit. But we only count undo and clicking on the cities so submit is not our interest. it would be 1, and log would be 0.
+    # LL_lower = np.sum([np.log(1.0 / n) for n in list(sub_data['n_within_reach']) if n != 0]) # n is 0 when it is terminal. then it would be just undo or submit. But we only count undo and clicking on the cities so submit is not our interest. it would be 1, and log would be 0.
 
     params_name = params_name
 
@@ -955,6 +955,7 @@ if __name__ == "__main__":
     print(arg)
     # generate_sim(int(arg), True)
 
+    # sherry: check number of parameters
     inparams = [0,0.01,15,0.01,
                 0.15,99,
                 2, 1.14, 0.58, -0.5]
