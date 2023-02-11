@@ -51,7 +51,7 @@ n_mas = single_condition_data[single_condition_data['subjects'] == 1].groupby(['
 # %matplotlib notebook
 
 fig, axs = plt.subplots(1, 1)
-axs.bar(range(7,13),
+axs.bar(range(6,13),
         n_mas/sum(n_mas),
         color = (.7,.7,.7), 
         edgecolor = 'k',)

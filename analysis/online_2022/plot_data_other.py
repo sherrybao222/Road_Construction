@@ -14,16 +14,17 @@
 #     name: python3
 # ---
 
-# import pandas as pd
-# import numpy as np
-# import math
-#
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-#
-# import json
-# from anytree.importer import JsonImporter
-# from anytree import PreOrderIter
+# +
+import pandas as pd
+import numpy as np
+import math
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+import json
+from anytree.importer import JsonImporter
+from anytree import PreOrderIter
 
 # +
 from scipy import stats
@@ -142,7 +143,7 @@ axs.set_xticklabels([1,3,6,'9+'])
 # axs.legend()
 fig.savefig(out_dir + 'error_optimal.png', dpi=600, bbox_inches='tight')
 # -
-# ## choice: connected cities
+# ## § choice: connected cities
 
 # +
 error_step = data_choice_level[data_choice_level['condition']==0].groupby(['currNumCities'])['error'].mean().to_frame()
@@ -167,7 +168,7 @@ bx = sns.barplot(x='currNumCities', y='error', data = data_choice_level[data_cho
 
 # # numUndo distribution
 
-# ## puzzle: MAS
+# ## § puzzle: MAS
 
 # +
 undo_mas = single_condition_data.groupby(['mas'])['numFullUndo'].mean().to_frame()
@@ -778,7 +779,7 @@ scatter_hist(str_ct, end_ct, ax, ax_histx, ax_histy, alpha=0.05)
 # -
 # # Undo initial state
 
-# ## budget (before submit/undo at the end of trial)
+# ## § budget (before submit/undo at the end of trial)
 
 # +
 # only undo condition
@@ -2278,6 +2279,7 @@ axs[0].set_ylabel('probability of undo')
 
 plt.show()
 fig.savefig(out_dir + 'undo_prob_end_optimal_state.png', dpi=600, bbox_inches='tight')
+# [TODO] distribution of state/optimality itself
 # -
 
 # ## Proportion of single/sequential undo depending on end
