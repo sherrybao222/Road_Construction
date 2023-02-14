@@ -11,7 +11,7 @@ data_all = []
 # home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'
 # map_dir = 'active_map/'
 # data_dir  = 'data/preprocessed'
-home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
+home_dir = '/Users/dbao/My_Drive'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
 R_out_dir = home_dir+'R_analysis_data/choice_level/'
@@ -132,10 +132,10 @@ for i in range(len(data_all)):
         # within_reach.append(np.array(data_all[i].n_within_reach)[ti])
 
         # RT.append(np.array(data_all[i].rt_all)[ti]) # can get undoRT using undo binary
-        if np.array(data_all[i].undoIndicator & (data_all[i].n_city_all != 1))[ti]==1:
+        if np.array(data_all[i].undoIndicator )[ti]==1: # & (data_all[i].n_city_all != 1)
             undoRT.append(np.array(data_all[i].rt_all)[ti])
         else:
-            undoRT.append(-1) # if there is no undo
+            undoRT.append(np.nan) # if there is no undo -1
             
         if (data_all[i].rt_all[ti] == -1): # which means if the trial has changed / only save once per trial
             this_allMAS = data_all[i].mas_all[ti]
