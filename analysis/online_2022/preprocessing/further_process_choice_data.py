@@ -5,7 +5,7 @@ from anytree import Node, RenderTree, AsciiStyle, PreOrderIter
 import pandas as pd
 
 
-home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
+home_dir = '/Users/dbao/My_Drive'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
 out_dir = home_dir + 'figures/figures_all/'
@@ -26,6 +26,7 @@ for ti in range(len(undo_tree)): # loop through trials
     for node in PreOrderIter(root): # loop through the tree
         n_child = len(node.children)
         visit.append(node.visit)
+
         if (n_child > 1): # if it is a branching node
             
             city = node.name
@@ -35,7 +36,6 @@ for ti in range(len(undo_tree)): # loop through trials
         
             get_ind = data_choice_level.index[(data_choice_level['subjects'] == subID)&(data_choice_level['puzzleID'] == mapID)&
                                               (data_choice_level['trialID'] == trialID)&(data_choice_level['choice'] == city)].tolist()
-            
             
             data_choice_level.loc[get_ind,'branching'] = True
             data_choice_level.loc[get_ind[0],'branchingFirst'] = True # the first visit of a branching node

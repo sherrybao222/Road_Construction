@@ -19,7 +19,7 @@ data_all = []
 # home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'
 # map_dir = 'active_map/'
 # data_dir  = 'data/preprocessed'
-home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
+home_dir = '/Users/dbao/My_Drive'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
 R_out_dir = home_dir+'R_analysis_data/choice_level/'
@@ -87,7 +87,7 @@ for i in range(len(data_all)): # per subjects
         elif data_all[i]['undoIndicator'][ti]:
             current_node = current_node.parent
 
-save_path = '/Users/dbao/google_drive_db/road_construction/data/2022_online/tree_data/'    
+save_path = '/Users/dbao/My_Drive/road_construction/data/2022_online/tree_data/'    
 with open(save_path + 'basic_tree','w') as file: 
     json.dump(basic_tree,file)
 with open(save_path + 'undo_tree','w') as file: 
