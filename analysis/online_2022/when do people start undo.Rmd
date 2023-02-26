@@ -1,0 +1,205 @@
+# setup
+## load
+```{r}
+rm(list=ls())
+
+knitr::opts_chunk$set(echo = FALSE)
+
+library(lme4)
+library(statmod)
+library(DHARMa)
+library(brms)
+library(glmmTMB)
+
+pathToFolder <- "/Users/dbao/My_Drive/road_construction/data/2022_online/"
+save_folder <- file.path(pathToFolder, 'stat_model')
+
+data_puzzle_level <- read.csv(file.path(pathToFolder, 'R_analysis_data/data.csv'))
+data_choice_level <- read.csv(file.path(pathToFolder, 'R_analysis_data/choice_level/choicelevel_data.csv'))
+```
+
+## transform data
+```{r}
+data_choice_level$subjects <- factor(data_choice_level$subjects)
+data_choice_level$firstUndo <- factor(data_choice_level$firstUndo)
+
+data_puzzle_level$subjects <- factor(data_puzzle_level$subjects)
+```
+
+# more undos till the end
+## number of cities within reach
+```{r}
+idx = (data_choice_level['condition']==1)&(data_choice_level['currNumCities']!=1)
+data_subset = data_choice_level[idx, c("within_reach","firstUndo", "subjects", "leftover")]
+```
+
+```{r}
+# model_undo <- lme4::glmer(firstUndo ~  1 + log(1+within_reach) + (1|subjects),
+#                   data = data_subset, family = binomial(link="cloglog"))
+model_undo <- glm(firstUndo ~  1 + sqrt(within_reach),
+                  data = data_subset, family = binomial)
+summary(model_undo)
+simulationOutput <- simulateResiduals(fittedModel = model_undo, plot = F)
+```
+
+```{r}
+plot(simulationOutput)
+```
+
+```{r}
+ita <- predict(model_undo)
+working_resi <- resid(model_undo, type="working")
+working_resp <- ita + working_resi
+plot(working_resp, ita)
+```
+## remaining budget
+```{r}
+model_undo = glm(firstUndo ~  1 + sqrt(leftover),
+                                  data = data_subset, family = "binomial")
+
+# get the coefficients for the best fitting model
+summary(model_undo)
+simulationOutput <- simulateResiduals(fittedModel = model_undo, plot = F)
+```
+```{r}
+plot(simulationOutput)
+```
+```{r}
+ita <- predict(model_undo)
+working_resi <- resid(model_undo, type="working")
+working_resp <- ita + working_resi
+plot(working_resp, ita)
+
+```
+## end state/ non-end
+```{r}
+idx = (data_choice_level['condition']==1)&(data_choice_level['currNumCities']!=1)
+data_subset = data_choice_level[idx,]
+
+end = (data_subset$checkEnd == 1)&(data_subset$submit != 1)
+index_undo = as.numeric(rownames(data_subset[end,])) + 1
+invalid = setdiff(index_undo, as.numeric(rownames(data_subset)))
+index_undo_valid = setdiff(index_undo, invalid)
+df_end_undo = data_choice_level[index_undo_valid, c('firstUndo','subjects','puzzleID')]
+
+notend = (data_subset$checkEnd != 1)&(data_subset$submit != 1)
+index_undo = as.numeric(rownames(data_subset[notend,])) + 1
+invalid = setdiff(index_undo, as.numeric(rownames(data_subset)))
+index_undo_valid = setdiff(index_undo, invalid)
+df_notend_undo = data_choice_level[index_undo_valid, c('firstUndo','subjects','puzzleID')]
+
+df_end_undo["type"] = "terminal"
+df_notend_undo["type"] = "non-terminal"
+undo_end_df = rbind(df_end_undo, df_notend_undo)
+```
+
+```{r}
+model_undo_end = glm(firstUndo ~  1 + type,
+                                  data = undo_end_df, family = "binomial")
+
+# get the coefficients for the best fitting model
+summary(model_undo_end)
+simulationOutput <- simulateResiduals(fittedModel = model_undo_end, plot = F)
+```
+```{r}
+plot(simulationOutput)
+testOutliers(simulationOutput)
+outliers(simulationOutput)
+```
+
+# dissatisfaction with the number of connected cities at the end, when there are no 
+## current number of connected citie at the end
+```{r}
+# undo ----
+index_first_undo =  as.numeric(rownames(data_choice_level[data_choice_level['undo'] == 1,])) # undo, not necessarily the first undo 
+df_beforeUndo = data_choice_level[index_first_undo-1,] # index before that
+df_beforeUndo = df_beforeUndo[df_beforeUndo$currMas == df_beforeUndo$allMAS,] # there are no errors
+index_end_undo = as.numeric(rownames(df_beforeUndo[df_beforeUndo['checkEnd'] == 1,])) # end of trial
+currNumCities_undo = data_choice_level[index_end_undo,c('currNumCities','subjects','puzzleID','leftover')] # remaining budget
+
+# submit ----
+index_notundo = as.numeric(rownames(data_choice_level[(data_choice_level['submit'] == 1)&(data_choice_level['condition'] == 1),])) # submit
+df_notbeforeUndo = data_choice_level[index_notundo-1,]
+df_notbeforeUndo = df_notbeforeUndo[df_notbeforeUndo$currMas == df_notbeforeUndo$allMAS,]
+index_end_notundo = as.numeric(rownames(df_notbeforeUndo[(df_notbeforeUndo['checkEnd'] == 1),]))
+currNumCities_notundo = data_choice_level[index_end_notundo,c('currNumCities','subjects','puzzleID','leftover')]
+
+currNumCities_undo['submit'] = 0
+currNumCities_notundo['submit'] = 1
+currNumCities_df = rbind(currNumCities_undo, currNumCities_notundo)
+
+```
+
+```{r}
+
+model_submit1 = lme4::glmer(submit ~  1 + currNumCities + (1 |subjects),
+                                  data = currNumCities_df, family = "binomial")
+summary(model_submit1)
+simulationOutput <- simulateResiduals(fittedModel = model_submit1, plot = F)
+```
+
+https://stats.stackexchange.com/questions/531601/dharma-quantile-deviations-detected
+```{r}
+plot(simulationOutput)
+testQuantiles(simulationOutput, currNumCities_df$currNumCities)
+testDispersion(simulationOutput)
+```
+
+## remaining budget at the end of trial 
+
+```{r}
+model_submit2 = lme4::glmer(submit ~  1 + sqrt(leftover) + (1 |subjects),
+                                  data = currNumCities_df, family = "binomial")
+summary(model_submit2)
+simulationOutput <- simulateResiduals(fittedModel = model_submit2, plot = F)
+
+```
+
+```{r}
+plot(simulationOutput)
+testQuantiles(simulationOutput, sqrt(currNumCities_df$leftover))
+testDispersion(simulationOutput)
+
+```
+
+## both
+```{r}
+model_submit3 = lme4::glmer(submit ~  1 + currNumCities + sqrt(leftover) + (1 |subjects),
+                                  data = currNumCities_df, family = "binomial")
+summary(model_submit3)
+simulationOutput <- simulateResiduals(fittedModel = model_submit3, plot = F)
+
+```
+```{r}
+plot(simulationOutput)
+testDispersion(simulationOutput)
+
+```
+
+```{r}
+anova(model_submit1, model_submit3, test="Chisq")
+anova(model_submit2, model_submit3, test="Chisq")
+```
+
+## puzzle MAS
+```{r}
+single_condition_data = data_puzzle_level[(data_puzzle_level['condition']==1), c("mas", "subjects", "numFullUndo")]
+```
+
+```{r}
+model_undo_brms = glmmTMB(numFullUndo ~  1  + mas ,
+                                  data = single_condition_data,  
+                                  ziformula=~1,
+                                  family = "nbinom1")
+```
+
+```{r}
+summary(model_undo_brms)
+simulationOutput <- simulateResiduals(fittedModel = model_undo_brms, plot = F)
+
+```
+```{r}
+plot(simulationOutput)
+
+```
+

@@ -59,3 +59,4 @@ rc_all_data/
 rushhour/
 model/output.txt
 *.pyc
+.Rproj.user
