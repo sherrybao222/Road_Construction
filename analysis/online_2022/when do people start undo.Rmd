@@ -30,7 +30,8 @@ data_puzzle_level$subjects <- factor(data_puzzle_level$subjects)
 ## number of cities within reach
 ```{r}
 idx = (data_choice_level['condition']==1)&(data_choice_level['currNumCities']!=1)
-data_subset = data_choice_level[idx, c("within_reach","firstUndo", "subjects", "leftover")]
+data_subset = data_choice_level[idx, c("subjects", "within_reach","leftover", "currNumCities","allMAS","firstUndo")]
+data_subset["step"] = data_subset$currNumCities / data_subset$allMAS
 ```
 
 ```{r}
@@ -71,6 +72,19 @@ working_resp <- ita + working_resi
 plot(working_resp, ita)
 
 ```
+## step
+```{r}
+model_undo = glm(firstUndo ~  1 + step ,
+                                  data = data_subset, family = "binomial")
+
+# get the coefficients for the best fitting model
+summary(model_undo)
+simulationOutput <- simulateResiduals(fittedModel = model_undo, plot = F)
+```
+```{r}
+plot(simulationOutput)
+```
+
 ## end state/ non-end
 ```{r}
 idx = (data_choice_level['condition']==1)&(data_choice_level['currNumCities']!=1)
@@ -201,5 +215,49 @@ simulationOutput <- simulateResiduals(fittedModel = model_undo_brms, plot = F)
 ```{r}
 plot(simulationOutput)
 
+```
+# when errors
+## step
+
+```{r}
+idx = (data_choice_level['condition']==0)&(data_choice_level['within_reach']!=0)
+data_subset = data_choice_level[idx, ]
+data_subset["step"] = data_subset$currNumCities / data_subset$allMAS
+```
+
+```{r}
+model_undo = lme4::glmer(error ~  1 + step + (1|subjects),
+                                  data = data_subset, family = "binomial")
+
+# get the coefficients for the best fitting model
+summary(model_undo)
+simulationOutput <- simulateResiduals(fittedModel = model_undo, plot = F)
+```
+
+```{r}
+plot(simulationOutput)
+
+```
+
+# made errors
+## sum of severity of error until last step
+
+```{r}
+idx = (data_choice_level['condition']==1)&(data_choice_level['currNumCities']!=1)&(data_choice_level['submit']!=1)
+index_error =  as.numeric(rownames(data_choice_level[idx,]))
+total_error = data_choice_level[index_error,'allMAS'] - data_choice_level[index_error,'currMas']
+
+df_error_undo = data_choice_level[index_error+1, c('subjects','puzzleID', "firstUndo")]
+df_error_undo["accumulatedError"] = total_error
+```
+
+```{r}
+model_error_undo = lme4::glmer(firstUndo ~  1 + log(accumulatedError+1) + (1|subjects),
+                                  data = df_error_undo, family = "binomial")
+summary(model_error_undo)
+simulationOutput <- simulateResiduals(fittedModel = model_error_undo, plot = F)
+```
+```{r}
+plot(simulationOutput)
 ```
 
