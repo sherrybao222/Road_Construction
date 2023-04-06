@@ -42,18 +42,18 @@ import pylab as py
 from rpy2.robjects.packages import importr
 # import R's "base" package
 lme4 = importr('lme4')
-optimx = importr('optimx')
-pbkrtest = importr('pbkrtest')
-lmerTest = importr('lmerTest')
-ggplot = importr('ggplot2')
-dplyr = importr('dplyr')
-sjplot = importr('sjPlot')
-car = importr('car')
+#optimx = importr('optimx')
+#pbkrtest = importr('pbkrtest')
+#lmerTest = importr('lmerTest')
+#ggplot = importr('ggplot2')
+#dplyr = importr('dplyr')
+#sjplot = importr('sjPlot')
+#car = importr('car')
 # fitdistrplus = importr('fitdistrplus')
-boot = importr('boot')
+#boot = importr('boot')
 # -
 
-home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
+home_dir = '/Users/dbao/My_Drive'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
 out_dir = home_dir + 'figures/cogsci_2022/'
@@ -2474,8 +2474,8 @@ plt.figure()
 plt.bar(range(3), np.mean(accu_error_3_p,axis=0),
         color=[.7,.7,.7], edgecolor = 'k', 
         yerr=np.std(accu_error_3_p,axis = 0)/np.sqrt(accu_error_3_p.shape[0]))
-plt.xticks([0,1,2], ['undo too many','undo right','undo too few'])
-plt.ylabel('probability')
+plt.xticks([0,1,2], ['Undo too many','Undo right','Undo too few'])
+plt.ylabel('Proportion')
 
 # ### When undo target is the start 
 
@@ -2525,8 +2525,8 @@ plt.figure()
 plt.bar(range(2), np.mean(accu_error_2_p,axis=0),
         color=[.7,.7,.7], edgecolor = 'k', 
         yerr=np.std(accu_error_2_p,axis = 0)/np.sqrt(accu_error_2_p.shape[0]))
-plt.xticks([0,1], ['undo too many','undo right'])
-plt.ylabel('probability')
+plt.xticks([0,1], ['Undo too many','Undo right'])
+plt.ylabel('Proportion')
 
 # # Branching node
 
