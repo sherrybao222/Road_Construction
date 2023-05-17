@@ -8,7 +8,7 @@ import pandas as pd
 data_all = []
 
 # directories
-home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
+home_dir = '/Users/dbao/My_Drive'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
 # home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'
@@ -190,7 +190,7 @@ headerList = ['subjects', 'puzzleID',
               'tortuosity']
 subjects = []
 for i in range(len(data_all)):
-    subjects.extend(((np.ones(len(np.unique(np.array(data_all[i].trial_id))))*(i+1)).astype(np.int16).tolist()))
+    subjects.extend(((np.ones(len(np.unique(np.array(data_all[i].trial_id))))*(i)).astype(np.int16).tolist())) #i+1
 data = [subjects]
 dataList = [np.array(puzzleID).astype(np.int16), 
             np.array(reward).astype(np.int16), np.array(numCities).astype(np.int16), np.array(mas).astype(np.int16), 
@@ -206,6 +206,6 @@ data = np.array(data).transpose()
 
 np.savetxt(R_out_dir + 'data.csv',data,delimiter=',', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f, %f', header=",".join(headerList),comments='')
 
-headerList_ = [" ", *headerList]
-np.savetxt(R_out_dir + 'data.txt',data,delimiter=' ', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f, %f', header=" ".join(headerList_),comments='')
+# headerList_ = [" ", *headerList]
+# np.savetxt(R_out_dir + 'data.txt',data,delimiter=' ', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f, %f', header=" ".join(headerList_),comments='')
 
