@@ -16,19 +16,19 @@ with open(home_dir +'tree_data/basic_tree', 'r') as file:
 with open(home_dir +'tree_data/undo_tree', 'r') as file:
     undo_tree = json.load(file)
 
-data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data.csv')
+data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data.csv', index_col=0)
 
 importer = JsonImporter()
 visit = []
-for ti in range(len(undo_tree)): # loop through trials
+
+for ti in range(1,2): # loop through trials len(undo_tree)
     root = importer.import_(undo_tree[ti])
-    
+    print(RenderTree(root, style=AsciiStyle()))
     for node in PreOrderIter(root): # loop through the tree
         n_child = len(node.children)
         visit.append(node.visit)
 
         if (n_child > 1): # if it is a branching node
-            
             city = node.name
             mapID = node.mapID
             subID = node.subID

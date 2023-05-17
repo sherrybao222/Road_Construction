@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Sat Feb 26 13:20:26 2022
 
@@ -37,22 +35,23 @@ basic_tree = []
 undo_tree = []
 for i in range(len(data_all)): # per subjects
     subID = i
-    current_trialID = int(data_all[i]['trial_id'][0])
+    current_trialID = int(data_all[i]['trial_id'][0]) # start of subject data
     current_mapID = int(data_all[i]['map_id'][0])
     current_condition = data_all[i]['condition'][0]
     
     for ti in range(data_all[i].shape[0]): # per choice
-        trialID = int(data_all[i]['trial_id'][ti])
+        trialID = int(data_all[i]['trial_id'][ti]) # each choice
         mapID = int(data_all[i]['map_id'][ti])
         condition = data_all[i]['condition'][ti]
 
-        if ti == 0: # start of subject data
+        if ti == 0: # start of subject data, first puzzle
 
             start_node = Node(0, budget = 300, RT= - 1, subID=subID, trialID=current_trialID, mapID = current_mapID,visit=1)
             current_node = start_node
         
-        elif (trialID!=current_trialID)|(mapID!=current_mapID)|(condition!=current_condition): # start of trial
+        elif (trialID!=current_trialID)|(mapID!=current_mapID)|(condition!=current_condition): # next puzzle
             
+            # save the current tree
             exporter = JsonExporter(indent=2, sort_keys=True)
             json_trial = exporter.export(start_node)
 
@@ -60,7 +59,8 @@ for i in range(len(data_all)): # per subjects
                 basic_tree.append(json_trial)
             elif current_condition == "undo":
                 undo_tree.append(json_trial)
-                
+            
+            # start a new tree
             current_trialID = trialID
             current_mapID = mapID
             current_condition = condition
@@ -68,23 +68,22 @@ for i in range(len(data_all)): # per subjects
             start_node = Node(0, budget = 300, RT= - 1, subID=subID, trialID=current_trialID, mapID = current_mapID,visit=1)
             current_node = start_node
             
-        elif not data_all[i]['undoIndicator'][ti]:
+        elif not data_all[i]['undoIndicator'][ti]: # not undo, just a move
             budget = float(data_all[i]['currentBudget'][ti])
             RT = int(data_all[i]['rt_all'][ti])
             city = int(data_all[i]['currentChoice'][ti])  
-            
-            indicator = 0
 
-            for child in current_node.children:
+            node_exist = 0
+            for child in current_node.children: # check if the node already exists
                 if (child.name == city)&(child.budget == budget):
                     child.visit = child.visit+1
                     current_node = child
-                    indicator = 1      
-            if not indicator:     
-                new_node = Node(city, budget = budget, RT= RT, subID=subID, trialID=current_trialID, mapID = current_mapID, parent = current_node,visit=1)
+                    node_exist = 1  
+            if not node_exist: # expand the tree
+                new_node = Node(city, budget = budget, RT= RT, subID=subID, trialID=current_trialID, mapID = current_mapID, parent = current_node, visit=1)
                 current_node = new_node
-            
-        elif data_all[i]['undoIndicator'][ti]:
+
+        elif data_all[i]['undoIndicator'][ti]: # undo
             current_node = current_node.parent
 
 save_path = '/Users/dbao/My_Drive/road_construction/data/2022_online/tree_data/'    
