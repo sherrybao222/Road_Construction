@@ -1,0 +1,65 @@
+---
+title: "final_statistics"
+author: "sherry"
+date: "2023-06-19"
+output: html_document
+---
+# setup
+## load
+```{r}
+rm(list=ls())
+
+knitr::opts_chunk$set(echo = FALSE)
+
+library(DHARMa)
+
+pathToFolder <- "/Users/dbao/My_Drive/road_construction/data/2022_online/"
+save_folder <- file.path(pathToFolder, 'stat_model/final/')
+```
+# When do people undo?
+## Error correction efficiency
+### Make errors at the beginning
+#### Basic condition (supp)
+```{r}
+load(file.path(save_folder, 'model_error_step_basic_condition.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_error, n = 1000, plot = F)
+plot(simulationOutput)
+```
+#### Undo condition
+```{r}
+load(file.path(save_folder, 'model_error_step_undo_condition.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_error, n = 1000, plot = F)
+plot(simulationOutput)
+```
+#### Given undo (supp)
+```{r}
+load(file.path(save_folder, 'model_error_step_given_undo.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_error, n = 1000, plot = F)
+plot(simulationOutput)
+```
+### Undo at the end
+#### Across step
+```{r}
+load(file.path(save_folder, 'model_undo_step.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
+plot(simulationOutput)
+```
+### Sequential - error magnitude
+#### Probability
+```{r}
+load(file.path(save_folder, 'model_undo_error_magnitude.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
+plot(simulationOutput)
+```
+
+```{r}
+load(file.path(save_folder, 'model_sequential_undo_error_magnitude.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
+plot(simulationOutput)
+```
+```{r}
+load(file.path(save_folder, 'model_single_undo_error_magnitude.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
+plot(simulationOutput)
+```
+
