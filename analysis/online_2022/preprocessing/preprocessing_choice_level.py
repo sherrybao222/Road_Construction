@@ -214,7 +214,7 @@ data = np.array(data).transpose()
 
 df = pd.DataFrame(data)
 df.columns = headerList
-df.to_csv(R_out_dir + 'choicelevel_data.csv', index=False)
+df.to_csv(R_out_dir + 'choicelevel_data_without_tree.csv', index=False)
 
 # np.savetxt(R_out_dir + 'choicelevel_data.csv',data, delimiter=',',fmt='%d,%d,%d,%d, %s,%d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=",".join(headerList),comments='')
 # headerList_ = [" ", *headerList]

@@ -16,7 +16,7 @@ with open(home_dir +'tree_data/basic_tree', 'r') as file:
 with open(home_dir +'tree_data/undo_tree', 'r') as file:
     undo_tree = json.load(file)
 
-data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data.csv') #, index_col=0
+data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data_without_tree.csv') #, index_col=0
 
 importer = JsonImporter()
 visit = []
@@ -39,5 +39,8 @@ for ti in range(1,2): # loop through trials len(undo_tree)
             
             data_choice_level.loc[get_ind,'branching'] = True
             data_choice_level.loc[get_ind[0],'branchingFirst'] = True # the first visit of a branching node
+            # fill the na values as false
+            data_choice_level['branching'] = data_choice_level['branching'].fillna(False)
+            data_choice_level['branchingFirst'] = data_choice_level['branchingFirst'].fillna(False)
 
 data_choice_level.to_csv(R_out_dir +  'choice_level/choicelevel_data.csv')  
