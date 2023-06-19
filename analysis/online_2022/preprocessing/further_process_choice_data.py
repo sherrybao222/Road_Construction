@@ -16,7 +16,7 @@ with open(home_dir +'tree_data/basic_tree', 'r') as file:
 with open(home_dir +'tree_data/undo_tree', 'r') as file:
     undo_tree = json.load(file)
 
-data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data.csv', index_col=0)
+data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data.csv') #, index_col=0
 
 importer = JsonImporter()
 visit = []
