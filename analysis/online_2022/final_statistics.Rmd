@@ -62,4 +62,34 @@ load(file.path(save_folder, 'model_single_undo_error_magnitude.RData'))
 simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
 plot(simulationOutput)
 ```
+#### Proportion
+```{r}
+load(file.path(save_folder, 'model_prop_single_undo_error_magnitude.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F, re.form = NULL) # 
+plot(simulationOutput)
+
+testUniformity(simulationOutput) 
+testQuantiles(simulationOutput)
+```
+## Possible cues for error correction
+### Achievd score in a puzzle
+```{r}
+load(file.path(save_folder, 'model_undo_optimal_mas_TT.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F, re.form = NULL)
+plot(simulationOutput)
+
+plot(simulationOutput, form = state_df$TT)
+testZeroInflation(simulationOutput)
+testQuantiles(simulationOutput)
+```
+### Remaining budget
+```{r}
+load(file.path(save_folder, 'model_undo_optimal_mas_TT_budget.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F, re.form = NULL) #, re.form = NULL
+plot(simulationOutput)
+
+plot(simulationOutput, form = state_df$TT)
+testZeroInflation(simulationOutput)
+testQuantiles(simulationOutput)
+```
 
