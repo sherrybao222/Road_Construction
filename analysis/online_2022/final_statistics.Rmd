@@ -92,4 +92,14 @@ plot(simulationOutput, form = state_df$TT)
 testZeroInflation(simulationOutput)
 testQuantiles(simulationOutput)
 ```
+### Uncertainty
+#### First-move RT
+```{r}
+load(file.path(save_folder, 'model_undo_rt1.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F) #, re.form = NULL
+plot(simulationOutput)
+
+testZeroInflation(simulationOutput)
+testQuantiles(simulationOutput)
+```
 
