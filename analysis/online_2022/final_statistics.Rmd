@@ -16,7 +16,7 @@ library(DHARMa)
 pathToFolder <- "/Users/dbao/My_Drive/road_construction/data/2022_online/"
 save_folder <- file.path(pathToFolder, 'stat_model/final/')
 ```
-# When do people undo?
+# Undo Initiation
 ## Error correction efficiency
 ### Make errors at the beginning
 #### Basic condition (supp)
@@ -97,6 +97,17 @@ testQuantiles(simulationOutput)
 ```{r}
 load(file.path(save_folder, 'model_undo_rt1.RData'))
 simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F) #, re.form = NULL
+plot(simulationOutput)
+
+testZeroInflation(simulationOutput)
+testQuantiles(simulationOutput)
+```
+
+# Undo Completion
+## what predicts the undo terminal
+```{r}
+load(file.path(save_folder, 'model_undo_right_error_and_cumulative.RData'))
+simulationOutput <- simulateResiduals(fittedModel = model_undo_right, n = 2000, plot = F) #, re.form = NULL
 plot(simulationOutput)
 
 testZeroInflation(simulationOutput)
