@@ -12,10 +12,46 @@ rm(list=ls())
 knitr::opts_chunk$set(echo = FALSE)
 
 library(DHARMa)
+library(brms)
 
 pathToFolder <- "/Users/dbao/My_Drive/road_construction/data/2022_online/"
+save_folder0 <- file.path(pathToFolder, 'stat_model/')
 save_folder <- file.path(pathToFolder, 'stat_model/final/')
 ```
+# Undo benefit
+```{r}
+load(file.path(save_folder0, 'puzzleID_order_data.RData'))
+```
+
+```{r}
+model_error1 = lme4::glmer(final_sumSeverityErrors ~  1 + undo_condition_interaction + (1|subjects) + (1|puzzleID), 
+                          data = puzzleID_order_data, family = "poisson")
+
+summary(model_error1)
+```
+
+```{r}
+simulationOutput <- simulateResiduals(fittedModel = model_error1, n = 1000, plot = F)
+plot(simulationOutput)
+```
+
+```{r}
+model_error_brm = brm(
+  final_sumSeverityErrors ~  1 + undo_condition_interaction + (1|subjects)+ (1|puzzleID),
+  data = puzzleID_order_data,  family = "zero_inflated_poisson",
+  chains = 3, cores = 3, iter = 2000, warmup = 1000)
+summary(model_error_brm)
+```
+```{r}
+simulationOutput <- simulateResiduals(fittedModel = model_error_brm, n = 1000, plot = F)
+plot(simulationOutput)
+```
+
+```{r}
+hypothesis(model_error_brm, "undo_condition_interaction1 > undo_condition_interaction2")
+hypothesis(model_error_brm, "undo_condition_interaction1 < 0")
+```
+
 # Undo Initiation
 ## Error correction efficiency
 ### Make errors at the beginning
