@@ -169,26 +169,26 @@ for i in range(len(data_all)):
 
     tortuosity.extend(temp_tortuosity)
 
-np.savetxt(R_out_dir + 'choicelevel_subjects.csv', np.array(subjects).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'choicelevel_puzzleID.csv', np.array(puzzleID).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'choicelevel_trialID.csv', np.array(trialID).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_subjects.csv', np.array(subjects).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_puzzleID.csv', np.array(puzzleID).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_trialID.csv', np.array(trialID).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
 
-np.savetxt(R_out_dir + 'choicelevel_undo_c.csv', np.array(undo_c).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'choicelevel_undo.csv', np.array(undo).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_undo_c.csv', np.array(undo_c).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_undo.csv', np.array(undo).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
 
-np.savetxt(R_out_dir + 'choicelevel_severityOfErrors.csv', np.array(severityOfErrors).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'choicelevel_error.csv', np.array(error).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_severityOfErrors.csv', np.array(severityOfErrors).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_error.csv', np.array(error).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
 
-np.savetxt(R_out_dir + 'choicelevel_currNumCities.csv', np.array(currNumCities).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'choicelevel_currMas.csv', np.array(currMas).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'choicelevel_currNos.csv', np.array(currNos).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'choicelevel_leftover.csv', np.array(leftover),fmt='%f',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'choicelevel_within_reach.csv', np.array(within_reach).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_currNumCities.csv', np.array(currNumCities).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_currMas.csv', np.array(currMas).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_currNos.csv', np.array(currNos).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_leftover.csv', np.array(leftover),fmt='%f',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_within_reach.csv', np.array(within_reach).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
 
-np.savetxt(R_out_dir + 'choicelevel_RT.csv', np.array(RT),fmt='%f',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'choicelevel_undoRT.csv', np.array(undoRT),fmt='%f',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_RT.csv', np.array(RT),fmt='%f',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_undoRT.csv', np.array(undoRT),fmt='%f',delimiter=',',encoding=None)
 
-np.savetxt(R_out_dir + 'choicelevel_tortuosity.csv', np.array(tortuosity),fmt='%f',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'choicelevel_tortuosity.csv', np.array(tortuosity),fmt='%f',delimiter=',',encoding=None)
 
 
 ## ==========================================================================
