@@ -37,6 +37,8 @@ nos = []              # number of optimal solutions
 leftover = []         # budget left after the maximum number of cities have been connected.
 numError = []         # number of errors in a puzzle
 sumSeverityErrors = []# sum of severity of errors
+final_sumSeverityErrors = []# sum of severity of errors
+SeverityError1 = []   # severity of errors in the first step
 
 undo_c = []           # undo condition or not : 1 for with undo condition and 0 for without undo condition
 numUNDO = []          # number of undos
@@ -72,6 +74,8 @@ for i in range(len(data_all)): # iterate over subjects
     
     temp_numError          = []
     temp_sumSeverityErrors = []
+    temp_final_sumSeverityErrors = []
+    temp_SeverityError1 = []
 
     temp_undo_c            = []
     temp_numUNDO           = []
@@ -106,6 +110,8 @@ for i in range(len(data_all)): # iterate over subjects
             errors_trial = (mas_all_trial[1:] - mas_all_trial[:-1])
             temp_numError.append(np.sum(errors_trial<0)) # how many errors?
             temp_sumSeverityErrors.append(np.sum(np.abs(errors_trial[errors_trial<0])))
+            temp_final_sumSeverityErrors.append(mas_all_trial[0] - mas_all_trial[-1])
+            temp_SeverityError1.append(np.abs(errors_trial[0]))
             
             temp_undo_c.append(np.double(np.array(single_trial.condition)[0]).astype(np.int16))
             temp_numUNDO.append(np.sum(np.array(single_trial.undoIndicator )))
@@ -145,6 +151,9 @@ for i in range(len(data_all)): # iterate over subjects
     
     numError.append(temp_numError)
     sumSeverityErrors.append(temp_sumSeverityErrors)
+    final_sumSeverityErrors.append(temp_final_sumSeverityErrors)
+    SeverityError1.append(temp_SeverityError1)
+
     numEnd.append(temp_numEnd)
     numFullUndo.append(temp_numFullUndo)
     
@@ -162,29 +171,29 @@ for i in range(len(data_all)): # iterate over subjects
     print(i)
     # print(np.unique(temp_mas))
 
-np.savetxt(R_out_dir + 'puzzleID.csv', np.array(puzzleID).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'puzzleID.csv', np.array(puzzleID).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
 
-np.savetxt(R_out_dir + 'reward.csv', np.array(reward).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'numCities.csv', np.array(numCities).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'mas.csv', np.array(mas).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'nos.csv', np.array(nos).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'leftover.csv', np.array(leftover).transpose(),fmt='%f',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'reward.csv', np.array(reward).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'numCities.csv', np.array(numCities).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'mas.csv', np.array(mas).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'nos.csv', np.array(nos).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'leftover.csv', np.array(leftover).transpose(),fmt='%f',delimiter=',',encoding=None)
 
-np.savetxt(R_out_dir + 'numError.csv', np.array(numError).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'sumSeverityErrors.csv', np.array(sumSeverityErrors).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'numError.csv', np.array(numError).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'sumSeverityErrors.csv', np.array(sumSeverityErrors).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
 
-np.savetxt(R_out_dir + 'undo_c.csv', np.array(undo_c).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'numUNDO.csv', np.array(numUNDO).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
-np.savetxt(R_out_dir + 'TT.csv', np.array(TT).transpose(),fmt='%f',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'undo_c.csv', np.array(undo_c).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'numUNDO.csv', np.array(numUNDO).astype(np.int16).transpose(),fmt='%d',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'TT.csv', np.array(TT).transpose(),fmt='%f',delimiter=',',encoding=None)
 
-np.savetxt(R_out_dir + 'tortuosity.csv', np.array(tortuosity).transpose(),fmt='%f',delimiter=',',encoding=None)
+# np.savetxt(R_out_dir + 'tortuosity.csv', np.array(tortuosity).transpose(),fmt='%f',delimiter=',',encoding=None)
 
 ## ==========================================================================
 ######## all puzzle-level data in one file
 headerList = ['subjects', 'puzzleID', 
               'reward', 'numCities', 'mas', 
               'nos', 'leftover', 
-              'numError', 'sumSeverityErrors', 
+              'numError', 'sumSeverityErrors', 'final_sumSeverityErrors', 'SeverityError1',
               'condition','numUNDO', 'numFullUndo', 'numEnd', 
               'TT','RT1','RTlater','RTsubmit',
               'tortuosity']
@@ -195,7 +204,7 @@ data = [subjects]
 dataList = [np.array(puzzleID).astype(np.int16), 
             np.array(reward).astype(np.int16), np.array(numCities).astype(np.int16), np.array(mas).astype(np.int16), 
             np.array(nos).astype(np.int16), np.array(leftover),
-            np.array(numError).astype(np.int16), np.array(sumSeverityErrors).astype(np.int16), 
+            np.array(numError).astype(np.int16), np.array(sumSeverityErrors).astype(np.int16), np.array(final_sumSeverityErrors).astype(np.int16), np.array(SeverityError1).astype(np.int16),
             np.array(undo_c).astype(np.int16), np.array(numUNDO).astype(np.int16), np.array(numFullUndo).astype(np.int16), np.array(numEnd).astype(np.int16),
             np.array(TT),np.array(RT1),np.array(RTlater),np.array(RTsubmit),
             np.array(tortuosity)]
@@ -205,7 +214,7 @@ for data_ in dataList:
 data = np.array(data).transpose()
 
 np.savetxt(R_out_dir + 'data.csv',data,delimiter=',', 
-           fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f, %f', 
+           fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d,%d, %d,%d,%d,%d,%d, %f,%f,%f,%f, %f', 
            header=",".join(headerList),comments='')
 
 # headerList_ = [" ", *headerList]
