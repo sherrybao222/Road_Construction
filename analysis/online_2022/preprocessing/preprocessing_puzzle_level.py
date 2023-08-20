@@ -118,7 +118,7 @@ for i in range(len(data_all)): # iterate over subjects
                         n_path = n_path + 1
             temp_numFullUndo.append(n_path)
             
-            temp_TT.append(np.array(single_trial.time_all)[-1]/1000)
+            temp_TT.append(np.array(single_trial.time_all)[-1]/1000 - np.array(single_trial.time_all)[0]/1000)
             temp_RT1.append(np.array(single_trial.rt_all)[1]/1000) 
             temp_RTsubmit.append(np.array(single_trial.rt_all)[-1]/1000)         
             index_later = single_trial.index[(single_trial['rt_all'] != -1) & (single_trial['undoIndicator'] != 1)& (single_trial['submit'] != 1)]
@@ -204,7 +204,9 @@ for data_ in dataList:
 
 data = np.array(data).transpose()
 
-np.savetxt(R_out_dir + 'data.csv',data,delimiter=',', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f, %f', header=",".join(headerList),comments='')
+np.savetxt(R_out_dir + 'data.csv',data,delimiter=',', 
+           fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f, %f', 
+           header=",".join(headerList),comments='')
 
 # headerList_ = [" ", *headerList]
 # np.savetxt(R_out_dir + 'data.txt',data,delimiter=' ', fmt='%d,%d, %d,%d,%d, %d,%f, %d,%d, %d,%d,%d,%d, %f,%f,%f,%f, %f', header=" ".join(headerList_),comments='')
