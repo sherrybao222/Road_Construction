@@ -23,8 +23,24 @@ save_folder <- file.path(pathToFolder, 'stat_model/final/')
 load(file.path(save_folder0, 'puzzleID_order_data.RData'))
 ```
 
+## lme. interaction
 ```{r}
-model_error1 = lme4::glmer(final_sumSeverityErrors ~  1 + undo_condition_interaction + (1|subjects) + (1|puzzleID), 
+puzzleID_order_data$undo_used <- as.factor(puzzleID_order_data$undo_used)
+puzzleID_order_data$condition <- as.factor(puzzleID_order_data$condition)
+  
+model_error0 = lme4::glmer(final_sumSeverityErrors ~  1 + undo_used:condition + condition + (1|subjects) + (1|puzzleID), 
+                          data = puzzleID_order_data, family = "poisson")
+
+summary(model_error0)
+```
+
+```{r}
+simulationOutput <- simulateResiduals(fittedModel = model_error0, n = 1000, plot = F)
+plot(simulationOutput)
+```
+## lme. 3 cate
+```{r}
+model_error1 = lme4::glmer(final_sumSeverityErrors ~  1 + undo_condition_interaction + (1|subjects) + (1|puzzleID) ,  #
                           data = puzzleID_order_data, family = "poisson")
 
 summary(model_error1)
@@ -34,7 +50,7 @@ summary(model_error1)
 simulationOutput <- simulateResiduals(fittedModel = model_error1, n = 1000, plot = F)
 plot(simulationOutput)
 ```
-
+## brms. 3 cate
 ```{r}
 model_error_brm = brm(
   final_sumSeverityErrors ~  1 + undo_condition_interaction + (1|subjects)+ (1|puzzleID),
@@ -42,6 +58,7 @@ model_error_brm = brm(
   chains = 3, cores = 3, iter = 2000, warmup = 1000)
 summary(model_error_brm)
 ```
+
 ```{r}
 simulationOutput <- simulateResiduals(fittedModel = model_error_brm, n = 1000, plot = F)
 plot(simulationOutput)
