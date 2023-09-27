@@ -29,7 +29,7 @@ for fname in flist:
         single_data = {
             'subjects': subjectID,
             'puzzleID': group.iloc[0]['map_id'],
-            'undo_c': int(group.iloc[0]['condition']),
+            'condition': int(group.iloc[0]['condition']),
             'trialID': group.iloc[0]['trial_id'],
             'block': int(group.iloc[0]['trial_id'] / 23),
 
