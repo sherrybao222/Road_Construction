@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 library(DHARMa)
 library(brms)
+library(lmerTest)
 
 pathToFolder <- "/Users/dbao/My_Drive/road_construction/data/2022_online/"
 save_folder0 <- file.path(pathToFolder, 'stat_model/')
@@ -67,6 +68,22 @@ plot(simulationOutput)
 ```{r}
 hypothesis(model_error_brm, "undo_condition_interaction1 > undo_condition_interaction2")
 hypothesis(model_error_brm, "undo_condition_interaction1 < 0")
+```
+
+# Block effect
+```{r}
+puzzleID_order_data$subjects <- factor(puzzleID_order_data$subjects)
+# puzzleID_order_data$block <- factor(puzzleID_order_data$block)
+puzzleID_order_data$condition <- factor(puzzleID_order_data$condition)
+
+model_final_sumSeverityErrors <- lme4::glmer(final_sumSeverityErrors ~  1 + block*condition + (1|subjects), data = puzzleID_order_data, family = "poisson")
+
+summary(model_final_sumSeverityErrors)
+```
+
+```{r}
+simulationOutput <- simulateResiduals(fittedModel = model_final_sumSeverityErrors, n = 1500, plot = F)
+plot(simulationOutput)
 ```
 
 # Undo Initiation
