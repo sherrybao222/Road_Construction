@@ -14,7 +14,7 @@ data_all = []
 home_dir = '/Users/dbao/My_Drive'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
-R_out_dir = home_dir+'R_analysis_data/choice_level/'
+R_out_dir = '/Users/dbao/My_Drive'+'/road_construction_own/'+'R_analysis_data/'
 
 
 flist = glob(home_dir + data_dir + '/preprocess4_sub_*.csv')
@@ -42,10 +42,13 @@ checkEnd = []
 
 severityOfErrors = []    # severity of errors
 error = []               # error binary
+missed_reward = []       # missed reward
+error_rate = []          # error rate
 
 path = [] 
 choice = []
 currNumCities = []       # current number of connected cities
+reward = []              # reward
 currMas = []             # current MAS
 currNos = []             # current number of optimal solutions
 leftover = []            # budget left
@@ -57,14 +60,10 @@ undoRT = []              # can get undoRT using undo binary
 tortuosity = []       # tortuosity
 
 for i in range(len(data_all)):
-    # prev_mapid = -1  # arbitrary number
-    # prev_mapname = -1
-    # prev_trial = -1
     data_all[i] = data_all[i].replace('undo',1)
     data_all[i] = data_all[i].replace('basic',0)
 
     # empty list to save per subject
-    # temp_subjects = []
     temp_puzzleID = data_all[i].map_id
     temp_trialID = data_all[i].trial_id
     temp_allMAS = []
@@ -75,25 +74,23 @@ for i in range(len(data_all)):
     temp_lastUndo = []            # binary: new path start, where undo goes back to, (excluding the first starting city)
     temp_submit = data_all[i].submit
     temp_checkEnd = data_all[i].checkEnd
-    
-    temp_severityOfErrors = []
-    temp_error = []
-    
+        
     temp_path = data_all[i].chosen_all
     temp_choice = data_all[i].currentChoice
     temp_currNumCities = data_all[i].n_city_all
+    temp_reward = [2*pow(i-1, 2) for i in temp_currNumCities]
     temp_currMas = data_all[i].mas_all
     temp_currNos = data_all[i].n_opt_paths_all
     temp_leftover = data_all[i].currentBudget
     temp_within_reach = data_all[i].n_within_reach
 
     temp_RT = data_all[i].rt_all # can get undoRT using undo binary
-    temp_undoRT = []
 
     temp_tortuosity = data_all[i].tortuosity_all
 
     mas_all_trial = np.array(data_all[i].mas_all)
     errors_trial = np.array([0, *(mas_all_trial[1:] - mas_all_trial[:-1]).tolist()])
+
     severe_error_trial = np.zeros(np.array(errors_trial).shape)
     severe_error_trial[errors_trial<0] = errors_trial[errors_trial<0]
     severe_error_trial = np.abs(severe_error_trial).astype(np.int16)
@@ -105,11 +102,6 @@ for i in range(len(data_all)):
     
     for ti in range(data_all[i].shape[0]):
         subjects.append(i)
-        # puzzleID.append(np.array(data_all[i].map_id)[ti])
-        # trialID.append(np.array(data_all[i].trial_id)[ti])
-        
-        # undo_c.append(np.array(data_all[i].condition)[ti])
-        # undo.append(np.array(data_all[i].undoIndicator & (data_all[i].n_city_all != 1))[ti])
         if (data_all[i].n_city_all[ti]==1):
             severityOfErrors.append(0)
             error.append(0)
@@ -117,7 +109,6 @@ for i in range(len(data_all)):
             severityOfErrors.append(severe_error_trial[ti])
             error.append(errors_trial[ti])
         
-
         temp_firstUndo.append((np.array(data_all[i].undoIndicator)[ti] == 1) & (np.array(data_all[i].rt_all)[ti] != -1) & (np.array(data_all[i].undoIndicator)[ti-1] == 0))         # first undo in a sequence of undo
             
         if (ti != data_all[i].shape[0]-1):
@@ -125,13 +116,6 @@ for i in range(len(data_all)):
         else:
             temp_lastUndo.append(0)
             
-        # currNumCities.append(np.array(data_all[i].n_city_all)[ti])
-        # currMas.append(np.array(data_all[i].mas_all)[ti])
-        # currNos.append(np.array(data_all[i].n_opt_paths_all)[ti])
-        # leftover.append(np.array(data_all[i].currentBudget)[ti])
-        # within_reach.append(np.array(data_all[i].n_within_reach)[ti])
-
-        # RT.append(np.array(data_all[i].rt_all)[ti]) # can get undoRT using undo binary
         if np.array(data_all[i].undoIndicator )[ti]==1: # & (data_all[i].n_city_all != 1)
             undoRT.append(np.array(data_all[i].rt_all)[ti])
         else:
@@ -140,7 +124,7 @@ for i in range(len(data_all)):
         if (data_all[i].rt_all[ti] == -1): # which means if the trial has changed / only save once per trial
             this_allMAS = data_all[i].mas_all[ti]
         temp_allMAS.append(this_allMAS)
-            
+                
     # subjects.extend(temp_subjects)
     puzzleID.extend(temp_puzzleID)
     trialID.extend(temp_trialID)
@@ -153,58 +137,54 @@ for i in range(len(data_all)):
     submit.extend(temp_submit)
     checkEnd.extend(temp_checkEnd)
     
-    # severityOfErrors.extend(temp_severityOfErrors)
-    # error.extend(temp_error)
-    
     path.extend(temp_path)
     choice.extend(temp_choice)
     currNumCities.extend(temp_currNumCities)
+    reward.extend(temp_reward)
     currMas.extend(temp_currMas)
     currNos.extend(temp_currNos)
     leftover.extend(temp_leftover)
     within_reach.extend(temp_within_reach)
 
     RT.extend(temp_RT)
-    undoRT.extend(temp_undoRT)
 
     tortuosity.extend(temp_tortuosity)
 
-# np.savetxt(R_out_dir + 'choicelevel_subjects.csv', np.array(subjects).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-# np.savetxt(R_out_dir + 'choicelevel_puzzleID.csv', np.array(puzzleID).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-# np.savetxt(R_out_dir + 'choicelevel_trialID.csv', np.array(trialID).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-
-# np.savetxt(R_out_dir + 'choicelevel_undo_c.csv', np.array(undo_c).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-# np.savetxt(R_out_dir + 'choicelevel_undo.csv', np.array(undo).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-
-# np.savetxt(R_out_dir + 'choicelevel_severityOfErrors.csv', np.array(severityOfErrors).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-# np.savetxt(R_out_dir + 'choicelevel_error.csv', np.array(error).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-
-# np.savetxt(R_out_dir + 'choicelevel_currNumCities.csv', np.array(currNumCities).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-# np.savetxt(R_out_dir + 'choicelevel_currMas.csv', np.array(currMas).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-# np.savetxt(R_out_dir + 'choicelevel_currNos.csv', np.array(currNos).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-# np.savetxt(R_out_dir + 'choicelevel_leftover.csv', np.array(leftover),fmt='%f',delimiter=',',encoding=None)
-# np.savetxt(R_out_dir + 'choicelevel_within_reach.csv', np.array(within_reach).astype(np.int16),fmt='%d',delimiter=',',encoding=None)
-
-# np.savetxt(R_out_dir + 'choicelevel_RT.csv', np.array(RT),fmt='%f',delimiter=',',encoding=None)
-# np.savetxt(R_out_dir + 'choicelevel_undoRT.csv', np.array(undoRT),fmt='%f',delimiter=',',encoding=None)
-
-# np.savetxt(R_out_dir + 'choicelevel_tortuosity.csv', np.array(tortuosity),fmt='%f',delimiter=',',encoding=None)
-
+for index, element in enumerate(severityOfErrors):
+    missed_reward.append(2*pow(element+currNumCities[index]-1, 2) - 2*pow(currNumCities[index]-1, 2))
+    error_rate.append(element/currNumCities[index])
 
 ## ==========================================================================
 ######## all choice-level data in one file
 headerList = ['subjects', 'puzzleID','trialID','allMAS',
-              'path','choice','currNumCities','currMas','currNos', 'leftover','within_reach',
+              'path','choice','currNumCities','currMas','reward',
+              'currNos', 'leftover','within_reach',
               'condition','undo','firstUndo','lastUndo',
               'submit','checkEnd',
-              'severityOfErrors', 'error',
+              'severityOfErrors', 'error', 'missed_reward', 'error_rate',
               'RT','undoRT','tortuosity']
 
-dataList = [np.array(puzzleID).astype(np.int16), np.array(trialID).astype(np.int16),np.array(allMAS).astype(np.int16),
-            np.array(path),np.array(choice),np.array(currNumCities).astype(np.int16), np.array(currMas).astype(np.int16), np.array(currNos).astype(np.int16),np.array(leftover),np.array(within_reach).astype(np.int16),
-            np.array(undo_c).astype(np.int16),np.array(undo),np.array(firstUndo).astype(np.int16),np.array(lastUndo).astype(np.int16),
-            np.array(submit).astype(np.int16),np.array(checkEnd).astype(np.int16),
-            np.array(severityOfErrors).astype(np.int16),np.array(error).astype(np.int16),
+dataList = [np.array(puzzleID).astype(np.int16), 
+            np.array(trialID).astype(np.int16),
+            np.array(allMAS).astype(np.int16),
+            np.array(path),
+            np.array(choice),
+            np.array(currNumCities).astype(np.int16), 
+            np.array(reward).astype(np.int16),
+            np.array(currMas).astype(np.int16),
+            np.array(currNos).astype(np.int16),
+            np.array(leftover),
+            np.array(within_reach).astype(np.int16),
+            np.array(undo_c).astype(np.int16),
+            np.array(undo),
+            np.array(firstUndo).astype(np.int16),
+            np.array(lastUndo).astype(np.int16),
+            np.array(submit).astype(np.int16),
+            np.array(checkEnd).astype(np.int16),
+            np.array(severityOfErrors).astype(np.int16),
+            np.array(error).astype(np.int16), 
+            np.array(missed_reward), 
+            np.array(error_rate),
             np.array(RT),np.array(undoRT),np.array(tortuosity)]
 data = [subjects]
 for data_ in dataList:
@@ -215,21 +195,5 @@ data = np.array(data).transpose()
 df = pd.DataFrame(data)
 df.columns = headerList
 df.to_csv(R_out_dir + 'choicelevel_data_without_tree.csv', index=False)
-
-# np.savetxt(R_out_dir + 'choicelevel_data.csv',data, delimiter=',',fmt='%d,%d,%d,%d, %s,%d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=",".join(headerList),comments='')
-# headerList_ = [" ", *headerList]
-# np.savetxt(R_out_dir + 'choicelevel_data.txt',data, delimiter=' ',fmt='%d,%d,%d,%d, %s,%d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f', header=" ".join(headerList_),comments='')
-
-
-# # undo data saving
-# ind_data = np.where(np.array(undoRT) != -1)
-# data = [np.array(subjects)[ind_data]]
-# for data_ in dataList:
-#     data.append(data_[ind_data])
-# data = np.array(data).transpose()
-# np.savetxt(R_out_dir + 'choicelevel_undo_data.csv',data, delimiter=',',fmt='%d,%d,%d,%d, %s,%d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=",".join(headerList),comments='')
-# headerList_ = [" ", *headerList]
-# np.savetxt(R_out_dir + 'choicelevel_undo_data.txt',data, delimiter=' ',fmt='%d,%d,%d,%d, %s,%d,%d,%d,%d,%f,%d, %d,%d,%d,%d,%d,%d, %d,%d, %f,%f,%f',header=" ".join(headerList_),comments='')
-
 
 

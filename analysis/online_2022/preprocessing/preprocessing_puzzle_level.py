@@ -14,7 +14,7 @@ data_dir  = 'data/preprocessed'
 # home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'
 # map_dir = 'active_map/'
 # data_dir  = 'data/preprocessed'
-R_out_dir = home_dir+'R_analysis_data/'
+R_out_dir = '/Users/dbao/My_Drive'+'/road_construction_own/'+'R_analysis_data/'
 
 
 flist = glob(home_dir + data_dir + '/preprocess4_sub_*.csv')
@@ -40,6 +40,7 @@ sumSeverityErrors = []# sum of severity of errors
 final_sumSeverityErrors = []# sum of severity of errors
 SeverityError1 = []   # severity of errors in the first step
 
+<<<<<<< Updated upstream
 undo_c = []           # undo condition or not : 1 for with undo condition and 0 for without undo condition
 numUNDO = []          # number of undos
 numFullUndo = []      # number of "single undo", combine sequential undo into one
@@ -49,6 +50,29 @@ TT = []               # total time taken for a trial
 RT1= []               # first step RT
 RTlater = []          # later step RT
 RTsubmit=[]           # submit RT
+=======
+            'reward': 2*pow(group.iloc[-1]['n_city_all']-1, 2),
+            'numCities': group.iloc[-1]['n_city_all'], # starts from 1
+            'mas': group.iloc[0]['mas_all'],
+            'nos': group.iloc[0]['n_opt_paths_all'],
+            'leftover': group.iloc[-1]['currentBudget'],
+            'numUNDO': group['undoIndicator'].sum(),
+            'numEnd': group['checkEnd'].sum() - 1,
+            'TT': (group.iloc[-1]['time_all'] - group.iloc[0]['time_all']) / 1000,
+            'RT1': group.iloc[1]['rt_all'] / 1000,
+            'RTsubmit': group.iloc[-1]['rt_all'] / 1000,
+            'tortuosity': group.iloc[-1]['tortuosity_all'],
+        }
+
+        mas_all_trial = group['mas_all'].values
+        errors_trial = (mas_all_trial[1:] - mas_all_trial[:-1])
+        single_data['numError'] = (errors_trial < 0).sum()
+        single_data['sumSeverityErrors'] = np.abs(errors_trial[errors_trial < 0]).sum()
+        single_data['final_sumSeverityErrors'] = mas_all_trial[0] - mas_all_trial[-1]
+        single_data['final_missed_reward'] = 2*pow(mas_all_trial[0]-1, 2) - 2*pow(mas_all_trial[-1]-1, 2)
+        single_data['final_error_rate'] = single_data['final_sumSeverityErrors'] / single_data['numCities']
+        single_data['SeverityError1'] = np.abs(errors_trial[0]) # severity of the first-move error
+>>>>>>> Stashed changes
 
 tortuosity = []       # tortuosity
 
