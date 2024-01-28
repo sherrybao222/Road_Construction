@@ -170,21 +170,26 @@ dataList = [np.array(puzzleID).astype(np.int16),
             np.array(path),
             np.array(choice),
             np.array(currNumCities).astype(np.int16), 
-            np.array(reward).astype(np.int16),
             np.array(currMas).astype(np.int16),
+            np.array(reward).astype(np.int16),
+            
             np.array(currNos).astype(np.int16),
             np.array(leftover),
             np.array(within_reach).astype(np.int16),
+
             np.array(undo_c).astype(np.int16),
             np.array(undo),
             np.array(firstUndo).astype(np.int16),
             np.array(lastUndo).astype(np.int16),
+
             np.array(submit).astype(np.int16),
             np.array(checkEnd).astype(np.int16),
+
             np.array(severityOfErrors).astype(np.int16),
             np.array(error).astype(np.int16), 
             np.array(missed_reward), 
             np.array(error_rate),
+            
             np.array(RT),np.array(undoRT),np.array(tortuosity)]
 data = [subjects]
 for data_ in dataList:
