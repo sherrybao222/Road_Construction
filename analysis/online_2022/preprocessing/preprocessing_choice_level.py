@@ -14,7 +14,7 @@ data_all = []
 home_dir = '/Users/dbao/My_Drive'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
-R_out_dir = '/Users/dbao/My_Drive'+'/road_construction_own/'+'R_analysis_data/'
+R_out_dir = home_dir+'R_analysis_data/choice_level/'
 
 
 flist = glob(home_dir + data_dir + '/preprocess4_sub_*.csv')
@@ -150,9 +150,10 @@ for i in range(len(data_all)):
 
     tortuosity.extend(temp_tortuosity)
 
-for index, element in enumerate(severityOfErrors):
-    missed_reward.append(2*pow(element+currNumCities[index]-1, 2) - 2*pow(currNumCities[index]-1, 2))
-    error_rate.append(element/currNumCities[index])
+cumulative_error = np.array(allMAS) - np.array(currMas)
+for index, element in enumerate(allMAS):
+    missed_reward.append(2*pow(element-1, 2) - 2*pow(currMas[index]-1, 2))
+    error_rate.append(cumulative_error[index]/currNumCities[index])
 
 ## ==========================================================================
 ######## all choice-level data in one file
@@ -161,7 +162,8 @@ headerList = ['subjects', 'puzzleID','trialID','allMAS',
               'currNos', 'leftover','within_reach',
               'condition','undo','firstUndo','lastUndo',
               'submit','checkEnd',
-              'severityOfErrors', 'error', 'missed_reward', 'error_rate',
+              'severityOfErrors', 'error', 
+              'cumulative_error','missed_reward', 'error_rate', 
               'RT','undoRT','tortuosity']
 
 dataList = [np.array(puzzleID).astype(np.int16), 
@@ -187,6 +189,8 @@ dataList = [np.array(puzzleID).astype(np.int16),
 
             np.array(severityOfErrors).astype(np.int16),
             np.array(error).astype(np.int16), 
+
+            np.array(cumulative_error),
             np.array(missed_reward), 
             np.array(error_rate),
             
