@@ -12,6 +12,7 @@ rm(list=ls())
 knitr::opts_chunk$set(echo = FALSE)
 
 library(DHARMa)
+library(rcompanion)
 
 pathToFolder <- "/Users/dbao/My_Drive/road_construction/data/2022_online/"
 save_folder <- file.path(pathToFolder, 'stat_model/final/')
@@ -41,6 +42,12 @@ plot(simulationOutput)
 #### Across step
 ```{r}
 load(file.path(save_folder, 'model_undo_step.RData'))
+load(file.path(save_folder, 'model2_undo_step.RData'))
+compareGLM(model_undo, model_undo2)
+```
+
+```{r}
+load(file.path(save_folder, 'model_undo_step.RData'))
 simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
 plot(simulationOutput)
 ```
@@ -50,6 +57,9 @@ plot(simulationOutput)
 load(file.path(save_folder, 'model_undo_error_magnitude.RData'))
 simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
 plot(simulationOutput)
+```
+```{r}
+
 ```
 
 ```{r}
