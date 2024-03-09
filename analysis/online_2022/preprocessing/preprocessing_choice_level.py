@@ -42,6 +42,8 @@ checkEnd = []
 
 severityOfErrors = []    # severity of errors
 error = []               # error binary
+budget_change = []       # budget change
+within_reach_change = [] # ncities within reach change
 missed_reward = []       # missed reward
 error_rate = []          # error rate
 
@@ -90,6 +92,8 @@ for i in range(len(data_all)):
 
     mas_all_trial = np.array(data_all[i].mas_all)
     errors_trial = np.array([0, *(mas_all_trial[1:] - mas_all_trial[:-1]).tolist()])
+    budget_change_trial = np.array([0, *(np.array(data_all[i].currentBudget)[1:] - np.array(data_all[i].currentBudget)[:-1]).tolist()])
+    within_reach_change_trial = np.array([0, *(np.array(data_all[i].n_within_reach)[1:] - np.array(data_all[i].n_within_reach)[:-1]).tolist()])
 
     severe_error_trial = np.zeros(np.array(errors_trial).shape)
     severe_error_trial[errors_trial<0] = errors_trial[errors_trial<0]
@@ -105,9 +109,13 @@ for i in range(len(data_all)):
         if (data_all[i].n_city_all[ti]==1):
             severityOfErrors.append(0)
             error.append(0)
+            budget_change.append(0)
+            within_reach_change.append(0)
         else:
             severityOfErrors.append(severe_error_trial[ti])
             error.append(errors_trial[ti])
+            budget_change.append(budget_change_trial[ti])
+            within_reach_change.append(within_reach_change_trial[ti])
         
         temp_firstUndo.append((np.array(data_all[i].undoIndicator)[ti] == 1) & (np.array(data_all[i].rt_all)[ti] != -1) & (np.array(data_all[i].undoIndicator)[ti-1] == 0))         # first undo in a sequence of undo
             
@@ -162,7 +170,7 @@ headerList = ['subjects', 'puzzleID','trialID','allMAS',
               'currNos', 'leftover','within_reach',
               'condition','undo','firstUndo','lastUndo',
               'submit','checkEnd',
-              'severityOfErrors', 'error', 
+              'severityOfErrors', 'error', 'budget_change', 'within_reach_change',
               'cumulative_error','missed_reward', 'error_rate', 
               'RT','undoRT','tortuosity']
 
@@ -189,6 +197,8 @@ dataList = [np.array(puzzleID).astype(np.int16),
 
             np.array(severityOfErrors).astype(np.int16),
             np.array(error).astype(np.int16), 
+            np.array(budget_change).astype(np.int16),
+            np.array(within_reach_change).astype(np.int16),
 
             np.array(cumulative_error),
             np.array(missed_reward), 
