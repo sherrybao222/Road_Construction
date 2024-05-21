@@ -9,7 +9,7 @@ data_dir  = 'data/preprocessed'
 # home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'
 # map_dir = 'active_map/'
 # data_dir  = 'data/preprocessed'
-R_out_dir = '/Users/dbao/My_Drive'+'/road_construction_own/'+'R_analysis_data/'
+R_out_dir = '/Users/dbao/My_Drive'+'/road_construction/'+'R_analysis_data/'
 
 flist = glob(home_dir + data_dir + '/preprocess4_sub_*.csv')
 
@@ -29,6 +29,7 @@ for fname in flist:
         single_data = {
             'subjects': subjectID,
             'puzzleID': group.iloc[0]['map_id'],
+            'action_gap': group.iloc[0]['action_gap'],
             'condition': int(group.iloc[0]['condition']),
             'trialID': group.iloc[0]['trial_id'],
             'block': int(group.iloc[0]['trial_id'] / 23),
@@ -43,7 +44,7 @@ for fname in flist:
             'TT': (group.iloc[-1]['time_all'] - group.iloc[0]['time_all']) / 1000,
             'RT1': group.iloc[1]['rt_all'] / 1000,
             'RTsubmit': group.iloc[-1]['rt_all'] / 1000,
-            'tortuosity': group.iloc[-1]['tortuosity_all'],
+            # 'tortuosity': group.iloc[-1]['tortuosity_all'],
         }
 
         mas_all_trial = group['mas_all'].values

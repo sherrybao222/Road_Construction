@@ -13,14 +13,14 @@ from ast import literal_eval
 
 # ============================================================================
 # directories
-home_dir = '/Users/dbao/google_drive_db'+'/road_construction/data/2022_online/'
+home_dir = '/Users/dbao/My_Drive'+'/road_construction/data/2022_online/'
 # home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'
 map_dir = 'active_map/'
 data_dir  = 'data/'
 
 
 # load basic map
-with open(home_dir + map_dir + 'basicMap.json', 'r') as file:
+with open(home_dir + map_dir + 'basicMap_action_gap.json', 'r') as file:
     basic_map = json.load(file)
 # load undo map
 # with open(home_dir + map_dir + 'undoMap.json', 'r') as file:
@@ -41,6 +41,7 @@ while subCount < len(flist):
     map_name = []        # whether it is coming from basic or undo.
     trial_id = []
     map_id = []
+    action_gap = []  # difficulty of the puzzle
     
     undo_all = []        # indicating whether this move is undo or not (1 or 0)
     submit =[]           # indicating whether this is a submit
@@ -61,13 +62,13 @@ while subCount < len(flist):
     n_subopt_paths_all=[]# n of suboptimal (which has #ConnectableCities of opt - 1) paths at the moment.
     mas_all = []         # maximum achievable score
 
-    tortuosity_all = []  # tortuosity of the path
+    # tortuosity_all = []  # tortuosity of the path
 
     ### load a file
     thefile = flist[subCount]
     # read int not str type of data
     with open(thefile, 'r') as f:
-        data_exp = pd.read_csv(f, converters={"choiceDyn": literal_eval})
+        data_exp = pd.read_csv(f, converters={"choiceDyn": literal_eval}, low_memory=False)
 
     # Drop check trials beforehand for easy code
     data_exp = data_exp.drop(
@@ -137,6 +138,7 @@ while subCount < len(flist):
                                 map_name.append('undo')
                             trial_id.append(single_trial['trialID'][i])
                             map_id.append(currenMapID)
+                            action_gap.append(basic_map[currenMapID]['action_gap'])
                             
                             currentChoice.append(single_trial['choiceHis'][i])
                             n_city_all.append(len(single_trial['choiceDyn'][i]))
@@ -149,20 +151,20 @@ while subCount < len(flist):
                             budget_all.append(single_trial['budgetHis'][i])
                             time.append(int(single_trial['time'][i]))
 
-                            # tortuosity
-                            mapid_temp = int(single_trial.mapID[0])
-                            xys = np.array(basic_map[mapid_temp]['xy'])
-                            if len(single_trial['choiceDyn'][i]) > 1: # for those connected at least 2
-                                if len(single_trial['choiceDyn'][i]) == 2: # it should be one when two cities are connected
-                                    tortuosity.append(1)
-                                else:
-                                    # xy_0 = xys[int(single_trial['choiceHis'][0]),:]
-                                    # xy_n = xys[int(single_trial['choiceHis'][i]),:]
-                                    tortuos_len = float(single_trial['budgetHis'][0]) - float(single_trial['budgetHis'][i])
-                                    distance_ = np.sqrt(np.sum((xys[int(single_trial['choiceHis'][i]),:] - xys[int(single_trial['choiceHis'][0]),:])**2))
-                                    tortuosity.append(tortuos_len/distance_)
-                            else:
-                                tortuosity.append(0)
+                            # tortuosity ------------ comment out 21/05/2024
+                            # mapid_temp = int(single_trial.mapID[0])
+                            # xys = np.array(basic_map[mapid_temp]['xy'])
+                            # if len(single_trial['choiceDyn'][i]) > 1: # for those connected at least 2
+                            #     if len(single_trial['choiceDyn'][i]) == 2: # it should be one when two cities are connected
+                            #         tortuosity.append(1)
+                            #     else:
+                            #         # xy_0 = xys[int(single_trial['choiceHis'][0]),:]
+                            #         # xy_n = xys[int(single_trial['choiceHis'][i]),:]
+                            #         tortuos_len = float(single_trial['budgetHis'][0]) - float(single_trial['budgetHis'][i])
+                            #         distance_ = np.sqrt(np.sum((xys[int(single_trial['choiceHis'][i]),:] - xys[int(single_trial['choiceHis'][0]),:])**2))
+                            #         tortuosity.append(tortuos_len/distance_)
+                            # else:
+                            #     tortuosity.append(0)
                             
                             # get unconnected cities within reach for each step
                             remain_trial = [x for x in all_city if x not in chosen_trial]
@@ -215,12 +217,13 @@ while subCount < len(flist):
                     time_all.extend(time)
                     rt_all.extend([-1, *[a - time[j-1] for j, a in enumerate(time) if j > 0]])
 
-                    tortuosity_all.extend(tortuosity)
+                    # tortuosity_all.extend(tortuosity)
                     
         data = {
             'condition': map_name,
             'trial_id': trial_id,
             'map_id': map_id,
+            'action_gap': action_gap,
             
             'undoIndicator': undo_all,
             'submit': submit,
@@ -239,9 +242,10 @@ while subCount < len(flist):
             
             'n_opt_paths_all': n_opt_paths_all,
             'n_subopt_paths_all': n_subopt_paths_all,
-            'mas_all': mas_all,
+            'mas_all': mas_all
 
-            'tortuosity_all':tortuosity_all}
+            # 'tortuosity_all':tortuosity_all
+            }
         
         # Create DataFrame
         df = pd.DataFrame(data)
