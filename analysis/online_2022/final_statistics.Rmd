@@ -109,9 +109,9 @@ summary(model_undo_mas)
 The standardized coefficients represent the change in the outcome variable for a one standard deviation change in the predictor variable, which might alter how interactions are interpreted and their significance in the model.
 ```{r}
 data_df = undo_data[(undo_data$N_more>0),]
-print(cor.test(data_df$currNumCities, data_df$leftover_new))
+# print(cor.test(data_df$currNumCities, data_df$leftover_new))
 
-model_undo_nonterminal0 = glm(firstUndo ~  1 + RT1_log*N_more + leftover*N_more + currNumCities*N_more + budget_change + within_reach_change,
+model_undo_nonterminal0 = glm(firstUndo ~  1 + RT1_log + leftover*N_more + currNumCities*N_more + budget_change + within_reach_change,
 data = data_df, family = binomial(link="logit"))
 summary(model_undo_nonterminal0)
 
