@@ -59,7 +59,7 @@ within_reach = []        # ncities within reach
 RT = []                  # reaction time of moves (including undo)
 undoRT = []              # can get undoRT using undo binary
 
-tortuosity = []       # tortuosity
+# tortuosity = []       # tortuosity
 
 for i in range(len(data_all)):
     data_all[i] = data_all[i].replace('undo',1)
@@ -88,7 +88,7 @@ for i in range(len(data_all)):
 
     temp_RT = data_all[i].rt_all # can get undoRT using undo binary
 
-    temp_tortuosity = data_all[i].tortuosity_all
+    # temp_tortuosity = data_all[i].tortuosity_all
 
     mas_all_trial = np.array(data_all[i].mas_all)
     reward_all_trial = np.array(temp_reward)
@@ -165,7 +165,7 @@ for i in range(len(data_all)):
 
     RT.extend(temp_RT)
 
-    tortuosity.extend(temp_tortuosity)
+    # tortuosity.extend(temp_tortuosity)
 
 cumulative_error = np.array(allMAS) - np.array(currMas)
 for index, element in enumerate(allMAS):
@@ -181,7 +181,7 @@ headerList = ['subjects', 'puzzleID','trialID','allMAS',
               'submit','checkEnd',
               'severityOfErrors', 'move_missed_reward', 'error', 'budget_change', 'within_reach_change',
               'cumulative_error','state_missed_reward', 'error_rate', 
-              'RT','undoRT','tortuosity']
+              'RT','undoRT'] # ,'tortuosity'
 
 dataList = [np.array(puzzleID).astype(np.int16), 
             np.array(trialID).astype(np.int16),
@@ -214,7 +214,8 @@ dataList = [np.array(puzzleID).astype(np.int16),
             np.array(missed_reward), 
             np.array(error_rate),
             
-            np.array(RT),np.array(undoRT),np.array(tortuosity)]
+           np.array(RT),np.array(undoRT) #,np.array(tortuosity)
+            ]
 data = [subjects]
 for data_ in dataList:
     data.append(data_.reshape((-1)).tolist())

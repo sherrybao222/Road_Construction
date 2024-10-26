@@ -20,7 +20,7 @@ data_dir  = 'data/'
 
 
 # load basic map
-with open(home_dir + map_dir + 'basicMap_action_gap.json', 'r') as file:
+with open(home_dir + map_dir + 'basicMap_action_gap.json', 'r') as file: #
     basic_map = json.load(file)
 # load undo map
 # with open(home_dir + map_dir + 'undoMap.json', 'r') as file:

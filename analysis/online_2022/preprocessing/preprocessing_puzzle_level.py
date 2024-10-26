@@ -9,7 +9,7 @@ data_dir  = 'data/preprocessed'
 # home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'
 # map_dir = 'active_map/'
 # data_dir  = 'data/preprocessed'
-R_out_dir = '/Users/dbao/My_Drive'+'/road_construction/'+'R_analysis_data/'
+R_out_dir = home_dir+'R_analysis_data/'
 
 flist = glob(home_dir + data_dir + '/preprocess4_sub_*.csv')
 

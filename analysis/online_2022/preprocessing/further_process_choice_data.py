@@ -11,8 +11,8 @@ data_dir  = 'data/preprocessed'
 out_dir = home_dir + 'figures/figures_all/'
 R_out_dir = home_dir + 'R_analysis_data/'
 
-with open(home_dir +'tree_data/basic_tree', 'r') as file:
-    basic_tree = json.load(file)
+# with open(home_dir +'tree_data/basic_tree', 'r') as file:
+#     basic_tree = json.load(file)
 with open(home_dir +'tree_data/undo_tree', 'r') as file:
     undo_tree = json.load(file)
 
@@ -21,7 +21,7 @@ data_choice_level = pd.read_csv(R_out_dir +  'choice_level/choicelevel_data_with
 importer = JsonImporter()
 visit = []
 
-for ti in range(1,2): # loop through trials len(undo_tree)
+for ti in range(len(undo_tree)): # loop through trials 
     root = importer.import_(undo_tree[ti])
     print(RenderTree(root, style=AsciiStyle()))
     for node in PreOrderIter(root): # loop through the tree
@@ -33,6 +33,8 @@ for ti in range(1,2): # loop through trials len(undo_tree)
             mapID = node.mapID
             subID = node.subID
             trialID = node.trialID
+
+            print('subID:',subID, 'mapID:',mapID, 'trialID:',trialID, 'city:',city)
         
             get_ind = data_choice_level.index[(data_choice_level['subjects'] == subID)&(data_choice_level['puzzleID'] == mapID)&
                                               (data_choice_level['trialID'] == trialID)&(data_choice_level['choice'] == city)].tolist()
