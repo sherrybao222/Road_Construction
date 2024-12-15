@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def df_add_features(data_choice_level):
+def df_choice_add_features(data_choice_level):
     data_choice_level["checkEnd"] = pd.to_numeric(data_choice_level["checkEnd"]) # Convert checkEnd to integer
     data_choice_level['currNumCities'] = data_choice_level.currNumCities - 1 # starting from 0
     data_choice_level['allMAS'] = data_choice_level.allMAS - 1

@@ -98,6 +98,7 @@ for i in range(len(data_all)):
     budget_change_trial = np.array([0, *(np.array(data_all[i].currentBudget)[1:] - np.array(data_all[i].currentBudget)[:-1]).tolist()])
     within_reach_change_trial = np.array([0, *(np.array(data_all[i].n_within_reach)[1:] - np.array(data_all[i].n_within_reach)[:-1]).tolist()])
 
+    # get error magnitude of each move
     severe_error_trial = np.zeros(np.array(errors_trial).shape)
     severe_error_trial[errors_trial<0] = errors_trial[errors_trial<0]
     severe_error_trial = np.abs(severe_error_trial).astype(np.int16)
