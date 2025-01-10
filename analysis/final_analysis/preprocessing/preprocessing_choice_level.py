@@ -46,6 +46,7 @@ budget_change = []       # budget change
 within_reach_change = [] # ncities within reach change
 missed_reward = []       # missed reward
 error_rate = []          # error rate
+error_count = []         # number of errors until the current move
 
 path = [] 
 choice = []
@@ -93,11 +94,12 @@ for i in range(len(data_all)):
     mas_all_trial = np.array(data_all[i].mas_all)
     reward_all_trial = np.array(temp_reward)
 
-    errors_trial = np.array([0, *(mas_all_trial[1:] - mas_all_trial[:-1]).tolist()])
+    errors_trial = np.array([0, *(mas_all_trial[1:] - mas_all_trial[:-1]).tolist()]) # get move error magnitude 
     missed_reward_trial = np.array([0, *(reward_all_trial[1:] - reward_all_trial[:-1]).tolist()])
     budget_change_trial = np.array([0, *(np.array(data_all[i].currentBudget)[1:] - np.array(data_all[i].currentBudget)[:-1]).tolist()])
     within_reach_change_trial = np.array([0, *(np.array(data_all[i].n_within_reach)[1:] - np.array(data_all[i].n_within_reach)[:-1]).tolist()])
 
+    # get error magnitude of each move
     severe_error_trial = np.zeros(np.array(errors_trial).shape)
     severe_error_trial[errors_trial<0] = errors_trial[errors_trial<0]
     severe_error_trial = np.abs(severe_error_trial).astype(np.int16)
@@ -117,12 +119,17 @@ for i in range(len(data_all)):
             severityOfErrors.append(0)
             move_missed_reward.append(0)
             error.append(0)
+            error_count.append(0)
             budget_change.append(0)
             within_reach_change.append(0)
         else:
             severityOfErrors.append(severe_error_trial[ti])
             move_missed_reward.append(missed_reward_trial2[i])
             error.append(errors_trial[ti])
+            if temp_undo[ti] == 1 and ti > 0 and temp_currMas[ti-1] < temp_currMas[ti]:
+                error[ti] = -1
+            # get number of errors until the current move
+            error_count.append(np.sum(error[:ti+1]))
             budget_change.append(budget_change_trial[ti])
             within_reach_change.append(within_reach_change_trial[ti])
         
@@ -180,7 +187,7 @@ headerList = ['subjects', 'puzzleID','trialID','allMAS',
               'condition','undo','firstUndo','lastUndo',
               'submit','checkEnd',
               'severityOfErrors', 'move_missed_reward', 'error', 'budget_change', 'within_reach_change',
-              'cumulative_error','state_missed_reward', 'error_rate', 
+              'cumulative_error','state_missed_reward', 'error_rate', 'error_count',
               'RT','undoRT'] # ,'tortuosity'
 
 dataList = [np.array(puzzleID).astype(np.int16), 
@@ -213,6 +220,7 @@ dataList = [np.array(puzzleID).astype(np.int16),
             np.array(cumulative_error),
             np.array(missed_reward), 
             np.array(error_rate),
+            np.array(error_count),      
             
            np.array(RT),np.array(undoRT) #,np.array(tortuosity)
             ]
