@@ -13,6 +13,7 @@ def df_undo_start_end(sc_data_choice_level, condition):
             n_connect_beginning_list = []
             cum_error_beginning_list = []
             error_beginning_list = []
+            error_count_beginning_list = [] 
             # error_rate_beginning_list = []
             terminal_beginning_list = []
             undo_length_list = []
@@ -28,6 +29,8 @@ def df_undo_start_end(sc_data_choice_level, condition):
                 # get cumulative error at undo beginning
                 n_connect_beginning = dat_sbj_pzi.loc[x-j-1,"currNumCities"]
                 n_connect_beginning_list.append(n_connect_beginning)
+                error_count_beginning = dat_sbj_pzi.loc[x-j-1,"error_count"]
+                error_count_beginning_list.append(error_count_beginning)
                 cum_error_beginning = dat_sbj_pzi.loc[x-j-1,"allMAS"] - dat_sbj_pzi.loc[x-j-1,"currMas"]
                 cum_error_beginning_list.append(cum_error_beginning)
                 error_beginning = dat_sbj_pzi.loc[x-j-1,"severityOfErrors"]
@@ -74,7 +77,7 @@ def df_undo_start_end(sc_data_choice_level, condition):
                                                              'undo_length': undo_length_list,
                                                              'mas_gain':mas_gain,
                                                              'error_beginning':error_beginning_list,
-                                                            #  'error_rate_beginning':error_rate_beginning_list,
+                                                             'error_count_beginning':error_count_beginning_list,    
                                                              'sequential_single':sequential_single,
                                                              'terminal_beginning':terminal_beginning_list,
                                                              'category':category})])
