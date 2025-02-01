@@ -1,6 +1,11 @@
 import numpy as np
 
 def df_subset_1state(df, data_puzzle_level, single_condition_data, condition, firstUndo):
+
+    """
+    select the submit/undo data [at] terminal state
+    """
+
     index = df.query(condition).index
     df_beforeUndo = df.loc[index-1,:]
     index_end_undo = df_beforeUndo.index[(df_beforeUndo.checkEnd == 1)] 
