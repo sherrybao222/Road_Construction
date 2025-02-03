@@ -1,0 +1,22 @@
+```{r}
+rm(list=ls())
+
+knitr::opts_chunk$set(echo = FALSE)
+
+library(lme4)
+library(lmerTest)
+
+pathToFolder <- '/Users/dbao/Library/CloudStorage/GoogleDrive-sherrydbao@gmail.com/.shortcut-targets-by-id/1sYZNVBbYCrHcHjo-9xdKcA4wLnob9ZEq/road_construction/data/2022_online/'
+save_folder <- file.path(pathToFolder, 'stat_model/final/')
+data_folder <- file.path(pathToFolder, 'R_analysis_data')
+
+data <- read.csv(file.path(data_folder, "dk_stats.csv"))
+data["firstmoveRT_log"] = log(data["firstmoveRT"]+1)
+```
+
+```{r}
+model = lmerTest::lmer(firstmoveRT_log ~ condition_UA + (1|subject) + (1|puzzle), data=data)
+
+summary(model)
+```
+
