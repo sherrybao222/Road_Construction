@@ -5,7 +5,7 @@ def df_subset_1undo_submit(sc_data_choice_level):
     """
     data_subset_before1undo_index = []
 
-    for sub in range(100):
+    for sub in np.unique(sc_data_choice_level['subjects']):
         dat_sbj  = sc_data_choice_level[sc_data_choice_level['subjects']==sub]
         
         for pzi in np.unique(sc_data_choice_level['puzzleID']):

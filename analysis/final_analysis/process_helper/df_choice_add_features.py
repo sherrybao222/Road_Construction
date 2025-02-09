@@ -4,13 +4,13 @@ import numpy as np
 def df_add_first_move(data_choice_level):
 
     new_data_choice_level = pd.DataFrame()
-    for sub in range(100):
+    for sub in np.unique(data_choice_level['subjects']):
         dat_sbj  = data_choice_level[data_choice_level['subjects']==sub]
         
         for pzi in np.unique(data_choice_level['puzzleID']):
             
-            dat_sbj_pzi_basic = dat_sbj[(dat_sbj['puzzleID'] == pzi) & (dat_sbj['condition'] == 0)]   
-            dat_sbj_pzi_undo = dat_sbj[(dat_sbj['puzzleID'] == pzi) & (dat_sbj['condition'] == 1)]   
+            dat_sbj_pzi_basic = dat_sbj[(dat_sbj['puzzleID'] == pzi) & (dat_sbj['condition'] == 0)].copy()   
+            dat_sbj_pzi_undo = dat_sbj[(dat_sbj['puzzleID'] == pzi) & (dat_sbj['condition'] == 1)].copy()   
 
             dat_sbj_pzi_basic.loc[:, 'first_move'] = (dat_sbj_pzi_basic.index == dat_sbj_pzi_basic.index[1])
             dat_sbj_pzi_undo.loc[:, 'first_move'] = (dat_sbj_pzi_undo.index == dat_sbj_pzi_undo.index[1])
@@ -20,8 +20,9 @@ def df_add_first_move(data_choice_level):
 
     return new_data_choice_level
 
-def df_choice_add_features(data_choice_level):
-    data_choice_level = df_add_first_move(data_choice_level)
+def df_choice_add_features(data_choice_level, add_first_move=0):
+    if add_first_move:
+        data_choice_level = df_add_first_move(data_choice_level)
     data_choice_level["checkEnd"] = pd.to_numeric(data_choice_level["checkEnd"]) # Convert checkEnd to integer
     data_choice_level['currNumCities'] = data_choice_level.currNumCities - 1 # starting from 0
     data_choice_level['allMAS'] = data_choice_level.allMAS - 1

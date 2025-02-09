@@ -3,7 +3,7 @@ import numpy as np
 from glob import glob
 
 # directories
-home_dir = '/Users/dbao/My_Drive'+'/road_construction/data/2022_online/'
+home_dir = '/Users/dbao/Library/CloudStorage/GoogleDrive-sherrydbao@gmail.com/.shortcut-targets-by-id/1sYZNVBbYCrHcHjo-9xdKcA4wLnob9ZEq/'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
 # home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'

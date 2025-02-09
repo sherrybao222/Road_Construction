@@ -5,7 +5,7 @@ from anytree import Node, RenderTree, AsciiStyle, PreOrderIter
 import pandas as pd
 
 
-home_dir = '/Users/dbao/My_Drive'+'/road_construction/data/2022_online/'
+home_dir = '/Users/dbao/Library/CloudStorage/GoogleDrive-sherrydbao@gmail.com/.shortcut-targets-by-id/1sYZNVBbYCrHcHjo-9xdKcA4wLnob9ZEq/'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
 out_dir = home_dir + 'figures/figures_all/'

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from final_analysis.tools.calculate_rolling_mean import calculate_rolling_mean
+from tools.calculate_rolling_mean import calculate_rolling_mean
 
 def df_map_add_features(data_puzzle_level, data_choice_level):
     data_puzzle_level = data_puzzle_level.sort_values(["subjects","trialID"])
