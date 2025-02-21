@@ -35,7 +35,7 @@ error_data["RT1_log"] = log(error_data["RT1"]+1)
 
 ```
 
-# UNDO-action gap
+# *Undo-task difficulty
 ```{r}
 state_df_1undo$subjects <- as.factor(state_df_1undo[,"subjects"])
 state_df_1undo$puzzleID <- as.factor(state_df_1undo[,"puzzleID"])
@@ -53,9 +53,18 @@ summary(model_undo2)
 ```
 
 ```{r}
-slopes(model_undo, variables = "action_gap", by = "error", type = "link")
+result1 = slopes(model_undo, variables = "action_gap", by = "error", type = "link")
 
-slopes(model_undo2, variables = "RT1_log", by = "error", type = "link")
+result2 = slopes(model_undo2, variables = "RT1_log", by = "error", type = "link")
+```
+
+```{r}
+# load(file.path(save_folder, 'model_undo_rt1.RData'))
+# simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F) #, re.form = NULL
+# plot(simulationOutput)
+# 
+# testZeroInflation(simulationOutput)
+# testQuantiles(simulationOutput)
 ```
 
 
@@ -89,26 +98,24 @@ summary(model_error_terminal)
 simulationOutput <- simulateResiduals(fittedModel = model_error_terminal, n = 1000, plot = F)
 plot(simulationOutput)
 ```
-# Undo
-## Undo - error
-### probability
+# Undo - error
 ```{r}
-load(file.path(save_folder, 'model_undo_error_magnitude.RData'))
-simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
-plot(simulationOutput)
+# load(file.path(save_folder, 'model_undo_error_magnitude.RData'))
+# simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
+# plot(simulationOutput)
 ```
 ```{r}
-load(file.path(save_folder, 'model_sequential_undo_error_magnitude.RData'))
-simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
-plot(simulationOutput)
-```
-```{r}
-load(file.path(save_folder, 'model_single_undo_error_magnitude.RData'))
-simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
-plot(simulationOutput)
+# load(file.path(save_folder, 'model_sequential_undo_error_magnitude.RData'))
+# simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
+# plot(simulationOutput)
+# ```
+# ```{r}
+# load(file.path(save_folder, 'model_single_undo_error_magnitude.RData'))
+# simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
+# plot(simulationOutput)
 ```
 
-#### N_more
+## Terminal
 ```{r}
 model_undo = lme4::glmer(firstUndo ~  1 + cumulative_error*checkEnd  + (1 |subjects) + (1|puzzleID),
                                   data = undo_data, family = "binomial")
@@ -121,24 +128,24 @@ model_undo = lme4::glmer(firstUndo ~  1 + severityOfErrors*checkEnd  + (1 |subje
 summary(model_undo)
 ```
 
-### proportion
+## proportion
 ```{r}
-load(file.path(save_folder, 'model_prop_single_undo_error_magnitude.RData'))
-simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F, re.form = NULL) # 
-plot(simulationOutput)
-
-testUniformity(simulationOutput) 
-testQuantiles(simulationOutput)
+# load(file.path(save_folder, 'model_prop_single_undo_error_magnitude.RData'))
+# simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F, re.form = NULL) # 
+# plot(simulationOutput)
+# 
+# testUniformity(simulationOutput) 
+# testQuantiles(simulationOutput)
 ```
 
-## Undo - map MAS
+# Undo - map MAS
 ```{r}
-model_undo_mas = lme4::glmer(firstUndo ~  1 + allMAS + (1|subjects),
-data = undo_data[(undo_data$checkEnd==1)&(undo_data$allMAS>=7),], family = binomial(link="logit"))
-summary(model_undo_mas)
+# model_undo_mas = lme4::glmer(firstUndo ~  1 + allMAS + (1|subjects),
+# data = undo_data[(undo_data$checkEnd==1)&(undo_data$allMAS>=7),], family = binomial(link="logit"))
+# summary(model_undo_mas)
 ```
 
-## Undo - state and move features
+# Undo - state and move features
 ### non-terminal
 The standardized coefficients represent the change in the outcome variable for a one standard deviation change in the predictor variable, which might alter how interactions are interpreted and their significance in the model.
 ```{r}
@@ -169,6 +176,7 @@ compareGLM(model_undo_nonterminal0, model_undo_nonterminal1,model_undo_nontermin
 simulationOutput <- simulateResiduals(fittedModel = model_undo_nonterminal0, n = 1000, plot = F, re.form = NULL) # 
 plot(simulationOutput)
 ```
+
 ### terminal
 ```{r}
 data_df <- undo_data[(undo_data$N_more == 0),]
@@ -195,17 +203,6 @@ simulationOutput <- simulateResiduals(fittedModel = model_undo_terminal3, n = 10
 plot(simulationOutput)
 ```
 
-
-## Undo - First-move RT (Uncertainty)
-```{r}
-load(file.path(save_folder, 'model_undo_rt1.RData'))
-simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F) #, re.form = NULL
-plot(simulationOutput)
-
-testZeroInflation(simulationOutput)
-testQuantiles(simulationOutput)
-```
-
 # RT
 ## all states
 ```{r}
@@ -223,10 +220,10 @@ summary(model_RT)
 ```
 
 ```{r}
-model_RT <- lmerTest::lmer(RT_log ~  1 + severityOfErrors + (1 |subjects) + (1|puzzleID),
-                                  data = RT_nonterminal[RT_all$undo==1,])
-simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
-plot(simulationOutput)
+model_RT <- lmerTest::lmer(RT_log ~  1 + cumulative_error + (1 |subjects) + (1|puzzleID),
+                                  data = RT_all[RT_all$undo==1,])
+# simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
+# plot(simulationOutput)
 summary(model_RT)
 ```
 

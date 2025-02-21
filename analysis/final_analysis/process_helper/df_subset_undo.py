@@ -8,7 +8,7 @@ def df_subset_undo(df):
     # Use query method for cleaner condition checking
     condition = f"(submit != 1) & (currNumCities != 0) & (undo != 1)" 
     index = df.query(condition).index
-    undo_data = df.loc[index + 1, ["subjects","puzzleID", "firstUndo",'lastUndo', "undo", "allMAS", "currMas","RT"]] 
+    undo_data = df.loc[index + 1, ["subjects","puzzleID", "firstUndo",'lastUndo', "undo", "allMAS", "currMas","RT", "undoRT"]] 
     # Direct assignment from the same dataframe using .loc to avoid chaining
     columns_to_copy = ["currNumCities", "N_more", "severityOfErrors", "move_missed_reward", 
                        "error", "cumulative_error", "state_missed_reward", "checkEnd", "leftover", "budget_change", "within_reach_change", "efficiency", "within_reach"]

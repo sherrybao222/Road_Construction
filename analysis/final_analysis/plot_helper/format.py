@@ -4,6 +4,6 @@ plt.rcParams['axes.spines.right'] = False
 plt.rcParams['axes.spines.top'] = False
 # set the font
 plt.rcParams['font.family'] = 'Arial'
-plt.rcParams.update({'font.size': 12})
+plt.rcParams.update({'font.size': 25})
 # remove legend edge
 plt.rcParams['legend.frameon'] = False
