@@ -20,3 +20,22 @@ model = lmerTest::lmer(firstmoveRT_log ~ condition_UA + (1|subject) + (1|puzzle)
 summary(model)
 ```
 
+```{r}
+data <- read.csv(file.path(data_folder, "do_redo_comparison.csv"))
+head(data)
+```
+
+```{r}
+data$subject <- as.factor(data$subject)
+data$puzzleID <- as.factor(data$puzzleID)
+data$do_redo <- as.factor(data$do_redo)
+
+model = lme4::glmer(error_seq ~  do_redo + (1 |subject) + (1 |puzzleID), data = data, family = "poisson")
+
+summary(model)
+
+model = lme4::glmer(error_move ~  do_redo + (1 |subject) + (1 |puzzleID), data = data, family = "poisson")
+
+summary(model)
+```
+
