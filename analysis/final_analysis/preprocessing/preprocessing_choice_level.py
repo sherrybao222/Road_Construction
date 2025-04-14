@@ -125,9 +125,10 @@ for i in range(len(data_all)):
         else:
             severityOfErrors.append(severe_error_trial[ti])
             move_missed_reward.append(missed_reward_trial2[i])
-            error.append(errors_trial[ti])
             if temp_undo[ti] == 1 and ti > 0 and temp_currMas[ti-1] < temp_currMas[ti]:
-                error[ti] = -1
+                error.append(-1)
+            else:
+                error.append(errors_trial[ti])
             # get number of errors until the current move
             error_count.append(np.sum(error[:ti+1]))
             budget_change.append(budget_change_trial[ti])

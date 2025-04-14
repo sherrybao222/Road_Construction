@@ -35,21 +35,33 @@ error_data["RT1_log"] = log(error_data["RT1"]+1)
 
 ```
 
-# *Undo-task difficulty
+# *Undo-prospective factors
 ```{r}
 state_df_1undo$subjects <- as.factor(state_df_1undo[,"subjects"])
 state_df_1undo$puzzleID <- as.factor(state_df_1undo[,"puzzleID"])
 state_df_1undo$error <- as.factor(state_df_1undo[,"error"])
 
-model_undo = lme4::glmer(firstUndo ~  1 + action_gap*error + (1 |subjects)+(1|puzzleID),
+model_undo = lme4::glmer(firstUndo ~  1 + action_gap*cumulative_error + (1 |subjects)+(1|puzzleID),
                                   data = state_df_1undo, family = binomial(link="logit"))
 
 summary(model_undo)
 
-model_undo2 = lme4::glmer(firstUndo ~  1 + RT1_log*error + (1 |subjects)+(1|puzzleID),
+model_undo2 = lme4::glmer(firstUndo ~  1 + RT1_log*cumulative_error + (1 |subjects)+(1|puzzleID),
                                   data = state_df_1undo, family = binomial(link="logit"))
 
 summary(model_undo2)
+
+error_rt1 = lmerTest::lmer(cumulative_error ~  1 + RT1_log + (1 |subjects)+(1|puzzleID),
+                                  data = state_df_1undo)
+summary(error_rt1)
+
+error_gap = lmerTest::lmer(cumulative_error ~  1 + action_gap + (1 |subjects)+(1|puzzleID),
+                                  data = state_df_1undo)
+summary(error_gap)
+
+rt1_gap = lmerTest::lmer(RT1_log ~  1 + action_gap + (1 |subjects)+(1|puzzleID),
+                                  data = state_df_1undo)
+summary(rt1_gap)
 ```
 
 ```{r}
