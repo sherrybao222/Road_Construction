@@ -133,6 +133,9 @@ model_undo = lme4::glmer(firstUndo ~  1 + cumulative_error*checkEnd  + (1 |subje
                                   data = undo_data, family = "binomial")
 summary(model_undo)
 ```
+```{r}
+result1 = slopes(model_undo, variables = "cumulative_error", by = "checkEnd", type = "link")
+```
 
 ```{r}
 model_undo = lme4::glmer(firstUndo ~  1 + severityOfErrors*checkEnd  + (1 |subjects) + (1|puzzleID),
@@ -232,11 +235,14 @@ summary(model_RT)
 ```
 
 ```{r}
-model_RT <- lmerTest::lmer(RT_log ~  1 + cumulative_error + (1 |subjects) + (1|puzzleID),
+model_RT <- lmerTest::lmer(RT_log ~  1 + cumulative_error*checkEnd + (1 |subjects) + (1|puzzleID),
                                   data = RT_all[RT_all$undo==1,])
 # simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
 # plot(simulationOutput)
 summary(model_RT)
+```
+```{r}
+result1 = slopes(model_RT, variables = "cumulative_error", by = "checkEnd")
 ```
 
 ## non-terminal
