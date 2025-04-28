@@ -122,6 +122,7 @@ for i in range(len(data_all)):
             error_count.append(0)
             budget_change.append(0)
             within_reach_change.append(0)
+            temp_index = ti
         else:
             severityOfErrors.append(severe_error_trial[ti])
             move_missed_reward.append(missed_reward_trial2[i])
@@ -130,7 +131,7 @@ for i in range(len(data_all)):
             else:
                 error.append(errors_trial[ti])
             # get number of errors until the current move
-            error_count.append(np.sum(error[:ti+1]))
+            error_count.append(np.sum(error[temp_index:ti+1]))
             budget_change.append(budget_change_trial[ti])
             within_reach_change.append(within_reach_change_trial[ti])
         
