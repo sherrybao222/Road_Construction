@@ -15,7 +15,7 @@ def df_subset_1state(df, data_puzzle_level, single_condition_data, condition, fi
     state_undo_1undo = state_undo_1undo.rename(columns = {"RT1":"RT1_basic"})
     state_undo_1undo = state_undo_1undo.merge(single_condition_data[["subjects","puzzleID", "RT1", "action_gap", "avg_numCities_before"]], on=["subjects","puzzleID"], how = "left") # , "RT_branching"
     state_undo_1undo["RT"] = list(df.loc[index_end_undo+1,'RT'])
-    state_undo_1undo["RT1_log"] = np.log(state_undo_1undo["RT1"]+1)
+    state_undo_1undo["RT1_log"] = np.log(state_undo_1undo["RT1"])#+1
     state_undo_1undo["RT1_basic_log"] = np.log(state_undo_1undo["RT1_basic"]+1)
     state_undo_1undo['firstUndo'] = firstUndo
     state_undo_1undo['error'] = state_undo_1undo['cumulative_error'] > 0
