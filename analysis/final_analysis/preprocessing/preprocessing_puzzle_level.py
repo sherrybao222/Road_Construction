@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 from glob import glob
-
+import os
+import re
 # directories
 home_dir = '/Users/dbao/Library/CloudStorage/GoogleDrive-sherrydbao@gmail.com/.shortcut-targets-by-id/1sYZNVBbYCrHcHjo-9xdKcA4wLnob9ZEq/'+'/road_construction/data/2022_online/'
 map_dir = 'active_map/'
@@ -20,6 +21,11 @@ subjectID = 0
 for fname in flist:
     df = pd.read_csv(fname)
 
+    base = os.path.basename(fname)  # get filename only
+    match = re.search(r'preprocess4_sub_(.*?)_', base)
+    if match:
+        subject_id = match.group(1)
+
     # Replace 'undo' with 1 and 'basic' with 0
     df.replace({'undo': 1, 'basic': 0}, inplace=True)
 
@@ -27,6 +33,7 @@ for fname in flist:
 
     for _, group in grouped:
         single_data = {
+            "ID_original": subject_id,
             'subjects': subjectID,
             'puzzleID': group.iloc[0]['map_id'],
             'action_gap': group.iloc[0]['action_gap'],

@@ -21,7 +21,7 @@ library(marginaleffects)
 #library(cAIC4)
 # library(BayesFactor)
 
-pathToFolder <- "/Users/dbao/Library/CloudStorage/GoogleDrive-sherrydbao@gmail.com/.shortcut-targets-by-id/1sYZNVBbYCrHcHjo-9xdKcA4wLnob9ZEq/road_construction/data/2022_online"
+pathToFolder <- "/Users/dbao/Library/CloudStorage/GoogleDrive-sherrydbao@gmail.com/My Drive/road_construction_data/data/2022_online/"
 save_folder <- file.path(pathToFolder, 'stat_model/final/')
 data_folder <- file.path(pathToFolder, 'R_analysis_data')
 
@@ -40,28 +40,73 @@ error_data["RT1_log"] = log(error_data["RT1"]+1)
 state_df_1undo$subjects <- as.factor(state_df_1undo[,"subjects"])
 state_df_1undo$puzzleID <- as.factor(state_df_1undo[,"puzzleID"])
 state_df_1undo$error <- as.factor(state_df_1undo[,"error"])
+state_df_1undo$action_gap_z <- scale(state_df_1undo[,"action_gap"])
+state_df_1undo$cumulative_error_z <- scale(state_df_1undo[,"cumulative_error"])
+state_df_1undo$RT1_log_z <- scale(state_df_1undo[,"RT1_log"])
+state_df_1undo$RT1_z <- scale(state_df_1undo[,"RT1"])
 
-model_undo = lme4::glmer(firstUndo ~  1 + action_gap*cumulative_error + (1 |subjects)+(1|puzzleID),
-                                  data = state_df_1undo, family = binomial(link="logit"))
+model_undo = lme4::glmer(firstUndo ~  1 + action_gap_z*cumulative_error_z + (1 |subjects)+(1|puzzleID),
+data = state_df_1undo, family = binomial(link="logit"))
 
 summary(model_undo)
 
-model_undo2 = lme4::glmer(firstUndo ~  1 + RT1_log*cumulative_error + (1 |subjects)+(1|puzzleID),
+# only cumulative_error_z in puzzleID as we don't believe the relationship between action_gap_z and firstUndo would differ that much
+model_undo_full = lme4::glmer(firstUndo ~  1 + action_gap_z*cumulative_error_z + (1+ action_gap_z|subjects)+(1+ cumulative_error_z |puzzleID),
+data = state_df_1undo, family = binomial(link="logit"),
+  control = lme4::glmerControl(
+    optimizer = "bobyqa",
+    optCtrl = list(maxfun = 2e5)
+  ))
+
+summary(model_undo_full)
+
+model_undo_noag = lme4::glmer(firstUndo ~  1 + cumulative_error_z + (1|subjects)+(1+ cumulative_error_z |puzzleID),
+data = state_df_1undo, family = binomial(link="logit"),
+  control = lme4::glmerControl(
+    optimizer = "bobyqa",
+    optCtrl = list(maxfun = 2e5)
+  ))
+summary(model_undo_noag)
+
+mc = anova(model_undo_noag, model_undo_full, test = "Chisq")
+
+# af <- lme4::allFit(model_undo_full)
+# summary(af)
+
+
+model_undo2 = lme4::glmer(firstUndo ~  1 + RT1_log_z*cumulative_error_z + (1 |subjects)+(1|puzzleID),
                                   data = state_df_1undo, family = binomial(link="logit"))
 
 summary(model_undo2)
 
-error_rt1 = lmerTest::lmer(cumulative_error ~  1 + RT1_log + (1 |subjects)+(1|puzzleID),
-                                  data = state_df_1undo)
-summary(error_rt1)
+model_undo2_full = lme4::glmer(firstUndo ~  1 + RT1_log_z * cumulative_error_z + (1+RT1_log_z|subjects)+( 1+cumulative_error_z|puzzleID),
+                                  data = state_df_1undo, family = binomial(link="logit"),
+                               control = lme4::glmerControl(
+    optimizer = "bobyqa",
+    optCtrl = list(maxfun = 2e5)
+  ))
 
-error_gap = lmerTest::lmer(cumulative_error ~  1 + action_gap + (1 |subjects)+(1|puzzleID),
-                                  data = state_df_1undo)
-summary(error_gap)
+summary(model_undo2_full)
 
-rt1_gap = lmerTest::lmer(RT1_log ~  1 + action_gap + (1 |subjects)+(1|puzzleID),
-                                  data = state_df_1undo)
-summary(rt1_gap)
+mc2 = anova(model_undo_noag, model_undo2_full, test = "Chisq")
+
+# avg_slopes(
+#   model_undo2_full,
+#   variables = "RT1_log_z",
+#   type = "link"       # average d(log-odds)/dRT
+# )
+
+# error_rt1 = lmerTest::lmer(cumulative_error ~  1 + RT1_log + (1 |subjects)+(1|puzzleID),
+#                                   data = state_df_1undo)
+# summary(error_rt1)
+# 
+# error_gap = lmerTest::lmer(cumulative_error ~  1 + action_gap + (1 |subjects)+(1|puzzleID),
+#                                   data = state_df_1undo)
+# summary(error_gap)
+# 
+# rt1_gap = lmerTest::lmer(RT1_log ~  1 + action_gap + (1 |subjects)+(1|puzzleID),
+#                                   data = state_df_1undo)
+# summary(rt1_gap)
 ```
 
 ```{r}
@@ -110,6 +155,7 @@ summary(model_error_terminal)
 simulationOutput <- simulateResiduals(fittedModel = model_error_terminal, n = 1000, plot = F)
 plot(simulationOutput)
 ```
+
 # Undo - error
 ```{r}
 # load(file.path(save_folder, 'model_undo_error_magnitude.RData'))
@@ -127,20 +173,28 @@ plot(simulationOutput)
 # plot(simulationOutput)
 ```
 
-## Terminal
+## *Terminal
 ```{r}
-model_undo = lme4::glmer(firstUndo ~  1 + cumulative_error*checkEnd  + (1 |subjects) + (1|puzzleID),
-                                  data = undo_data, family = "binomial")
-summary(model_undo)
+# model_undo = lme4::glmer(firstUndo ~  1 + cumulative_error*checkEnd  + (1 |subjects) + (1|puzzleID),
+#                                   data = undo_data, family = "binomial")
+undo_data$cumulative_error_z <- scale(undo_data[,"cumulative_error"])
+
+model_undo_full = lme4::glmer(firstUndo ~  1 + cumulative_error_z*checkEnd  + (1 + cumulative_error_z + checkEnd |subjects) + (1 + cumulative_error_z + checkEnd|puzzleID),
+                                  data = undo_data, family = "binomial",
+                              control = glmerControl(optimizer = "bobyqa",
+                                      optCtrl = list(maxfun = 1e5)))
+# summary(model_undo)
+summary(model_undo_full)
 ```
 ```{r}
-result1 = slopes(model_undo, variables = "cumulative_error", by = "checkEnd", type = "link")
+result1 = slopes(model_undo_full, variables = "cumulative_error_z", by = "checkEnd", type = "link")
+result1
 ```
 
 ```{r}
-model_undo = lme4::glmer(firstUndo ~  1 + severityOfErrors*checkEnd  + (1 |subjects) + (1|puzzleID),
-                                  data = undo_data, family = "binomial")
-summary(model_undo)
+# model_undo = lme4::glmer(firstUndo ~  1 + severityOfErrors*checkEnd  + (1 |subjects) + (1|puzzleID),
+#                                   data = undo_data, family = "binomial")
+# summary(model_undo)
 ```
 
 ## proportion
@@ -219,30 +273,34 @@ plot(simulationOutput)
 ```
 
 # RT
-## all states
+## *all states
 ```{r}
 RT_all <- read.csv(file.path(data_folder, "statsdata_rt.csv"))
 RT_all <- RT_all %>% 
   filter(abs(scale(RT))[] <= 3)
+RT_all$cumulative_error_z <- scale(RT_all[,"cumulative_error"])
 ```
 
 ```{r}
-model_RT <- lmerTest::lmer(RT_log ~  1 + cumulative_error*undo + (1 |subjects) + (1|puzzleID),
-                                  data = RT_all)
+# model_RT <- lmerTest::lmer(RT_log ~  1 + cumulative_error*undo + (1 |subjects) + (1|puzzleID),
+#                                   data = RT_all)
+# # simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
+# # plot(simulationOutput)
+# summary(model_RT)
+```
+
+```{r}
+# eq:stats_undoRT_error
+model_RT <- lmerTest::lmer(RT_log ~  1 + cumulative_error_z * checkEnd  + (1 + cumulative_error_z  | subjects) + (1 |puzzleID),
+                                  data = RT_all[(RT_all$undo==1),],         control = lmerControl(optimizer = "bobyqa",
+                                      optCtrl = list(maxfun = 1e5)))
+
 # simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
 # plot(simulationOutput)
 summary(model_RT)
 ```
-
 ```{r}
-model_RT <- lmerTest::lmer(RT_log ~  1 + cumulative_error*checkEnd + (1 |subjects) + (1|puzzleID),
-                                  data = RT_all[RT_all$undo==1,])
-# simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
-# plot(simulationOutput)
-summary(model_RT)
-```
-```{r}
-result1 = slopes(model_RT, variables = "cumulative_error", by = "checkEnd")
+result1 = slopes(model_RT, variables = "cumulative_error_z", by = "checkEnd")
 ```
 
 ## non-terminal
@@ -297,6 +355,7 @@ simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F
 plot(simulationOutput)
 summary(model_RT)
 ```
+
 # Undo Completion
 ## what predicts the undo terminal
 ```{r}
@@ -308,6 +367,23 @@ testZeroInflation(simulationOutput)
 testQuantiles(simulationOutput)
 ```
 
+# *moveRT
+```{r}
+test_df <- read.csv(file.path(data_folder, "moveRT_df.csv"))
 
+test_df$first_move = as.factor(test_df$first_move)
+test_df$first_move = relevel(test_df$first_move, ref="False") 
+test_df$condition = as.factor(test_df$condition)
+test_df$subjects = as.factor(test_df$subjects)
+test_df$puzzleID = as.factor(test_df$puzzleID)
+```
+
+```{r}
+model_rt_full = lmerTest::lmer(log_RT ~  1 + first_move+condition  + (1+first_move|subjects) + (1+first_move|puzzleID),  
+                data = test_df,
+                control = lmerControl(optimizer = "bobyqa",
+                                      optCtrl = list(maxfun = 1e5)))
+print(summary(model_rt_full))  
+```
 
 
