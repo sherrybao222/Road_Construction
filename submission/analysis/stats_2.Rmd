@@ -5,7 +5,6 @@ date: "2023-06-19"
 output: html_document
 ---
 # setup
-## load
 ```{r}
 rm(list=ls())
 
@@ -35,7 +34,7 @@ error_data["RT1_log"] = log(error_data["RT1"]+1)
 
 ```
 
-# *Undo-prospective factors
+# Undo - prospective
 ```{r}
 state_df_1undo$subjects <- as.factor(state_df_1undo[,"subjects"])
 state_df_1undo$puzzleID <- as.factor(state_df_1undo[,"puzzleID"])
@@ -125,55 +124,7 @@ result2 = slopes(model_undo2, variables = "RT1_log", by = "error", type = "link"
 ```
 
 
-# Error
-
-## move error
-```{r}
-model_error = glm(severityOfErrors ~  1  + RT1_log + budget_change + within_reach_change,
-                                  data = error_data[error_data$checkEnd==0,], family = "poisson")
-summary(model_error)
-
-simulationOutput <- simulateResiduals(fittedModel = model_error, n = 1000, plot = F)
-plot(simulationOutput)
-```
-
-## cumulative error - map MAS
-```{r}
-model_error_allMAS = lme4::glmer(cumulative_error ~  1 + allMAS + (1|subjects),
-                                  data = error_data[(error_data$checkEnd==1)&(error_data$allMAS>=7),], family = poisson)
-summary(model_error_allMAS)
-simulationOutput <- simulateResiduals(fittedModel = model_error_allMAS, n = 1000, plot = F)
-plot(simulationOutput)
-```
-
-
-## cumulative error - state and move features
-```{r}
-model_error_terminal = glm(cumulative_error ~  1 + RT1_log + currNumCities*N_more + leftover*N_more + budget_change + within_reach_change,
-                                  data = error_data, family = poisson)
-summary(model_error_terminal)
-simulationOutput <- simulateResiduals(fittedModel = model_error_terminal, n = 1000, plot = F)
-plot(simulationOutput)
-```
-
-# Undo - error
-```{r}
-# load(file.path(save_folder, 'model_undo_error_magnitude.RData'))
-# simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
-# plot(simulationOutput)
-```
-```{r}
-# load(file.path(save_folder, 'model_sequential_undo_error_magnitude.RData'))
-# simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
-# plot(simulationOutput)
-# ```
-# ```{r}
-# load(file.path(save_folder, 'model_single_undo_error_magnitude.RData'))
-# simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F)
-# plot(simulationOutput)
-```
-
-## *Terminal
+# Undo - cumulative error * terminal
 ```{r}
 # model_undo = lme4::glmer(firstUndo ~  1 + cumulative_error*checkEnd  + (1 |subjects) + (1|puzzleID),
 #                                   data = undo_data, family = "binomial")
@@ -191,28 +142,6 @@ result1 = slopes(model_undo_full, variables = "cumulative_error_z", by = "checkE
 result1
 ```
 
-```{r}
-# model_undo = lme4::glmer(firstUndo ~  1 + severityOfErrors*checkEnd  + (1 |subjects) + (1|puzzleID),
-#                                   data = undo_data, family = "binomial")
-# summary(model_undo)
-```
-
-## proportion
-```{r}
-# load(file.path(save_folder, 'model_prop_single_undo_error_magnitude.RData'))
-# simulationOutput <- simulateResiduals(fittedModel = model_undo, n = 1000, plot = F, re.form = NULL) # 
-# plot(simulationOutput)
-# 
-# testUniformity(simulationOutput) 
-# testQuantiles(simulationOutput)
-```
-
-# Undo - map MAS
-```{r}
-# model_undo_mas = lme4::glmer(firstUndo ~  1 + allMAS + (1|subjects),
-# data = undo_data[(undo_data$checkEnd==1)&(undo_data$allMAS>=7),], family = binomial(link="logit"))
-# summary(model_undo_mas)
-```
 
 # Undo - state and move features
 ### non-terminal
@@ -272,21 +201,12 @@ simulationOutput <- simulateResiduals(fittedModel = model_undo_terminal3, n = 10
 plot(simulationOutput)
 ```
 
-# RT
-## *all states
+# RT - cumulative error * terminal
 ```{r}
 RT_all <- read.csv(file.path(data_folder, "statsdata_rt.csv"))
 RT_all <- RT_all %>% 
   filter(abs(scale(RT))[] <= 3)
 RT_all$cumulative_error_z <- scale(RT_all[,"cumulative_error"])
-```
-
-```{r}
-# model_RT <- lmerTest::lmer(RT_log ~  1 + cumulative_error*undo + (1 |subjects) + (1|puzzleID),
-#                                   data = RT_all)
-# # simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
-# # plot(simulationOutput)
-# summary(model_RT)
 ```
 
 ```{r}
@@ -303,71 +223,7 @@ summary(model_RT)
 result1 = slopes(model_RT, variables = "cumulative_error_z", by = "checkEnd")
 ```
 
-## non-terminal
-```{r}
-model_RT <- lmerTest::lmer(RT_log ~  1 + currNumCities+ severityOfErrors + undo + (1 |subjects) + (1|puzzleID),
-                                  data = RT_all[RT_all$N_more!=0,])
-simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
-plot(simulationOutput)
-summary(model_RT)
-```
-
-## terminal
-```{r}
-RT_terminal <- read.csv(file.path(data_folder, "statsdata_rt_terminal.csv"))
-RT_terminal <- RT_terminal %>% 
-  filter(abs(scale(RT))[] <= 3)
-```
-
-```{r}
-model_RT <- lmerTest::lmer(
-  RT_log ~  1 + cumulative_error + firstUndo + (1|subjects) + (1|puzzleID),
-                        data = RT_terminal)
-# simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
-# plot(simulationOutput)
-summary(model_RT)
-```
-
-```{r}
-model_RT <- lmerTest::lmer(
-  RT_log ~  1 + scale(currNumCities)  + (1|subjects) ,
-  data = RT_terminal[(RT_terminal$cumulative_error==0)&(RT_terminal$firstUndo =="undo"),])
-# simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
-# plot(simulationOutput)
-summary(model_RT)
-```
-
-## RPE
-```{r}
-model_RT <- lmerTest::lmer(
-  RT_log ~  1 + RPE + (1|subjects) + (1|puzzleID),
-  data = RT_terminal[(RT_terminal$cumulative_error==0),])
-# simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
-# plot(simulationOutput)
-summary(model_RT)
-```
-
-```{r}
-model_RT <- lmerTest::lmer(
-  RT_log ~  1 + allMAS + (1|subjects) + (1|puzzleID),
-  data = RT_terminal[RT_terminal$firstUndo=="undo",])
-simulationOutput <- simulateResiduals(fittedModel = model_RT, n = 1000, plot = F) #, re.form = NULL
-plot(simulationOutput)
-summary(model_RT)
-```
-
-# Undo Completion
-## what predicts the undo terminal
-```{r}
-load(file.path(save_folder, 'model_undo_right_error_and_cumulative.RData'))
-simulationOutput <- simulateResiduals(fittedModel = model_undo_right, n = 2000, plot = F) #, re.form = NULL
-plot(simulationOutput)
-
-testZeroInflation(simulationOutput)
-testQuantiles(simulationOutput)
-```
-
-# *moveRT
+# moveRT
 ```{r}
 test_df <- read.csv(file.path(data_folder, "moveRT_df.csv"))
 
