@@ -151,7 +151,7 @@ def greedy(mmap):
 
 # main function to run
 # =============================================================================   
-n_map = 500 # number of maps needed
+n_map = 1 # number of maps needed
 map_list = []
 breath_first_tree = []
 optimal_list = []
@@ -173,7 +173,10 @@ while True:
 
     # get optimal solution
     root_ = Node(0, budget = mmap.total)
+    # calculate total number of nodes in the tree
     optimal(mmap,root_) 
+    total_nodes = len(root_.leaves)
+    print(total_nodes)
     # get greedy solution
     n_greedy, greedy_index = greedy(mmap)
     # calculate difference
@@ -218,28 +221,12 @@ while True:
     if len(map_list) == n_map:
         break
 
-with open(save_path+'basic_map_2500','w') as file: 
-    json.dump(map_list,file)
-with open(save_path+'basic_tree_2500','w') as file: 
-    json.dump(breath_first_tree,file)
-with open(save_path+'basic_summary_2500','w') as file: 
-    json.dump((diff_list,optimal_list,greedy_list,optimal_number,greedy_number),file) 
-
-# saving yaml
-#import yaml
-#with open('basic_map', 'w') as file:
-#    yaml.dump(map_list, file)
-#with open('basic_tree','w') as file: 
-#    yaml.dump(breath_first_tree,file)
-#with open('basic_summary','w') as file: 
-#    yaml.dump((diff_list,optimal_list,greedy_list,optimal_number,greedy_number),file) 
-   
-# saving mat file
-#sio.savemat('basic_map_test.mat', {'map_list':map_list})
-#sio.savemat('basic_tree_test.mat', {'breath_first_tree':breath_first_tree})
-#sio.savemat('basic_summary_test.mat', {'diff_list':diff_list,
-#                                    'optimal_list':optimal_list,'greedy_list':greedy_list,
-#                                    'optimal_number':optimal_number,'greedy_number':greedy_number})
+# with open(save_path+'basic_map_2500','w') as file: 
+#     json.dump(map_list,file)
+# with open(save_path+'basic_tree_2500','w') as file: 
+#     json.dump(breath_first_tree,file)
+# with open(save_path+'basic_summary_2500','w') as file: 
+#     json.dump((diff_list,optimal_list,greedy_list,optimal_number,greedy_number),file) 
 
 ## draw 
 #plt.plot(operator.itemgetter(*optimal_index)(map_list[0].x), 
@@ -258,7 +245,3 @@ with open(save_path+'basic_summary_2500','w') as file:
 #plt.show()
 ##print(diff)
     
-#with open('basic_map.yaml') as file:
-#    # The FullLoader parameter handles the conversion from YAML
-#    # scalar values to Python the dictionary format
-#    fruits_list = yaml.load(file,Loader=yaml.Loader)

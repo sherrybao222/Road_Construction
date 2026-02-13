@@ -73,7 +73,7 @@ mc = anova(model_undo_noag, model_undo_full, test = "Chisq")
 # summary(af)
 
 
-model_undo2 = lme4::glmer(firstUndo ~  1 + RT1_log_z*cumulative_error_z + (1 |subjects)+(1|puzzleID),
+model_undo2 = lme4::glmer(firstUndo ~  1 + RT1_log_z * cumulative_error_z + (1 |subjects)+(1|puzzleID),
                                   data = state_df_1undo, family = binomial(link="logit"))
 
 summary(model_undo2)

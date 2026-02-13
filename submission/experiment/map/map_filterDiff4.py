@@ -72,4 +72,4 @@ while len(basic_map) < 48 and ind < 2000:
 with open('basic_map_48_all4','w') as file: 
     json.dump((basic_map,optimal,optimal_n),file)            
 # saving mat
-sio.savemat('basic_map_48_all4.mat', {'map_list':basic_map,'optimal':optimal,'optimal_n':optimal_n})
+# sio.savemat('basic_map_48_all4.mat', {'map_list':basic_map,'optimal':optimal,'optimal_n':optimal_n})
