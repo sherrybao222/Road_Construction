@@ -4,7 +4,7 @@ from glob import glob
 import os
 import re
 # directories
-home_dir = '/Users/dbao/Library/CloudStorage/GoogleDrive-sherrydbao@gmail.com/.shortcut-targets-by-id/1sYZNVBbYCrHcHjo-9xdKcA4wLnob9ZEq/'+'/road_construction/data/2022_online/'
+home_dir = '/Users/dbao/Library/CloudStorage/GoogleDrive-sherrydbao@gmail.com/My Drive/road_construction_data/data/2022_online/'
 map_dir = 'active_map/'
 data_dir  = 'data/preprocessed'
 # home_dir = 'G:\My Drive\\researches\\nyu\\road-construction-local-dk\data_online_2022/'
@@ -61,6 +61,7 @@ for fname in flist:
         single_data['final_sumSeverityErrors'] = mas_all_trial[0] - mas_all_trial[-1]
         single_data['final_missed_reward'] = 2*pow(mas_all_trial[0]-1, 2) - 2*pow(mas_all_trial[-1]-1, 2)
         single_data['final_error_rate'] = single_data['final_sumSeverityErrors'] / single_data['numCities']
+        single_data['final_reward_RT_ratio'] = single_data['reward'] / single_data['TT']
         single_data['SeverityError1'] = np.abs(errors_trial[0]) # severity of the first-move error
 
         if group.iloc[0]['condition'] == 1:
@@ -77,5 +78,5 @@ for fname in flist:
     subjectID += 1
 
 df_final = pd.DataFrame(all_data)
-df_final.to_csv(R_out_dir + 'data.csv', index=False)
+df_final.to_csv(R_out_dir + 'data_new.csv', index=False)
 

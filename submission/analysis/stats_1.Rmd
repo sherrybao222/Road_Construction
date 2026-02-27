@@ -50,3 +50,16 @@ summary(model)
 summary(model_full)
 ```
 
+# optimal submissions
+```{r}
+data_puzzle <- read.csv(file.path(data_folder, "data_new.csv"))
+
+data_puzzle$subject <- as.factor(data_puzzle$subject)
+data_puzzle$puzzle <- as.factor(data_puzzle$puzzle)
+data_puzzle$zero_missed_reward <- as.integer(data_puzzle$final_missed_reward == 0)
+
+model = lme4::glmer(zero_missed_reward ~ condition + (1+condition|subject) + (1+condition|puzzle), 
+                    data = data_puzzle, family = binomial(link = "logit"))
+summary(model)
+```
+
