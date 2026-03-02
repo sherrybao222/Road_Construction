@@ -61,5 +61,9 @@ data_puzzle$zero_missed_reward <- as.integer(data_puzzle$final_missed_reward == 
 model = lme4::glmer(zero_missed_reward ~ condition + (1+condition|subject) + (1+condition|puzzle), 
                     data = data_puzzle, family = binomial(link = "logit"))
 summary(model)
+
+model_klein = lme4::glmer(zero_missed_reward ~ condition + (1|subject) + (1|puzzle), 
+                    data = data_puzzle, family = binomial(link = "logit"))
+summary(model_klein)
 ```
 
